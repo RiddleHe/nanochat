@@ -25,7 +25,8 @@ import wandb
 import torch
 import torch.distributed as dist
 
-from nanochat.gpt import GPT, GPTConfig, Linear
+from nanochat.gpt import Linear
+from nanochat.model_registry import get_model
 from nanochat.dataloader import tokenizing_distributed_data_loader_bos_bestfit, tokenizing_distributed_data_loader_with_state_bos_bestfit
 from nanochat.common import compute_init, compute_cleanup, print0, DummyWandb, print_banner, get_base_dir, autodetect_device_type, get_peak_flops, COMPUTE_DTYPE, COMPUTE_DTYPE_REASON, is_ddp_initialized
 from nanochat.tokenizer import get_tokenizer, get_token_bytes
@@ -52,6 +53,7 @@ parser.add_argument("--aspect-ratio", type=int, default=64, help="model_dim = de
 parser.add_argument("--head-dim", type=int, default=128, help="target head dimension for attention")
 parser.add_argument("--max-seq-len", type=int, default=2048, help="max context length")
 parser.add_argument("--window-pattern", type=str, default="SSSL", help="sliding window pattern tiled across layers: L=full, S=half context (e.g. 'SSL')")
+parser.add_argument("--model-type", type=str, default="gpt", help="model architecture variant (e.g. 'gpt', 'linear_attn', 'sparse_attn')")
 # Training horizon (only one used, in order of precedence)
 parser.add_argument("--num-iterations", type=int, default=-1, help="explicit number of optimization steps (-1 = disable)")
 parser.add_argument("--target-flops", type=float, default=-1.0, help="calculate num_iterations to reach target_flops (-1 = disable)")
@@ -126,6 +128,8 @@ print0(f"Vocab size: {vocab_size:,}")
 # -----------------------------------------------------------------------------
 # Initialize the Model
 
+ConfigClass, ModelClass = get_model(args.model_type)
+
 def build_model_meta(depth):
     """Build a model on meta device for a given depth (shapes/dtypes only, no data)."""
     # Model dim is nudged up to nearest multiple of head_dim for clean division
@@ -133,13 +137,13 @@ def build_model_meta(depth):
     base_dim = depth * args.aspect_ratio
     model_dim = ((base_dim + args.head_dim - 1) // args.head_dim) * args.head_dim
     num_heads = model_dim // args.head_dim
-    config = GPTConfig(
+    config = ConfigClass(
         sequence_len=args.max_seq_len, vocab_size=vocab_size,
         n_layer=depth, n_head=num_heads, n_kv_head=num_heads, n_embd=model_dim,
         window_pattern=args.window_pattern,
     )
     with torch.device("meta"):
-        model_meta = GPT(config)
+        model_meta = ModelClass(config)
     return model_meta
 
 # Build the model, move to device, init the weights
@@ -482,6 +486,7 @@ while True:
             { # metadata saved as json
                 "step": step,
                 "val_bpb": val_bpb, # loss at last step
+                "model_type": args.model_type,
                 "model_config": model_config_kwargs,
                 "user_config": user_config, # inputs to the training script
                 "device_batch_size": args.device_batch_size,
