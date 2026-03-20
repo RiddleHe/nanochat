@@ -10,4 +10,8 @@ eval_bundle/
 
 # Local setup
 CLAUDE.md
+papers/
 wandb/
+knowledge/
+
+.DS_Store

@@ -29,10 +29,7 @@ def get_model(name="gpt"):
 
 def _register_variants():
     """Lazy import of variant model files so we don't load them unless needed."""
-    # Add new variants here as they are created, e.g.:
-    # from nanochat.gpt_linear_attn import GPTLinearAttnConfig, GPTLinearAttn
-    # register("linear_attn", GPTLinearAttnConfig, GPTLinearAttn)
-    #
-    # from nanochat.gpt_sparse_attn import GPTSparseAttnConfig, GPTSparseAttn
-    # register("sparse_attn", GPTSparseAttnConfig, GPTSparseAttn)
-    pass
+    from nanochat.gpt_attn_res import GPTAttnResConfig, GPTAttnRes
+    register("attn_res", GPTAttnResConfig, GPTAttnRes)
+    from nanochat.gpt_gated_attn_res import GPTGatedAttnResConfig, GPTGatedAttnRes
+    register("gated_attn_res", GPTGatedAttnResConfig, GPTGatedAttnRes)
