@@ -9,22 +9,30 @@
 # plotting FLOP-controlled validation loss curves.
 #
 # Usage:
-#   bash runs/arch_comparison.sh
+#   bash runs/attn_res_arch_compare.sh
 #   # or with wandb logging:
-#   WANDB_RUN=arch_cmp bash runs/arch_comparison.sh
+#   WANDB_RUN=arch_cmp bash runs/attn_res_arch_compare.sh
 
 set -e
 
 FLOPS=1e18
 DEPTH=12
 EVAL_EVERY=50          # eval val bpb every N steps (dense curve)
-SAVE_EVERY=200         # save intermediate checkpoints
 NPROC_PER_NODE="${NPROC_PER_NODE:-8}"
 WANDB_RUN="${WANDB_RUN:-dummy}"
 
 export OMP_NUM_THREADS=1
 export NANOCHAT_BASE_DIR="${NANOCHAT_BASE_DIR:-$HOME/.cache/nanochat}"
+mkdir -p "$NANOCHAT_BASE_DIR"
+
+# Python venv setup with uv
+command -v uv &> /dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
+[ -d ".venv" ] || uv venv
+uv sync --extra gpu
 source .venv/bin/activate
+
+# Download dataset if not already present
+python -m nanochat.dataset -n 170
 
 RESULTS_DIR="$NANOCHAT_BASE_DIR/arch_comparison"
 mkdir -p "$RESULTS_DIR"
@@ -53,7 +61,6 @@ for model_type in "${MODEL_TYPES[@]}"; do
         --target-flops=$FLOPS \
         --target-param-data-ratio=-1 \
         --eval-every=$EVAL_EVERY \
-        --save-every=$SAVE_EVERY \
         --core-metric-every=999999 \
         --core-metric-max-per-task=-1 \
         --sample-every=-1 \
