@@ -83,7 +83,7 @@ class GPTGatedAttnRes(nn.Module):
         self.attn_res_queries = nn.Parameter(torch.zeros(n_queries_padded, config.n_embd))
 
         # Gated AttnRes: one bottleneck sigmoid gate per AttnRes call
-        self.attn_res_gates = nn.ModuleList([AttnResGate(config.n_embd) for _ in range(n_queries)])
+        self.attn_res_gates = nn.ModuleList([AttnResGate(config.n_embd) for _ in range(self.n_queries)])
 
         # Smear
         self.smear_gate = Linear(24, 1, bias=False)
