@@ -15,11 +15,6 @@ def _register_variants():
     register("yourmodel", YourModelConfig, YourModel)
 ```
 
-3. Train it:
-```bash
-torchrun --nproc_per_node=4 -m scripts.base_train -- --depth=12 --model-type=yourmodel
-```
-
 The `model_type` is saved in checkpoint metadata, so evaluation auto-detects the right model class.
 
 ## Training
@@ -44,7 +39,7 @@ torchrun --standalone --nproc_per_node=4 -m scripts.base_eval -- --model-tag=my_
 
 ## Architecture experiments
 
-We compare transformer variants that differ in how information flows across depth. All experiments use FLOP-controlled training at depth 12.
+We compare transformer variants that differ in how information flows across depth, using FLOP-controlled training.
 
 | Model | `--model-type` | Residual mechanism |
 |---|---|---|
@@ -52,11 +47,6 @@ We compare transformer variants that differ in how information flows across dept
 | GPT + lambdas | `gpt` | Learned per-layer residual and embedding scaling |
 | AttnRes | `attn_res` | Softmax attention over all prior sublayer outputs |
 | Gated AttnRes | `gated_attn_res` | AttnRes + sigmoid bottleneck gate |
-
-Run the full comparison:
-```bash
-NPROC_PER_NODE=4 bash runs/attn_res_arch_compare.sh
-```
 
 ## Cite
 
