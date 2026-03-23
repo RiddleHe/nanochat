@@ -75,7 +75,7 @@ for model_type in "${MODEL_TYPES[@]}"; do
         --core-metric-max-per-task=-1 \
         --sample-every=-1 \
         --model-tag="${TAG}" \
-        --run="${WANDB_RUN}_${TAG}" \
+        --run="${WANDB_RUN}" \
         2>&1 | tee "$LOG_FILE"
 
     log "Finished training: $model_type"
