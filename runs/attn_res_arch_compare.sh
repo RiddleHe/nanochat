@@ -103,6 +103,12 @@ for model_type in "${TRAINED_MODELS[@]}"; do
     TAG="arch_${model_type}"
     LOG_FILE="$RESULTS_DIR/${TAG}_eval.log"
 
+    # Skip if eval already completed (log contains CORE metric)
+    if grep -q "CORE metric:" "$LOG_FILE" 2>/dev/null; then
+        log "Skipping eval for $model_type (already completed)"
+        continue
+    fi
+
     log "=============================================="
     log "Evaluating: $model_type"
     log "=============================================="

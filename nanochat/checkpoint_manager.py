@@ -98,7 +98,8 @@ def build_model(checkpoint_dir, step, device, phase):
     _patch_missing_config_keys(model_config_kwargs)
     log0(f"Building {model_type} model with config: {model_config_kwargs}")
     model_config = ConfigClass(**model_config_kwargs)
-    _patch_missing_keys(model_data, model_config)
+    if model_type == "gpt":
+        _patch_missing_keys(model_data, model_config)
     with torch.device("meta"):
         model = ModelClass(model_config)
     # Load the model state
