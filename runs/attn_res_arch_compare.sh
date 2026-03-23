@@ -31,8 +31,15 @@ command -v uv &> /dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 uv sync --extra gpu
 source .venv/bin/activate
 
-# Download dataset if not already present
-python -m nanochat.dataset -n 170
+# Download dataset (need ≥8 shards for tokenizer training, 170 for pretraining)
+python -m nanochat.dataset -n 8
+# Train tokenizer if not already present
+if [ ! -f "$NANOCHAT_BASE_DIR/tokenizer/tokenizer.pkl" ]; then
+    python -m scripts.tok_train
+fi
+# Download remaining shards in background while training starts
+python -m nanochat.dataset -n 170 &
+DATASET_PID=$!
 
 RESULTS_DIR="$NANOCHAT_BASE_DIR/arch_comparison"
 mkdir -p "$RESULTS_DIR"
@@ -42,6 +49,9 @@ MODEL_TYPES=("gpt" "attn_res" "gated_attn_res")
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
 }
+
+# Wait for dataset download to complete before training
+wait $DATASET_PID
 
 # =============================================================================
 # Train all three models
