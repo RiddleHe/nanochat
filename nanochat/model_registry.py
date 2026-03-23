@@ -7,11 +7,17 @@ Usage:
     ConfigClass, ModelClass = get_model("linear_attn")   # variant
 """
 
+from dataclasses import dataclass
 from nanochat.gpt import GPTConfig, GPT
+
+@dataclass
+class GPTNoLambdaConfig(GPTConfig):
+    use_lambdas: bool = False
 
 # Maps model_type string -> (ConfigClass, ModelClass)
 MODELS = {
     "gpt": (GPTConfig, GPT),
+    "gpt_nolambda": (GPTNoLambdaConfig, GPT),
 }
 
 def register(name, config_cls, model_cls):

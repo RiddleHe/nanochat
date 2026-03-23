@@ -12,9 +12,9 @@ using a single learned pseudo-query vector w_l per sublayer:
 Pseudo-queries are initialized to zero so that initial weights are uniform,
 reducing AttnRes to an equal-weight average at training start.
 
-All other features (smear, backout, value embeddings, sliding window, etc.)
-are kept from the base GPT model. resid_lambdas and x0_lambdas are removed
-since AttnRes replaces the residual connection entirely.
+All other features (smear, value embeddings, sliding window, etc.)
+are kept from the base GPT model. resid_lambdas, x0_lambdas, and backout
+are removed since AttnRes replaces the residual connection entirely.
 """
 
 from functools import partial
@@ -79,8 +79,6 @@ class GPTAttnRes(nn.Module):
         self.smear_gate = Linear(24, 1, bias=False)
         self.smear_lambda = nn.Parameter(torch.zeros(1))
 
-        # Backout: subtract cached mid-layer residual before final norm
-        self.backout_lambda = nn.Parameter(0.2 * torch.ones(1))
 
         # Value embeddings (ResFormer-style): alternating layers
         head_dim = config.n_embd // config.n_head
@@ -183,7 +181,7 @@ class GPTAttnRes(nn.Module):
         value_embeds_numel = sum(ve.weight.numel() for ve in self.value_embeds.values())
         nparams_exclude = (self.transformer.wte.weight.numel() + value_embeds_numel +
                           self.attn_res_queries.numel() +
-                          self.smear_gate.weight.numel() + self.smear_lambda.numel() + self.backout_lambda.numel())
+                          self.smear_gate.weight.numel() + self.smear_lambda.numel())
         h, q, t = self.config.n_head, self.config.n_embd // self.config.n_head, self.config.sequence_len
         attn_flops = 0
         for window_size in self.window_sizes:
@@ -202,7 +200,7 @@ class GPTAttnRes(nn.Module):
         lm_head = sum(p.numel() for p in self.lm_head.parameters())
         transformer_matrices = sum(p.numel() for p in self.transformer.h.parameters())
         scalars = (self.attn_res_queries.numel() +
-                   self.smear_gate.weight.numel() + self.smear_lambda.numel() + self.backout_lambda.numel())
+                   self.smear_gate.weight.numel() + self.smear_lambda.numel())
         total = wte + value_embeds + lm_head + transformer_matrices + scalars
         assert total == sum(p.numel() for p in self.parameters()), "Parameter count mismatch"
         return {
@@ -223,7 +221,7 @@ class GPTAttnRes(nn.Module):
         embedding_params = list(self.transformer.wte.parameters())
         lm_head_params = list(self.lm_head.parameters())
         attn_res_params = [self.attn_res_queries]
-        smear_params = [self.smear_gate.weight, self.smear_lambda, self.backout_lambda]
+        smear_params = [self.smear_gate.weight, self.smear_lambda]
         assert len(list(self.parameters())) == (len(matrix_params) + len(embedding_params) +
             len(lm_head_params) + len(value_embeds_params) + len(attn_res_params) + len(smear_params))
 
@@ -282,8 +280,6 @@ class GPTAttnRes(nn.Module):
         # --- Full Attention Residuals ---
         # v_list collects all sublayer outputs: [embedding, attn_0, mlp_0, attn_1, mlp_1, ...]
         v_list = [x]  # v_0 = token embedding
-        backout_layer = n_layer // 2
-        h_backout = None
         qi = 0  # query index into attn_res_queries
 
         for i, block in enumerate(self.transformer.h):
@@ -302,15 +298,8 @@ class GPTAttnRes(nn.Module):
             mlp_out = block.mlp(norm(h))
             v_list.append(mlp_out)
 
-            if i == backout_layer:
-                h_backout = h
-
         # Final AttnRes aggregation over all sublayer outputs
         x = self._attn_res(self.attn_res_queries[qi], v_list)
-
-        # Backout: subtract mid-layer representation
-        if h_backout is not None:
-            x = x - self.backout_lambda.to(x.dtype) * h_backout
         x = norm(x)
 
         # Logits

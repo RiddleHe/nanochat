@@ -89,8 +89,6 @@ class GPTGatedAttnRes(nn.Module):
         self.smear_gate = Linear(24, 1, bias=False)
         self.smear_lambda = nn.Parameter(torch.zeros(1))
 
-        # Backout
-        self.backout_lambda = nn.Parameter(0.2 * torch.ones(1))
 
         # Value embeddings
         head_dim = config.n_embd // config.n_head
@@ -140,10 +138,10 @@ class GPTGatedAttnRes(nn.Module):
         # AttnRes pseudo-queries: zero init
         torch.nn.init.zeros_(self.attn_res_queries)
 
-        # AttnRes gates: zero-init the up projection so gate starts at sigmoid(0) = 0.5
+        # AttnRes gates: uniform init for both projections (matching gated attention paper)
         for gate in self.attn_res_gates:
             torch.nn.init.uniform_(gate.down.weight, -s, s)
-            torch.nn.init.zeros_(gate.up.weight)
+            torch.nn.init.uniform_(gate.up.weight, -s, s)
 
         # Value embeddings
         for ve in self.value_embeds.values():
@@ -196,7 +194,7 @@ class GPTGatedAttnRes(nn.Module):
         value_embeds_numel = sum(ve.weight.numel() for ve in self.value_embeds.values())
         nparams_exclude = (self.transformer.wte.weight.numel() + value_embeds_numel +
                           self.attn_res_queries.numel() +
-                          self.smear_gate.weight.numel() + self.smear_lambda.numel() + self.backout_lambda.numel())
+                          self.smear_gate.weight.numel() + self.smear_lambda.numel())
         h, q, t = self.config.n_head, self.config.n_embd // self.config.n_head, self.config.sequence_len
         attn_flops = 0
         for window_size in self.window_sizes:
@@ -213,7 +211,7 @@ class GPTGatedAttnRes(nn.Module):
         transformer_matrices = sum(p.numel() for p in self.transformer.h.parameters())
         gate_matrices = sum(p.numel() for p in self.attn_res_gates.parameters())
         scalars = (self.attn_res_queries.numel() +
-                   self.smear_gate.weight.numel() + self.smear_lambda.numel() + self.backout_lambda.numel())
+                   self.smear_gate.weight.numel() + self.smear_lambda.numel())
         total = wte + value_embeds + lm_head + transformer_matrices + gate_matrices + scalars
         assert total == sum(p.numel() for p in self.parameters()), "Parameter count mismatch"
         return {
@@ -236,7 +234,7 @@ class GPTGatedAttnRes(nn.Module):
         embedding_params = list(self.transformer.wte.parameters())
         lm_head_params = list(self.lm_head.parameters())
         attn_res_params = [self.attn_res_queries]
-        smear_params = [self.smear_gate.weight, self.smear_lambda, self.backout_lambda]
+        smear_params = [self.smear_gate.weight, self.smear_lambda]
         assert len(list(self.parameters())) == (len(matrix_params) + len(gate_params) + len(embedding_params) +
             len(lm_head_params) + len(value_embeds_params) + len(attn_res_params) + len(smear_params))
 
@@ -296,8 +294,6 @@ class GPTGatedAttnRes(nn.Module):
 
         # --- Gated Full Attention Residuals ---
         v_list = [x]  # v_0 = token embedding
-        backout_layer = n_layer // 2
-        h_backout = None
         qi = 0  # query/gate index
 
         for i, block in enumerate(self.transformer.h):
@@ -316,15 +312,8 @@ class GPTGatedAttnRes(nn.Module):
             mlp_out = block.mlp(norm(h))
             v_list.append(mlp_out)
 
-            if i == backout_layer:
-                h_backout = h
-
         # Final gated AttnRes aggregation
         x = self._attn_res(self.attn_res_queries[qi], v_list, self.attn_res_gates[qi])
-
-        # Backout
-        if h_backout is not None:
-            x = x - self.backout_lambda.to(x.dtype) * h_backout
         x = norm(x)
 
         # Logits

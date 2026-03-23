@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Compare three architecture variants at a fixed compute budget (1e18 FLOPs):
-#   1. gpt          - baseline GPT
-#   2. attn_res     - Full Attention Residuals
-#   3. gated_attn_res - Gated Full Attention Residuals
+# Compare four architecture variants at a fixed compute budget (1e18 FLOPs):
+#   1. gpt_nolambda  - vanilla GPT (no lambdas, no backout)
+#   2. gpt           - GPT with resid_lambdas + x0_lambdas
+#   3. attn_res      - Full Attention Residuals
+#   4. gated_attn_res - Gated Full Attention Residuals
 #
 # Training logs contain everything needed:
 #   - FLOP-controlled val loss curves (--eval-every)
@@ -46,7 +47,7 @@ DATASET_PID=$!
 RESULTS_DIR="$NANOCHAT_BASE_DIR/arch_comparison"
 mkdir -p "$RESULTS_DIR"
 
-MODEL_TYPES=("gpt" "attn_res" "gated_attn_res")
+MODEL_TYPES=("gpt_nolambda" "gpt" "attn_res" "gated_attn_res")
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
