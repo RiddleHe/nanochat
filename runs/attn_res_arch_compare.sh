@@ -5,8 +5,9 @@
 #   2. attn_res     - Full Attention Residuals
 #   3. gated_attn_res - Gated Full Attention Residuals
 #
-# All models are trained at depth 12 with frequent eval checkpoints for
-# plotting FLOP-controlled validation loss curves.
+# Training logs contain everything needed:
+#   - FLOP-controlled val loss curves (--eval-every)
+#   - Final CORE benchmark metrics (--core-metric-every=999999 = final step)
 #
 # Usage:
 #   bash runs/attn_res_arch_compare.sh
@@ -46,7 +47,6 @@ RESULTS_DIR="$NANOCHAT_BASE_DIR/arch_comparison"
 mkdir -p "$RESULTS_DIR"
 
 MODEL_TYPES=("gpt" "attn_res" "gated_attn_res")
-TRAINED_MODELS=()
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
@@ -67,7 +67,6 @@ for model_type in "${MODEL_TYPES[@]}"; do
     # Skip if checkpoint already exists
     if ls "$CKPT_DIR"/model_*.pt &>/dev/null; then
         log "Skipping $model_type (checkpoint found in $CKPT_DIR)"
-        TRAINED_MODELS+=("$model_type")
         continue
     fi
 
@@ -89,50 +88,29 @@ for model_type in "${MODEL_TYPES[@]}"; do
         --run="${WANDB_RUN}" \
         2>&1 | tee "$LOG_FILE"; then
         log "Finished training: $model_type"
-        TRAINED_MODELS+=("$model_type")
     else
         log "FAILED training: $model_type (see $LOG_FILE)"
     fi
 done
 
 # =============================================================================
-# Evaluate all three models (CORE + BPB + samples)
+# Extract results from training logs
 # =============================================================================
 
-for model_type in "${TRAINED_MODELS[@]}"; do
-    TAG="arch_${model_type}"
-    LOG_FILE="$RESULTS_DIR/${TAG}_eval.log"
+log "Extracting results..."
 
-    # Skip if eval already completed (log contains CORE metric)
-    if grep -q "CORE metric:" "$LOG_FILE" 2>/dev/null; then
-        log "Skipping eval for $model_type (already completed)"
-        continue
-    fi
-
-    log "=============================================="
-    log "Evaluating: $model_type"
-    log "=============================================="
-
-    torchrun --standalone --nproc_per_node=$NPROC_PER_NODE -m scripts.base_eval -- \
-        --model-tag="${TAG}" \
-        --device-batch-size=$DEVICE_BATCH_SIZE \
-        2>&1 | tee "$LOG_FILE"
-
-    log "Finished evaluating: $model_type"
-done
-
-# =============================================================================
-# Extract FLOP-controlled val loss curves from training logs
-# =============================================================================
-
-log "Extracting validation loss curves..."
-
+# 1. FLOP-controlled val loss curves
 CURVE_FILE="$RESULTS_DIR/val_loss_curves.csv"
 echo "model_type,step,flops,val_bpb" > "$CURVE_FILE"
 
 for model_type in "${MODEL_TYPES[@]}"; do
     TAG="arch_${model_type}"
     LOG_FILE="$RESULTS_DIR/${TAG}_train.log"
+
+    if [ ! -f "$LOG_FILE" ]; then
+        log "WARNING: No training log for $model_type"
+        continue
+    fi
 
     # Extract flops_per_token and batch_size from the log
     FLOPS_PER_TOKEN=$(grep "Estimated FLOPs per token:" "$LOG_FILE" | head -1 | grep -oP '[\d.]+e\+?\d+')
@@ -147,7 +125,6 @@ for model_type in "${MODEL_TYPES[@]}"; do
     grep "Validation bpb:" "$LOG_FILE" | while read -r line; do
         step=$(echo "$line" | grep -oP 'Step \K\d+')
         bpb=$(echo "$line" | grep -oP 'bpb: \K[\d.]+')
-        # Compute FLOPs at this step: step * flops_per_token * batch_size
         flops_at_step=$(python3 -c "print(f'{int($step) * $FLOPS_PER_TOKEN * $BATCH_SIZE:.6e}')")
         echo "$model_type,$step,$flops_at_step,$bpb" >> "$CURVE_FILE"
     done
@@ -155,12 +132,37 @@ for model_type in "${MODEL_TYPES[@]}"; do
     log "Extracted $(grep -c "^$model_type," "$CURVE_FILE") eval points for $model_type"
 done
 
+# 2. Final benchmark metrics
+METRICS_FILE="$RESULTS_DIR/final_metrics.csv"
+echo "model_type,final_val_bpb,core_metric" > "$METRICS_FILE"
+
+for model_type in "${MODEL_TYPES[@]}"; do
+    TAG="arch_${model_type}"
+    LOG_FILE="$RESULTS_DIR/${TAG}_train.log"
+
+    if [ ! -f "$LOG_FILE" ]; then
+        continue
+    fi
+
+    FINAL_BPB=$(grep "Validation bpb:" "$LOG_FILE" | tail -1 | grep -oP 'bpb: \K[\d.]+')
+    CORE=$(grep "CORE metric:" "$LOG_FILE" | tail -1 | grep -oP '[\d.]+$')
+
+    if [ -n "$FINAL_BPB" ] && [ -n "$CORE" ]; then
+        echo "$model_type,$FINAL_BPB,$CORE" >> "$METRICS_FILE"
+    else
+        log "WARNING: Could not extract final metrics for $model_type"
+    fi
+done
+
 log "=============================================="
 log "Architecture Comparison Complete"
 log "=============================================="
 log "Training logs: $RESULTS_DIR/*_train.log"
-log "Eval logs:     $RESULTS_DIR/*_eval.log"
 log "Loss curves:   $CURVE_FILE"
+log "Final metrics: $METRICS_FILE"
 echo ""
-echo "Loss curve data:"
+echo "Final metrics:"
+column -t -s',' "$METRICS_FILE"
+echo ""
+echo "Loss curve data (first 30 rows):"
 column -t -s',' "$CURVE_FILE" | head -30
