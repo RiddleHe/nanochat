@@ -125,7 +125,7 @@ for model_type in "${MODEL_TYPES[@]}"; do
     grep "Validation bpb:" "$LOG_FILE" | while read -r line; do
         step=$(echo "$line" | grep -oP 'Step \K\d+')
         bpb=$(echo "$line" | grep -oP 'bpb: \K[\d.]+')
-        flops_at_step=$(python3 -c "print(f'{int($step) * $FLOPS_PER_TOKEN * $BATCH_SIZE:.6e}')")
+        flops_at_step=$(python3 -c "print(f'{int(\"$step\") * $FLOPS_PER_TOKEN * $BATCH_SIZE:.6e}')")
         echo "$model_type,$step,$flops_at_step,$bpb" >> "$CURVE_FILE"
     done
 
