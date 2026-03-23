@@ -70,8 +70,10 @@ class GPTAttnRes(nn.Module):
 
         # AttnRes pseudo-queries: 2 per transformer layer (before attn, before mlp) + 1 for final output.
         # Initialized to zero so initial attention weights are uniform (critical for training stability).
-        n_queries = 2 * config.n_layer + 1
-        self.attn_res_queries = nn.Parameter(torch.zeros(n_queries, config.n_embd))
+        # Padded to multiple of 8 so distributed optimizer can shard across up to 8 GPUs.
+        self.n_queries = 2 * config.n_layer + 1
+        n_queries_padded = ((self.n_queries + 7) // 8) * 8
+        self.attn_res_queries = nn.Parameter(torch.zeros(n_queries_padded, config.n_embd))
 
         # Smear: mix previous token's embedding into current token (cheap bigram info)
         self.smear_gate = Linear(24, 1, bias=False)

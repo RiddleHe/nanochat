@@ -77,8 +77,10 @@ class GPTGatedAttnRes(nn.Module):
         self.lm_head = Linear(config.n_embd, padded_vocab_size, bias=False)
 
         # AttnRes pseudo-queries: 2 per transformer layer (before attn, before mlp) + 1 for final output.
-        n_queries = 2 * config.n_layer + 1
-        self.attn_res_queries = nn.Parameter(torch.zeros(n_queries, config.n_embd))
+        # Padded to multiple of 8 so distributed optimizer can shard across up to 8 GPUs.
+        self.n_queries = 2 * config.n_layer + 1
+        n_queries_padded = ((self.n_queries + 7) // 8) * 8
+        self.attn_res_queries = nn.Parameter(torch.zeros(n_queries_padded, config.n_embd))
 
         # Gated AttnRes: one bottleneck sigmoid gate per AttnRes call
         self.attn_res_gates = nn.ModuleList([AttnResGate(config.n_embd) for _ in range(n_queries)])
