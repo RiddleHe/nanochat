@@ -6,7 +6,6 @@ Usage:
 """
 import argparse
 import torch
-import numpy as np
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--checkpoint", type=str, default=None, help="path to model_*.pt file")
@@ -36,7 +35,6 @@ n_total, d = queries.shape
 print(f"Query tensor shape: ({n_total}, {d})")
 
 # Figure out how many are real (not padding)
-# Padded rows are all zeros if never updated
 row_norms = queries.norm(dim=1)
 n_active = (row_norms > 1e-8).sum().item()
 print(f"Active queries: {n_active} / {n_total} (rest are padding)")
@@ -44,9 +42,7 @@ print(f"Active queries: {n_active} / {n_total} (rest are padding)")
 queries = queries[:n_active]
 row_norms = row_norms[:n_active]
 
-print(f"\n{'='*60}")
-print("Per-query L2 norms:")
-print(f"{'='*60}")
+print(f"\nPer-query L2 norms:")
 n_layers = (n_active - 1) // 2
 for i in range(n_active):
     if i < 2 * n_layers:
@@ -57,47 +53,12 @@ for i in range(n_active):
         label = "Final output  "
     print(f"  Query {i:2d} ({label}): norm = {row_norms[i]:.6f}")
 
-print(f"\n{'='*60}")
-print("Summary statistics:")
-print(f"{'='*60}")
-print(f"  Mean norm:   {row_norms.mean():.6f}")
-print(f"  Std norm:    {row_norms.std():.6f}")
-print(f"  Min norm:    {row_norms.min():.6f}  (query {row_norms.argmin().item()})")
-print(f"  Max norm:    {row_norms.max():.6f}  (query {row_norms.argmax().item()})")
-print(f"  Total norm:  {queries.norm():.6f}")
+print(f"\nMean: {row_norms.mean():.6f}  Std: {row_norms.std():.6f}  "
+      f"Min: {row_norms.min():.6f}  Max: {row_norms.max():.6f}")
 
-# Check if queries are effectively zero (frozen)
 if row_norms.max() < 0.01:
-    print(f"\n  *** Queries are near-zero — effectively frozen (no routing learned) ***")
+    print("\n*** Queries are near-zero — effectively frozen (no routing learned) ***")
 elif row_norms.max() < 0.1:
-    print(f"\n  *** Queries have small norms — minimal routing learned ***")
+    print("\n*** Queries have small norms — minimal routing learned ***")
 else:
-    print(f"\n  *** Queries have significant norms — active routing ***")
-
-# Cosine similarity between adjacent queries (are they learning different things?)
-print(f"\n{'='*60}")
-print("Cosine similarity between consecutive queries:")
-print(f"{'='*60}")
-for i in range(min(n_active - 1, 10)):
-    cos = torch.nn.functional.cosine_similarity(queries[i:i+1], queries[i+1:i+2]).item()
-    print(f"  Query {i:2d} vs {i+1:2d}: {cos:.4f}")
-if n_active > 11:
-    print(f"  ... ({n_active - 11} more)")
-
-# What do the softmax weights look like for a uniform input?
-print(f"\n{'='*60}")
-print("Softmax weights (uniform unit-norm input):")
-print(f"{'='*60}")
-print("If queries learned routing, weights should be non-uniform.")
-fake_keys = torch.ones(n_active, d) / d**0.5  # uniform keys
-for qi in [0, n_active // 4, n_active // 2, 3 * n_active // 4, n_active - 1]:
-    n_sources = qi + 1 if qi < n_active - 1 else n_active
-    logits = queries[qi] @ fake_keys[:n_sources].T
-    weights = torch.softmax(logits, dim=0)
-    uniform = 1.0 / n_sources
-    max_w = weights.max().item()
-    min_w = weights.min().item()
-    entropy = -(weights * weights.log()).sum().item()
-    max_entropy = np.log(n_sources)
-    print(f"  Query {qi:2d} ({n_sources:2d} sources): max={max_w:.4f} min={min_w:.4f} "
-          f"entropy={entropy:.3f}/{max_entropy:.3f} (uniform={uniform:.4f})")
+    print("\n*** Queries have significant norms — active routing ***")
