@@ -69,8 +69,7 @@ for model_type in "${MODEL_TYPES[@]}"; do
         --target-flops=$FLOPS \
         --target-param-data-ratio=-1 \
         --eval-every=$EVAL_EVERY \
-        --core-metric-every=999999 \
-        --core-metric-max-per-task=-1 \
+        --core-metric-every=-1 \
         --sample-every=-1 \
         --model-tag="${TAG}" \
         --run="${WANDB_RUN}" \
