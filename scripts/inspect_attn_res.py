@@ -34,18 +34,24 @@ queries = model_data["attn_res_queries"].float()
 n_total, d = queries.shape
 print(f"Query tensor shape: ({n_total}, {d})")
 
-# Figure out how many are real (not padding)
-row_norms = queries.norm(dim=1)
-n_active = (row_norms > 1e-8).sum().item()
-print(f"Active queries: {n_active} / {n_total} (rest are padding)")
+# Infer n_queries from model config: 2 * n_layer + 1, padded to multiple of 8
+# Try to find n_layer from the checkpoint
+n_layer = None
+for key in model_data:
+    if "transformer.h." in key:
+        idx = int(key.split("transformer.h.")[1].split(".")[0])
+        if n_layer is None or idx + 1 > n_layer:
+            n_layer = idx + 1
+n_queries = 2 * n_layer + 1 if n_layer else n_total
+print(f"Detected n_layer={n_layer}, n_queries={n_queries} (padded to {n_total})")
 
-queries = queries[:n_active]
-row_norms = row_norms[:n_active]
+row_norms = queries.norm(dim=1)
+queries = queries[:n_queries]
+row_norms = row_norms[:n_queries]
 
 print(f"\nPer-query L2 norms:")
-n_layers = (n_active - 1) // 2
-for i in range(n_active):
-    if i < 2 * n_layers:
+for i in range(n_queries):
+    if i < 2 * n_layer:
         layer = i // 2
         sublayer = "attn" if i % 2 == 0 else "mlp"
         label = f"Layer {layer:2d} {sublayer:4s}"
