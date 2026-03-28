@@ -44,7 +44,7 @@ fi
 python -m nanochat.dataset -n 170 &
 DATASET_PID=$!
 
-RESULTS_DIR="$NANOCHAT_BASE_DIR/arch_comparison"
+RESULTS_DIR="$NANOCHAT_BASE_DIR/arch_comparison_d${DEPTH}"
 mkdir -p "$RESULTS_DIR"
 
 MODEL_TYPES=("gpt_nolambda" "gpt" "attn_res")
@@ -62,7 +62,7 @@ wait $DATASET_PID
 # =============================================================================
 
 for model_type in "${MODEL_TYPES[@]}"; do
-    TAG="arch_${model_type}"
+    TAG="arch_d${DEPTH}_${model_type}"
     LOG_FILE="$RESULTS_DIR/${TAG}_train.log"
     CKPT_DIR="$NANOCHAT_BASE_DIR/base_checkpoints/${TAG}"
 
@@ -105,7 +105,7 @@ CURVE_FILE="$RESULTS_DIR/val_loss_curves.csv"
 echo "model_type,step,flops,val_bpb" > "$CURVE_FILE"
 
 for model_type in "${MODEL_TYPES[@]}"; do
-    TAG="arch_${model_type}"
+    TAG="arch_d${DEPTH}_${model_type}"
     LOG_FILE="$RESULTS_DIR/${TAG}_train.log"
 
     if [ ! -f "$LOG_FILE" ]; then
@@ -138,7 +138,7 @@ METRICS_FILE="$RESULTS_DIR/final_metrics.csv"
 echo "model_type,final_val_bpb,core_metric" > "$METRICS_FILE"
 
 for model_type in "${MODEL_TYPES[@]}"; do
-    TAG="arch_${model_type}"
+    TAG="arch_d${DEPTH}_${model_type}"
     LOG_FILE="$RESULTS_DIR/${TAG}_train.log"
 
     if [ ! -f "$LOG_FILE" ]; then

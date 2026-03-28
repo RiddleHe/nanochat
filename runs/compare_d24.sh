@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Compare GPT (no lambdas) vs AttnRes at d=24 to test if AttnRes
-# benefits from increased depth. Fixed compute budget of 1e18 FLOPs.
+# benefits from increased depth. Fixed compute budget of 1.5e19 FLOPs.
 #
 # Usage:
-#   NPROC_PER_NODE=4 bash runs/attn_res_depth_compare.sh
+#   NPROC_PER_NODE=4 bash runs/compare_d24.sh
 
 set -eo pipefail
 
