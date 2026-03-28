@@ -4,7 +4,9 @@ Produces two heatmaps (Pre-Attn and Pre-MLP) showing which source layers
 each block attends to, averaged across samples and token positions.
 
 Usage:
-    python -m scripts.visualize_attn_res --model-tag arch_attn_res --num-samples 100
+    python -m scripts.visualize_attn_res --depth 12 --lr 001 --num-samples 100
+    python -m scripts.visualize_attn_res --depth 24 --lr 001 --num-samples 100
+    python -m scripts.visualize_attn_res --model-tag arch_d12_attn_res_lr001 --num-samples 100
 """
 import argparse
 import torch
@@ -19,12 +21,23 @@ from nanochat.dataloader import tokenizing_distributed_data_loader_bos_bestfit
 from nanochat.gpt import norm
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--model-tag", type=str, required=True)
+parser.add_argument("--model-tag", type=str, default=None, help="full model tag (e.g. arch_d12_attn_res_lr001)")
+parser.add_argument("--depth", type=int, default=None, help="depth (e.g. 12, 24)")
+parser.add_argument("--lr", type=str, default=None, help="lr suffix (e.g. 001, 006)")
 parser.add_argument("--step", type=int, default=None)
 parser.add_argument("--num-samples", type=int, default=100)
 parser.add_argument("--device-type", type=str, default="")
-parser.add_argument("--output", type=str, default="results/attn_res_heatmap.png")
+parser.add_argument("--output", type=str, default=None)
 args = parser.parse_args()
+
+# Build model tag from depth + lr if not specified directly
+if args.model_tag is None:
+    if args.depth is None or args.lr is None:
+        raise ValueError("Provide --model-tag or both --depth and --lr")
+    args.model_tag = f"arch_d{args.depth}_attn_res_lr{args.lr}"
+
+if args.output is None:
+    args.output = f"results/attn_res_heatmap_{args.model_tag}.png"
 
 # Load model
 device_type = autodetect_device_type() if args.device_type == "" else args.device_type
