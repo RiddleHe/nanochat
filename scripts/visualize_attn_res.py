@@ -46,7 +46,7 @@ attn_weights_count = torch.zeros(n_queries)
 
 # Load validation data
 val_loader = tokenizing_distributed_data_loader_bos_bestfit(
-    tokenizer, batch_size=1, sequence_len=config["sequence_len"], split="val", device=device
+    tokenizer, device_batch_size=1, sequence_len=config["sequence_len"], split="val", device=device
 )
 
 print(f"Running {args.num_samples} validation samples...")
