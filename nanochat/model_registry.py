@@ -49,3 +49,5 @@ def _register_variants():
     register("attn_res", GPTAttnResConfig, GPTAttnRes)
     from nanochat.gpt_gated_attn_res import GPTGatedAttnResConfig, GPTGatedAttnRes
     register("gated_attn_res", GPTGatedAttnResConfig, GPTGatedAttnRes)
+    from nanochat.gpt_depth_v import GPTDepthVConfig, GPTDepthV
+    register("depth_v", GPTDepthVConfig, GPTDepthV)
