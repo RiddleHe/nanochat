@@ -1,16 +1,22 @@
 #!/bin/bash
 
-# Compare GPT (no lambdas) vs AttnRes at d=24 to test if AttnRes
-# benefits from increased depth. Fixed compute budget of 1.5e19 FLOPs.
+# Compare residual connection variants: GPT baseline, GPT + lambdas, AttnRes
+# Configurable depth — auto-adjusts batch size and FLOP budget.
 #
 # Usage:
-#   NPROC_PER_NODE=4 bash runs/compare_d24.sh
+#   DEPTH=12 NPROC_PER_NODE=4 bash runs/compare_attn_res.sh
+#   DEPTH=24 NPROC_PER_NODE=4 bash runs/compare_attn_res.sh
 
 set -eo pipefail
 
-FLOPS=1.5e19
-DEPTH=24
-DEVICE_BATCH_SIZE="${DEVICE_BATCH_SIZE:-8}"
+DEPTH="${DEPTH:-12}"
+if [ "$DEPTH" -ge 24 ]; then
+    FLOPS="${FLOPS:-1.5e19}"
+    DEVICE_BATCH_SIZE="${DEVICE_BATCH_SIZE:-8}"
+else
+    FLOPS="${FLOPS:-1e18}"
+    DEVICE_BATCH_SIZE="${DEVICE_BATCH_SIZE:-16}"
+fi
 EVAL_EVERY=50
 NPROC_PER_NODE="${NPROC_PER_NODE:-8}"
 WANDB_RUN="${WANDB_RUN:-dummy}"
@@ -25,7 +31,7 @@ command -v uv &> /dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 uv sync --extra gpu
 source .venv/bin/activate
 
-# Dataset and tokenizer (should already exist if previous experiments ran)
+# Dataset and tokenizer
 python -m nanochat.dataset -n 8
 if [ ! -f "$NANOCHAT_BASE_DIR/tokenizer/tokenizer.pkl" ]; then
     python -m scripts.tok_train
@@ -116,32 +122,7 @@ for model_type in "${MODEL_TYPES[@]}"; do
     log "Extracted $(grep -c "^$model_type," "$CURVE_FILE") eval points for $model_type"
 done
 
-METRICS_FILE="$RESULTS_DIR/final_metrics.csv"
-echo "model_type,final_val_bpb,core_metric" > "$METRICS_FILE"
-
-for model_type in "${MODEL_TYPES[@]}"; do
-    TAG="arch_d${DEPTH}_${model_type}"
-    LOG_FILE="$RESULTS_DIR/${TAG}_train.log"
-
-    if [ ! -f "$LOG_FILE" ]; then
-        continue
-    fi
-
-    FINAL_BPB=$(grep "Validation bpb:" "$LOG_FILE" | tail -1 | grep -oP 'bpb: \K[\d.]+')
-    CORE=$(grep "CORE metric:" "$LOG_FILE" | tail -1 | grep -oP '[\d.]+$')
-
-    if [ -n "$FINAL_BPB" ] && [ -n "$CORE" ]; then
-        echo "$model_type,$FINAL_BPB,$CORE" >> "$METRICS_FILE"
-    else
-        log "WARNING: Could not extract final metrics for $model_type"
-    fi
-done
-
 log "=============================================="
-log "Depth Comparison Complete (d=$DEPTH)"
+log "AttnRes Comparison Complete (d=$DEPTH)"
 log "=============================================="
 log "Loss curves: $CURVE_FILE"
-log "Final metrics: $METRICS_FILE"
-echo ""
-echo "Final metrics:"
-column -t -s',' "$METRICS_FILE"
