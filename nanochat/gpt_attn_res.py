@@ -42,6 +42,7 @@ class GPTAttnResConfig:
     n_kv_head: int = 6
     n_embd: int = 768
     window_pattern: str = "SSSL"
+    xsa_mode: str = "none"
 
 
 class Block(nn.Module):

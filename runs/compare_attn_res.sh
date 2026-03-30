@@ -42,7 +42,7 @@ DATASET_PID=$!
 RESULTS_DIR="$NANOCHAT_BASE_DIR/arch_comparison_d${DEPTH}"
 mkdir -p "$RESULTS_DIR"
 
-MODEL_TYPES=("gpt_nolambda" "gpt" "attn_res", "gated_attn_res")
+MODEL_TYPES=("gpt_nolambda" "gpt" "attn_res" "gated_attn_res")
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
