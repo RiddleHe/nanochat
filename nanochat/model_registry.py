@@ -14,10 +14,20 @@ from nanochat.gpt import GPTConfig, GPT
 class GPTNoLambdaConfig(GPTConfig):
     use_lambdas: bool = False
 
+@dataclass
+class GPTXsaPreVeConfig(GPTConfig):
+    xsa_mode: str = "pre_ve"
+
+@dataclass
+class GPTXsaPostVeConfig(GPTConfig):
+    xsa_mode: str = "post_ve"
+
 # Maps model_type string -> (ConfigClass, ModelClass)
 MODELS = {
     "gpt": (GPTConfig, GPT),
     "gpt_nolambda": (GPTNoLambdaConfig, GPT),
+    "gpt_xsa_pre_ve": (GPTXsaPreVeConfig, GPT),
+    "gpt_xsa_post_ve": (GPTXsaPostVeConfig, GPT),
 }
 
 def register(name, config_cls, model_cls):

@@ -38,6 +38,7 @@ class GPTConfig:
     # Examples: "L"=all full context, "SL"=alternating, "SSL"=two short then one long
     window_pattern: str = "SSSL"
     use_lambdas: bool = True  # per-layer resid_lambdas and x0_lambdas
+    xsa_mode: str = "none"  # "none", "pre_ve" (remove raw v), "post_ve" (remove v+ve)
 
 
 def norm(x):
@@ -71,6 +72,7 @@ class CausalSelfAttention(nn.Module):
         self.n_kv_head = config.n_kv_head
         self.n_embd = config.n_embd
         self.head_dim = self.n_embd // self.n_head
+        self.xsa_mode = config.xsa_mode
         assert self.n_embd % self.n_head == 0
         assert self.n_kv_head <= self.n_head and self.n_head % self.n_kv_head == 0
         self.c_q = Linear(self.n_embd, self.n_head * self.head_dim, bias=False)
@@ -80,6 +82,15 @@ class CausalSelfAttention(nn.Module):
         self.ve_gate_channels = 12
         self.ve_gate = Linear(self.ve_gate_channels, self.n_kv_head, bias=False) if has_ve(layer_idx, config.n_layer) else None
 
+    def _xsa(self, y, v_xsa):
+        """Exclusive Self-Attention: remove projection of y onto v_xsa (per-head).
+        y: (B, T, n_head, D), v_xsa: (B, T, n_kv_head, D)"""
+        group = self.n_head // self.n_kv_head
+        y_g = y.reshape(y.shape[0], y.shape[1], self.n_kv_head, group, self.head_dim)
+        vn = F.normalize(v_xsa, dim=-1).unsqueeze(-2)  # (B, T, n_kv_head, 1, D)
+        proj = (y_g * vn).sum(dim=-1, keepdim=True) * vn
+        return (y_g - proj).reshape(y.shape)
+
     def forward(self, x, ve, cos_sin, window_size, kv_cache):
         B, T, C = x.size()
 
@@ -88,6 +99,9 @@ class CausalSelfAttention(nn.Module):
         q = self.c_q(x).view(B, T, self.n_head, self.head_dim)
         k = self.c_k(x).view(B, T, self.n_kv_head, self.head_dim)
         v = self.c_v(x).view(B, T, self.n_kv_head, self.head_dim)
+
+        # Save pre-ve value for XSA "pre_ve" mode
+        v_pre_ve = v if self.xsa_mode == "pre_ve" else None
 
         # Value residual (ResFormer): mix in value embedding with input-dependent gate per head
         if ve is not None:
@@ -120,6 +134,12 @@ class CausalSelfAttention(nn.Module):
             # Advance position after last layer processes
             if self.layer_idx == kv_cache.n_layers - 1:
                 kv_cache.advance(T)
+
+        # XSA: remove self-value projection from attention output
+        if self.xsa_mode == "pre_ve":
+            y = self._xsa(y, v_pre_ve)
+        elif self.xsa_mode == "post_ve":
+            y = self._xsa(y, v)
 
         # Re-assemble the heads and project back to residual stream
         y = y.contiguous().view(B, T, -1)
