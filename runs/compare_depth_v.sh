@@ -1,23 +1,20 @@
 #!/bin/bash
 
-# Compare XSA variants: GPT baseline vs XSA pre-ve vs XSA post-ve
-# All with lambdas enabled. Configurable depth and FLOP budget.
+# Compare GPT (with value_embeds/ResFormer) vs Depth V (generalized ResFormer).
+# GPT checkpoint is shared with other comparison scripts via arch_d${DEPTH}_gpt tag.
 #
 # Usage:
-#   DEPTH=12 FLOPS=1e18 NPROC_PER_NODE=4 bash runs/compare_xsa.sh
-#   DEPTH=24 FLOPS=1.5e19 NPROC_PER_NODE=4 bash runs/compare_xsa.sh
+#   DEPTH=12 NPROC_PER_NODE=4 bash runs/compare_depth_v.sh
+#   DEPTH=24 NPROC_PER_NODE=4 bash runs/compare_depth_v.sh
 
 set -eo pipefail
 
 DEPTH="${DEPTH:-12}"
 if [ "$DEPTH" -ge 24 ]; then
     FLOPS="${FLOPS:-1.5e19}"
-else
-    FLOPS="${FLOPS:-1e18}"
-fi
-if [ "$DEPTH" -ge 24 ]; then
     DEVICE_BATCH_SIZE="${DEVICE_BATCH_SIZE:-8}"
 else
+    FLOPS="${FLOPS:-1e18}"
     DEVICE_BATCH_SIZE="${DEVICE_BATCH_SIZE:-16}"
 fi
 EVAL_EVERY=50
@@ -42,10 +39,10 @@ fi
 python -m nanochat.dataset -n 170 &
 DATASET_PID=$!
 
-RESULTS_DIR="$NANOCHAT_BASE_DIR/xsa_comparison_d${DEPTH}"
+RESULTS_DIR="$NANOCHAT_BASE_DIR/depth_v_comparison_d${DEPTH}"
 mkdir -p "$RESULTS_DIR"
 
-MODEL_TYPES=("gpt" "gpt_xsa_pre_ve" "gpt_xsa_post_ve")
+MODEL_TYPES=("gpt" "depth_v")
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
@@ -126,6 +123,6 @@ for model_type in "${MODEL_TYPES[@]}"; do
 done
 
 log "=============================================="
-log "XSA Comparison Complete (d=$DEPTH)"
+log "Depth V Comparison Complete (d=$DEPTH)"
 log "=============================================="
 log "Loss curves: $CURVE_FILE"
