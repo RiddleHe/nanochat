@@ -105,10 +105,11 @@ for model_idx, (model_tag, label) in enumerate(zip(args.model_tags, args.labels)
                 print(f"  {sample_idx + 1}/{args.num_samples}")
 
     ang_dist_avg = (ang_dist_sum / count).numpy()
-    # Mask upper triangle (keep lower triangle only)
+    # Mask upper triangle + diagonal (only show target > source)
     mask = np.triu(np.ones_like(ang_dist_avg, dtype=bool), k=0)
     ang_dist_avg[mask] = np.nan
     all_matrices.append(ang_dist_avg)
+    n_layers_model = ang_dist_avg.shape[0]
 
     del model
     if device_type == "cuda":
@@ -126,12 +127,16 @@ for model_idx, (label, matrix) in enumerate(zip(args.labels, all_matrices)):
     im = ax.imshow(matrix, cmap=cmap, vmin=0, vmax=vmax, interpolation='nearest')
     ax.set_title(label, fontsize=13)
     ax.set_xlabel("Source Layer", fontsize=12)
-    ax.set_ylabel("Target Layer", fontsize=12)
-    ax.set_xticks(range(0, n_points, max(1, n_points // 8)))
-    ax.set_yticks(range(0, n_points, max(1, n_points // 8)))
+    ax.set_ylabel("Subsequent Layer", fontsize=12)
+    ax.set_xticks(range(n_points))
+    ax.set_xticklabels(range(1, n_points + 1), fontsize=7)
+    ax.set_yticks(range(n_points))
+    ax.set_yticklabels(range(1, n_points + 1), fontsize=7)
+    ax.invert_yaxis()
 
-fig.colorbar(im, ax=axes, shrink=0.8, label="Angular Distance (0=identical, 1=orthogonal)")
-fig.suptitle("Cross-Layer Angular Distance", fontsize=15, y=1.02)
-plt.tight_layout()
+fig.suptitle("Cross-Layer Angular Distance", fontsize=15)
+fig.subplots_adjust(bottom=0.18)
+cbar_ax = fig.add_axes([0.15, 0.06, 0.7, 0.03])
+fig.colorbar(im, cax=cbar_ax, orientation='horizontal', label="Angular Distance (0=identical, 1=orthogonal)")
 plt.savefig(args.output, dpi=150, bbox_inches='tight')
 print(f"\nSaved to {args.output}")
