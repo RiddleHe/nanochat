@@ -44,10 +44,10 @@ class GPTGatedAttnResConfig:
 
 class AttnResGate(nn.Module):
     """Bottleneck sigmoid gate: y * sigmoid(W_up(W_down(y)))."""
-    def __init__(self, d, r=4):
+    def __init__(self, d, bottleneck=4):
         super().__init__()
-        self.down = Linear(d, d // r, bias=False)
-        self.up = Linear(d // r, d, bias=False)
+        self.down = Linear(d, bottleneck, bias=False)
+        self.up = Linear(bottleneck, d, bias=False)
 
     def forward(self, y):
         return y * torch.sigmoid(self.up(self.down(y)))
