@@ -45,6 +45,7 @@ if n_models == 1:
 
 # Shared colorbar range
 all_matrices = []
+all_n_layers = []
 
 for model_idx, (model_tag, label) in enumerate(zip(args.model_tags, args.labels)):
     print(f"\nProcessing: {label} ({model_tag})")
@@ -105,11 +106,18 @@ for model_idx, (model_tag, label) in enumerate(zip(args.model_tags, args.labels)
                 print(f"  {sample_idx + 1}/{args.num_samples}")
 
     ang_dist_avg = (ang_dist_sum / count).numpy()
-    # Mask upper triangle + diagonal (only show target > source)
-    mask = np.triu(np.ones_like(ang_dist_avg, dtype=bool), k=0)
-    ang_dist_avg[mask] = np.nan
-    all_matrices.append(ang_dist_avg)
-    n_layers_model = ang_dist_avg.shape[0]
+    n_pts = ang_dist_avg.shape[0]
+
+    # Reshape into offset matrix: row n = n-th subsequent layer, col = source layer
+    # offset_matrix[n, l] = angular distance between layer l and layer l+n+1
+    max_offset = n_pts - 1
+    offset_matrix = np.full((max_offset, n_pts - 1), np.nan)
+    for l in range(n_pts - 1):          # source layer
+        for n in range(1, n_pts - l):   # offset (1, 2, ...)
+            offset_matrix[n - 1, l] = ang_dist_avg[l, l + n]
+
+    all_matrices.append(offset_matrix)
+    all_n_layers.append(n_pts)
 
     del model
     if device_type == "cuda":
@@ -118,21 +126,20 @@ for model_idx, (model_tag, label) in enumerate(zip(args.model_tags, args.labels)
 # Find shared color range (ignoring NaN)
 vmax = max(np.nanmax(m) for m in all_matrices)
 
-cmap = plt.cm.Blues.copy()
+cmap = plt.cm.viridis.copy()
 cmap.set_bad(color='white', alpha=0)
 
 for model_idx, (label, matrix) in enumerate(zip(args.labels, all_matrices)):
     ax = axes[model_idx]
-    n_points = matrix.shape[0]
-    im = ax.imshow(matrix, cmap=cmap, vmin=0, vmax=vmax, interpolation='nearest')
+    n_pts = all_n_layers[model_idx]
+    im = ax.imshow(matrix, cmap=cmap, vmin=0, vmax=vmax, interpolation='nearest', origin='lower')
     ax.set_title(label, fontsize=13)
-    ax.set_xlabel("Source Layer", fontsize=12)
-    ax.set_ylabel("Subsequent Layer", fontsize=12)
-    ax.set_xticks(range(n_points))
-    ax.set_xticklabels(range(1, n_points + 1), fontsize=7)
-    ax.set_yticks(range(n_points))
-    ax.set_yticklabels(range(1, n_points + 1), fontsize=7)
-    ax.invert_yaxis()
+    ax.set_xlabel("Layer Index $\\ell$", fontsize=12)
+    ax.set_ylabel("Subsequent $n^{th}$ Layer", fontsize=12)
+    ax.set_xticks(range(0, n_pts - 1, max(1, (n_pts - 1) // 8)))
+    ax.set_xticklabels(range(0, n_pts - 1, max(1, (n_pts - 1) // 8)), fontsize=8)
+    ax.set_yticks(range(0, n_pts - 1, max(1, (n_pts - 1) // 4)))
+    ax.set_yticklabels([i + 1 for i in range(0, n_pts - 1, max(1, (n_pts - 1) // 4))], fontsize=8)
 
 fig.suptitle("Cross-Layer Angular Distance", fontsize=15)
 fig.subplots_adjust(bottom=0.18)
