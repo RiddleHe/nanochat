@@ -126,7 +126,7 @@ for model_idx, (model_tag, label) in enumerate(zip(args.model_tags, args.labels)
 # Find shared color range (ignoring NaN)
 vmax = max(np.nanmax(m) for m in all_matrices)
 
-cmap = plt.cm.viridis.copy()
+cmap = plt.cm.viridis_r.copy()
 cmap.set_bad(color='white', alpha=0)
 
 for model_idx, (label, matrix) in enumerate(zip(args.labels, all_matrices)):
