@@ -1,22 +1,15 @@
 """
-GPT with Gated Full Attention Residuals.
-Builds on AttnRes (gpt_attn_res.py) by adding a sigmoid bottleneck gate
-after each depth-wise attention residual aggregation:
+GPT with Full Attention Residuals + learnable sink logits.
 
-    h = _attn_res(query, layer_outputs)
-    h = h * sigmoid(W_up(W_down(h)))
+Each _attn_res call has a learnable scalar sink logit that competes with
+real sources for softmax probability mass. After softmax, the sink weight
+is discarded — it absorbs attention but contributes nothing to the output.
+This gives the model a "none of the above" option, reducing dump attention
+on unimportant layer outputs.
 
-where W_down: d -> d//4, W_up: d//4 -> d.
-
-Motivation: the AttnRes softmax over layers sums to 1, creating the same
-"attention sink" pressure as sequence-level softmax attention. The gate
-adds input-dependent sparsity and non-linearity, following the findings of
-"Gated Attention for LLMs" (Qiu et al., 2025).
-
-W_up is zero-initialized so gates start at sigmoid(0) = 0.5 (uniform scaling).
+Inspired by OpenAI gpt-oss sink implementation.
 """
 
-from functools import partial
 from dataclasses import dataclass
 
 import torch
@@ -31,7 +24,7 @@ from nanochat.gpt import norm, Linear, has_ve, apply_rotary_emb, CausalSelfAtten
 
 
 @dataclass
-class GPTGatedAttnResConfig:
+class GPTAttnResSinkConfig:
     sequence_len: int = 2048
     vocab_size: int = 32768
     n_layer: int = 12
@@ -42,26 +35,14 @@ class GPTGatedAttnResConfig:
     xsa_mode: str = "none"
 
 
-class AttnResGate(nn.Module):
-    """Bottleneck sigmoid gate: y * sigmoid(W_up(W_down(y)))."""
-    def __init__(self, d, bottleneck=32):
-        super().__init__()
-        self.down = Linear(d, bottleneck, bias=False)
-        self.up = Linear(bottleneck, d, bias=False)
-
-    def forward(self, y):
-        return y * torch.sigmoid(self.up(F.silu(self.down(y))))
-
-
 class Block(nn.Module):
-    """Weight container for attention + MLP. Forward is called by the model directly."""
     def __init__(self, config, layer_idx):
         super().__init__()
         self.attn = CausalSelfAttention(config, layer_idx)
         self.mlp = MLP(config)
 
 
-class GPTGatedAttnRes(nn.Module):
+class GPTAttnResSink(nn.Module):
     def __init__(self, config, pad_vocab_size_to=64):
         super().__init__()
         self.config = config
@@ -77,21 +58,17 @@ class GPTGatedAttnRes(nn.Module):
         })
         self.lm_head = Linear(config.n_embd, padded_vocab_size, bias=False)
 
-        # AttnRes pseudo-queries: 2 per transformer layer (before attn, before mlp) + 1 for final output.
-        # Padded to multiple of 8 so distributed optimizer can shard across up to 8 GPUs.
+        # AttnRes pseudo-queries
         self.n_queries = 2 * config.n_layer + 1
         n_queries_padded = ((self.n_queries + 7) // 8) * 8
         self.attn_res_queries = nn.Parameter(torch.zeros(n_queries_padded, config.n_embd))
 
-        # Gated AttnRes: one bottleneck sigmoid gate per AttnRes call
-        self.attn_res_gates = nn.ModuleList([AttnResGate(config.n_embd) for _ in range(self.n_queries)])
+        # Sink logits: one scalar per query, zero-init
+        self.sink_logits = nn.Parameter(torch.zeros(self.n_queries))
 
-        # Smear
         self.smear_gate = Linear(24, 1, bias=False)
         self.smear_lambda = nn.Parameter(torch.zeros(1))
 
-
-        # Value embeddings
         head_dim = config.n_embd // config.n_head
         kv_dim = config.n_kv_head * head_dim
         self.value_embeds = nn.ModuleDict({
@@ -99,33 +76,30 @@ class GPTGatedAttnRes(nn.Module):
             for i in range(config.n_layer) if has_ve(i, config.n_layer)
         })
 
-        # Rotary embeddings
         self.rotary_seq_len = config.sequence_len * 10
         head_dim = config.n_embd // config.n_head
         cos, sin = self._precompute_rotary_embeddings(self.rotary_seq_len, head_dim)
         self.register_buffer("cos", cos, persistent=False)
         self.register_buffer("sin", sin, persistent=False)
 
-    def _attn_res(self, query, layer_outputs, gate):
-        """
-        Compute gated attention residual: softmax-weighted sum over prior layer outputs,
-        then apply sigmoid bottleneck gate.
-        """
+    def _attn_res(self, query, layer_outputs, sink_logit):
         V = torch.stack(layer_outputs, dim=0)  # (N, B, T, D)
         K = norm(V)
-        logits = torch.einsum('d, n b t d -> n b t', query.to(V.dtype), K)
-        weights = logits.softmax(dim=0)
+        logits = torch.einsum('d, n b t d -> n b t', query.to(V.dtype), K)  # (N, B, T)
+        # Append sink logit — competes for softmax mass but contributes nothing
+        B, T = logits.shape[1], logits.shape[2]
+        sink = sink_logit.expand(1, B, T)  # (1, B, T)
+        logits_with_sink = torch.cat([logits, sink], dim=0)  # (N+1, B, T)
+        weights = logits_with_sink.softmax(dim=0)
+        weights = weights[:-1]  # drop sink weight, keep only real source weights
         h = torch.einsum('n b t, n b t d -> b t d', weights, V)
-        h = gate(h)
         return h
 
     @torch.no_grad()
     def init_weights(self):
-        # Embedding and unembedding
         torch.nn.init.normal_(self.transformer.wte.weight, mean=0.0, std=0.8)
         torch.nn.init.normal_(self.lm_head.weight, mean=0.0, std=0.001)
 
-        # Transformer blocks
         n_embd = self.config.n_embd
         s = 3**0.5 * n_embd**-0.5
         for block in self.transformer.h:
@@ -136,27 +110,19 @@ class GPTGatedAttnRes(nn.Module):
             torch.nn.init.uniform_(block.mlp.c_fc.weight, -s * 0.4, s * 0.4)
             torch.nn.init.zeros_(block.mlp.c_proj.weight)
 
-        # AttnRes pseudo-queries: zero init
         torch.nn.init.zeros_(self.attn_res_queries)
+        torch.nn.init.zeros_(self.sink_logits)
 
-        # AttnRes gates: uniform init for both projections (matching gated attention paper)
-        for gate in self.attn_res_gates:
-            torch.nn.init.uniform_(gate.down.weight, -s, s)
-            torch.nn.init.uniform_(gate.up.weight, -s, s)
-
-        # Value embeddings
         for ve in self.value_embeds.values():
             torch.nn.init.uniform_(ve.weight, -s, s)
         for block in self.transformer.h:
             if block.attn.ve_gate is not None:
                 torch.nn.init.uniform_(block.attn.ve_gate.weight, 0.0, 0.02)
 
-        # Rotary embeddings
         head_dim = self.config.n_embd // self.config.n_head
         cos, sin = self._precompute_rotary_embeddings(self.rotary_seq_len, head_dim)
         self.cos, self.sin = cos, sin
 
-        # Cast embeddings to COMPUTE_DTYPE
         if COMPUTE_DTYPE != torch.float16:
             self.transformer.wte.to(dtype=COMPUTE_DTYPE)
             for ve in self.value_embeds.values():
@@ -194,7 +160,7 @@ class GPTGatedAttnRes(nn.Module):
         nparams = sum(p.numel() for p in self.parameters())
         value_embeds_numel = sum(ve.weight.numel() for ve in self.value_embeds.values())
         nparams_exclude = (self.transformer.wte.weight.numel() + value_embeds_numel +
-                          self.attn_res_queries.numel() +
+                          self.attn_res_queries.numel() + self.sink_logits.numel() +
                           self.smear_gate.weight.numel() + self.smear_lambda.numel())
         h, q, t = self.config.n_head, self.config.n_embd // self.config.n_head, self.config.sequence_len
         attn_flops = 0
@@ -210,17 +176,15 @@ class GPTGatedAttnRes(nn.Module):
         value_embeds = sum(p.numel() for p in self.value_embeds.parameters())
         lm_head = sum(p.numel() for p in self.lm_head.parameters())
         transformer_matrices = sum(p.numel() for p in self.transformer.h.parameters())
-        gate_matrices = sum(p.numel() for p in self.attn_res_gates.parameters())
-        scalars = (self.attn_res_queries.numel() +
+        scalars = (self.attn_res_queries.numel() + self.sink_logits.numel() +
                    self.smear_gate.weight.numel() + self.smear_lambda.numel())
-        total = wte + value_embeds + lm_head + transformer_matrices + gate_matrices + scalars
+        total = wte + value_embeds + lm_head + transformer_matrices + scalars
         assert total == sum(p.numel() for p in self.parameters()), "Parameter count mismatch"
         return {
             'wte': wte,
             'value_embeds': value_embeds,
             'lm_head': lm_head,
             'transformer_matrices': transformer_matrices,
-            'gate_matrices': gate_matrices,
             'scalars': scalars,
             'total': total,
         }
@@ -230,14 +194,14 @@ class GPTGatedAttnRes(nn.Module):
         ddp, rank, local_rank, world_size = get_dist_info()
 
         matrix_params = list(self.transformer.h.parameters())
-        gate_params = list(self.attn_res_gates.parameters())
         value_embeds_params = list(self.value_embeds.parameters())
         embedding_params = list(self.transformer.wte.parameters())
         lm_head_params = list(self.lm_head.parameters())
         attn_res_params = [self.attn_res_queries]
+        sink_params = [self.sink_logits]
         smear_params = [self.smear_gate.weight, self.smear_lambda]
-        assert len(list(self.parameters())) == (len(matrix_params) + len(gate_params) + len(embedding_params) +
-            len(lm_head_params) + len(value_embeds_params) + len(attn_res_params) + len(smear_params))
+        assert len(list(self.parameters())) == (len(matrix_params) + len(embedding_params) +
+            len(lm_head_params) + len(value_embeds_params) + len(attn_res_params) + len(sink_params) + len(smear_params))
 
         dmodel_lr_scale = (model_dim / 768) ** -0.5
         print0(f"Scaling the LR for the AdamW parameters ∝1/√({model_dim}/768) = {dmodel_lr_scale:.6f}")
@@ -247,12 +211,11 @@ class GPTGatedAttnRes(nn.Module):
             dict(kind='adamw', params=embedding_params, lr=embedding_lr * dmodel_lr_scale, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.001),
             dict(kind='adamw', params=value_embeds_params, lr=embedding_lr * dmodel_lr_scale * 0.5, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.01),
             dict(kind='adamw', params=attn_res_params, lr=0.001, betas=(0.9, 0.999), eps=1e-10, weight_decay=0.0),
+            dict(kind='adamw', params=sink_params, lr=0.001, betas=(0.9, 0.999), eps=1e-10, weight_decay=0.0),
             dict(kind='adamw', params=smear_params, lr=0.2, betas=(0.8, 0.95), eps=1e-10, weight_decay=0.0),
         ]
-        # Gate matrices and transformer matrices go to Muon, grouped by shape
-        all_matrix_params = matrix_params + gate_params
-        for shape in sorted({p.shape for p in all_matrix_params}):
-            group_params = [p for p in all_matrix_params if p.shape == shape]
+        for shape in sorted({p.shape for p in matrix_params}):
+            group_params = [p for p in matrix_params if p.shape == shape]
             param_groups.append(dict(
                 kind='muon', params=group_params, lr=matrix_lr,
                 momentum=0.95, ns_steps=5, beta2=0.9, weight_decay=weight_decay,
@@ -268,12 +231,10 @@ class GPTGatedAttnRes(nn.Module):
         B, T = idx.size()
         n_layer = self.config.n_layer
 
-        # Rotary embeddings
         assert T <= self.cos.size(1)
         T0 = 0 if kv_cache is None else kv_cache.get_pos()
         cos_sin = self.cos[:, T0:T0+T], self.sin[:, T0:T0+T]
 
-        # Embed tokens
         x = self.transformer.wte(idx)
         x = x.to(COMPUTE_DTYPE)
         x = norm(x)
@@ -293,28 +254,25 @@ class GPTGatedAttnRes(nn.Module):
                 gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, :, :24]))
                 x = x + gate * x_pre_smear
 
-        # --- Gated Full Attention Residuals ---
-        v_list = [x]  # v_0 = token embedding
-        qi = 0  # query/gate index
+        # --- Full Attention Residuals with sink ---
+        v_list = [x]
+        qi = 0
 
         for i, block in enumerate(self.transformer.h):
-            # Gated AttnRes before attention sublayer
-            h = self._attn_res(self.attn_res_queries[qi], v_list, self.attn_res_gates[qi])
+            h = self._attn_res(self.attn_res_queries[qi], v_list, self.sink_logits[qi])
             qi += 1
 
             ve = self.value_embeds[str(i)](idx).to(h.dtype) if str(i) in self.value_embeds else None
             attn_out = block.attn(norm(h), ve, cos_sin, self.window_sizes[i], kv_cache)
             v_list.append(attn_out)
 
-            # Gated AttnRes before MLP sublayer
-            h = self._attn_res(self.attn_res_queries[qi], v_list, self.attn_res_gates[qi])
+            h = self._attn_res(self.attn_res_queries[qi], v_list, self.sink_logits[qi])
             qi += 1
 
             mlp_out = block.mlp(norm(h))
             v_list.append(mlp_out)
 
-        # Final gated AttnRes aggregation
-        x = self._attn_res(self.attn_res_queries[qi], v_list, self.attn_res_gates[qi])
+        x = self._attn_res(self.attn_res_queries[qi], v_list, self.sink_logits[qi])
         x = norm(x)
 
         # Logits
