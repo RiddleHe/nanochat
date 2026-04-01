@@ -130,10 +130,13 @@ with torch.no_grad():
 
 gate_avg = (gate_sum / gate_count).numpy()  # (n_queries, n_embd)
 
+# Sort each row ascending so x-axis becomes cumulative count
+gate_sorted = np.sort(gate_avg, axis=1)
+
 fig, ax = plt.subplots(figsize=(16, 6))
 
-im = ax.imshow(gate_avg, aspect='auto', cmap='RdYlBu_r', vmin=0, vmax=1, interpolation='nearest')
-ax.set_xlabel("Dimension", fontsize=12)
+im = ax.imshow(gate_sorted, aspect='auto', cmap='RdYlBu_r', vmin=0, vmax=1, interpolation='nearest')
+ax.set_xlabel("Dimension (sorted ascending per row)", fontsize=12)
 ax.set_ylabel("Gate (layer/sublayer)", fontsize=12)
 ax.set_title("Gate Sigmoid Values", fontsize=14)
 
