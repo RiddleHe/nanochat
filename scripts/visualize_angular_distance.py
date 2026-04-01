@@ -105,22 +105,28 @@ for model_idx, (model_tag, label) in enumerate(zip(args.model_tags, args.labels)
                 print(f"  {sample_idx + 1}/{args.num_samples}")
 
     ang_dist_avg = (ang_dist_sum / count).numpy()
+    # Mask upper triangle (keep lower triangle only)
+    mask = np.triu(np.ones_like(ang_dist_avg, dtype=bool), k=0)
+    ang_dist_avg[mask] = np.nan
     all_matrices.append(ang_dist_avg)
 
     del model
     if device_type == "cuda":
         torch.cuda.empty_cache()
 
-# Find shared color range
-vmax = max(m.max() for m in all_matrices)
+# Find shared color range (ignoring NaN)
+vmax = max(np.nanmax(m) for m in all_matrices)
+
+cmap = plt.cm.Blues.copy()
+cmap.set_bad(color='white', alpha=0)
 
 for model_idx, (label, matrix) in enumerate(zip(args.labels, all_matrices)):
     ax = axes[model_idx]
     n_points = matrix.shape[0]
-    im = ax.imshow(matrix, cmap='Blues', vmin=0, vmax=vmax, interpolation='nearest')
+    im = ax.imshow(matrix, cmap=cmap, vmin=0, vmax=vmax, interpolation='nearest')
     ax.set_title(label, fontsize=13)
-    ax.set_xlabel("Layer", fontsize=12)
-    ax.set_ylabel("Layer", fontsize=12)
+    ax.set_xlabel("Source Layer", fontsize=12)
+    ax.set_ylabel("Target Layer", fontsize=12)
     ax.set_xticks(range(0, n_points, max(1, n_points // 8)))
     ax.set_yticks(range(0, n_points, max(1, n_points // 8)))
 
