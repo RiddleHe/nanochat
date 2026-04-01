@@ -50,7 +50,7 @@ class AttnResGate(nn.Module):
         self.up = Linear(bottleneck, d, bias=False)
 
     def forward(self, y):
-        return y * torch.sigmoid(self.up(self.down(y)))
+        return y * torch.sigmoid(self.up(F.silu(self.down(y))))
 
 
 class Block(nn.Module):
