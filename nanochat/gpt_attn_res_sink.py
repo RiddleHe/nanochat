@@ -88,7 +88,7 @@ class GPTAttnResSink(nn.Module):
         logits = torch.einsum('d, n b t d -> n b t', query.to(V.dtype), K)  # (N, B, T)
         # Append sink logit — competes for softmax mass but contributes nothing
         B, T = logits.shape[1], logits.shape[2]
-        sink = sink_logit.expand(1, B, T)  # (1, B, T)
+        sink = sink_logit.to(logits.dtype).expand(1, B, T)  # (1, B, T)
         logits_with_sink = torch.cat([logits, sink], dim=0)  # (N+1, B, T)
         weights = logits_with_sink.softmax(dim=0)
         weights = weights[:-1]  # drop sink weight, keep only real source weights
