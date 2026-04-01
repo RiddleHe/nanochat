@@ -59,9 +59,9 @@ for model_idx, (model_tag, label) in enumerate(zip(args.model_tags, args.labels)
         tokenizer, 1, seq_len, split="val", device=device
     )
 
-    # Accumulate pairwise angular distances: (n_layer+1, n_layer+1)
-    # Index 0 = embedding input, index i = input to layer i (1-indexed)
-    n_points = n_layer + 1  # embedding + n_layer block inputs
+    # Accumulate pairwise angular distances: (n_layer, n_layer)
+    # Index i = input to attention at layer i (0-indexed)
+    n_points = n_layer
     ang_dist_sum = torch.zeros(n_points, n_points)
     count = 0
 
