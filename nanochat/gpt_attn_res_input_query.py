@@ -277,7 +277,7 @@ class GPTAttnResInputQuery(nn.Module):
 
         for i, block in enumerate(self.transformer.h):
             # Input-dependent AttnRes before attention sublayer
-            current_state = v_list[0]
+            current_state = v_list[-1]
             query = self.query_projs[qi](current_state)
             h = self._attn_res(query, v_list)
             qi += 1
@@ -287,7 +287,7 @@ class GPTAttnResInputQuery(nn.Module):
             v_list.append(attn_out)
 
             # Input-dependent AttnRes before MLP sublayer
-            current_state = v_list[0]
+            current_state = v_list[-1]
             query = self.query_projs[qi](current_state)
             h = self._attn_res(query, v_list)
             qi += 1
@@ -296,7 +296,7 @@ class GPTAttnResInputQuery(nn.Module):
             v_list.append(mlp_out)
 
         # Final AttnRes aggregation over all sublayer outputs
-        current_state = v_list[0]
+        current_state = v_list[-1]
         query = self.query_projs[qi](current_state)
         x = self._attn_res(query, v_list)
         x = norm(x)
