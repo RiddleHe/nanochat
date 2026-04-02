@@ -82,25 +82,24 @@ class GPTAttnResBalanced(nn.Module):
 
     def _attn_res(self, query, layer_outputs, collect_entropy=False):
         """
-        Compute attention residual. If collect_entropy=True, detach the query
-        so gradients from the balance loss flow only to layer outputs.
+        Compute attention residual. If collect_entropy=True, also compute entropy
+        with detached query so balance loss gradients flow only to layer outputs.
         Returns (h, entropy) if collect_entropy, else just h.
         """
         V = torch.stack(layer_outputs, dim=0)
         K = norm(V)
 
-        if collect_entropy:
-            # Detach query: balance loss gradient flows to K (layer outputs), not query
-            logits = torch.einsum('d, n b t d -> n b t', query.detach().to(V.dtype), K)
-        else:
-            logits = torch.einsum('d, n b t d -> n b t', query.to(V.dtype), K)
-
+        # Normal forward — LM loss gradients flow through query as usual
+        logits = torch.einsum('d, n b t d -> n b t', query.to(V.dtype), K)
         weights = logits.softmax(dim=0)
         h = torch.einsum('n b t, n b t d -> b t d', weights, V)
 
         if collect_entropy:
-            # Entropy of the attention weights over sources, averaged over B, T
-            entropy = -(weights * (weights + 1e-8).log()).sum(dim=0).mean()
+            # Separate entropy computation with detached query —
+            # balance loss gradients flow to K (layer outputs) only
+            logits_detached = torch.einsum('d, n b t d -> n b t', query.detach().to(V.dtype), K)
+            weights_detached = logits_detached.softmax(dim=0)
+            entropy = -(weights_detached * (weights_detached + 1e-8).log()).sum(dim=0).mean()
             return h, entropy
         return h
 
