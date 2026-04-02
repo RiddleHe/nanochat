@@ -75,7 +75,7 @@ with torch.no_grad():
             V = torch.stack(v_list, dim=0)
             K = norm(V)
             logits = torch.einsum('d, n b t d -> n b t', query.to(V.dtype), K)
-            sink = sink_logit.expand(1, B, T)
+            sink = sink_logit.to(logits.dtype).expand(1, B, T)
             logits_with_sink = torch.cat([logits, sink], dim=0)  # (N+1, B, T)
             weights = logits_with_sink.softmax(dim=0)  # (N+1, B, T)
 
@@ -102,7 +102,7 @@ with torch.no_grad():
             V = torch.stack(v_list, dim=0)
             K = norm(V)
             logits = torch.einsum('d, n b t d -> n b t', query.to(V.dtype), K)
-            sink = sink_logit.expand(1, B, T)
+            sink = sink_logit.to(logits.dtype).expand(1, B, T)
             logits_with_sink = torch.cat([logits, sink], dim=0)
             weights = logits_with_sink.softmax(dim=0)
 
