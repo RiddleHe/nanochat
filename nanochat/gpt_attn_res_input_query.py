@@ -3,12 +3,11 @@ GPT with Full Attention Residuals (AttnRes) and input-dependent queries.
 
 This variant keeps the original AttnRes data flow and source-depth softmax, but
 replaces each slot's fixed learned query vector with a query generated from the
-latest available hidden state:
+token embedding via a low-rank bottleneck:
 
-    current_state = v_list[-1]
-    query = W_slot * current_state
+    query = W_up(silu(W_down(v_list[0])))
 
-The projection matrices are zero-initialized so routing is uniform at step 0,
+W_down is random-init, W_up is zero-init so routing is uniform at step 0,
 matching the original AttnRes control condition.
 """
 
@@ -64,9 +63,15 @@ class GPTAttnResInputQuery(nn.Module):
         self.lm_head = Linear(config.n_embd, padded_vocab_size, bias=False)
 
         # 2 per transformer layer (before attn, before mlp) + 1 for final output.
+        # Low-rank bottleneck: down(d→32) → silu → up(32→d)
         self.n_queries = 2 * config.n_layer + 1
-        self.query_projs = nn.ModuleList([
-            Linear(config.n_embd, config.n_embd, bias=False)
+        self.query_bottleneck = 32
+        self.query_down = nn.ModuleList([
+            Linear(config.n_embd, self.query_bottleneck, bias=False)
+            for _ in range(self.n_queries)
+        ])
+        self.query_up = nn.ModuleList([
+            Linear(self.query_bottleneck, config.n_embd, bias=False)
             for _ in range(self.n_queries)
         ])
 
@@ -121,9 +126,11 @@ class GPTAttnResInputQuery(nn.Module):
             torch.nn.init.uniform_(block.mlp.c_fc.weight, -s * 0.4, s * 0.4)
             torch.nn.init.zeros_(block.mlp.c_proj.weight)
 
-        # Zero init preserves uniform initial routing, matching baseline AttnRes.
-        for proj in self.query_projs:
-            torch.nn.init.zeros_(proj.weight)
+        # Random down, zero up preserves uniform initial routing at step 0.
+        for down in self.query_down:
+            torch.nn.init.uniform_(down.weight, -s, s)
+        for up in self.query_up:
+            torch.nn.init.zeros_(up.weight)
 
         # Value embeddings
         for ve in self.value_embeds.values():
@@ -182,7 +189,7 @@ class GPTAttnResInputQuery(nn.Module):
             window = window_size[0]
             effective_seq = t if window < 0 else min(window, t)
             attn_flops += 12 * h * q * effective_seq
-        # Query projections are full dxd matrices, so they are counted with the
+        # Query projections are low-rank (d->32->d) matrices, counted with the
         # main matrix FLOP estimate above. The source-depth dot products remain tiny.
         num_flops_per_token = 6 * (nparams - nparams_exclude) + attn_flops
         return num_flops_per_token
@@ -191,7 +198,7 @@ class GPTAttnResInputQuery(nn.Module):
         wte = sum(p.numel() for p in self.transformer.wte.parameters())
         value_embeds = sum(p.numel() for p in self.value_embeds.parameters())
         lm_head = sum(p.numel() for p in self.lm_head.parameters())
-        query_matrices = sum(p.numel() for p in self.query_projs.parameters())
+        query_matrices = sum(p.numel() for p in self.query_down.parameters()) + sum(p.numel() for p in self.query_up.parameters())
         transformer_matrices = sum(p.numel() for p in self.transformer.h.parameters()) + query_matrices
         scalars = (self.smear_gate.weight.numel() + self.smear_lambda.numel())
         total = wte + value_embeds + lm_head + transformer_matrices + scalars
@@ -212,7 +219,7 @@ class GPTAttnResInputQuery(nn.Module):
         ddp, rank, local_rank, world_size = get_dist_info()
         del rank, local_rank, world_size
 
-        matrix_params = list(self.transformer.h.parameters()) + list(self.query_projs.parameters())
+        matrix_params = list(self.transformer.h.parameters()) + list(self.query_down.parameters()) + list(self.query_up.parameters())
         value_embeds_params = list(self.value_embeds.parameters())
         embedding_params = list(self.transformer.wte.parameters())
         lm_head_params = list(self.lm_head.parameters())
@@ -277,8 +284,7 @@ class GPTAttnResInputQuery(nn.Module):
 
         for i, block in enumerate(self.transformer.h):
             # Input-dependent AttnRes before attention sublayer
-            current_state = v_list[-1]
-            query = self.query_projs[qi](current_state)
+            query = self.query_up[qi](F.silu(self.query_down[qi](v_list[0])))
             h = self._attn_res(query, v_list)
             qi += 1
 
@@ -287,8 +293,7 @@ class GPTAttnResInputQuery(nn.Module):
             v_list.append(attn_out)
 
             # Input-dependent AttnRes before MLP sublayer
-            current_state = v_list[-1]
-            query = self.query_projs[qi](current_state)
+            query = self.query_up[qi](F.silu(self.query_down[qi](v_list[0])))
             h = self._attn_res(query, v_list)
             qi += 1
 
@@ -296,8 +301,7 @@ class GPTAttnResInputQuery(nn.Module):
             v_list.append(mlp_out)
 
         # Final AttnRes aggregation over all sublayer outputs
-        current_state = v_list[-1]
-        query = self.query_projs[qi](current_state)
+        query = self.query_up[qi](F.silu(self.query_down[qi](v_list[0])))
         x = self._attn_res(query, v_list)
         x = norm(x)
 
