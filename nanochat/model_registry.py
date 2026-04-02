@@ -47,6 +47,8 @@ def _register_variants():
     """Lazy import of variant model files so we don't load them unless needed."""
     from nanochat.gpt_attn_res import GPTAttnResConfig, GPTAttnRes
     register("attn_res", GPTAttnResConfig, GPTAttnRes)
+    from nanochat.gpt_attn_res_input_query import GPTAttnResInputQueryConfig, GPTAttnResInputQuery
+    register("attn_res_input_query", GPTAttnResInputQueryConfig, GPTAttnResInputQuery)
     from nanochat.gpt_gated_attn_res import GPTGatedAttnResConfig, GPTGatedAttnRes
     register("gated_attn_res", GPTGatedAttnResConfig, GPTGatedAttnRes)
     from nanochat.gpt_depth_v import GPTDepthVConfig, GPTDepthV
