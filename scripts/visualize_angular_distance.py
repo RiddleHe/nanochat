@@ -29,11 +29,7 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 
-from nanochat.common import (
-    get_base_dir,
-    autodetect_device_type,
-    download_file_with_lock,
-)
+from nanochat.common import get_base_dir, autodetect_device_type, download_file_with_lock
 from nanochat.checkpoint_manager import load_model
 from nanochat.tokenizer import get_tokenizer
 from nanochat.core_eval import render_prompts_mc, render_prompts_schema, render_prompts_lm
@@ -46,7 +42,7 @@ def place_eval_bundle(file_path):
     base_dir = get_base_dir()
     eval_bundle_dir = os.path.join(base_dir, "eval_bundle")
     with tempfile.TemporaryDirectory() as tmpdir:
-        with zipfile.ZipFile(file_path, 'r') as zip_ref:
+        with zipfile.ZipFile(file_path, "r") as zip_ref:
             zip_ref.extractall(tmpdir)
         extracted_bundle_dir = os.path.join(tmpdir, "eval_bundle")
         if os.path.exists(eval_bundle_dir):
@@ -56,17 +52,8 @@ def place_eval_bundle(file_path):
 def _normalize_label(label):
     return "".join(ch.lower() for ch in label if ch.isalnum())
 
-def resolve_core_task(task_lookup, label):
-    """Resolve a CORE task label with exact match first, then fuzzy fallback."""
-    key = _normalize_label(label)
-    if key in task_lookup:
-        return task_lookup[key]
-
-    available = sorted(task_meta["label"] for task_meta, _ in task_lookup.values())
-    raise ValueError(f"Could not find CORE task '{label}'. Available labels: {available}")
-
-def load_core_tasks():
-    """Load CORE task config and data files from eval_bundle."""
+def load_benchmark_data():
+    """Load the two hardcoded benchmarks from the CORE eval bundle."""
     base_dir = get_base_dir()
     eval_bundle_dir = os.path.join(base_dir, "eval_bundle")
     if not os.path.exists(eval_bundle_dir):
@@ -76,7 +63,7 @@ def load_core_tasks():
 
     config_path = os.path.join(eval_bundle_dir, "core.yaml")
     data_base_path = os.path.join(eval_bundle_dir, "eval_data")
-    with open(config_path, 'r', encoding='utf-8') as f:
+    with open(config_path, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
 
     task_lookup = {}
@@ -89,45 +76,54 @@ def load_core_tasks():
             "continuation_delimiter": task.get("continuation_delimiter", " "),
         }
         data_path = os.path.join(data_base_path, task_meta["dataset_uri"])
-        with open(data_path, 'r', encoding='utf-8') as f:
+        with open(data_path, "r", encoding="utf-8") as f:
             data = [json.loads(line.strip()) for line in f]
         task_lookup[_normalize_label(task_meta["label"])] = (task_meta, data)
-    return task_lookup
+
+    benchmark_data = []
+    for benchmark_label in BENCHMARK_LABELS:
+        key = _normalize_label(benchmark_label)
+        if key not in task_lookup:
+            available = sorted(task_meta["label"] for task_meta, _ in task_lookup.values())
+            raise ValueError(f"Could not find CORE task '{benchmark_label}'. Available labels: {available}")
+        benchmark_data.append(task_lookup[key])
+    return benchmark_data
 
 def build_benchmark_inputs(tokenizer, seq_len, task_meta, data, num_samples):
-    """Build tokenized input tensors for a CORE task."""
+    """Build 0-shot tokenized input tensors for a CORE task, dropping overlength examples."""
     shuffled = list(data)
     random.Random(1337).shuffle(shuffled)
-    selected = shuffled[:num_samples]
     bos_token = tokenizer.get_bos_token_id()
     inputs = []
+    num_total = len(shuffled)
+    num_dropped = 0
 
-    for sample_idx, item in enumerate(selected):
-        fewshot_examples = []
-        if task_meta["num_fewshot"] > 0:
-            rng = random.Random(1234 + sample_idx)
-            available_indices = [i for i in range(len(data)) if data[i] is not item]
-            fewshot_indices = rng.sample(available_indices, task_meta["num_fewshot"])
-            fewshot_examples = [data[i] for i in fewshot_indices]
-
+    for item in shuffled:
         if task_meta["task_type"] == "multiple_choice":
-            prompts = render_prompts_mc(item, task_meta["continuation_delimiter"], fewshot_examples)
+            prompts = render_prompts_mc(item, task_meta["continuation_delimiter"], fewshot_examples=[])
             prompt = prompts[item["gold"]]
         elif task_meta["task_type"] == "schema":
-            prompts = render_prompts_schema(item, task_meta["continuation_delimiter"], fewshot_examples)
+            prompts = render_prompts_schema(item, task_meta["continuation_delimiter"], fewshot_examples=[])
             prompt = prompts[item["gold"]]
         elif task_meta["task_type"] == "language_modeling":
-            _, prompt = render_prompts_lm(item, task_meta["continuation_delimiter"], fewshot_examples)
+            _, prompt = render_prompts_lm(item, task_meta["continuation_delimiter"], fewshot_examples=[])
         else:
             raise ValueError(f"Unsupported CORE task type: {task_meta['task_type']}")
 
         tokens = tokenizer(prompt, prepend=bos_token)
         if len(tokens) > seq_len:
-            tokens = tokens[-seq_len:]
-        x_input = torch.tensor(tokens, dtype=torch.long).unsqueeze(0)
-        inputs.append(x_input)
+            num_dropped += 1
+            continue
+        if len(inputs) < num_samples:
+            inputs.append(torch.tensor(tokens, dtype=torch.long).unsqueeze(0))
 
-    return inputs
+    stats = {
+        "num_total": num_total,
+        "num_dropped": num_dropped,
+        "num_remaining": num_total - num_dropped,
+        "num_selected": len(inputs),
+    }
+    return inputs, stats
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model-tags", type=str, nargs="+", required=True)
@@ -144,11 +140,7 @@ assert len(args.labels) == len(args.model_tags)
 device_type = autodetect_device_type() if args.device_type == "" else args.device_type
 device = torch.device(device_type)
 tokenizer = get_tokenizer()
-core_tasks = load_core_tasks()
-
-benchmark_data = []
-for benchmark_label in BENCHMARK_LABELS:
-    benchmark_data.append(resolve_core_task(core_tasks, benchmark_label))
+benchmark_data = load_benchmark_data()
 
 n_models = len(args.model_tags)
 fig, axes = plt.subplots(len(BENCHMARK_LABELS), n_models, figsize=(6 * n_models, 5 * len(BENCHMARK_LABELS)))
@@ -170,10 +162,21 @@ for model_idx, (model_tag, model_label) in enumerate(zip(args.model_tags, args.l
     config = meta["model_config"]
     n_layer = config["n_layer"]
     seq_len = config["sequence_len"]
-    benchmark_inputs = [
-        build_benchmark_inputs(tokenizer, seq_len, task_meta, data, args.num_samples)
-        for task_meta, data in benchmark_data
-    ]
+    benchmark_inputs = []
+    for task_meta, data in benchmark_data:
+        sample_inputs, stats = build_benchmark_inputs(
+            tokenizer,
+            seq_len,
+            task_meta,
+            data,
+            args.num_samples,
+        )
+        benchmark_inputs.append(sample_inputs)
+        print(
+            f"  Loaded {task_meta['label']} from {task_meta['dataset_uri']} "
+            f"(0-shot, kept {stats['num_remaining']}/{stats['num_total']}, "
+            f"selected {stats['num_selected']})"
+        )
 
     for benchmark_idx, (benchmark_label, sample_inputs) in enumerate(zip(BENCHMARK_LABELS, benchmark_inputs)):
         print(f"  Benchmark: {benchmark_label}")
