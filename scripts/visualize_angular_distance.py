@@ -241,9 +241,6 @@ for model_idx, (model_tag, model_label) in enumerate(zip(args.model_tags, args.l
     if device_type == "cuda":
         torch.cuda.empty_cache()
 
-# Find shared color range (ignoring NaN)
-vmax = max(np.nanmax(m) for m in all_matrices)
-
 cmap = plt.cm.viridis_r.copy()
 cmap.set_bad(color='white', alpha=0)
 
@@ -255,7 +252,7 @@ for model_idx, model_label in enumerate(args.labels):
         matrix_idx += 1
         ax = axes[benchmark_idx, model_idx]
         n_pts = all_n_layers[model_idx][benchmark_idx]
-        im = ax.imshow(matrix, cmap=cmap, vmin=0, vmax=vmax, interpolation='nearest', origin='lower')
+        im = ax.imshow(matrix, cmap=cmap, vmin=0, vmax=1, interpolation='nearest', origin='lower')
         ax.set_title(f"{model_label} | {benchmark_label}", fontsize=13)
         ax.set_xlabel("Layer Index $\\ell$", fontsize=12)
         ax.set_ylabel("Subsequent $n^{th}$ Layer", fontsize=12)
