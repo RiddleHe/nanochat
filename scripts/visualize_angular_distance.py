@@ -116,11 +116,12 @@ def build_benchmark_inputs(tokenizer, seq_len, task_meta, data, num_samples):
             continue
         if len(inputs) < num_samples:
             inputs.append(torch.tensor(tokens, dtype=torch.long).unsqueeze(0))
+            if len(inputs) == num_samples:
+                break
 
     stats = {
         "num_total": num_total,
         "num_dropped": num_dropped,
-        "num_remaining": num_total - num_dropped,
         "num_selected": len(inputs),
     }
     return inputs, stats
@@ -174,7 +175,7 @@ for model_idx, (model_tag, model_label) in enumerate(zip(args.model_tags, args.l
         benchmark_inputs.append(sample_inputs)
         print(
             f"  Loaded {task_meta['label']} from {task_meta['dataset_uri']} "
-            f"(0-shot, kept {stats['num_remaining']}/{stats['num_total']}, "
+            f"(0-shot, dropped {stats['num_dropped']}/{stats['num_total']}, "
             f"selected {stats['num_selected']})"
         )
 
