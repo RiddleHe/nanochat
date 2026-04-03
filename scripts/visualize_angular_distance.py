@@ -62,13 +62,6 @@ def resolve_core_task(task_lookup, label):
     if key in task_lookup:
         return task_lookup[key]
 
-    matches = []
-    for task_key, task_value in task_lookup.items():
-        if key in task_key or task_key in key:
-            matches.append(task_value)
-    if len(matches) == 1:
-        return matches[0]
-
     available = sorted(task_meta["label"] for task_meta, _ in task_lookup.values())
     raise ValueError(f"Could not find CORE task '{label}'. Available labels: {available}")
 
@@ -158,9 +151,13 @@ for benchmark_label in BENCHMARK_LABELS:
     benchmark_data.append(resolve_core_task(core_tasks, benchmark_label))
 
 n_models = len(args.model_tags)
-fig, axes = plt.subplots(n_models, len(BENCHMARK_LABELS), figsize=(12, 5 * n_models))
-if n_models == 1:
+fig, axes = plt.subplots(len(BENCHMARK_LABELS), n_models, figsize=(6 * n_models, 5 * len(BENCHMARK_LABELS)))
+if len(BENCHMARK_LABELS) == 1 and n_models == 1:
+    axes = np.array([[axes]])
+elif len(BENCHMARK_LABELS) == 1:
     axes = np.expand_dims(axes, axis=0)
+elif n_models == 1:
+    axes = np.expand_dims(axes, axis=1)
 
 # Shared colorbar range
 all_matrices = []
@@ -256,7 +253,7 @@ for model_idx, model_label in enumerate(args.labels):
     for benchmark_idx, benchmark_label in enumerate(BENCHMARK_LABELS):
         matrix = all_matrices[matrix_idx]
         matrix_idx += 1
-        ax = axes[model_idx, benchmark_idx]
+        ax = axes[benchmark_idx, model_idx]
         n_pts = all_n_layers[model_idx][benchmark_idx]
         im = ax.imshow(matrix, cmap=cmap, vmin=0, vmax=vmax, interpolation='nearest', origin='lower')
         ax.set_title(f"{model_label} | {benchmark_label}", fontsize=13)
