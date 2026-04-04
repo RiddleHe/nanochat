@@ -5,7 +5,10 @@ For each model, produces two heatmaps:
 - ARC Challenge (science QA / reasoning)
 
 Each heatmap cell (i, j) shows the angular distance between the hidden state at
-layer i and layer j, averaged over benchmark prompts.
+layer i and layer j, averaged over decode steps across benchmark prompts.
+
+The model greedy-decodes up to 64 tokens per prompt (stopping at EOS), and
+angular distances are computed from the last-token activations at each step.
 
 Reference: "The Curse of Depth in Large Language Models" (arxiv 2502.05795)
 
@@ -36,6 +39,7 @@ from nanochat.core_eval import render_prompts_mc, render_prompts_schema, render_
 
 EVAL_BUNDLE_URL = "https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip"
 BENCHMARK_LABELS = ["Jeopardy", "ARC Challenge"]
+MAX_GEN_TOKENS = 64
 
 def place_eval_bundle(file_path):
     """Unzip eval_bundle.zip and place it in the base directory."""
@@ -89,33 +93,36 @@ def load_benchmark_data():
         benchmark_data.append(task_lookup[key])
     return benchmark_data
 
+def render_prompt_stem(task_meta, item):
+    """Render the question/context stem without the golden answer (0-shot)."""
+    cd = task_meta["continuation_delimiter"]
+    if task_meta["task_type"] == "multiple_choice":
+        return item["query"] + cd
+    elif task_meta["task_type"] == "schema":
+        return item["context_options"][0] + cd
+    elif task_meta["task_type"] == "language_modeling":
+        return item["context"].strip() + cd
+    else:
+        raise ValueError(f"Unsupported CORE task type: {task_meta['task_type']}")
+
 def build_benchmark_inputs(tokenizer, seq_len, task_meta, data, num_samples):
-    """Build 0-shot tokenized input tensors for a CORE task, dropping overlength examples."""
+    """Build 0-shot tokenized prompt stems, dropping those too long for generation."""
     shuffled = list(data)
     random.Random(1337).shuffle(shuffled)
     bos_token = tokenizer.get_bos_token_id()
+    max_prompt_len = seq_len - MAX_GEN_TOKENS
     inputs = []
     num_total = len(shuffled)
     num_dropped = 0
 
     for item in shuffled:
-        if task_meta["task_type"] == "multiple_choice":
-            prompts = render_prompts_mc(item, task_meta["continuation_delimiter"], fewshot_examples=[])
-            prompt = prompts[item["gold"]]
-        elif task_meta["task_type"] == "schema":
-            prompts = render_prompts_schema(item, task_meta["continuation_delimiter"], fewshot_examples=[])
-            prompt = prompts[item["gold"]]
-        elif task_meta["task_type"] == "language_modeling":
-            _, prompt = render_prompts_lm(item, task_meta["continuation_delimiter"], fewshot_examples=[])
-        else:
-            raise ValueError(f"Unsupported CORE task type: {task_meta['task_type']}")
-
+        prompt = render_prompt_stem(task_meta, item)
         tokens = tokenizer(prompt, prepend=bos_token)
-        if len(tokens) > seq_len:
+        if len(tokens) > max_prompt_len:
             num_dropped += 1
             continue
         if len(inputs) < num_samples:
-            inputs.append(torch.tensor(tokens, dtype=torch.long).unsqueeze(0))
+            inputs.append(tokens)
             if len(inputs) == num_samples:
                 break
 
@@ -125,6 +132,43 @@ def build_benchmark_inputs(tokenizer, seq_len, task_meta, data, num_samples):
         "num_selected": len(inputs),
     }
     return inputs, stats
+
+def greedy_decode_with_hooks(model, prompt_tokens, eos_token, bos_token):
+    """Greedy-decode up to MAX_GEN_TOKENS, capturing per-layer activations at each step.
+
+    Returns a list of per-step layer activations. Each element is a list of
+    (n_layer,) tensors of shape (D,) — the last-token hidden state entering
+    each attention sublayer.
+    """
+    device = model.get_device()
+    ids = torch.tensor([prompt_tokens], dtype=torch.long, device=device)
+    step_layer_reps = []  # list of lists, one per decode step
+    layer_inputs = []
+
+    def make_hook(storage):
+        def hook_fn(module, inp, out):
+            storage.append(inp[0][:, -1, :].detach())
+        return hook_fn
+
+    hooks = []
+    for block in model.transformer.h:
+        hooks.append(block.attn.register_forward_hook(make_hook(layer_inputs)))
+
+    try:
+        for _ in range(MAX_GEN_TOKENS):
+            logits = model(ids)
+            step_layer_reps.append([li.squeeze(0).float() for li in layer_inputs])
+            layer_inputs.clear()
+
+            next_token = torch.argmax(logits[:, -1, :], dim=-1).item()
+            if next_token == eos_token or next_token == bos_token:
+                break
+            ids = torch.cat([ids, torch.tensor([[next_token]], dtype=torch.long, device=device)], dim=1)
+    finally:
+        for h in hooks:
+            h.remove()
+
+    return step_layer_reps
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model-tags", type=str, nargs="+", required=True)
@@ -141,6 +185,8 @@ assert len(args.labels) == len(args.model_tags)
 device_type = autodetect_device_type() if args.device_type == "" else args.device_type
 device = torch.device(device_type)
 tokenizer = get_tokenizer()
+eos_token = tokenizer.encode_special("<|assistant_end|>")
+bos_token = tokenizer.get_bos_token_id()
 benchmark_data = load_benchmark_data()
 
 n_models = len(args.model_tags)
@@ -175,67 +221,48 @@ for model_idx, (model_tag, model_label) in enumerate(zip(args.model_tags, args.l
         benchmark_inputs.append(sample_inputs)
         print(
             f"  Loaded {task_meta['label']} from {task_meta['dataset_uri']} "
-            f"(0-shot, dropped {stats['num_dropped']}/{stats['num_total']}, "
+            f"(0-shot, max_prompt_len={seq_len - MAX_GEN_TOKENS}, "
+            f"dropped {stats['num_dropped']}/{stats['num_total']}, "
             f"selected {stats['num_selected']})"
         )
 
     for benchmark_idx, (benchmark_label, sample_inputs) in enumerate(zip(BENCHMARK_LABELS, benchmark_inputs)):
         print(f"  Benchmark: {benchmark_label}")
-        # Accumulate pairwise angular distances: (n_layer, n_layer)
-        # Index i = input to attention at layer i (0-indexed)
         n_points = n_layer
         ang_dist_sum = torch.zeros(n_points, n_points)
         count = 0
 
         with torch.no_grad():
-            for sample_idx, x_input in enumerate(sample_inputs):
-                x_input = x_input.to(device)
+            for sample_idx, prompt_tokens in enumerate(sample_inputs):
+                step_layer_reps = greedy_decode_with_hooks(model, prompt_tokens, eos_token, bos_token)
 
-                # Capture input to each attention sublayer via forward hooks
-                layer_inputs = []
-
-                def make_hook(layer_inputs_list):
-                    def hook_fn(module, input, output):
-                        layer_inputs_list.append(input[0].detach())
-                    return hook_fn
-
-                hooks = []
-                for block in model.transformer.h:
-                    hooks.append(block.attn.register_forward_hook(make_hook(layer_inputs)))
-
-                model(x_input)
-
-                for h in hooks:
-                    h.remove()
-
-                # layer_inputs[i] is the normed input to attention at layer i
-                # Compute all pairwise angular distances
-                reps = [li.float() for li in layer_inputs]  # n_layer tensors of (B, T, D)
-
-                for i in range(len(reps)):
-                    for j in range(i + 1, len(reps)):
-                        cos_sim = torch.nn.functional.cosine_similarity(reps[i], reps[j], dim=-1)
-                        cos_sim = cos_sim.clamp(-1, 1)
-                        ang_dist = torch.acos(cos_sim) / torch.pi
-                        avg = ang_dist.mean().cpu()
-                        ang_dist_sum[i, j] += avg
-                        ang_dist_sum[j, i] += avg
-
-                count += 1
-                layer_inputs.clear()
+                # Average angular distances across all decode steps
+                for step_reps in step_layer_reps:
+                    # step_reps: list of n_layer tensors of shape (D,)
+                    for i in range(len(step_reps)):
+                        for j in range(i + 1, len(step_reps)):
+                            cos_sim = torch.nn.functional.cosine_similarity(
+                                step_reps[i].unsqueeze(0), step_reps[j].unsqueeze(0), dim=-1
+                            )
+                            cos_sim = cos_sim.clamp(-1, 1)
+                            ang_dist = torch.acos(cos_sim) / torch.pi
+                            avg = ang_dist.item()
+                            ang_dist_sum[i, j] += avg
+                            ang_dist_sum[j, i] += avg
+                    count += 1
 
                 if (sample_idx + 1) % 10 == 0:
-                    print(f"    {sample_idx + 1}/{len(sample_inputs)}")
+                    n_steps = len(step_layer_reps)
+                    print(f"    {sample_idx + 1}/{len(sample_inputs)} (last sample: {n_steps} decode steps)")
 
         ang_dist_avg = (ang_dist_sum / count).numpy()
         n_pts = ang_dist_avg.shape[0]
 
         # Reshape into offset matrix: row n = n-th subsequent layer, col = source layer
-        # offset_matrix[n, l] = angular distance between layer l and layer l+n+1
         max_offset = n_pts - 1
         offset_matrix = np.full((max_offset, n_pts - 1), np.nan)
-        for l in range(n_pts - 1):          # source layer
-            for n in range(1, n_pts - l):   # offset (1, 2, ...)
+        for l in range(n_pts - 1):
+            for n in range(1, n_pts - l):
                 offset_matrix[n - 1, l] = ang_dist_avg[l, l + n]
 
         all_matrices.append(offset_matrix)
@@ -265,7 +292,7 @@ for model_idx, model_label in enumerate(args.labels):
         ax.set_yticks(range(0, n_pts - 1, max(1, (n_pts - 1) // 4)))
         ax.set_yticklabels([i + 1 for i in range(0, n_pts - 1, max(1, (n_pts - 1) // 4))], fontsize=8)
 
-fig.suptitle("Cross-Layer Angular Distance by Benchmark", fontsize=15)
+fig.suptitle("Cross-Layer Angular Distance by Benchmark (Decode)", fontsize=15)
 fig.subplots_adjust(bottom=0.18)
 cbar_ax = fig.add_axes([0.15, 0.06, 0.7, 0.03])
 fig.colorbar(im, cax=cbar_ax, orientation='horizontal', label="Angular Distance (0=identical, 1=orthogonal)")
