@@ -1,15 +1,23 @@
 """
-GPT with Full Attention Residuals + load balancing loss on depth attention.
+GPT with Full Attention Residuals (AttnRes).
+Paper: "Attention Residuals" (MoonshotAI)
 
-Same as gpt_attn_res.py but adds an entropy-maximization auxiliary loss
-on the AttnRes softmax weights, with gradients flowing to layer outputs
-(not queries), encouraging layers to produce distinct, useful representations.
+Instead of fixed residual connections (h_l = h_{l-1} + f(h_{l-1})),
+each sublayer computes a softmax-weighted sum over ALL prior sublayer outputs,
+using a single learned pseudo-query vector w_l per sublayer:
 
-Inspired by MoE load balancing (Switch Transformer, coeff=0.001).
-The balance loss is only applied to _attn_res calls with >= min_sources sources,
-since early layers have too few sources for meaningful entropy.
+    h_l = sum_{i=0}^{l-1} alpha_{i->l} * v_i
+    alpha_{i->l} = exp(w_l^T * RMSNorm(v_i)) / sum_j exp(w_l^T * RMSNorm(v_j))
+
+Pseudo-queries are initialized to zero so that initial weights are uniform,
+reducing AttnRes to an equal-weight average at training start.
+
+All other features (smear, value embeddings, sliding window, etc.)
+are kept from the base GPT model. resid_lambdas, x0_lambdas, and backout
+are removed since AttnRes replaces the residual connection entirely.
 """
 
+from functools import partial
 from dataclasses import dataclass
 
 import torch
@@ -20,11 +28,13 @@ from nanochat.common import get_dist_info, print0, COMPUTE_DTYPE
 from nanochat.optim import MuonAdamW, DistMuonAdamW
 from nanochat.flash_attention import flash_attn
 
-from nanochat.gpt import norm, Linear, has_ve, apply_rotary_emb, CausalSelfAttention, MLP
+
+# Reuse these from base gpt.py
+from nanochat.model.gpt import norm, Linear, has_ve, apply_rotary_emb, CausalSelfAttention, MLP
 
 
 @dataclass
-class GPTAttnResBalancedConfig:
+class GPTAttnResConfig:
     sequence_len: int = 2048
     vocab_size: int = 32768
     n_layer: int = 12
@@ -33,18 +43,17 @@ class GPTAttnResBalancedConfig:
     n_embd: int = 768
     window_pattern: str = "SSSL"
     xsa_mode: str = "none"
-    balance_coeff: float = 0.001
-    balance_min_sources: int = 6  # only apply balance loss when >= this many sources
 
 
 class Block(nn.Module):
+    """Weight container for attention + MLP. Forward is called by GPTAttnRes directly."""
     def __init__(self, config, layer_idx):
         super().__init__()
         self.attn = CausalSelfAttention(config, layer_idx)
         self.mlp = MLP(config)
 
 
-class GPTAttnResBalanced(nn.Module):
+class GPTAttnRes(nn.Module):
     def __init__(self, config, pad_vocab_size_to=64):
         super().__init__()
         self.config = config
@@ -60,13 +69,19 @@ class GPTAttnResBalanced(nn.Module):
         })
         self.lm_head = Linear(config.n_embd, padded_vocab_size, bias=False)
 
+        # AttnRes pseudo-queries: 2 per transformer layer (before attn, before mlp) + 1 for final output.
+        # Initialized to zero so initial attention weights are uniform (critical for training stability).
+        # Padded to multiple of 8 so distributed optimizer can shard across up to 8 GPUs.
         self.n_queries = 2 * config.n_layer + 1
         n_queries_padded = ((self.n_queries + 7) // 8) * 8
         self.attn_res_queries = nn.Parameter(torch.zeros(n_queries_padded, config.n_embd))
 
+        # Smear: mix previous token's embedding into current token (cheap bigram info)
         self.smear_gate = Linear(24, 1, bias=False)
         self.smear_lambda = nn.Parameter(torch.zeros(1))
 
+
+        # Value embeddings (ResFormer-style): alternating layers
         head_dim = config.n_embd // config.n_head
         kv_dim = config.n_kv_head * head_dim
         self.value_embeds = nn.ModuleDict({
@@ -74,40 +89,35 @@ class GPTAttnResBalanced(nn.Module):
             for i in range(config.n_layer) if has_ve(i, config.n_layer)
         })
 
+        # Rotary embeddings (over-computed 10X, same as base GPT)
         self.rotary_seq_len = config.sequence_len * 10
         head_dim = config.n_embd // config.n_head
         cos, sin = self._precompute_rotary_embeddings(self.rotary_seq_len, head_dim)
         self.register_buffer("cos", cos, persistent=False)
         self.register_buffer("sin", sin, persistent=False)
 
-    def _attn_res(self, query, layer_outputs, collect_entropy=False):
+    def _attn_res(self, query, layer_outputs):
         """
-        Compute attention residual. If collect_entropy=True, also compute entropy
-        with detached query so balance loss gradients flow only to layer outputs.
-        Returns (h, entropy) if collect_entropy, else just h.
-        """
-        V = torch.stack(layer_outputs, dim=0)
-        K = norm(V)
+        Compute attention residual: softmax-weighted sum over prior layer outputs.
 
-        # Normal forward — LM loss gradients flow through query as usual
+        query: (D,) learned pseudo-query vector
+        layer_outputs: list of N tensors, each (B, T, D)
+        returns: (B, T, D)
+        """
+        V = torch.stack(layer_outputs, dim=0)  # (N, B, T, D)
+        K = norm(V)  # RMSNorm on keys (critical per paper ablation)
         logits = torch.einsum('d, n b t d -> n b t', query.to(V.dtype), K)
-        weights = logits.softmax(dim=0)
+        weights = logits.softmax(dim=0)  # softmax over layer dimension
         h = torch.einsum('n b t, n b t d -> b t d', weights, V)
-
-        if collect_entropy:
-            # Separate entropy computation with detached query —
-            # balance loss gradients flow to K (layer outputs) only
-            logits_detached = torch.einsum('d, n b t d -> n b t', query.detach().to(V.dtype), K)
-            weights_detached = logits_detached.softmax(dim=0)
-            entropy = -(weights_detached * (weights_detached + 1e-8).log()).sum(dim=0).mean()
-            return h, entropy
         return h
 
     @torch.no_grad()
     def init_weights(self):
+        # Embedding and unembedding
         torch.nn.init.normal_(self.transformer.wte.weight, mean=0.0, std=0.8)
         torch.nn.init.normal_(self.lm_head.weight, mean=0.0, std=0.001)
 
+        # Transformer blocks
         n_embd = self.config.n_embd
         s = 3**0.5 * n_embd**-0.5
         for block in self.transformer.h:
@@ -118,18 +128,22 @@ class GPTAttnResBalanced(nn.Module):
             torch.nn.init.uniform_(block.mlp.c_fc.weight, -s * 0.4, s * 0.4)
             torch.nn.init.zeros_(block.mlp.c_proj.weight)
 
+        # AttnRes pseudo-queries: zero init (uniform initial attention weights)
         torch.nn.init.zeros_(self.attn_res_queries)
 
+        # Value embeddings
         for ve in self.value_embeds.values():
             torch.nn.init.uniform_(ve.weight, -s, s)
         for block in self.transformer.h:
             if block.attn.ve_gate is not None:
                 torch.nn.init.uniform_(block.attn.ve_gate.weight, 0.0, 0.02)
 
+        # Rotary embeddings
         head_dim = self.config.n_embd // self.config.n_head
         cos, sin = self._precompute_rotary_embeddings(self.rotary_seq_len, head_dim)
         self.cos, self.sin = cos, sin
 
+        # Cast embeddings to COMPUTE_DTYPE
         if COMPUTE_DTYPE != torch.float16:
             self.transformer.wte.to(dtype=COMPUTE_DTYPE)
             for ve in self.value_embeds.values():
@@ -175,6 +189,9 @@ class GPTAttnResBalanced(nn.Module):
             window = window_size[0]
             effective_seq = t if window < 0 else min(window, t)
             attn_flops += 12 * h * q * effective_seq
+        # AttnRes flops: each _attn_res call does a dot product of query (D,) with N keys of (D,) per position
+        # 2*n_layer+1 calls, average N ~ n_layer sublayer outputs, cost ~ 2*D per dot product
+        # This is tiny compared to transformer flops, so we skip it
         num_flops_per_token = 6 * (nparams - nparams_exclude) + attn_flops
         return num_flops_per_token
 
@@ -235,19 +252,18 @@ class GPTAttnResBalanced(nn.Module):
     def forward(self, idx, targets=None, kv_cache=None, loss_reduction='mean'):
         B, T = idx.size()
         n_layer = self.config.n_layer
-        min_sources = self.config.balance_min_sources
-        balance_coeff = self.config.balance_coeff
-        training = targets is not None  # only apply balance loss during training
 
+        # Rotary embeddings
         assert T <= self.cos.size(1)
         T0 = 0 if kv_cache is None else kv_cache.get_pos()
         cos_sin = self.cos[:, T0:T0+T], self.sin[:, T0:T0+T]
 
+        # Embed tokens
         x = self.transformer.wte(idx)
         x = x.to(COMPUTE_DTYPE)
         x = norm(x)
 
-        # Smear
+        # Smear: mix previous token's embedding into current position
         if kv_cache is None:
             assert T > 1
             gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, 1:, :24]))
@@ -262,22 +278,14 @@ class GPTAttnResBalanced(nn.Module):
                 gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, :, :24]))
                 x = x + gate * x_pre_smear
 
-        # --- Full Attention Residuals with balance loss ---
-        v_list = [x]
-        qi = 0
-        entropy_sum = 0.0
-        entropy_count = 0
+        # --- Full Attention Residuals ---
+        # v_list collects all sublayer outputs: [embedding, attn_0, mlp_0, attn_1, mlp_1, ...]
+        v_list = [x]  # v_0 = token embedding
+        qi = 0  # query index into attn_res_queries
 
         for i, block in enumerate(self.transformer.h):
             # AttnRes before attention sublayer
-            n_sources = len(v_list)
-            collect = training and n_sources >= min_sources
-            if collect:
-                h, ent = self._attn_res(self.attn_res_queries[qi], v_list, collect_entropy=True)
-                entropy_sum = entropy_sum + ent
-                entropy_count += 1
-            else:
-                h = self._attn_res(self.attn_res_queries[qi], v_list)
+            h = self._attn_res(self.attn_res_queries[qi], v_list)
             qi += 1
 
             ve = self.value_embeds[str(i)](idx).to(h.dtype) if str(i) in self.value_embeds else None
@@ -285,28 +293,14 @@ class GPTAttnResBalanced(nn.Module):
             v_list.append(attn_out)
 
             # AttnRes before MLP sublayer
-            n_sources = len(v_list)
-            collect = training and n_sources >= min_sources
-            if collect:
-                h, ent = self._attn_res(self.attn_res_queries[qi], v_list, collect_entropy=True)
-                entropy_sum = entropy_sum + ent
-                entropy_count += 1
-            else:
-                h = self._attn_res(self.attn_res_queries[qi], v_list)
+            h = self._attn_res(self.attn_res_queries[qi], v_list)
             qi += 1
 
             mlp_out = block.mlp(norm(h))
             v_list.append(mlp_out)
 
-        # Final AttnRes aggregation
-        n_sources = len(v_list)
-        collect = training and n_sources >= min_sources
-        if collect:
-            x, ent = self._attn_res(self.attn_res_queries[qi], v_list, collect_entropy=True)
-            entropy_sum = entropy_sum + ent
-            entropy_count += 1
-        else:
-            x = self._attn_res(self.attn_res_queries[qi], v_list)
+        # Final AttnRes aggregation over all sublayer outputs
+        x = self._attn_res(self.attn_res_queries[qi], v_list)
         x = norm(x)
 
         # Logits
@@ -317,13 +311,7 @@ class GPTAttnResBalanced(nn.Module):
         logits = softcap * torch.tanh(logits / softcap)
 
         if targets is not None:
-            lm_loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-1, reduction=loss_reduction)
-            # Balance loss: negative mean entropy (minimize = maximize entropy)
-            if entropy_count > 0:
-                balance_loss = -(entropy_sum / entropy_count)
-                loss = lm_loss + balance_coeff * balance_loss
-            else:
-                loss = lm_loss
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-1, reduction=loss_reduction)
             return loss
         else:
             return logits

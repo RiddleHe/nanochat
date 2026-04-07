@@ -8,7 +8,7 @@ Usage:
 """
 
 from dataclasses import dataclass
-from nanochat.gpt import GPTConfig, GPT
+from nanochat.model.gpt import GPTConfig, GPT
 
 @dataclass
 class GPTNoLambdaConfig(GPTConfig):
@@ -45,15 +45,15 @@ def get_model(name="gpt"):
 
 def _register_variants():
     """Lazy import of variant model files so we don't load them unless needed."""
-    from nanochat.gpt_attn_res import GPTAttnResConfig, GPTAttnRes
+    from nanochat.model.gpt_attn_res import GPTAttnResConfig, GPTAttnRes
     register("attn_res", GPTAttnResConfig, GPTAttnRes)
-    from nanochat.gpt_attn_res_input_query import GPTAttnResInputQueryConfig, GPTAttnResInputQuery
+    from nanochat.model.gpt_attn_res_input_query import GPTAttnResInputQueryConfig, GPTAttnResInputQuery
     register("attn_res_input_query", GPTAttnResInputQueryConfig, GPTAttnResInputQuery)
-    from nanochat.gpt_gated_attn_res import GPTGatedAttnResConfig, GPTGatedAttnRes
+    from nanochat.model.gpt_gated_attn_res import GPTGatedAttnResConfig, GPTGatedAttnRes
     register("gated_attn_res", GPTGatedAttnResConfig, GPTGatedAttnRes)
-    from nanochat.gpt_depth_v import GPTDepthVConfig, GPTDepthV
+    from nanochat.model.gpt_depth_v import GPTDepthVConfig, GPTDepthV
     register("depth_v", GPTDepthVConfig, GPTDepthV)
-    from nanochat.gpt_attn_res_balanced import GPTAttnResBalancedConfig, GPTAttnResBalanced
+    from nanochat.model.gpt_attn_res_balanced import GPTAttnResBalancedConfig, GPTAttnResBalanced
     register("attn_res_balanced", GPTAttnResBalancedConfig, GPTAttnResBalanced)
-    from nanochat.gpt_attn_res_sink import GPTAttnResSinkConfig, GPTAttnResSink
+    from nanochat.model.gpt_attn_res_sink import GPTAttnResSinkConfig, GPTAttnResSink
     register("attn_res_sink", GPTAttnResSinkConfig, GPTAttnResSink)

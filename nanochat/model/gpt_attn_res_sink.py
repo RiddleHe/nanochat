@@ -1,17 +1,15 @@
 """
-GPT with Full Attention Residuals (AttnRes) and input-dependent queries.
+GPT with Full Attention Residuals + learnable sink logits.
 
-This variant keeps the original AttnRes data flow and source-depth softmax, but
-replaces each slot's fixed learned query vector with a query generated from the
-token embedding via a low-rank bottleneck:
+Each _attn_res call has a learnable scalar sink logit that competes with
+real sources for softmax probability mass. After softmax, the sink weight
+is discarded — it absorbs attention but contributes nothing to the output.
+This gives the model a "none of the above" option, reducing dump attention
+on unimportant layer outputs.
 
-    query = W_up(silu(W_down(v_list[0])))
-
-W_down is random-init, W_up is zero-init so routing is uniform at step 0,
-matching the original AttnRes control condition.
+Inspired by OpenAI gpt-oss sink implementation.
 """
 
-from functools import partial
 from dataclasses import dataclass
 
 import torch
@@ -22,12 +20,11 @@ from nanochat.common import get_dist_info, print0, COMPUTE_DTYPE
 from nanochat.optim import MuonAdamW, DistMuonAdamW
 from nanochat.flash_attention import flash_attn
 
-
-from nanochat.gpt import norm, Linear, has_ve, apply_rotary_emb, CausalSelfAttention, MLP
+from nanochat.model.gpt import norm, Linear, has_ve, apply_rotary_emb, CausalSelfAttention, MLP
 
 
 @dataclass
-class GPTAttnResInputQueryConfig:
+class GPTAttnResSinkConfig:
     sequence_len: int = 2048
     vocab_size: int = 32768
     n_layer: int = 12
@@ -39,14 +36,13 @@ class GPTAttnResInputQueryConfig:
 
 
 class Block(nn.Module):
-    """Weight container for attention + MLP. Forward is called by GPTAttnResInputQuery directly."""
     def __init__(self, config, layer_idx):
         super().__init__()
         self.attn = CausalSelfAttention(config, layer_idx)
         self.mlp = MLP(config)
 
 
-class GPTAttnResInputQuery(nn.Module):
+class GPTAttnResSink(nn.Module):
     def __init__(self, config, pad_vocab_size_to=64):
         super().__init__()
         self.config = config
@@ -62,24 +58,17 @@ class GPTAttnResInputQuery(nn.Module):
         })
         self.lm_head = Linear(config.n_embd, padded_vocab_size, bias=False)
 
-        # 2 per transformer layer (before attn, before mlp) + 1 for final output.
-        # Low-rank bottleneck: down(d→32) → silu → up(32→d)
+        # AttnRes pseudo-queries
         self.n_queries = 2 * config.n_layer + 1
-        self.query_bottleneck = 32
-        self.query_down = nn.ModuleList([
-            Linear(config.n_embd, self.query_bottleneck, bias=False)
-            for _ in range(self.n_queries)
-        ])
-        self.query_up = nn.ModuleList([
-            Linear(self.query_bottleneck, config.n_embd, bias=False)
-            for _ in range(self.n_queries)
-        ])
+        n_queries_padded = ((self.n_queries + 7) // 8) * 8
+        self.attn_res_queries = nn.Parameter(torch.zeros(n_queries_padded, config.n_embd))
 
-        # Smear: mix previous token's embedding into current token (cheap bigram info)
+        # Sink logits: one scalar per query, zero-init
+        self.sink_logits = nn.Parameter(torch.zeros(self.n_queries))
+
         self.smear_gate = Linear(24, 1, bias=False)
         self.smear_lambda = nn.Parameter(torch.zeros(1))
 
-        # Value embeddings (ResFormer-style): alternating layers
         head_dim = config.n_embd // config.n_head
         kv_dim = config.n_kv_head * head_dim
         self.value_embeds = nn.ModuleDict({
@@ -87,35 +76,30 @@ class GPTAttnResInputQuery(nn.Module):
             for i in range(config.n_layer) if has_ve(i, config.n_layer)
         })
 
-        # Rotary embeddings (over-computed 10X, same as base GPT)
         self.rotary_seq_len = config.sequence_len * 10
         head_dim = config.n_embd // config.n_head
         cos, sin = self._precompute_rotary_embeddings(self.rotary_seq_len, head_dim)
         self.register_buffer("cos", cos, persistent=False)
         self.register_buffer("sin", sin, persistent=False)
 
-    def _attn_res(self, query, layer_outputs):
-        """
-        Compute attention residual: softmax-weighted sum over prior layer outputs.
-
-        query: (B, T, D) input-dependent query tensor
-        layer_outputs: list of N tensors, each (B, T, D)
-        returns: (B, T, D)
-        """
+    def _attn_res(self, query, layer_outputs, sink_logit):
         V = torch.stack(layer_outputs, dim=0)  # (N, B, T, D)
-        K = norm(V)  # RMSNorm on keys (critical per paper ablation)
-        logits = torch.einsum('b t d, n b t d -> n b t', query.to(V.dtype), K)
-        weights = logits.softmax(dim=0)  # softmax over layer dimension
+        K = norm(V)
+        logits = torch.einsum('d, n b t d -> n b t', query.to(V.dtype), K)  # (N, B, T)
+        # Append sink logit — competes for softmax mass but contributes nothing
+        B, T = logits.shape[1], logits.shape[2]
+        sink = sink_logit.to(logits.dtype).expand(1, B, T)  # (1, B, T)
+        logits_with_sink = torch.cat([logits, sink], dim=0)  # (N+1, B, T)
+        weights = logits_with_sink.softmax(dim=0)
+        weights = weights[:-1]  # drop sink weight, keep only real source weights
         h = torch.einsum('n b t, n b t d -> b t d', weights, V)
         return h
 
     @torch.no_grad()
     def init_weights(self):
-        # Embedding and unembedding
         torch.nn.init.normal_(self.transformer.wte.weight, mean=0.0, std=0.8)
         torch.nn.init.normal_(self.lm_head.weight, mean=0.0, std=0.001)
 
-        # Transformer blocks
         n_embd = self.config.n_embd
         s = 3**0.5 * n_embd**-0.5
         for block in self.transformer.h:
@@ -126,25 +110,19 @@ class GPTAttnResInputQuery(nn.Module):
             torch.nn.init.uniform_(block.mlp.c_fc.weight, -s * 0.4, s * 0.4)
             torch.nn.init.zeros_(block.mlp.c_proj.weight)
 
-        # Random down, zero up preserves uniform initial routing at step 0.
-        for down in self.query_down:
-            torch.nn.init.uniform_(down.weight, -s, s)
-        for up in self.query_up:
-            torch.nn.init.zeros_(up.weight)
+        torch.nn.init.zeros_(self.attn_res_queries)
+        torch.nn.init.zeros_(self.sink_logits)
 
-        # Value embeddings
         for ve in self.value_embeds.values():
             torch.nn.init.uniform_(ve.weight, -s, s)
         for block in self.transformer.h:
             if block.attn.ve_gate is not None:
                 torch.nn.init.uniform_(block.attn.ve_gate.weight, 0.0, 0.02)
 
-        # Rotary embeddings
         head_dim = self.config.n_embd // self.config.n_head
         cos, sin = self._precompute_rotary_embeddings(self.rotary_seq_len, head_dim)
         self.cos, self.sin = cos, sin
 
-        # Cast embeddings to COMPUTE_DTYPE
         if COMPUTE_DTYPE != torch.float16:
             self.transformer.wte.to(dtype=COMPUTE_DTYPE)
             for ve in self.value_embeds.values():
@@ -182,6 +160,7 @@ class GPTAttnResInputQuery(nn.Module):
         nparams = sum(p.numel() for p in self.parameters())
         value_embeds_numel = sum(ve.weight.numel() for ve in self.value_embeds.values())
         nparams_exclude = (self.transformer.wte.weight.numel() + value_embeds_numel +
+                          self.attn_res_queries.numel() + self.sink_logits.numel() +
                           self.smear_gate.weight.numel() + self.smear_lambda.numel())
         h, q, t = self.config.n_head, self.config.n_embd // self.config.n_head, self.config.sequence_len
         attn_flops = 0
@@ -189,8 +168,6 @@ class GPTAttnResInputQuery(nn.Module):
             window = window_size[0]
             effective_seq = t if window < 0 else min(window, t)
             attn_flops += 12 * h * q * effective_seq
-        # Query projections are low-rank (d->32->d) matrices, counted with the
-        # main matrix FLOP estimate above. The source-depth dot products remain tiny.
         num_flops_per_token = 6 * (nparams - nparams_exclude) + attn_flops
         return num_flops_per_token
 
@@ -198,9 +175,9 @@ class GPTAttnResInputQuery(nn.Module):
         wte = sum(p.numel() for p in self.transformer.wte.parameters())
         value_embeds = sum(p.numel() for p in self.value_embeds.parameters())
         lm_head = sum(p.numel() for p in self.lm_head.parameters())
-        query_matrices = sum(p.numel() for p in self.query_down.parameters()) + sum(p.numel() for p in self.query_up.parameters())
-        transformer_matrices = sum(p.numel() for p in self.transformer.h.parameters()) + query_matrices
-        scalars = (self.smear_gate.weight.numel() + self.smear_lambda.numel())
+        transformer_matrices = sum(p.numel() for p in self.transformer.h.parameters())
+        scalars = (self.attn_res_queries.numel() + self.sink_logits.numel() +
+                   self.smear_gate.weight.numel() + self.smear_lambda.numel())
         total = wte + value_embeds + lm_head + transformer_matrices + scalars
         assert total == sum(p.numel() for p in self.parameters()), "Parameter count mismatch"
         return {
@@ -208,24 +185,23 @@ class GPTAttnResInputQuery(nn.Module):
             'value_embeds': value_embeds,
             'lm_head': lm_head,
             'transformer_matrices': transformer_matrices,
-            'query_matrices': query_matrices,
             'scalars': scalars,
             'total': total,
         }
 
     def setup_optimizer(self, unembedding_lr=0.004, embedding_lr=0.2, matrix_lr=0.02, weight_decay=0.0, scalar_lr=0.5):
-        del scalar_lr
         model_dim = self.config.n_embd
         ddp, rank, local_rank, world_size = get_dist_info()
-        del rank, local_rank, world_size
 
-        matrix_params = list(self.transformer.h.parameters()) + list(self.query_down.parameters()) + list(self.query_up.parameters())
+        matrix_params = list(self.transformer.h.parameters())
         value_embeds_params = list(self.value_embeds.parameters())
         embedding_params = list(self.transformer.wte.parameters())
         lm_head_params = list(self.lm_head.parameters())
+        attn_res_params = [self.attn_res_queries]
+        sink_params = [self.sink_logits]
         smear_params = [self.smear_gate.weight, self.smear_lambda]
         assert len(list(self.parameters())) == (len(matrix_params) + len(embedding_params) +
-            len(lm_head_params) + len(value_embeds_params) + len(smear_params))
+            len(lm_head_params) + len(value_embeds_params) + len(attn_res_params) + len(sink_params) + len(smear_params))
 
         dmodel_lr_scale = (model_dim / 768) ** -0.5
         print0(f"Scaling the LR for the AdamW parameters ∝1/√({model_dim}/768) = {dmodel_lr_scale:.6f}")
@@ -234,6 +210,8 @@ class GPTAttnResInputQuery(nn.Module):
             dict(kind='adamw', params=lm_head_params, lr=unembedding_lr * dmodel_lr_scale, betas=(0.8, 0.96), eps=1e-10, weight_decay=0.01),
             dict(kind='adamw', params=embedding_params, lr=embedding_lr * dmodel_lr_scale, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.001),
             dict(kind='adamw', params=value_embeds_params, lr=embedding_lr * dmodel_lr_scale * 0.5, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.01),
+            dict(kind='adamw', params=attn_res_params, lr=0.001, betas=(0.9, 0.999), eps=1e-10, weight_decay=0.0),
+            dict(kind='adamw', params=sink_params, lr=0.001, betas=(0.9, 0.999), eps=1e-10, weight_decay=0.0),
             dict(kind='adamw', params=smear_params, lr=0.2, betas=(0.8, 0.95), eps=1e-10, weight_decay=0.0),
         ]
         for shape in sorted({p.shape for p in matrix_params}):
@@ -253,17 +231,15 @@ class GPTAttnResInputQuery(nn.Module):
         B, T = idx.size()
         n_layer = self.config.n_layer
 
-        # Rotary embeddings
         assert T <= self.cos.size(1)
         T0 = 0 if kv_cache is None else kv_cache.get_pos()
         cos_sin = self.cos[:, T0:T0+T], self.sin[:, T0:T0+T]
 
-        # Embed tokens
         x = self.transformer.wte(idx)
         x = x.to(COMPUTE_DTYPE)
         x = norm(x)
 
-        # Smear: mix previous token's embedding into current position
+        # Smear
         if kv_cache is None:
             assert T > 1
             gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, 1:, :24]))
@@ -278,31 +254,25 @@ class GPTAttnResInputQuery(nn.Module):
                 gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, :, :24]))
                 x = x + gate * x_pre_smear
 
-        # --- Full Attention Residuals with input-dependent queries ---
-        v_list = [x]  # v_0 = token embedding
+        # --- Full Attention Residuals with sink ---
+        v_list = [x]
         qi = 0
 
         for i, block in enumerate(self.transformer.h):
-            # Input-dependent AttnRes before attention sublayer
-            query = self.query_up[qi](F.silu(self.query_down[qi](v_list[0])))
-            h = self._attn_res(query, v_list)
+            h = self._attn_res(self.attn_res_queries[qi], v_list, self.sink_logits[qi])
             qi += 1
 
             ve = self.value_embeds[str(i)](idx).to(h.dtype) if str(i) in self.value_embeds else None
             attn_out = block.attn(norm(h), ve, cos_sin, self.window_sizes[i], kv_cache)
             v_list.append(attn_out)
 
-            # Input-dependent AttnRes before MLP sublayer
-            query = self.query_up[qi](F.silu(self.query_down[qi](v_list[0])))
-            h = self._attn_res(query, v_list)
+            h = self._attn_res(self.attn_res_queries[qi], v_list, self.sink_logits[qi])
             qi += 1
 
             mlp_out = block.mlp(norm(h))
             v_list.append(mlp_out)
 
-        # Final AttnRes aggregation over all sublayer outputs
-        query = self.query_up[qi](F.silu(self.query_down[qi](v_list[0])))
-        x = self._attn_res(query, v_list)
+        x = self._attn_res(self.attn_res_queries[qi], v_list, self.sink_logits[qi])
         x = norm(x)
 
         # Logits

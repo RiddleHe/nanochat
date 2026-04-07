@@ -27,7 +27,7 @@ from nanochat.common import get_dist_info, print0, COMPUTE_DTYPE
 from nanochat.optim import MuonAdamW, DistMuonAdamW
 from nanochat.flash_attention import flash_attn
 
-from nanochat.gpt import norm, Linear, has_ve, apply_rotary_emb, CausalSelfAttention, MLP
+from nanochat.model.gpt import norm, Linear, has_ve, apply_rotary_emb, CausalSelfAttention, MLP
 
 
 @dataclass

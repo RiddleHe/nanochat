@@ -16,7 +16,7 @@ from nanochat.common import autodetect_device_type, COMPUTE_DTYPE
 from nanochat.checkpoint_manager import load_model
 from nanochat.tokenizer import get_tokenizer
 from nanochat.dataloader import tokenizing_distributed_data_loader_bos_bestfit
-from nanochat.gpt import norm
+from nanochat.model.gpt import norm
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model-tag", type=str, required=True)

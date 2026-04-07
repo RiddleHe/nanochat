@@ -11,7 +11,7 @@ Forked from [karpathy/nanochat](https://github.com/karpathy/nanochat). This fork
 2. Register it in `nanochat/model_registry.py`:
 ```python
 def _register_variants():
-    from nanochat.gpt_yourmodel import YourModelConfig, YourModel
+    from nanochat.model.gpt_yourmodel import YourModelConfig, YourModel
     register("yourmodel", YourModelConfig, YourModel)
 ```
 

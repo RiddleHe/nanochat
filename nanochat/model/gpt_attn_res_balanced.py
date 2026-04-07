@@ -1,13 +1,13 @@
 """
-GPT with Full Attention Residuals + learnable sink logits.
+GPT with Full Attention Residuals + load balancing loss on depth attention.
 
-Each _attn_res call has a learnable scalar sink logit that competes with
-real sources for softmax probability mass. After softmax, the sink weight
-is discarded — it absorbs attention but contributes nothing to the output.
-This gives the model a "none of the above" option, reducing dump attention
-on unimportant layer outputs.
+Same as gpt_attn_res.py but adds an entropy-maximization auxiliary loss
+on the AttnRes softmax weights, with gradients flowing to layer outputs
+(not queries), encouraging layers to produce distinct, useful representations.
 
-Inspired by OpenAI gpt-oss sink implementation.
+Inspired by MoE load balancing (Switch Transformer, coeff=0.001).
+The balance loss is only applied to _attn_res calls with >= min_sources sources,
+since early layers have too few sources for meaningful entropy.
 """
 
 from dataclasses import dataclass
@@ -20,11 +20,11 @@ from nanochat.common import get_dist_info, print0, COMPUTE_DTYPE
 from nanochat.optim import MuonAdamW, DistMuonAdamW
 from nanochat.flash_attention import flash_attn
 
-from nanochat.gpt import norm, Linear, has_ve, apply_rotary_emb, CausalSelfAttention, MLP
+from nanochat.model.gpt import norm, Linear, has_ve, apply_rotary_emb, CausalSelfAttention, MLP
 
 
 @dataclass
-class GPTAttnResSinkConfig:
+class GPTAttnResBalancedConfig:
     sequence_len: int = 2048
     vocab_size: int = 32768
     n_layer: int = 12
@@ -33,6 +33,8 @@ class GPTAttnResSinkConfig:
     n_embd: int = 768
     window_pattern: str = "SSSL"
     xsa_mode: str = "none"
+    balance_coeff: float = 0.001
+    balance_min_sources: int = 6  # only apply balance loss when >= this many sources
 
 
 class Block(nn.Module):
@@ -42,7 +44,7 @@ class Block(nn.Module):
         self.mlp = MLP(config)
 
 
-class GPTAttnResSink(nn.Module):
+class GPTAttnResBalanced(nn.Module):
     def __init__(self, config, pad_vocab_size_to=64):
         super().__init__()
         self.config = config
@@ -58,13 +60,9 @@ class GPTAttnResSink(nn.Module):
         })
         self.lm_head = Linear(config.n_embd, padded_vocab_size, bias=False)
 
-        # AttnRes pseudo-queries
         self.n_queries = 2 * config.n_layer + 1
         n_queries_padded = ((self.n_queries + 7) // 8) * 8
         self.attn_res_queries = nn.Parameter(torch.zeros(n_queries_padded, config.n_embd))
-
-        # Sink logits: one scalar per query, zero-init
-        self.sink_logits = nn.Parameter(torch.zeros(self.n_queries))
 
         self.smear_gate = Linear(24, 1, bias=False)
         self.smear_lambda = nn.Parameter(torch.zeros(1))
@@ -82,17 +80,27 @@ class GPTAttnResSink(nn.Module):
         self.register_buffer("cos", cos, persistent=False)
         self.register_buffer("sin", sin, persistent=False)
 
-    def _attn_res(self, query, layer_outputs, sink_logit):
-        V = torch.stack(layer_outputs, dim=0)  # (N, B, T, D)
+    def _attn_res(self, query, layer_outputs, collect_entropy=False):
+        """
+        Compute attention residual. If collect_entropy=True, also compute entropy
+        with detached query so balance loss gradients flow only to layer outputs.
+        Returns (h, entropy) if collect_entropy, else just h.
+        """
+        V = torch.stack(layer_outputs, dim=0)
         K = norm(V)
-        logits = torch.einsum('d, n b t d -> n b t', query.to(V.dtype), K)  # (N, B, T)
-        # Append sink logit — competes for softmax mass but contributes nothing
-        B, T = logits.shape[1], logits.shape[2]
-        sink = sink_logit.to(logits.dtype).expand(1, B, T)  # (1, B, T)
-        logits_with_sink = torch.cat([logits, sink], dim=0)  # (N+1, B, T)
-        weights = logits_with_sink.softmax(dim=0)
-        weights = weights[:-1]  # drop sink weight, keep only real source weights
+
+        # Normal forward — LM loss gradients flow through query as usual
+        logits = torch.einsum('d, n b t d -> n b t', query.to(V.dtype), K)
+        weights = logits.softmax(dim=0)
         h = torch.einsum('n b t, n b t d -> b t d', weights, V)
+
+        if collect_entropy:
+            # Separate entropy computation with detached query —
+            # balance loss gradients flow to K (layer outputs) only
+            logits_detached = torch.einsum('d, n b t d -> n b t', query.detach().to(V.dtype), K)
+            weights_detached = logits_detached.softmax(dim=0)
+            entropy = -(weights_detached * (weights_detached + 1e-8).log()).sum(dim=0).mean()
+            return h, entropy
         return h
 
     @torch.no_grad()
@@ -111,7 +119,6 @@ class GPTAttnResSink(nn.Module):
             torch.nn.init.zeros_(block.mlp.c_proj.weight)
 
         torch.nn.init.zeros_(self.attn_res_queries)
-        torch.nn.init.zeros_(self.sink_logits)
 
         for ve in self.value_embeds.values():
             torch.nn.init.uniform_(ve.weight, -s, s)
@@ -160,7 +167,7 @@ class GPTAttnResSink(nn.Module):
         nparams = sum(p.numel() for p in self.parameters())
         value_embeds_numel = sum(ve.weight.numel() for ve in self.value_embeds.values())
         nparams_exclude = (self.transformer.wte.weight.numel() + value_embeds_numel +
-                          self.attn_res_queries.numel() + self.sink_logits.numel() +
+                          self.attn_res_queries.numel() +
                           self.smear_gate.weight.numel() + self.smear_lambda.numel())
         h, q, t = self.config.n_head, self.config.n_embd // self.config.n_head, self.config.sequence_len
         attn_flops = 0
@@ -176,7 +183,7 @@ class GPTAttnResSink(nn.Module):
         value_embeds = sum(p.numel() for p in self.value_embeds.parameters())
         lm_head = sum(p.numel() for p in self.lm_head.parameters())
         transformer_matrices = sum(p.numel() for p in self.transformer.h.parameters())
-        scalars = (self.attn_res_queries.numel() + self.sink_logits.numel() +
+        scalars = (self.attn_res_queries.numel() +
                    self.smear_gate.weight.numel() + self.smear_lambda.numel())
         total = wte + value_embeds + lm_head + transformer_matrices + scalars
         assert total == sum(p.numel() for p in self.parameters()), "Parameter count mismatch"
@@ -198,10 +205,9 @@ class GPTAttnResSink(nn.Module):
         embedding_params = list(self.transformer.wte.parameters())
         lm_head_params = list(self.lm_head.parameters())
         attn_res_params = [self.attn_res_queries]
-        sink_params = [self.sink_logits]
         smear_params = [self.smear_gate.weight, self.smear_lambda]
         assert len(list(self.parameters())) == (len(matrix_params) + len(embedding_params) +
-            len(lm_head_params) + len(value_embeds_params) + len(attn_res_params) + len(sink_params) + len(smear_params))
+            len(lm_head_params) + len(value_embeds_params) + len(attn_res_params) + len(smear_params))
 
         dmodel_lr_scale = (model_dim / 768) ** -0.5
         print0(f"Scaling the LR for the AdamW parameters ∝1/√({model_dim}/768) = {dmodel_lr_scale:.6f}")
@@ -211,7 +217,6 @@ class GPTAttnResSink(nn.Module):
             dict(kind='adamw', params=embedding_params, lr=embedding_lr * dmodel_lr_scale, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.001),
             dict(kind='adamw', params=value_embeds_params, lr=embedding_lr * dmodel_lr_scale * 0.5, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.01),
             dict(kind='adamw', params=attn_res_params, lr=0.001, betas=(0.9, 0.999), eps=1e-10, weight_decay=0.0),
-            dict(kind='adamw', params=sink_params, lr=0.001, betas=(0.9, 0.999), eps=1e-10, weight_decay=0.0),
             dict(kind='adamw', params=smear_params, lr=0.2, betas=(0.8, 0.95), eps=1e-10, weight_decay=0.0),
         ]
         for shape in sorted({p.shape for p in matrix_params}):
@@ -230,6 +235,9 @@ class GPTAttnResSink(nn.Module):
     def forward(self, idx, targets=None, kv_cache=None, loss_reduction='mean'):
         B, T = idx.size()
         n_layer = self.config.n_layer
+        min_sources = self.config.balance_min_sources
+        balance_coeff = self.config.balance_coeff
+        training = targets is not None  # only apply balance loss during training
 
         assert T <= self.cos.size(1)
         T0 = 0 if kv_cache is None else kv_cache.get_pos()
@@ -254,25 +262,51 @@ class GPTAttnResSink(nn.Module):
                 gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, :, :24]))
                 x = x + gate * x_pre_smear
 
-        # --- Full Attention Residuals with sink ---
+        # --- Full Attention Residuals with balance loss ---
         v_list = [x]
         qi = 0
+        entropy_sum = 0.0
+        entropy_count = 0
 
         for i, block in enumerate(self.transformer.h):
-            h = self._attn_res(self.attn_res_queries[qi], v_list, self.sink_logits[qi])
+            # AttnRes before attention sublayer
+            n_sources = len(v_list)
+            collect = training and n_sources >= min_sources
+            if collect:
+                h, ent = self._attn_res(self.attn_res_queries[qi], v_list, collect_entropy=True)
+                entropy_sum = entropy_sum + ent
+                entropy_count += 1
+            else:
+                h = self._attn_res(self.attn_res_queries[qi], v_list)
             qi += 1
 
             ve = self.value_embeds[str(i)](idx).to(h.dtype) if str(i) in self.value_embeds else None
             attn_out = block.attn(norm(h), ve, cos_sin, self.window_sizes[i], kv_cache)
             v_list.append(attn_out)
 
-            h = self._attn_res(self.attn_res_queries[qi], v_list, self.sink_logits[qi])
+            # AttnRes before MLP sublayer
+            n_sources = len(v_list)
+            collect = training and n_sources >= min_sources
+            if collect:
+                h, ent = self._attn_res(self.attn_res_queries[qi], v_list, collect_entropy=True)
+                entropy_sum = entropy_sum + ent
+                entropy_count += 1
+            else:
+                h = self._attn_res(self.attn_res_queries[qi], v_list)
             qi += 1
 
             mlp_out = block.mlp(norm(h))
             v_list.append(mlp_out)
 
-        x = self._attn_res(self.attn_res_queries[qi], v_list, self.sink_logits[qi])
+        # Final AttnRes aggregation
+        n_sources = len(v_list)
+        collect = training and n_sources >= min_sources
+        if collect:
+            x, ent = self._attn_res(self.attn_res_queries[qi], v_list, collect_entropy=True)
+            entropy_sum = entropy_sum + ent
+            entropy_count += 1
+        else:
+            x = self._attn_res(self.attn_res_queries[qi], v_list)
         x = norm(x)
 
         # Logits
@@ -283,7 +317,13 @@ class GPTAttnResSink(nn.Module):
         logits = softcap * torch.tanh(logits / softcap)
 
         if targets is not None:
-            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-1, reduction=loss_reduction)
+            lm_loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-1, reduction=loss_reduction)
+            # Balance loss: negative mean entropy (minimize = maximize entropy)
+            if entropy_count > 0:
+                balance_loss = -(entropy_sum / entropy_count)
+                loss = lm_loss + balance_coeff * balance_loss
+            else:
+                loss = lm_loss
             return loss
         else:
             return logits
