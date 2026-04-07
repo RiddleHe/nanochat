@@ -1,14 +1,15 @@
-"""Visualize cross-layer angular distance heatmaps on two CORE benchmarks.
+"""Visualize cross-layer angular distance heatmaps on CORE benchmarks.
 
-For each model, produces two heatmaps:
-- Jeopardy (world knowledge / factual recall)
-- ARC Challenge (science QA / reasoning)
+For each model, produces one heatmap per benchmark in BENCHMARK_LABELS.
 
 Each heatmap cell (i, j) shows the angular distance between the hidden state at
-layer i and layer j, averaged over decode steps across benchmark prompts.
+layer i and layer j, averaged over the golden-answer tokens in each prompt and
+across benchmark samples.
 
-The model greedy-decodes up to 64 tokens per prompt (stopping at EOS), and
-angular distances are computed from the last-token activations at each step.
+The model is run as a single prefill pass on (few-shot context + prompt + golden
+answer), and per-layer attention-input activations are sliced to the answer
+span [start_idx:end_idx) — matching how core_eval scores MC/schema tasks by
+the per-token loss on the answer span.
 
 Reference: "The Curse of Depth in Large Language Models" (arxiv 2502.05795)
 
@@ -35,11 +36,17 @@ import matplotlib.pyplot as plt
 from nanochat.common import get_base_dir, autodetect_device_type, download_file_with_lock
 from nanochat.checkpoint_manager import load_model
 from nanochat.tokenizer import get_tokenizer
-from nanochat.core_eval import render_prompts_mc, render_prompts_schema, render_prompts_lm
+from nanochat.core_eval import (
+    render_prompts_mc,
+    render_prompts_schema,
+    render_prompts_lm,
+    batch_sequences_mc,
+    batch_sequences_schema,
+    batch_sequences_lm,
+)
 
 EVAL_BUNDLE_URL = "https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip"
-BENCHMARK_LABELS = ["Jeopardy", "ARC Challenge"]
-MAX_GEN_TOKENS = 64
+BENCHMARK_LABELS = ["ARC Challenge", "Winogrande", "SQuAD"]
 
 def place_eval_bundle(file_path):
     """Unzip eval_bundle.zip and place it in the base directory."""
@@ -93,38 +100,64 @@ def load_benchmark_data():
         benchmark_data.append(task_lookup[key])
     return benchmark_data
 
-def render_prompt_stem(task_meta, item):
-    """Render the question/context stem without the golden answer (0-shot)."""
+def render_gold_with_indices(tokenizer, task_meta, item, fewshot_examples):
+    """Render the golden-answer prompt and return (tokens, start_idx, end_idx).
+
+    The returned span [start_idx, end_idx) covers the golden answer tokens
+    within the full prompt — matching the convention used by core_eval's
+    batch_sequences_* helpers.
+    """
     cd = task_meta["continuation_delimiter"]
-    if task_meta["task_type"] == "multiple_choice":
-        return item["query"] + cd
-    elif task_meta["task_type"] == "schema":
-        return item["context_options"][0] + cd
-    elif task_meta["task_type"] == "language_modeling":
-        return item["context"].strip() + cd
+    task_type = task_meta["task_type"]
+    if task_type == "multiple_choice":
+        prompts = render_prompts_mc(item, cd, fewshot_examples)
+        tokens, start_idxs, end_idxs = batch_sequences_mc(tokenizer, prompts)
+        gold = item["gold"]
+        return tokens[gold], start_idxs[gold], end_idxs[gold]
+    elif task_type == "schema":
+        prompts = render_prompts_schema(item, cd, fewshot_examples)
+        tokens, start_idxs, end_idxs = batch_sequences_schema(tokenizer, prompts)
+        gold = item["gold"]
+        return tokens[gold], start_idxs[gold], end_idxs[gold]
+    elif task_type == "language_modeling":
+        prompts = render_prompts_lm(item, cd, fewshot_examples)
+        tokens, start_idxs, end_idxs = batch_sequences_lm(tokenizer, prompts)
+        return tokens[0], start_idxs[0], end_idxs[0]
     else:
-        raise ValueError(f"Unsupported CORE task type: {task_meta['task_type']}")
+        raise ValueError(f"Unsupported CORE task type: {task_type}")
 
 def build_benchmark_inputs(tokenizer, seq_len, task_meta, data, num_samples):
-    """Build 0-shot tokenized prompt stems, dropping those too long for generation."""
-    shuffled = list(data)
-    random.Random(1337).shuffle(shuffled)
-    bos_token = tokenizer.get_bos_token_id()
-    max_prompt_len = seq_len - MAX_GEN_TOKENS
+    """Build few-shot tokenized golden-answer prompts, dropping those too long.
+
+    Few-shot count is taken from task_meta["num_fewshot"] (per core.yaml).
+    Returns a list of (tokens, start_idx, end_idx) tuples.
+    """
+    shuffled_indices = list(range(len(data)))
+    random.Random(1337).shuffle(shuffled_indices)
+    num_fewshot = task_meta["num_fewshot"]
     inputs = []
-    num_total = len(shuffled)
+    num_total = len(shuffled_indices)
     num_dropped = 0
 
-    for item in shuffled:
-        prompt = render_prompt_stem(task_meta, item)
-        tokens = tokenizer(prompt, prepend=bos_token)
-        if len(tokens) > max_prompt_len:
+    for orig_idx in shuffled_indices:
+        item = data[orig_idx]
+        # Sample few-shot deterministically (mirroring core_eval.evaluate_example)
+        fewshot_examples = []
+        if num_fewshot > 0:
+            rng = random.Random(1234 + orig_idx)
+            available = [i for i in range(len(data)) if i != orig_idx]
+            fewshot_indices = rng.sample(available, num_fewshot)
+            fewshot_examples = [data[i] for i in fewshot_indices]
+
+        tokens, start_idx, end_idx = render_gold_with_indices(
+            tokenizer, task_meta, item, fewshot_examples
+        )
+        if len(tokens) > seq_len or end_idx <= start_idx:
             num_dropped += 1
             continue
-        if len(inputs) < num_samples:
-            inputs.append(tokens)
-            if len(inputs) == num_samples:
-                break
+        inputs.append((tokens, start_idx, end_idx))
+        if len(inputs) == num_samples:
+            break
 
     stats = {
         "num_total": num_total,
@@ -133,47 +166,10 @@ def build_benchmark_inputs(tokenizer, seq_len, task_meta, data, num_samples):
     }
     return inputs, stats
 
-def greedy_decode_with_hooks(model, prompt_tokens, eos_token, bos_token):
-    """Greedy-decode up to MAX_GEN_TOKENS, capturing per-layer activations at each step.
-
-    Returns a list of per-step layer activations. Each element is a list of
-    (n_layer,) tensors of shape (D,) — the last-token hidden state entering
-    each attention sublayer.
-    """
-    device = model.get_device()
-    ids = torch.tensor([prompt_tokens], dtype=torch.long, device=device)
-    step_layer_reps = []  # list of lists, one per decode step
-    layer_inputs = []
-
-    def make_hook(storage):
-        def hook_fn(module, inp, out):
-            storage.append(inp[0][:, -1, :].detach())
-        return hook_fn
-
-    hooks = []
-    for block in model.transformer.h:
-        hooks.append(block.attn.register_forward_hook(make_hook(layer_inputs)))
-
-    try:
-        for _ in range(MAX_GEN_TOKENS):
-            logits = model(ids)
-            step_layer_reps.append([li.squeeze(0).float() for li in layer_inputs])
-            layer_inputs.clear()
-
-            next_token = torch.argmax(logits[:, -1, :], dim=-1).item()
-            if next_token == eos_token or next_token == bos_token:
-                break
-            ids = torch.cat([ids, torch.tensor([[next_token]], dtype=torch.long, device=device)], dim=1)
-    finally:
-        for h in hooks:
-            h.remove()
-
-    return step_layer_reps
-
 parser = argparse.ArgumentParser()
 parser.add_argument("--model-tags", type=str, nargs="+", required=True)
 parser.add_argument("--labels", type=str, nargs="+", default=None)
-parser.add_argument("--num-samples", type=int, default=50)
+parser.add_argument("--num-samples", type=int, default=20)
 parser.add_argument("--device-type", type=str, default="")
 parser.add_argument("--output", type=str, default="results/angular_distance.png")
 args = parser.parse_args()
@@ -185,8 +181,6 @@ assert len(args.labels) == len(args.model_tags)
 device_type = autodetect_device_type() if args.device_type == "" else args.device_type
 device = torch.device(device_type)
 tokenizer = get_tokenizer()
-eos_token = tokenizer.encode_special("<|assistant_end|>")
-bos_token = tokenizer.get_bos_token_id()
 benchmark_data = load_benchmark_data()
 
 n_models = len(args.model_tags)
@@ -221,7 +215,7 @@ for model_idx, (model_tag, model_label) in enumerate(zip(args.model_tags, args.l
         benchmark_inputs.append(sample_inputs)
         print(
             f"  Loaded {task_meta['label']} from {task_meta['dataset_uri']} "
-            f"(0-shot, max_prompt_len={seq_len - MAX_GEN_TOKENS}, "
+            f"({task_meta['num_fewshot']}-shot, max_len={seq_len}, "
             f"dropped {stats['num_dropped']}/{stats['num_total']}, "
             f"selected {stats['num_selected']})"
         )
@@ -232,28 +226,36 @@ for model_idx, (model_tag, model_label) in enumerate(zip(args.model_tags, args.l
         ang_dist_sum = torch.zeros(n_points, n_points)
         count = 0
 
-        with torch.no_grad():
-            for sample_idx, prompt_tokens in enumerate(sample_inputs):
-                step_layer_reps = greedy_decode_with_hooks(model, prompt_tokens, eos_token, bos_token)
+        # Register attention-input hooks once for this benchmark (cleared per sample)
+        layer_inputs = []
+        def hook_fn(module, inp, out):
+            layer_inputs.append(inp[0].detach())
+        hooks = [block.attn.register_forward_hook(hook_fn) for block in model.transformer.h]
 
-                # Average angular distances across all decode steps
-                for step_reps in step_layer_reps:
-                    # step_reps: list of n_layer tensors of shape (D,)
-                    for i in range(len(step_reps)):
-                        for j in range(i + 1, len(step_reps)):
-                            cos_sim = torch.nn.functional.cosine_similarity(
-                                step_reps[i].unsqueeze(0), step_reps[j].unsqueeze(0), dim=-1
-                            )
-                            cos_sim = cos_sim.clamp(-1, 1)
-                            ang_dist = torch.acos(cos_sim) / torch.pi
-                            avg = ang_dist.item()
-                            ang_dist_sum[i, j] += avg
-                            ang_dist_sum[j, i] += avg
+        try:
+            with torch.no_grad():
+                for sample_idx, (prompt_tokens, start_idx, end_idx) in enumerate(sample_inputs):
+                    layer_inputs.clear()
+                    input_ids = torch.tensor([prompt_tokens], dtype=torch.long, device=device)
+                    model(input_ids)
+
+                    # Slice each layer's activations to the golden-answer span: (n_ans, D)
+                    reps = [li[0, start_idx:end_idx, :].float() for li in layer_inputs]
                     count += 1
 
-                if (sample_idx + 1) % 10 == 0:
-                    n_steps = len(step_layer_reps)
-                    print(f"    {sample_idx + 1}/{len(sample_inputs)} (last sample: {n_steps} decode steps)")
+                    for i in range(len(reps)):
+                        for j in range(i + 1, len(reps)):
+                            cos_sim = torch.nn.functional.cosine_similarity(reps[i], reps[j], dim=-1)
+                            cos_sim = cos_sim.clamp(-1, 1)
+                            ang_dist = (torch.acos(cos_sim) / torch.pi).mean().cpu()
+                            ang_dist_sum[i, j] += ang_dist
+                            ang_dist_sum[j, i] += ang_dist
+
+                    if (sample_idx + 1) % 10 == 0:
+                        print(f"    {sample_idx + 1}/{len(sample_inputs)}")
+        finally:
+            for h in hooks:
+                h.remove()
 
         ang_dist_avg = (ang_dist_sum / count).numpy()
         n_pts = ang_dist_avg.shape[0]
@@ -292,8 +294,8 @@ for model_idx, model_label in enumerate(args.labels):
         ax.set_yticks(range(0, n_pts - 1, max(1, (n_pts - 1) // 4)))
         ax.set_yticklabels([i + 1 for i in range(0, n_pts - 1, max(1, (n_pts - 1) // 4))], fontsize=8)
 
-fig.suptitle("Cross-Layer Angular Distance by Benchmark (Decode)", fontsize=15)
-fig.subplots_adjust(bottom=0.18)
+fig.suptitle("Cross-Layer Angular Distance by Benchmark (Answer-Span Prefill)", fontsize=15)
+fig.subplots_adjust(bottom=0.18, hspace=0.45)
 cbar_ax = fig.add_axes([0.15, 0.06, 0.7, 0.03])
 fig.colorbar(im, cax=cbar_ax, orientation='horizontal', label="Angular Distance (0=identical, 1=orthogonal)")
 output_dir = os.path.dirname(args.output)
