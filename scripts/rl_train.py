@@ -55,8 +55,10 @@ parser.add_argument("--max-seq-len", type=int, default=2048)
 # Evaluation
 parser.add_argument("--eval-every", type=int, default=20)
 # Task / Reward
-parser.add_argument("--task", type=str, default="gsm8k", help="RL dataset name")
+parser.add_argument("--task", type=str, default="rstar_seed", help="RL dataset name")
+parser.add_argument("--difficulty", type=str, default=None, help="Filter dataset to one difficulty bucket")
 parser.add_argument("--reward-workers", type=int, default=0, help="Reward worker pool size")
+parser.add_argument("--k-tests", type=int, default=10, help="Tests subsampled per rollout")
 # Runtime
 parser.add_argument("--device-type", type=str, default="")
 parser.add_argument("--run", type=str, default="dummy", help="wandb run name")
@@ -97,7 +99,7 @@ if master_process:
 
 # -----------------------------------------------------------------------------
 # RL dataset + reward worker pool + loss fn
-dataset = build_rl_dataset(args.task, split="train")
+dataset = build_rl_dataset(args.task, split="train", difficulty_filter=args.difficulty)
 loader = distributed_rl_loader(
     dataset,
     prompts_per_step=args.prompts_per_step,
@@ -105,7 +107,7 @@ loader = distributed_rl_loader(
     rank=ddp_rank,
     seed=args.seed,
 )
-rewarder = RewardWorkerPool(dataset, num_workers=args.reward_workers)
+rewarder = RewardWorkerPool(num_workers=args.reward_workers, k_tests=args.k_tests)
 loss_fn = ALGORITHMS[args.algorithm]
 
 # -----------------------------------------------------------------------------
@@ -135,7 +137,8 @@ for step in range(args.num_steps):
     # 3. Compute rewards
     # Re-expand examples to align 1:1 with the flat rollout list
     expanded_examples = [examples[i // args.num_samples] for i in range(len(rollouts))]
-    rewards, _infos = rewarder.score(expanded_examples, rollouts)
+    responses = [r["response"] for r in rollouts]
+    rewards, _infos = rewarder.score(expanded_examples, responses, step=step)
     mean_reward = sum(rewards) / len(rewards) if rewards else 0.0
 
     # 4. Pack training batch
