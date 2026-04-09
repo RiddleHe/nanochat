@@ -170,9 +170,9 @@ def build_benchmark_inputs(tokenizer, seq_len, task_meta, data, num_samples):
 parser = argparse.ArgumentParser()
 parser.add_argument("--model-tags", type=str, nargs="+", required=True)
 parser.add_argument("--labels", type=str, nargs="+", default=None)
-parser.add_argument("--reference-hf", type=str, default="Qwen/Qwen3.5-0.8B-Base",
+parser.add_argument("--reference-hf", type=str, default="Qwen/Qwen3-0.6B-Base",
                     help="HuggingFace model ID for a reference baseline (use --no-reference to disable)")
-parser.add_argument("--reference-label", type=str, default="Qwen 0.8B (ref)",
+parser.add_argument("--reference-label", type=str, default="Qwen 0.6B (ref)",
                     help="Label for the reference model")
 parser.add_argument("--no-reference", action="store_true",
                     help="Disable the reference model column")
@@ -242,9 +242,9 @@ if args.reference_hf:
         count = 0
 
         layer_inputs = []
-        def ref_hook_fn(module, inp, out):
+        def ref_hook_fn(module, inp):
             layer_inputs.append(inp[0].detach())
-        hooks = [layer.self_attn.register_forward_hook(ref_hook_fn)
+        hooks = [layer.input_layernorm.register_forward_pre_hook(ref_hook_fn)
                  for layer in ref_model.model.layers]
 
         try:
