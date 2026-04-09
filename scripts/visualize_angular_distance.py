@@ -32,6 +32,7 @@ import argparse
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
+from transformers import AutoModelForCausalLM, AutoTokenizer as HFAutoTokenizer
 
 from nanochat.common import get_base_dir, autodetect_device_type, download_file_with_lock
 from nanochat.checkpoint_manager import load_model
@@ -169,6 +170,12 @@ def build_benchmark_inputs(tokenizer, seq_len, task_meta, data, num_samples):
 parser = argparse.ArgumentParser()
 parser.add_argument("--model-tags", type=str, nargs="+", required=True)
 parser.add_argument("--labels", type=str, nargs="+", default=None)
+parser.add_argument("--reference-hf", type=str, default="Qwen/Qwen3.5-0.8B-Base",
+                    help="HuggingFace model ID for a reference baseline (use --no-reference to disable)")
+parser.add_argument("--reference-label", type=str, default="Qwen 0.8B (ref)",
+                    help="Label for the reference model")
+parser.add_argument("--no-reference", action="store_true",
+                    help="Disable the reference model column")
 parser.add_argument("--num-samples", type=int, default=20)
 parser.add_argument("--device-type", type=str, default="")
 parser.add_argument("--output", type=str, default="results/angular_distance.png")
@@ -177,13 +184,110 @@ args = parser.parse_args()
 if args.labels is None:
     args.labels = args.model_tags
 assert len(args.labels) == len(args.model_tags)
+if args.no_reference:
+    args.reference_hf = None
+
+class HFTokenizerAdapter:
+    """Wrap a HuggingFace tokenizer to match the nanochat tokenizer interface."""
+    def __init__(self, hf_tokenizer):
+        self._tok = hf_tokenizer
+
+    def get_bos_token_id(self):
+        return self._tok.bos_token_id
+
+    def __call__(self, texts, prepend=None, append=None, num_threads=None):
+        if isinstance(texts, str):
+            texts = [texts]
+            return [self._encode_one(texts[0], prepend)]
+        return [self._encode_one(t, prepend) for t in texts]
+
+    def _encode_one(self, text, prepend=None):
+        ids = []
+        if prepend is not None:
+            ids.append(prepend if isinstance(prepend, int) else self._tok.convert_tokens_to_ids(prepend))
+        ids.extend(self._tok.encode(text, add_special_tokens=False))
+        return ids
 
 device_type = autodetect_device_type() if args.device_type == "" else args.device_type
 device = torch.device(device_type)
 tokenizer = get_tokenizer()
 benchmark_data = load_benchmark_data()
 
-n_models = len(args.model_tags)
+# --- Reference HF model (prepended as first column) ---
+ref_matrices = []
+ref_n_layers = []
+if args.reference_hf:
+    ref_label = args.reference_label or args.reference_hf
+    print(f"\nProcessing reference: {ref_label} ({args.reference_hf})")
+    ref_tok = HFAutoTokenizer.from_pretrained(args.reference_hf)
+    ref_adapter = HFTokenizerAdapter(ref_tok)
+    ref_model = AutoModelForCausalLM.from_pretrained(
+        args.reference_hf, torch_dtype=torch.float32
+    ).to(device).eval()
+    ref_n_layer = ref_model.config.num_hidden_layers
+    ref_seq_len = getattr(ref_model.config, "max_position_embeddings", 2048)
+
+    for task_meta, data in benchmark_data:
+        sample_inputs, stats = build_benchmark_inputs(
+            ref_adapter, ref_seq_len, task_meta, data, args.num_samples,
+        )
+        print(
+            f"  Loaded {task_meta['label']} "
+            f"(dropped {stats['num_dropped']}/{stats['num_total']}, "
+            f"selected {stats['num_selected']})"
+        )
+
+        n_points = ref_n_layer
+        ang_dist_sum = torch.zeros(n_points, n_points)
+        count = 0
+
+        layer_inputs = []
+        def ref_hook_fn(module, inp, out):
+            layer_inputs.append(inp[0].detach())
+        hooks = [layer.self_attn.register_forward_hook(ref_hook_fn)
+                 for layer in ref_model.model.layers]
+
+        try:
+            with torch.no_grad():
+                for sample_idx, (prompt_tokens, start_idx, end_idx) in enumerate(sample_inputs):
+                    layer_inputs.clear()
+                    input_ids = torch.tensor([prompt_tokens], dtype=torch.long, device=device)
+                    ref_model(input_ids)
+
+                    reps = [li[0, start_idx:end_idx, :].float() for li in layer_inputs]
+                    count += 1
+
+                    for i in range(len(reps)):
+                        for j in range(i + 1, len(reps)):
+                            cos_sim = torch.nn.functional.cosine_similarity(reps[i], reps[j], dim=-1)
+                            cos_sim = cos_sim.clamp(-1, 1)
+                            ang_dist = (torch.acos(cos_sim) / torch.pi).mean().cpu()
+                            ang_dist_sum[i, j] += ang_dist
+                            ang_dist_sum[j, i] += ang_dist
+
+                    if (sample_idx + 1) % 10 == 0:
+                        print(f"    {sample_idx + 1}/{len(sample_inputs)}")
+        finally:
+            for h in hooks:
+                h.remove()
+
+        ang_dist_avg = (ang_dist_sum / count).numpy()
+        n_pts = ang_dist_avg.shape[0]
+        max_offset = n_pts - 1
+        offset_matrix = np.full((max_offset, n_pts - 1), np.nan)
+        for l in range(n_pts - 1):
+            for n in range(1, n_pts - l):
+                offset_matrix[n - 1, l] = ang_dist_avg[l, l + n]
+        ref_matrices.append(offset_matrix)
+        ref_n_layers.append(n_pts)
+
+    del ref_model
+    if device_type == "cuda":
+        torch.cuda.empty_cache()
+
+# Build column labels: [ref] + user models
+all_labels = ([ref_label] if args.reference_hf else []) + list(args.labels)
+n_models = len(all_labels)
 fig, axes = plt.subplots(len(BENCHMARK_LABELS), n_models, figsize=(6 * n_models, 5 * len(BENCHMARK_LABELS)))
 if len(BENCHMARK_LABELS) == 1 and n_models == 1:
     axes = np.array([[axes]])
@@ -193,8 +297,12 @@ elif n_models == 1:
     axes = np.expand_dims(axes, axis=1)
 
 # Shared colorbar range
-all_matrices = []
+ref_col_offset = 1 if args.reference_hf else 0
+all_matrices = list(ref_matrices)  # ref benchmarks first (if any)
 all_n_layers = [[None for _ in BENCHMARK_LABELS] for _ in range(n_models)]
+if args.reference_hf:
+    for benchmark_idx in range(len(BENCHMARK_LABELS)):
+        all_n_layers[0][benchmark_idx] = ref_n_layers[benchmark_idx]
 
 for model_idx, (model_tag, model_label) in enumerate(zip(args.model_tags, args.labels)):
     print(f"\nProcessing: {model_label} ({model_tag})")
@@ -268,7 +376,7 @@ for model_idx, (model_tag, model_label) in enumerate(zip(args.model_tags, args.l
                 offset_matrix[n - 1, l] = ang_dist_avg[l, l + n]
 
         all_matrices.append(offset_matrix)
-        all_n_layers[model_idx][benchmark_idx] = n_pts
+        all_n_layers[model_idx + ref_col_offset][benchmark_idx] = n_pts
 
     del model
     if device_type == "cuda":
@@ -281,7 +389,7 @@ vmax = max(np.nanmax(m) for m in all_matrices)
 
 im = None
 matrix_idx = 0
-for model_idx, model_label in enumerate(args.labels):
+for model_idx, model_label in enumerate(all_labels):
     for benchmark_idx, benchmark_label in enumerate(BENCHMARK_LABELS):
         matrix = all_matrices[matrix_idx]
         matrix_idx += 1
