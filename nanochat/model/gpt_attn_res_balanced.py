@@ -33,7 +33,7 @@ class GPTAttnResBalancedConfig:
     n_embd: int = 768
     window_pattern: str = "SSSL"
     xsa_mode: str = "none"
-    balance_coeff: float = 0.001
+    balance_coeff: float = 0.01
     balance_min_sources: int = 6  # only apply balance loss when >= this many sources
 
 
@@ -323,7 +323,11 @@ class GPTAttnResBalanced(nn.Module):
                 balance_loss = -(entropy_sum / entropy_count)
                 loss = lm_loss + balance_coeff * balance_loss
             else:
+                balance_loss = torch.zeros_like(lm_loss)
                 loss = lm_loss
+            # Stash component losses for logging (detached)
+            self._last_lm_loss = lm_loss.detach()
+            self._last_balance_loss = balance_loss.detach()
             return loss
         else:
             return logits
