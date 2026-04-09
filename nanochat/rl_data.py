@@ -67,11 +67,11 @@ class RLExample:
 class JSONLRLDataset:
     """Loads a JSONL of RLExamples into memory.
 
-    rStar seed is ~37k rows × a few KB each = roughly 100MB resident. Cheap.
-    `difficulty_filter` lets you keep only one bucket without re-prepping.
+    rStar seed is ~7.8k rows. Rows with many test cases can be large;
+    total resident size depends on whether test cases were capped at prep time.
     """
 
-    def __init__(self, path: str, difficulty_filter: str | None = None):
+    def __init__(self, path: str):
         self.path = path
         self.examples: list[RLExample] = []
         with open(path) as f:
@@ -80,9 +80,6 @@ class JSONLRLDataset:
                 if not line:
                     continue
                 row = json.loads(line)
-                if difficulty_filter is not None:
-                    if row.get("meta", {}).get("difficulty") != difficulty_filter:
-                        continue
                 self.examples.append(RLExample(
                     id=row["id"],
                     prompt=row["prompt"],
@@ -100,8 +97,7 @@ class JSONLRLDataset:
         return self.examples[i]
 
 
-def build_rl_dataset(name: str, split: str = "train",
-                     difficulty_filter: str | None = None) -> JSONLRLDataset:
+def build_rl_dataset(name: str, split: str = "train") -> JSONLRLDataset:
     """Resolve a dataset name to its on-disk JSONL and load it.
 
     Convention: <base_dir>/data/rl/<name>_<split>.jsonl
@@ -114,7 +110,7 @@ def build_rl_dataset(name: str, split: str = "train",
             f"RL dataset not found: {path}\n"
             f"Run the corresponding prep script (e.g. scripts/prepare_{name}.py) first."
         )
-    return JSONLRLDataset(path, difficulty_filter=difficulty_filter)
+    return JSONLRLDataset(path)
 
 
 # ----------------------------------------------------------------------------

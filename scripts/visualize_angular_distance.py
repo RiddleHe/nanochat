@@ -222,7 +222,7 @@ if args.reference_hf:
     ref_tok = HFAutoTokenizer.from_pretrained(args.reference_hf)
     ref_adapter = HFTokenizerAdapter(ref_tok)
     ref_model = AutoModelForCausalLM.from_pretrained(
-        args.reference_hf, torch_dtype=torch.float32
+        args.reference_hf, torch_dtype=torch.float32, trust_remote_code=True,
     ).to(device).eval()
     ref_n_layer = ref_model.config.num_hidden_layers
     ref_seq_len = getattr(ref_model.config, "max_position_embeddings", 2048)

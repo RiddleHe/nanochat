@@ -56,7 +56,6 @@ parser.add_argument("--max-seq-len", type=int, default=2048)
 parser.add_argument("--eval-every", type=int, default=20)
 # Task / Reward
 parser.add_argument("--task", type=str, default="rstar_seed", help="RL dataset name")
-parser.add_argument("--difficulty", type=str, default=None, help="Filter dataset to one difficulty bucket")
 parser.add_argument("--reward-workers", type=int, default=0, help="Reward worker pool size")
 parser.add_argument("--k-tests", type=int, default=10, help="Tests subsampled per rollout")
 # Runtime
@@ -99,7 +98,7 @@ if master_process:
 
 # -----------------------------------------------------------------------------
 # RL dataset + reward worker pool + loss fn
-dataset = build_rl_dataset(args.task, split="train", difficulty_filter=args.difficulty)
+dataset = build_rl_dataset(args.task, split="train")
 loader = distributed_rl_loader(
     dataset,
     prompts_per_step=args.prompts_per_step,
