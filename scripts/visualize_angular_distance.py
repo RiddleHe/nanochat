@@ -288,7 +288,8 @@ for model_idx, model_label in enumerate(args.labels):
         ax = axes[benchmark_idx, model_idx]
         n_pts = all_n_layers[model_idx][benchmark_idx]
         im = ax.imshow(matrix, cmap=cmap, vmin=0, vmax=vmax, interpolation='nearest', origin='lower')
-        ax.set_title(f"{model_label} | {benchmark_label}", fontsize=13)
+        avg_ang_dist = np.nanmean(matrix)
+        ax.set_title(f"{model_label} (avg={avg_ang_dist:.3f})", fontsize=13)
         ax.set_xlabel("Layer Index $\\ell$", fontsize=12)
         ax.set_ylabel("Subsequent $n^{th}$ Layer", fontsize=12)
         ax.set_xticks(range(0, n_pts - 1, max(1, (n_pts - 1) // 8)))
@@ -297,7 +298,10 @@ for model_idx, model_label in enumerate(args.labels):
         ax.set_yticklabels([i + 1 for i in range(0, n_pts - 1, max(1, (n_pts - 1) // 4))], fontsize=8)
 
 fig.suptitle("Cross-Layer Angular Distance by Benchmark (Answer-Span Prefill)", fontsize=15)
-fig.subplots_adjust(bottom=0.18, hspace=0.45)
+fig.subplots_adjust(bottom=0.18, hspace=0.7)
+for benchmark_idx, benchmark_label in enumerate(BENCHMARK_LABELS):
+    pos = axes[benchmark_idx, 0].get_position()
+    fig.text(0.5, pos.y1 + 0.025, benchmark_label, ha='center', fontsize=16, fontweight='bold')
 cbar_ax = fig.add_axes([0.15, 0.06, 0.7, 0.03])
 fig.colorbar(im, cax=cbar_ax, orientation='horizontal', label="Angular Distance (0=identical)")
 output_dir = os.path.dirname(args.output)
