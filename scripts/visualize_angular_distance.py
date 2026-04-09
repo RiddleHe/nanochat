@@ -277,6 +277,8 @@ for model_idx, (model_tag, model_label) in enumerate(zip(args.model_tags, args.l
 cmap = plt.cm.viridis_r.copy()
 cmap.set_bad(color='white', alpha=0)
 
+vmax = max(np.nanmax(m) for m in all_matrices)
+
 im = None
 matrix_idx = 0
 for model_idx, model_label in enumerate(args.labels):
@@ -285,7 +287,7 @@ for model_idx, model_label in enumerate(args.labels):
         matrix_idx += 1
         ax = axes[benchmark_idx, model_idx]
         n_pts = all_n_layers[model_idx][benchmark_idx]
-        im = ax.imshow(matrix, cmap=cmap, vmin=0, vmax=1, interpolation='nearest', origin='lower')
+        im = ax.imshow(matrix, cmap=cmap, vmin=0, vmax=vmax, interpolation='nearest', origin='lower')
         ax.set_title(f"{model_label} | {benchmark_label}", fontsize=13)
         ax.set_xlabel("Layer Index $\\ell$", fontsize=12)
         ax.set_ylabel("Subsequent $n^{th}$ Layer", fontsize=12)
@@ -297,7 +299,7 @@ for model_idx, model_label in enumerate(args.labels):
 fig.suptitle("Cross-Layer Angular Distance by Benchmark (Answer-Span Prefill)", fontsize=15)
 fig.subplots_adjust(bottom=0.18, hspace=0.45)
 cbar_ax = fig.add_axes([0.15, 0.06, 0.7, 0.03])
-fig.colorbar(im, cax=cbar_ax, orientation='horizontal', label="Angular Distance (0=identical, 1=orthogonal)")
+fig.colorbar(im, cax=cbar_ax, orientation='horizontal', label="Angular Distance (0=identical)")
 output_dir = os.path.dirname(args.output)
 if output_dir:
     os.makedirs(output_dir, exist_ok=True)
