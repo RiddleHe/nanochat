@@ -6,102 +6,45 @@ decisions; this file is the action list.
 
 ---
 
-## Step 0 — Verify schema before committing (10 min)
+## Step 0 — Schema ✅ (2026-04-09)
 
-On the new machine, **before** writing any prep code:
+Verified via HF datasets-server API. See `rstar_coder_rl_pipeline.md`
+for the authoritative schema. Key facts:
 
-```python
-from datasets import load_dataset
-ds = load_dataset("microsoft/rStar-Coder", "seed_testcase", split="train[:5]")
-print("columns:", ds.column_names)
-for k, v in ds[0].items():
-    print(f"{k}: {type(v).__name__} → {repr(v)[:400]}")
+```
+seed_testcase columns:
+  question_id      : string
+  question         : string
+  starter_code     : string
+  inputs           : large_string  (JSON list)
+  outputs          : large_string  (JSON list)
+  is_synthesized   : large_string  (JSON list)
+  test_case_type   : large_string  (JSON list)
+  func_name        : string
+  class_name       : string
 ```
 
-Confirm:
-
-- `inputs`/`outputs` are lists of JSON-encoded strings.
-- `starter_code` shape (empty string vs missing for stdio mode).
-- Whether `is_synthesized` and `test_case_type` are per-test sequences or
-  scalars.
-- Whether there is a `difficulty` column. The paper mentions difficulty,
-  but it has not been confirmed in the released schema.
-
-Also load a few different `question_id`s to see at least one stdio problem
-and one call-based problem.
-
-If anything diverges from the assumed schema in
-`knowledge/rstar_coder_rl_pipeline.md`, update that doc **first**, then
-proceed.
+- ~7.8k rows (HF viewer shows first 317 due to 5GB preview cap)
+- No `difficulty` column
+- `func_name`/`class_name` provided directly (no regex extraction needed)
 
 ---
 
-## Step 1 — Write `scripts/prepare_rstar.py` (~120 lines)
+## Step 1 — Write `scripts/prepare_rstar.py` ✅ DONE (2026-04-09)
 
-Single script. Output `<base_dir>/data/rl/rstar_seed_train.jsonl`, plus
-`..._test.jsonl` if a test split exists (otherwise emit only train and
-let later eval do its own random holdout).
+Script written. Handles both schema corrections (func_name column, no
+difficulty, JSON large_string parsing). See script for details.
 
 CLI:
-
 ```
---tokenizer Qwen/Qwen3-0.6B   # required; templates per family
---limit N                     # optional; for smoke testing on a small subset
---human-tests-only            # filter out synthesized tests
---time-limit 4.0
---memory-limit-mb 256
-```
-
-Per-row processing:
-
-1. `inputs_parsed = [json.loads(s) for s in row["inputs"]]`, same for
-   `outputs`. Wrap in try/except — drop the row on failure, increment a
-   `malformed` counter.
-2. Drop rows where `len(inputs_parsed) == 0` or lengths mismatch — increment
-   a counter.
-3. Detect mode:
-   `kind = "code_call_based" if row["starter_code"].strip() else "code_stdin_stdout"`.
-4. For call-based: extract `fn_name` from `starter_code` with
-   `re.search(r"def\s+(\w+)\s*\(", starter)`. If no match, drop and count.
-5. (Optional) If `--human-tests-only`, filter `inputs_parsed` and
-   `outputs_parsed` by `is_synthesized[i] == False`. Drop the row if zero
-   tests remain.
-6. Build the prompt:
-
-   ```python
-   user_content = row["question"].strip()
-   if starter_code:
-       user_content += (
-           "\n\nUse this starter code:\n```python\n"
-           + starter_code.strip()
-           + "\n```"
-       )
-   user_content += "\n\nProvide your complete solution as a single Python code block."
-   prompt_str = tokenizer.apply_chat_template(
-       [{"role": "user", "content": user_content}],
-       tokenize=False,
-       add_generation_prompt=True,
-   )
-   ```
-
-7. Build the JSONL row matching the schema in
-   `knowledge/rstar_coder_rl_pipeline.md`. `meta.difficulty` only if a
-   difficulty field exists in the source row.
-8. `f.write(json.dumps(row) + "\n")`.
-
-End with a counter dump:
-
-```
-loaded N rows
-dropped M (malformed=..., empty_tests=..., missing_fn_name=..., zero_human_tests=...)
-emitted K rows to <path>
-  - call_based: ..
-  - stdin_stdout: ..
+python -m scripts.prepare_rstar --tokenizer Qwen/Qwen3-0.6B
+python -m scripts.prepare_rstar --tokenizer Qwen/Qwen3-0.6B --limit 10
+python -m scripts.prepare_rstar --tokenizer Qwen/Qwen3-0.6B --human-tests-only
 ```
 
 ---
 
-## Step 2 — Smoke test the prep script with `--limit 50`
+## Step 2 — Smoke test the prep script with `--limit 10`
 
 Run with a tiny limit, then `head -1 <path> | python -m json.tool` to
 confirm shape, plus:
@@ -121,9 +64,12 @@ expects, end-to-end, before doing the full multi-GB run.
 
 ## Step 3 — Full prep run
 
-Drop `--limit`. Expect a multi-GB download plus a few minutes of parsing.
+Drop `--limit`. Expect a ~2.3 GB download plus a few minutes of parsing.
 Confirm the final counters look sane (drop rate ≤10%, both modes present
 in reasonable proportions).
+
+**Note:** ~7.8k problems total (not 317 — the HF viewer was truncated
+by the 5GB preview cap). Good diversity for RL.
 
 ---
 
@@ -153,9 +99,8 @@ Likely failure modes to watch for:
   object, our fallback path runs but only handles TP=1.
 - **Schema mismatch in payload fields.** Hopefully caught at Step 2 already.
 - **All-zero rewards on every prompt.** Means the base model can't solve
-  any of these even partially. Mitigation: filter the JSONL down to the
-  easiest difficulty bucket, or smaller test counts so partial credit
-  shows up sooner.
+  any of these even partially. Mitigation: use smaller test counts so
+  partial credit shows up sooner.
 - **Sandbox timeouts dominating step time.** If most rollouts produce
   infinite-loop code, every test waits the full timeout. Drop
   `--time-limit` to 2 s or lower.
@@ -189,6 +134,8 @@ Once Step 4 produces non-degenerate gradients, add:
 
 ## Stretch / nice-to-have, not blocking
 
+- **Prepare `synthetic_rl_testcase`** (~464k rows) for even more
+  problem diversity beyond the ~7.8k seed problems.
 - Stratified test subsampling at prep time (keep all human tests + a budget
   per complexity bucket from synthesized) instead of uniform random
   subsample at verify time.
@@ -202,8 +149,6 @@ Once Step 4 produces non-degenerate gradients, add:
 
 ## Summary
 
-The two pieces of true work are **Step 0 (verify schema)** and **Step 1
-(write prep script)**. Everything after that is running things and
-iterating on what breaks. The companion file
-`rstar_coder_rl_pipeline.md` should be enough for a fresh session to resume
-without re-asking any of the questions worked through earlier.
+Steps 0 and 1 are done. The prep script (`scripts/prepare_rstar.py`) is
+written and handles the actual schema. Next: smoke test (Step 2), then
+full run (Step 3), then end-to-end RL test (Step 4).

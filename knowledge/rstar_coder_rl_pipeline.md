@@ -46,29 +46,44 @@ dedup and after filtering out problems with no reference solution (down from
 57,215 raw collected). Each problem has at least one oracle solution that
 the rStar pipeline used to generate and validate the expanded test sets.
 
-### `seed_testcase` schema (as documented; not yet directly verified)
+**Actual released counts** (verified 2026-04-09 via HF dashboard):
+- `seed_testcase`: **~7.8k rows** (not 37k — only problems with test cases)
+- `seed_sft`: ~592k rows (multiple solutions per problem)
+- `synthetic_rl_testcase`: **~464k rows**
+- `synthetic_rl`: ~398k rows
+- `synthetic_sft`: ~398k rows
 
-Columns reported by the dataset card and reconstructed from third-party
-mirrors. **First action on the next machine: load 1–2 rows and `print(row)`
-to confirm shapes match before committing to parsing logic.**
+Note: the HF dataset viewer and datasets-server `/size` API only show
+the first 5GB of data for large configs. `seed_testcase` shows "317 rows"
+in the viewer because each row is ~15MB (massive test suites), but
+`load_dataset` downloads the full parquet and returns all ~7.8k rows.
+
+### `seed_testcase` schema (verified 2026-04-09)
+
+Confirmed via HF datasets-server API and dashboard inspection.
 
 ```
 seed_testcase columns:
   question_id      : string                    # join key
   question         : string                    # problem statement
   starter_code     : string                    # function signature for call-based; "" for stdio
-  inputs           : Sequence[large_string]    # JSON-encoded list of test inputs
-  outputs          : Sequence[large_string]    # JSON-encoded list of expected outputs
-  is_synthesized   : Sequence[...]             # per-test flag (expert vs generated)
-  test_case_type   : Sequence[...]             # per-test category/scale tag
+  inputs           : large_string              # JSON-encoded list of test inputs (single blob)
+  outputs          : large_string              # JSON-encoded list of expected outputs (single blob)
+  is_synthesized   : large_string              # JSON-encoded list of per-test booleans
+  test_case_type   : large_string              # JSON-encoded list of per-test category tags
+  func_name        : string                    # function name for call-based; "" for stdio
+  class_name       : string                    # class name (e.g. "Solution") if applicable; "" otherwise
 ```
 
 Important quirks:
 
-1. **`inputs` and `outputs` are sequences of JSON-encoded strings**, not
-   structured columns. Each element must be `json.loads`-ed at parse time.
-   APPS uses the same trick. Expect ~5–10% of rows to have malformed/null
-   payloads — drop them at prep time, log the count.
+1. **`inputs`, `outputs`, `is_synthesized`, `test_case_type` are each a
+   single `large_string`** — one JSON blob per row, not a sequence of
+   separate strings. `json.loads(row["inputs"])` yields a list. For
+   call-based problems, each element of that list is itself a JSON-encoded
+   string (arg list / return value) that needs a second `json.loads`. For
+   stdio, elements are plain strings (stdin/stdout text). Expect some rows
+   to have malformed payloads — drop at prep time, log the count.
 2. **Both problem modes coexist in one table**, distinguished by whether
    `starter_code` is non-empty:
    - **Call-based** (starter_code present): the model writes a function with
@@ -77,29 +92,35 @@ Important quirks:
    - **Standard I/O** (starter_code empty): the model writes a complete
      program. Each `inputs[i]` is a string piped to the program's stdin.
      Each `outputs[i]` is the expected stdout string.
-3. **LeetCode-style class wrapper.** Many call-based problems use the
+3. **`func_name` and `class_name` columns** provide the function/class name
+   directly — no need to regex-extract from `starter_code`. For stdio
+   problems both are empty strings.
+4. **LeetCode-style class wrapper.** Many call-based problems use the
    LeetCode convention `class Solution:\n    def fn_name(self, ...)`. Models
    imitate this. The sandbox driver must handle both `fn = ns[fn_name]` AND
    `fn = Solution().fn_name` — already implemented in `nanochat/rl_sandbox.py`.
-4. **Test cases are graded by complexity scale**, with input sizes spanning
+5. **Test cases are graded by complexity scale**, with input sizes spanning
    10⁰ to 10⁵. The `test_case_type` field tags this. Useful for stratified
    subsampling: keep all human tests + a budget-capped subset of synthesized
    tests per scale bucket.
-5. **`is_synthesized`** lets you separate human-written from rStar-generated
+6. **`is_synthesized`** lets you separate human-written from rStar-generated
    tests. For a clean run you can train only on the human-authored ones.
+7. **No `difficulty` column exists** in this config. The paper mentions
+   difficulty levels but they are not included in the released schema.
 
 ### Download cost: a real friction point
 
-- The `seed_testcase` parquet shard is **at least 3 GB single file**. Even
-  `load_dataset(..., split="train[:5]")` triggers downloading the entire
-  shard, because parquet is column-oriented and HF datasets does not
-  support byte-range row-group reads through this API.
-- `streaming=True` does not help — it still has to fetch the parquet bytes
-  needed for the first row, which means most or all of the shard.
+- The `seed_testcase` parquet is **multi-GB** (rows are ~15MB each due to
+  massive test suites). `load_dataset(..., split="train[:5]")` still
+  downloads the full parquet, because HF datasets does not support
+  byte-range row-group reads.
+- `streaming=True` does not help — it still has to fetch the parquet bytes.
 - The HF datasets-server REST API
   (`https://datasets-server.huggingface.co/rows?...`) returns sample rows
   over HTTP without any parquet download — use this for schema inspection
-  in environments where the multi-GB download is impractical.
+  in environments where the multi-GB download is impractical. Note: the
+  `/size` endpoint and the HF viewer both cap at 5GB, so they report
+  only ~317 rows; the actual dataset has ~7.8k rows.
 - For real prep work, plan for a multi-GB one-time download and run on a
   machine with good bandwidth and disk.
 
@@ -197,7 +218,7 @@ Implemented and tested:
 
 ## Canonical JSONL contract
 
-The on-disk file produced by the prep script (TODO) and consumed by
+The on-disk file produced by `scripts/prepare_rstar.py` and consumed by
 `JSONLRLDataset`. One row per line:
 
 ```json
@@ -215,7 +236,6 @@ The on-disk file produced by the prep script (TODO) and consumed by
   },
   "meta": {
     "source": "rstar_seed",
-    "difficulty": "introductory" | "interview" | "competition",
     "n_tests": 12
   }
 }
