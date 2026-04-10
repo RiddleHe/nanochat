@@ -5,7 +5,7 @@ Produces two heatmaps:
   2. Per-layer histogram of gate values
 
 Usage:
-    python -m scripts.visualize_gate_values --model-tag arch_d12_gated_attn_res --num-samples 50
+    python -m scripts.visualizations.visualize_gate_values --model-tag arch_d12_gated_attn_res --num-samples 50
 """
 import argparse
 import torch

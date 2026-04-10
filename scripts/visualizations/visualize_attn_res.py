@@ -7,8 +7,8 @@ Works with any AttnRes variant (attn_res, attn_res_balanced, etc.) as long
 as the model has `attn_res_queries` and the standard `_attn_res` mechanism.
 
 Usage:
-    python -m scripts.visualize_attn_res --model-tag arch_d12_attn_res --num-samples 100
-    python -m scripts.visualize_attn_res --model-tag arch_d12_attn_res_balanced --num-samples 100
+    python -m scripts.visualizations.visualize_attn_res --model-tag arch_d12_attn_res --num-samples 100
+    python -m scripts.visualizations.visualize_attn_res --model-tag arch_d12_attn_res_balanced --num-samples 100
 """
 import argparse
 import torch

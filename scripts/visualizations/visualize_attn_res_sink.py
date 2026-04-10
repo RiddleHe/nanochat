@@ -4,7 +4,7 @@ Same as visualize_attn_res.py but includes the sink weight as the first column
 (source index 0 = sink, source index 1+ = real layer outputs).
 
 Usage:
-    python -m scripts.visualize_attn_res_sink --model-tag arch_d12_attn_res_sink --num-samples 100
+    python -m scripts.visualizations.visualize_attn_res_sink --model-tag arch_d12_attn_res_sink --num-samples 100
 """
 import argparse
 import torch
