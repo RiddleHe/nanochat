@@ -2,16 +2,17 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PYTHON_BIN="${PYTHON_BIN:-/local-ssd/mh3897/conda-envs/nanochat-rl/bin/python}"
-TORCHRUN_BIN="${TORCHRUN_BIN:-/local-ssd/mh3897/conda-envs/nanochat-rl/bin/torchrun}"
-BASE_DIR="${NANOCHAT_BASE_DIR:-/local-ssd/mh3897}"
+PYTHON_BIN="${PYTHON_BIN:-python}"
+TORCHRUN_BIN="${TORCHRUN_BIN:-torchrun}"
+BASE_DIR="${NANOCHAT_BASE_DIR:-$ROOT_DIR/.nanochat}"
 
 MODEL="${MODEL:-Qwen/Qwen3-0.6B}"
+TASK="${TASK:-rstar_seed}"
+ALGORITHM="${ALGORITHM:-grpo}"
 ROLLOUT_HOST="${ROLLOUT_HOST:-127.0.0.1}"
 ROLLOUT_PORT="${ROLLOUT_PORT:-8047}"
 ROLLOUT_GPU="${ROLLOUT_GPU:-7}"
 TRAIN_GPUS="${TRAIN_GPUS:-4,5,6}"
-TRAIN_NPROC="${TRAIN_NPROC:-3}"
 
 NUM_STEPS="${NUM_STEPS:-200}"
 PROMPTS_PER_STEP="${PROMPTS_PER_STEP:-12}"
@@ -34,6 +35,19 @@ export PYTHONPATH="$ROOT_DIR"
 export NANOCHAT_BASE_DIR="$BASE_DIR"
 export ROLLOUT_HOST
 export ROLLOUT_PORT
+
+if [[ -z "${TRAIN_NPROC:-}" ]]; then
+  IFS=, read -r -a TRAIN_GPU_LIST <<< "$TRAIN_GPUS"
+  TRAIN_NPROC="${#TRAIN_GPU_LIST[@]}"
+fi
+
+IFS=, read -r -a TRAIN_GPU_LIST <<< "$TRAIN_GPUS"
+for gpu in "${TRAIN_GPU_LIST[@]}"; do
+  if [[ "$gpu" == "$ROLLOUT_GPU" ]]; then
+    echo "ROLLOUT_GPU ($ROLLOUT_GPU) must not overlap TRAIN_GPUS ($TRAIN_GPUS)" >&2
+    exit 1
+  fi
+done
 
 WORKER_PID=""
 
@@ -86,8 +100,8 @@ echo "[launcher] starting trainer on GPUs $TRAIN_GPUS -> $TRAIN_LOG"
 CUDA_VISIBLE_DEVICES="$TRAIN_GPUS" \
   "$TORCHRUN_BIN" --standalone --nproc_per_node="$TRAIN_NPROC" -m scripts.rl_train \
     --model "$MODEL" \
-    --algorithm grpo \
-    --task rstar_seed \
+    --algorithm "$ALGORITHM" \
+    --task "$TASK" \
     --rollout-backend remote_vllm \
     --rollout-worker-url "http://$ROLLOUT_HOST:$ROLLOUT_PORT" \
     --rollout-sync-dir "$ROLLOUT_SYNC_DIR" \

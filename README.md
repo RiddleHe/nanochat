@@ -37,6 +37,16 @@ torchrun --standalone --nproc_per_node=4 -m scripts.base_train -- \
 torchrun --standalone --nproc_per_node=4 -m scripts.base_eval -- --model-tag=my_experiment
 ```
 
+## RL
+
+RL training docs live in [docs/rl.md](docs/rl.md).
+
+That document covers:
+- preparing `rStar-Coder` into canonical RL JSONL
+- running the simple HF rollout path
+- running the recommended `remote_vllm` path with a unified launcher
+- required launcher inputs such as `MODEL`, `NANOCHAT_BASE_DIR`, and GPU selection
+
 ## Architecture experiments
 
 We compare transformer variants that differ in how information flows across depth, using FLOP-controlled training.
