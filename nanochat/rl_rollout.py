@@ -278,6 +278,38 @@ def vllm_weight_sync(vllm_engine, hf_model):
         torch.cuda.empty_cache()
 
 
+def vllm_reload_weights_inplace(vllm_engine, model_path):
+    """Reload checkpoint-format weights into an existing vLLM engine.
+
+    This preserves the already-initialized engine/runtime and only refreshes
+    model parameters plus runtime caches. It keeps strict-sync semantics while
+    avoiding the much slower cold-engine reconstruction path.
+    """
+    if hasattr(vllm_engine, "collective_rpc"):
+        vllm_engine.collective_rpc(
+            "reload_weights",
+            kwargs={
+                "weights_path": model_path,
+                "is_checkpoint_format": True,
+            },
+        )
+    else:
+        worker = vllm_engine.llm_engine.model_executor.driver_worker
+        worker.model_runner.reload_weights(
+            weights_path=model_path,
+            is_checkpoint_format=True,
+        )
+
+    # Weight changes invalidate generation-time caches.
+    if hasattr(vllm_engine, "reset_prefix_cache"):
+        vllm_engine.reset_prefix_cache()
+    if hasattr(vllm_engine, "reset_mm_cache"):
+        vllm_engine.reset_mm_cache()
+
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
+
 def vllm_reload_model(model_path, tokenizer_path, dtype="bfloat16", gpu_memory_utilization=0.3):
     """Create a fresh vLLM engine from a local checkpoint path."""
     from vllm import LLM

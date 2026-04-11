@@ -21,6 +21,7 @@ import os
 import math
 import time
 import argparse
+from statistics import mean
 
 import torch
 import torch.distributed as dist
@@ -150,6 +151,19 @@ optimizer = torch.optim.AdamW(
 )
 
 
+def summarize_rewards(rewards):
+    if not rewards:
+        return "n=0"
+    nonzero = sum(1 for r in rewards if r != 0.0)
+    return (
+        f"n={len(rewards)} "
+        f"mean={mean(rewards):.4f} "
+        f"min={min(rewards):.4f} "
+        f"max={max(rewards):.4f} "
+        f"nonzero={nonzero}/{len(rewards)} ({nonzero / len(rewards):.1%})"
+    )
+
+
 def broadcast_batch(batch, advantages, mean_reward):
     """Broadcast a rollout batch prepared by rank 0 to every training rank."""
     if master_process:
@@ -204,13 +218,17 @@ print0(f"Starting RL training: {args.num_steps} steps, {args.prompts_per_step} p
 
 for step in range(args.num_steps):
     t0 = time.time()
+    phase = {}
 
     if master_process:
         # 1. Sample prompts for the whole global batch on rank 0
+        phase_t0 = time.time()
         examples, _loader_state = next(loader)
         prompt_texts = [ex.prompt for ex in examples]
+        phase["fetch_prompts_s"] = time.time() - phase_t0
 
         # 2. Generate rollouts via vLLM
+        phase_t0 = time.time()
         if args.rollout_backend == "vllm":
             rollouts = generate_rollouts(
                 vllm_engine, tokenizer, prompt_texts,
@@ -229,35 +247,55 @@ for step in range(args.num_steps):
                 args.num_samples, args.max_new_tokens,
                 args.temperature, args.top_k, device,
             )
+        phase["rollout_s"] = time.time() - phase_t0
 
         # 3. Compute rewards on rank 0
+        phase_t0 = time.time()
         expanded_examples = [examples[i // args.num_samples] for i in range(len(rollouts))]
         responses = [r["response"] for r in rollouts]
         rewards, _infos = rewarder.score(expanded_examples, responses, step=step)
         mean_reward = sum(rewards) / len(rewards) if rewards else 0.0
+        phase["reward_s"] = time.time() - phase_t0
+        reward_summary = summarize_rewards(rewards)
 
         # 4. Pack training batch on CPU, then broadcast to all ranks
+        phase_t0 = time.time()
         batch = prepare_batch(rollouts, rewards, tokenizer, args.max_seq_len, "cpu")
         advantages = compute_advantages(args.algorithm, batch["rewards"])
+        phase["pack_batch_s"] = time.time() - phase_t0
+
+        print0(
+            f"[step {step:04d}] prompts={len(examples)} rollouts={len(rollouts)} "
+            f"fetch={phase['fetch_prompts_s']:.1f}s rollout={phase['rollout_s']:.1f}s "
+            f"reward={phase['reward_s']:.1f}s pack={phase['pack_batch_s']:.1f}s "
+            f"rewards[{reward_summary}]"
+        )
     else:
         batch = None
         advantages = None
         mean_reward = 0.0
+        reward_summary = ""
 
+    phase_t0 = time.time()
     batch, advantages, mean_reward = broadcast_batch(batch, advantages, mean_reward)
     batch, advantages = local_shard(batch, advantages)
+    local_bsz = batch["input_ids"].shape[0]
+    phase["broadcast_and_shard_s"] = time.time() - phase_t0
 
     # 5. Old log-probs (no grad, frozen behavior model = current policy)
+    phase_t0 = time.time()
     with torch.no_grad():
         old_logprobs = get_logprobs(
             raw_model, batch["input_ids"], batch["attention_mask"], batch["response_mask"],
         )
+    phase["old_logprobs_s"] = time.time() - phase_t0
 
     # 6. Policy update with grad accumulation over micro-batches
     total_samples = batch["input_ids"].shape[0]
     micro_bs = args.train_batch_size
     n_microbatches = math.ceil(total_samples / micro_bs)
 
+    phase_t0 = time.time()
     optimizer.zero_grad()
     total_loss = 0.0
     for mb in range(n_microbatches):
@@ -284,8 +322,11 @@ for step in range(args.num_steps):
 
     torch.nn.utils.clip_grad_norm_(raw_model.parameters(), 1.0)
     optimizer.step()
+    phase["update_s"] = time.time() - phase_t0
 
     # 7. Push updated weights into vLLM so next-step rollouts stay on-policy
+    phase_t0 = time.time()
+    sync_mode = ""
     if vllm_engine is not None:
         vllm_weight_sync(vllm_engine, raw_model)
     elif master_process and args.rollout_backend == "remote_vllm":
@@ -296,10 +337,24 @@ for step in range(args.num_steps):
             slot_idx=step % 2,
             tokenizer_source=args.model,
         )
-        remote_vllm_reload(args.rollout_worker_url, checkpoint_path)
+        resp = remote_vllm_reload(args.rollout_worker_url, checkpoint_path)
+        sync_mode = resp.get("reload_mode", "")
+    phase["sync_rollout_s"] = time.time() - phase_t0
 
     dt = time.time() - t0
-    print0(f"step {step:04d}/{args.num_steps:04d} | loss: {total_loss:.4f} | reward: {mean_reward:.4f} | dt: {dt:.1f}s")
+    print0(
+        f"step {step:04d}/{args.num_steps:04d} | loss: {total_loss:.4f} | reward: {mean_reward:.4f} "
+        f"| local_bsz: {local_bsz} | dt: {dt:.1f}s "
+        f"| phases(fetch={phase.get('fetch_prompts_s', 0.0):.1f}s "
+        f"rollout={phase.get('rollout_s', 0.0):.1f}s "
+        f"reward={phase.get('reward_s', 0.0):.1f}s "
+        f"pack={phase.get('pack_batch_s', 0.0):.1f}s "
+        f"bcast={phase['broadcast_and_shard_s']:.1f}s "
+        f"oldlp={phase['old_logprobs_s']:.1f}s "
+        f"update={phase['update_s']:.1f}s "
+        f"sync={phase['sync_rollout_s']:.1f}s"
+        f"{f' mode={sync_mode}' if sync_mode else ''})"
+    )
 
     # 8. Evaluation
     if args.eval_every > 0 and (step + 1) % args.eval_every == 0:

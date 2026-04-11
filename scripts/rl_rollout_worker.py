@@ -26,7 +26,11 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import torch
 from transformers import AutoTokenizer
 
-from nanochat.rl_rollout import generate_rollouts, vllm_reload_model
+from nanochat.rl_rollout import (
+    generate_rollouts,
+    vllm_reload_model,
+    vllm_reload_weights_inplace,
+)
 
 
 class RolloutState:
@@ -46,6 +50,15 @@ class RolloutState:
         )
 
     def reload(self, model_path):
+        try:
+            vllm_reload_weights_inplace(self.engine, model_path)
+            self.model_path = model_path
+            return {"mode": "inplace"}
+        except Exception as e:
+            # Fall back to the original cold-reload path if this vLLM build
+            # cannot reload the checkpoint in place.
+            print(f"in-place reload failed, falling back to cold reload: {e}", flush=True)
+
         old_engine = self.engine
         self.engine = None
         del old_engine
@@ -60,6 +73,7 @@ class RolloutState:
             dtype=self.dtype,
             gpu_memory_utilization=self.gpu_memory_utilization,
         )
+        return {"mode": "cold"}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -114,10 +128,11 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == "/reload":
             payload = self._read_json()
             state = self.server.state
-            state.reload(payload["model_path"])
+            reload_info = state.reload(payload["model_path"])
             self._write_json({
                 "ok": True,
                 "model_path": state.model_path,
+                "reload_mode": reload_info["mode"],
             })
             return
 
