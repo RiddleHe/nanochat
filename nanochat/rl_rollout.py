@@ -6,6 +6,14 @@ log-probs with the HF training model, pack rollouts into padded tensors, and
 push updated weights back into the vLLM engine between steps.
 """
 
+import gc
+import json
+import os
+import shutil
+import time
+import urllib.error
+import urllib.request
+
 import torch
 import torch.nn.functional as F
 
@@ -55,6 +63,150 @@ def generate_rollouts(vllm_engine, tokenizer, prompts, num_samples, max_new_toke
                 "prompt_ids": list(output.prompt_token_ids),
                 "response_ids": list(completion.token_ids),
             })
+    return results
+
+
+def _remote_json_request(base_url, method, path, payload=None, timeout=600):
+    data = None
+    headers = {}
+    if payload is not None:
+        data = json.dumps(payload).encode("utf-8")
+        headers["Content-Type"] = "application/json"
+    req = urllib.request.Request(
+        f"{base_url.rstrip('/')}{path}",
+        data=data,
+        headers=headers,
+        method=method,
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            body = resp.read()
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"remote rollout request failed: {e.code} {body}") from e
+    except urllib.error.URLError as e:
+        raise RuntimeError(f"remote rollout request failed: {e}") from e
+
+    if not body:
+        return None
+    return json.loads(body)
+
+
+def wait_for_rollout_worker(base_url, timeout_s=300):
+    """Poll the rollout worker until it reports healthy."""
+    deadline = time.time() + timeout_s
+    last_err = None
+    while time.time() < deadline:
+        try:
+            payload = _remote_json_request(base_url, "GET", "/health", timeout=10)
+            if payload and payload.get("ok"):
+                return payload
+        except Exception as e:  # pragma: no cover - best-effort polling
+            last_err = e
+        time.sleep(1.0)
+    raise RuntimeError(
+        f"rollout worker at {base_url} did not become healthy within {timeout_s}s"
+        + (f"; last error: {last_err}" if last_err else "")
+    )
+
+
+def generate_rollouts_remote(base_url, prompts, num_samples, max_new_tokens,
+                             temperature, top_k):
+    """Generate rollouts via a separate rollout worker process."""
+    payload = {
+        "prompts": prompts,
+        "num_samples": num_samples,
+        "max_new_tokens": max_new_tokens,
+        "temperature": temperature,
+        "top_k": top_k,
+    }
+    resp = _remote_json_request(base_url, "POST", "/generate", payload=payload, timeout=1800)
+    return resp["rollouts"]
+
+
+def remote_vllm_reload(base_url, model_path):
+    """Ask the rollout worker to reload weights from a checkpoint path."""
+    resp = _remote_json_request(
+        base_url, "POST", "/reload", payload={"model_path": model_path}, timeout=1800,
+    )
+    if not resp or not resp.get("ok"):
+        raise RuntimeError(f"rollout worker reload failed for {model_path}: {resp}")
+    return resp
+
+
+def materialize_rollout_checkpoint(hf_model, sync_root, slot_idx, tokenizer_source=None):
+    """Write a HF checkpoint into one of two alternating sync slots.
+
+    The worker reloads from the returned slot path. Alternating slots preserves
+    strict per-step semantics without accumulating one checkpoint directory per
+    RL step.
+    """
+    if hasattr(hf_model, "module"):
+        hf_model = hf_model.module
+
+    os.makedirs(sync_root, exist_ok=True)
+    slot_path = os.path.join(sync_root, f"slot{slot_idx}")
+    tmp_path = f"{slot_path}.tmp"
+    shutil.rmtree(tmp_path, ignore_errors=True)
+    shutil.rmtree(slot_path, ignore_errors=True)
+    hf_model.save_pretrained(tmp_path, safe_serialization=True)
+
+    if tokenizer_source is not None:
+        for name in (
+            "tokenizer.json",
+            "tokenizer_config.json",
+            "special_tokens_map.json",
+            "added_tokens.json",
+            "merges.txt",
+            "vocab.json",
+        ):
+            src = os.path.join(tokenizer_source, name)
+            if os.path.exists(src):
+                shutil.copy2(src, os.path.join(tmp_path, name))
+
+    os.replace(tmp_path, slot_path)
+    return slot_path
+
+
+def generate_rollouts_hf(model, tokenizer, prompts, num_samples, max_new_tokens,
+                         temperature, top_k, device):
+    """Generate rollouts with the HF training model directly.
+
+    This is slower than vLLM but avoids the extra rollout engine dependency
+    during debugging or in setups where colocated vLLM is not stable.
+    """
+    do_sample = temperature > 0
+    was_training = model.training
+    model.eval()
+    results = []
+    try:
+        with torch.no_grad():
+            for prompt_text in prompts:
+                inputs = tokenizer(prompt_text, return_tensors="pt").to(device)
+                outputs = model.generate(
+                    **inputs,
+                    max_new_tokens=max_new_tokens,
+                    do_sample=do_sample,
+                    temperature=temperature if do_sample else None,
+                    top_k=top_k if do_sample else None,
+                    num_return_sequences=num_samples,
+                    pad_token_id=tokenizer.pad_token_id,
+                    eos_token_id=tokenizer.eos_token_id,
+                    use_cache=True,
+                )
+                prompt_ids = inputs["input_ids"][0].tolist()
+                prompt_len = len(prompt_ids)
+                for seq in outputs:
+                    response_ids = seq[prompt_len:].tolist()
+                    results.append({
+                        "prompt": prompt_text,
+                        "response": tokenizer.decode(response_ids, skip_special_tokens=True),
+                        "prompt_ids": prompt_ids,
+                        "response_ids": response_ids,
+                    })
+    finally:
+        if was_training:
+            model.train()
     return results
 
 
@@ -124,3 +276,21 @@ def vllm_weight_sync(vllm_engine, hf_model):
     # rollout doesn't OOM when training and inference share a GPU.
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
+
+
+def vllm_reload_model(model_path, tokenizer_path, dtype="bfloat16", gpu_memory_utilization=0.3):
+    """Create a fresh vLLM engine from a local checkpoint path."""
+    from vllm import LLM
+
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
+    return LLM(
+        model=model_path,
+        tokenizer=tokenizer_path,
+        dtype=dtype,
+        gpu_memory_utilization=gpu_memory_utilization,
+        trust_remote_code=True,
+        disable_log_stats=True,
+    )

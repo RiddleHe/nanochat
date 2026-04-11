@@ -12,9 +12,19 @@ response tokens (shape [B]) and `rewards` is a scalar reward per sample
 import torch
 
 
-def grpo_loss(logprobs, old_logprobs, rewards, clip=0.2, kl_coeff=0.0, **kwargs):
+def compute_advantages(algorithm: str, rewards: torch.Tensor) -> torch.Tensor:
+    """Compute per-sample advantages using the same convention as the loss."""
+    if algorithm in ("grpo", "dapo"):
+        return (rewards - rewards.mean()) / (rewards.std() + 1e-8)
+    if algorithm == "reinforce":
+        return rewards - rewards.mean()
+    raise ValueError(f"unknown RL algorithm: {algorithm!r}")
+
+
+def grpo_loss(logprobs, old_logprobs, rewards, advantages=None, clip=0.2, kl_coeff=0.0, **kwargs):
     """GRPO: group-relative policy optimization."""
-    advantages = (rewards - rewards.mean()) / (rewards.std() + 1e-8)
+    if advantages is None:
+        advantages = compute_advantages("grpo", rewards)
     ratio = (logprobs - old_logprobs).exp()
     clipped = torch.clamp(ratio, 1 - clip, 1 + clip)
     pg_loss = -torch.min(ratio * advantages, clipped * advantages).mean()
@@ -24,17 +34,19 @@ def grpo_loss(logprobs, old_logprobs, rewards, clip=0.2, kl_coeff=0.0, **kwargs)
     return pg_loss
 
 
-def dapo_loss(logprobs, old_logprobs, rewards, clip_low=0.8, clip_high=1.28, **kwargs):
+def dapo_loss(logprobs, old_logprobs, rewards, advantages=None, clip_low=0.8, clip_high=1.28, **kwargs):
     """DAPO: decoupled asymmetric policy optimization."""
-    advantages = (rewards - rewards.mean()) / (rewards.std() + 1e-8)
+    if advantages is None:
+        advantages = compute_advantages("dapo", rewards)
     ratio = (logprobs - old_logprobs).exp()
     clipped = torch.clamp(ratio, clip_low, clip_high)
     return -torch.min(ratio * advantages, clipped * advantages).mean()
 
 
-def reinforce_loss(logprobs, old_logprobs, rewards, **kwargs):
+def reinforce_loss(logprobs, old_logprobs, rewards, advantages=None, **kwargs):
     """Simple REINFORCE with mean-subtracted advantages."""
-    advantages = rewards - rewards.mean()
+    if advantages is None:
+        advantages = compute_advantages("reinforce", rewards)
     return -(logprobs * advantages).mean()
 
 

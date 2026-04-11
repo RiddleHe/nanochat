@@ -40,11 +40,18 @@ import sys
 import json
 import random
 import traceback
+from array import array
 from dataclasses import dataclass, field
 from typing import Any
 
+from filelock import FileLock
+
 from nanochat.common import get_base_dir
 from nanochat.rl_sandbox import run_test
+
+
+if hasattr(sys, "set_int_max_str_digits"):
+    sys.set_int_max_str_digits(0)
 
 
 # ----------------------------------------------------------------------------
@@ -65,36 +72,88 @@ class RLExample:
 # ----------------------------------------------------------------------------
 
 class JSONLRLDataset:
-    """Loads a JSONL of RLExamples into memory.
+    """Indexed JSONL dataset with lazy row materialization.
 
-    rStar seed is ~7.8k rows. Rows with many test cases can be large;
-    total resident size depends on whether test cases were capped at prep time.
+    Large RL corpora can easily exceed RAM if every row is eagerly parsed into
+    Python objects. We instead build a compact sidecar index of byte offsets and
+    seek to the requested row on demand.
     """
 
     def __init__(self, path: str):
         self.path = path
-        self.examples: list[RLExample] = []
-        with open(path) as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                row = json.loads(line)
-                self.examples.append(RLExample(
-                    id=row["id"],
-                    prompt=row["prompt"],
-                    kind=row["kind"],
-                    payload=row["payload"],
-                    meta=row.get("meta", {}),
-                ))
-        if not self.examples:
+        self.index_path = f"{path}.offsets.u64"
+        self.index_lock_path = f"{self.index_path}.lock"
+        self.offsets = self._load_or_build_offsets()
+        self._fh = None
+        if not self.offsets:
             raise RuntimeError(f"JSONLRLDataset loaded zero examples from {path}")
 
+    def _load_or_build_offsets(self) -> array:
+        rebuild = (
+            not os.path.exists(self.index_path) or
+            os.path.getmtime(self.index_path) < os.path.getmtime(self.path)
+        )
+        if rebuild:
+            with FileLock(self.index_lock_path):
+                rebuild = (
+                    not os.path.exists(self.index_path) or
+                    os.path.getmtime(self.index_path) < os.path.getmtime(self.path)
+                )
+                if rebuild:
+                    offsets = array("Q")
+                    with open(self.path, "rb", buffering=1024 * 1024) as f:
+                        while True:
+                            offset = f.tell()
+                            line = f.readline()
+                            if not line:
+                                break
+                            if line.strip():
+                                offsets.append(offset)
+                    tmp_path = f"{self.index_path}.tmp"
+                    with open(tmp_path, "wb") as f:
+                        offsets.tofile(f)
+                    os.replace(tmp_path, self.index_path)
+
+        offsets = array("Q")
+        n_entries = os.path.getsize(self.index_path) // offsets.itemsize
+        with open(self.index_path, "rb") as f:
+            offsets.fromfile(f, n_entries)
+        return offsets
+
+    def _file(self):
+        if self._fh is None:
+            self._fh = open(self.path, "rb", buffering=1024 * 1024)
+        return self._fh
+
+    @staticmethod
+    def _row_to_example(row: dict) -> RLExample:
+        return RLExample(
+            id=row["id"],
+            prompt=row["prompt"],
+            kind=row["kind"],
+            payload=row["payload"],
+            meta=row.get("meta", {}),
+        )
+
     def __len__(self) -> int:
-        return len(self.examples)
+        return len(self.offsets)
 
     def __getitem__(self, i: int) -> RLExample:
-        return self.examples[i]
+        f = self._file()
+        f.seek(self.offsets[i])
+        line = f.readline()
+        if not line:
+            raise IndexError(i)
+        row = json.loads(line)
+        return self._row_to_example(row)
+
+    def close(self) -> None:
+        if self._fh is not None:
+            self._fh.close()
+            self._fh = None
+
+    def __del__(self):
+        self.close()
 
 
 def build_rl_dataset(name: str, split: str = "train") -> JSONLRLDataset:
