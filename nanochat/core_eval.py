@@ -230,10 +230,18 @@ def evaluate_example(idx, model, tokenizer, data, device, task_meta):
         actual_tokens = input_ids[0, si:ei]
         is_correct = torch.all(predicted_tokens == actual_tokens).item()
     elif task_type in ['multiple_choice', 'schema']:
-        # For MC/schema: find the option with lowest average loss
-        mean_losses = [losses[i, si-1:ei-1].mean().item()
-                        for i, (si, ei) in enumerate(zip(start_idxs, end_idxs))]
-        pred_idx = mean_losses.index(min(mean_losses))
+        # For MC/schema: find the option with lowest byte-length-normalized loss
+        # (sum of per-token NLL divided by byte length of the scored continuation).
+        # Byte normalization makes rankings tokenizer-agnostic and matches the
+        # lm-eval-harness `acc_norm` metric standard for HellaSwag/ARC/OpenbookQA/etc.
+        per_byte_losses = []
+        for i, (si, ei) in enumerate(zip(start_idxs, end_idxs)):
+            total_loss = losses[i, si-1:ei-1].sum().item()
+            continuation_tokens = input_ids[i, si:ei].tolist()
+            decoded = tokenizer.decode(continuation_tokens)
+            byte_len = max(len(decoded.encode('utf-8')), 1)
+            per_byte_losses.append(total_loss / byte_len)
+        pred_idx = per_byte_losses.index(min(per_byte_losses))
         is_correct = pred_idx == item['gold']
     else:
         raise ValueError(f"Unsupported task type: {task_type}")

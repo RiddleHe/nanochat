@@ -294,3 +294,86 @@ The harness reports SE of the mean: `SE = sqrt(p * (1-p) / n)` (Bernoulli SE). F
 5. **GSM8K on base models** depends heavily on few-shot formatting — the model needs to learn the `#### <number>` pattern from the examples
 6. **Data contamination** — MMLU is public and widely scraped; consider MMLU-Pro or MMLU-CF for more reliable differentiation
 7. **Aggregation** — Hendrycks et al. use micro-average (over all samples); some papers use macro-average (over subjects). These differ.
+
+---
+
+## How nanochat base_eval works
+
+nanochat's `scripts/base_eval.py` runs a **21-task CORE gauntlet** originally derived from the **DCLM paper** (Li et al., 2024 — https://arxiv.org/abs/2406.11794) / MosaicML Eval Gauntlet v0.3. Task config lives in the **repo-tracked `configs/core.yaml`** (with `$NANOCHAT_BASE_DIR/eval_bundle/core.yaml` as a fallback if the repo copy is absent). Scoring logic is in `nanochat/core_eval.py`. Data files (`eval_data/*.jsonl`, `eval_meta_data.csv`) still come from the downloaded `eval_bundle.zip`.
+
+Per-task output is **`accuracy`** (micro-average). The **CORE metric** is the mean over all tasks of a **random-baseline-centered** accuracy: `centered = (acc − 0.01·rb) / (1 − 0.01·rb)` where `rb` is the % random baseline from `eval_meta_data.csv`. Random scores 0; perfect scores 1.
+
+> **Note on divergence from DCLM defaults:** this section describes nanochat's *current* setup, which has been patched away from the vanilla DCLM config in several places — `hellaswag_zeroshot` removed, ARC-Easy/ARC-Challenge raised to 25-shot, WinoGrande raised to 5-shot, and MC scoring switched from token-length to byte-length normalization. Anywhere below that cites "standard" refers to lm-eval-harness / Open LLM Leaderboard conventions.
+
+### Three task types and their scoring
+
+Defined in `nanochat/core_eval.py:168-249`:
+
+| Task type | How scored | Normalization |
+|---|---|---|
+| `multiple_choice` | For each choice, render `{context}{delim}{choice}`, sum per-token cross-entropy loss on the continuation tokens, divide by the **UTF-8 byte length** of the decoded continuation. Pick the choice with minimum per-byte loss (= max avg log-likelihood per byte). Common prefix detected via `find_common_length(..., direction='left')`. | **Byte-length normalized** (matches lm-eval-harness `acc_norm`). |
+| `schema` | Context varies, continuation is shared. Common suffix detected via `find_common_length(..., direction='right')`, loss taken over the shared continuation. Byte-length normalized across choices, but since the continuation is identical across choices, this reduces to unnormalized comparison (both choices have the same byte count). Equivalent to `acc` for WinoGrande-style tasks. | Byte-length normalized, but degenerate — equivalent to `acc`. |
+| `language_modeling` | Render `{context}{delim}{continuation}`, run a single teacher-forced forward pass, take `argmax` at each continuation position, and check `torch.all(predicted == actual)`. Every ground-truth token must be the top-1 prediction. Any mismatch → 0. | Binary exact match, no scoring scale. |
+
+**LM scoring is unusually strict** — not string-level EM/F1, but token-level exact match. "Paris, France" vs. gold "Paris" scores 0 because the second token diverges. This is a known source of underreporting on SQuAD/CoQA (roughly 5–7 pp below published F1). We've kept it for now; to fix, the path is greedy generation + SQuAD-style F1 on normalized strings, at a ~1.5× total CORE eval cost.
+
+### Normalization — why byte-length, and what that means
+
+All MC/schema scoring is **byte-length normalized**: sum log-prob of the continuation divided by `len(decoded_string.encode('utf-8'))`. This matches the `acc_norm` metric used by lm-eval-harness and the Open LLM Leaderboard for HellaSwag, ARC, OpenbookQA, and similar tasks.
+
+Byte-length normalization serves two purposes:
+1. **Tokenizer-agnostic comparison.** Two models with different tokenizers can produce differently-counted tokens for the same string; dividing by bytes removes that artifact.
+2. **Defeats the short-answer bias** better than token-length normalization. Even with a fixed tokenizer, choices like `"yes"` (3 bytes, 1 token) vs `"absolutely"` (10 bytes, 1 token) have identical token counts but very different byte counts, so token-length normalization is degenerate here while byte-length isn't.
+
+nanochat does **not** use **unconditional-likelihood normalization** (`log P(choice | context) − log P(choice | null)`, the GPT-3 paper's ARC/OpenbookQA scheme). So specifically on ARC-Challenge and OpenbookQA, our numbers may still lag a few points behind GPT-3-style reports.
+
+> **History:** earlier versions used token-length normalization (mean per-token NLL). This was self-consistent across same-tokenizer comparisons but didn't match published `acc_norm` values. Switched to byte-length on 2026-04-14 to bring nanochat's MC numbers closer to published baselines.
+
+### The 21 CORE benchmarks
+
+| # | Label | Task type | Shots | Random % | Scoring | Alignment with standard |
+|---|---|---|---|---|---|---|
+| 1 | `jeopardy` | language_modeling | 10 | 0 | Token-exact match | MosaicML convention; no universal standard. Harsh scoring. |
+| 2 | `bigbench_qa_wikidata` | language_modeling | 10 | 0 | Token-exact match | BIG-bench convention. |
+| 3 | `arc_easy` | multiple_choice | **25** | 25 | Byte-norm over 4 choices | Matches ARC 25-shot `acc_norm` standard. |
+| 4 | `arc_challenge` | multiple_choice | **25** | 25 | Byte-norm over 4 choices | Matches Open LLM Leaderboard (25-shot `acc_norm`). |
+| 5 | `copa` | multiple_choice | 0 | 50 | Byte-norm over 2 choices | Matches standard (0-shot). |
+| 6 | `commonsense_qa` | multiple_choice | 10 | 20 | Byte-norm over 4-5 choices | Original paper uses few-shot prompting (7-shot); 10-shot close to standard. |
+| 7 | `piqa` | multiple_choice | 10 | 50 | Byte-norm over 2 choices | **Standard is 0-shot `acc_norm`.** 10-shot here is DCLM-inherited; still unusual. |
+| 8 | `openbook_qa` | multiple_choice | 0 | 25 | Byte-norm over 4 choices | Matches standard (0-shot `acc_norm`). |
+| 9 | `lambada_openai` | language_modeling | 0 | 0 | Token-exact on final word | Matches standard (0-shot, greedy argmax). |
+| 10 | `hellaswag` | multiple_choice | 10 | 25 | Byte-norm over 4 choices | Matches Open LLM Leaderboard (10-shot `acc_norm`). |
+| 11 | `winograd` | schema | 0 | 50 | Loss on shared continuation | Matches WSC273 standard (0-shot). |
+| 12 | `winogrande` | schema | **5** | 50 | Loss on shared continuation | Matches Open LLM Leaderboard (5-shot `acc`). |
+| 13 | `bigbench_dyck_languages` | language_modeling | 10 | 0 | Token-exact match | BIG-bench convention. |
+| 14 | `agi_eval_lsat_ar` | multiple_choice | 3 | 20 | Byte-norm over 4 choices | AGIEval paper uses 0/3/5-shot; 3-shot reasonable. |
+| 15 | `bigbench_cs_algorithms` | language_modeling | 10 | 0 | Token-exact match | BIG-bench convention. |
+| 16 | `bigbench_operators` | language_modeling | 10 | 0 | Token-exact match | BIG-bench convention. |
+| 17 | `bigbench_repeat_copy_logic` | language_modeling | 10 | 0 | Token-exact match | 32 examples — very high variance. |
+| 18 | `squad` | language_modeling | 10 | 0 | Token-exact match | **Standard is F1/EM on decoded strings.** nanochat reports ~31% vs. ~37% reference due to harsh scoring. |
+| 19 | `coqa` | language_modeling | 0 | 0 | Token-exact match | Standard is F1; token-exact is much stricter. Same issue as SQuAD. |
+| 20 | `boolq` | multiple_choice | 10 | 62 | Byte-norm over yes/no | Standard is 0-shot. 10-shot here works fine; note 62% random baseline reflects class imbalance. |
+| 21 | `bigbench_language_identification` | multiple_choice | 10 | 9.1 | Byte-norm over 4 language names | BIG-bench convention. |
+
+**Current alignment with Open LLM Leaderboard / standard setups:**
+
+| Benchmark | nanochat | Standard |
+|---|---|---|
+| HellaSwag | 10-shot, byte-norm | 10-shot, `acc_norm` ✅ |
+| ARC-Easy | 25-shot, byte-norm | 25-shot, `acc_norm` ✅ |
+| ARC-Challenge | 25-shot, byte-norm | 25-shot, `acc_norm` ✅ |
+| WinoGrande | 5-shot, schema | 5-shot, `acc` ✅ |
+| OpenbookQA | 0-shot, byte-norm | 0-shot, `acc_norm` ✅ |
+| PIQA | 10-shot, byte-norm | 0-shot, `acc_norm` ⚠️ (shots drift) |
+| BoolQ | 10-shot, byte-norm | 0-shot, `acc` ⚠️ (shots drift, minor) |
+| SQuAD / CoQA / Jeopardy | token-exact match | F1 on decoded strings ❌ |
+
+### Notable quirks
+
+1. **SQuAD/CoQA/Jeopardy still use harsh token-exact scoring** — the biggest remaining gap vs. published numbers. Fixable with greedy-generate + F1, at a modest total eval cost increase (~1.5× total CORE runtime). Left as-is for now; means those three tasks systematically under-report.
+2. **`bigbench_repeat_copy_logic` has only 32 examples** → noisy signal per run.
+3. **BoolQ random baseline 62%** (not 50%) reflects majority-class rate; centered metric corrects for this.
+4. **Few-shot sampling is seeded per-example** (`random.Random(1234 + idx)` in `core_eval.py:178`), so results are deterministic across runs of the same model.
+5. The **`continuation_delimiter`** varies per task (`"\nAnswer: "` for ARC/PIQA/BoolQ, default `" "` elsewhere). Small changes here can shift numbers by 1-2pp.
+6. **Task config is now version-controlled at `configs/core.yaml`** (repo root). `base_eval.py` prefers this file over the one shipped in the downloaded `eval_bundle.zip`, so shot-count / task-list changes travel with the code across machines, branches, and checkouts. The `eval_bundle/` directory is still downloaded for `eval_data/` (per-task JSONL) and `eval_meta_data.csv` (random baselines), which aren't customized.
+7. The unused `hellaswag_zeroshot` entry was removed from the tracked `core.yaml` to avoid double-counting HellaSwag in the CORE average (it's still eval'd at 10-shot).

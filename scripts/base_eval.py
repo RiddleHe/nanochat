@@ -115,9 +115,15 @@ def evaluate_core(model, tokenizer, device, max_per_task=-1):
     if not os.path.exists(eval_bundle_dir):
         download_file_with_lock(EVAL_BUNDLE_URL, "eval_bundle.zip", postprocess_fn=place_eval_bundle)
 
-    config_path = os.path.join(eval_bundle_dir, "core.yaml")
+    # Prefer the repo-tracked core.yaml (configs/core.yaml at the repo root) over the
+    # one shipped in the downloaded eval_bundle. This lets us version-control changes
+    # to shot counts / task selection without depending on the local eval_bundle copy.
+    repo_config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "configs", "core.yaml")
+    bundle_config_path = os.path.join(eval_bundle_dir, "core.yaml")
+    config_path = repo_config_path if os.path.exists(repo_config_path) else bundle_config_path
     data_base_path = os.path.join(eval_bundle_dir, "eval_data")
     eval_meta_data = os.path.join(eval_bundle_dir, "eval_meta_data.csv")
+    print0(f"Using CORE config: {config_path}")
 
     with open(config_path, 'r', encoding='utf-8') as f:
         config = yaml.safe_load(f)
