@@ -33,7 +33,7 @@ class GPTAttnResBalancedConfig:
     n_embd: int = 768
     window_pattern: str = "SSSL"
     xsa_mode: str = "none"
-    balance_coeff: float = 0.01
+    balance_coeff: float = 0.05
     balance_min_sources: int = 6  # only apply balance loss when >= this many sources
 
 

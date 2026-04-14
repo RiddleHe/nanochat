@@ -71,6 +71,7 @@ for model_type in "${MODEL_TYPES[@]}"; do
         --core-metric-every=-1 \
         --sample-every=-1 \
         --model-tag="${TAG}" \
+        --save-every=500 \
         --run="${WANDB_RUN}" \
         2>&1 | tee "$LOG_FILE"; then
         log "Finished training: $model_type"
