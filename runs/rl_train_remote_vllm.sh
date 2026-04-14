@@ -102,7 +102,6 @@ CUDA_VISIBLE_DEVICES="$TRAIN_GPUS" \
     --model "$MODEL" \
     --algorithm "$ALGORITHM" \
     --task "$TASK" \
-    --rollout-backend remote_vllm \
     --rollout-worker-url "http://$ROLLOUT_HOST:$ROLLOUT_PORT" \
     --rollout-sync-dir "$ROLLOUT_SYNC_DIR" \
     --save-dir "$SAVE_DIR" \

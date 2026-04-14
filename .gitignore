@@ -14,5 +14,7 @@ papers/
 wandb/
 # knowledge/
 results/
+.nanochat/
+.claude/
 
 .DS_Store
