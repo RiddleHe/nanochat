@@ -37,6 +37,15 @@ torchrun --standalone --nproc_per_node=4 -m scripts.base_train -- \
 torchrun --standalone --nproc_per_node=4 -m scripts.base_eval -- --model-tag=my_experiment
 ```
 
+## RL
+
+RL training docs live in [knowledge/rl_training.md](knowledge/rl_training.md).
+
+That document covers:
+- the `rstar_seed` code-generation task and its canonical JSONL schema
+- the remote vLLM rollout architecture (trainer + worker on separate GPUs)
+- the `runs/rl_train_remote_vllm.sh` launcher
+
 ## Architecture experiments
 
 We compare transformer variants that differ in how information flows across depth, using FLOP-controlled training.

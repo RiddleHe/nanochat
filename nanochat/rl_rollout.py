@@ -1,10 +1,17 @@
 """
 Rollout / batch utilities for RL training.
 
-This is the engine-side of RL: generate completions with vLLM, score per-token
-log-probs with the HF training model, pack rollouts into padded tensors, and
-push updated weights back into the vLLM engine between steps.
+Generation runs in a separate vLLM worker process. The trainer calls the
+`*_remote` helpers (HTTP to the worker); the worker itself reuses
+`generate_rollouts` and `vllm_reload_weights_inplace` from this module.
 """
+
+import json
+import os
+import shutil
+import time
+import urllib.error
+import urllib.request
 
 import torch
 import torch.nn.functional as F
@@ -58,6 +65,108 @@ def generate_rollouts(vllm_engine, tokenizer, prompts, num_samples, max_new_toke
     return results
 
 
+def _remote_json_request(base_url, method, path, payload=None, timeout=600):
+    data = None
+    headers = {}
+    if payload is not None:
+        data = json.dumps(payload).encode("utf-8")
+        headers["Content-Type"] = "application/json"
+    req = urllib.request.Request(
+        f"{base_url.rstrip('/')}{path}",
+        data=data,
+        headers=headers,
+        method=method,
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            body = resp.read()
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"remote rollout request failed: {e.code} {body}") from e
+    except urllib.error.URLError as e:
+        raise RuntimeError(f"remote rollout request failed: {e}") from e
+
+    if not body:
+        return None
+    return json.loads(body)
+
+
+def wait_for_rollout_worker(base_url, timeout_s=300):
+    """Poll the rollout worker until it reports healthy."""
+    deadline = time.time() + timeout_s
+    last_err = None
+    while time.time() < deadline:
+        try:
+            payload = _remote_json_request(base_url, "GET", "/health", timeout=10)
+            if payload and payload.get("ok"):
+                return payload
+        except Exception as e:  # pragma: no cover - best-effort polling
+            last_err = e
+        time.sleep(1.0)
+    raise RuntimeError(
+        f"rollout worker at {base_url} did not become healthy within {timeout_s}s"
+        + (f"; last error: {last_err}" if last_err else "")
+    )
+
+
+def generate_rollouts_remote(base_url, prompts, num_samples, max_new_tokens,
+                             temperature, top_k):
+    """Generate rollouts via a separate rollout worker process."""
+    payload = {
+        "prompts": prompts,
+        "num_samples": num_samples,
+        "max_new_tokens": max_new_tokens,
+        "temperature": temperature,
+        "top_k": top_k,
+    }
+    resp = _remote_json_request(base_url, "POST", "/generate", payload=payload, timeout=1800)
+    return resp["rollouts"]
+
+
+def remote_vllm_reload(base_url, model_path):
+    """Ask the rollout worker to reload weights from a checkpoint path."""
+    resp = _remote_json_request(
+        base_url, "POST", "/reload", payload={"model_path": model_path}, timeout=1800,
+    )
+    if not resp or not resp.get("ok"):
+        raise RuntimeError(f"rollout worker reload failed for {model_path}: {resp}")
+    return resp
+
+
+def materialize_rollout_checkpoint(hf_model, sync_root, slot_idx, tokenizer_source=None):
+    """Write a HF checkpoint into one of two alternating sync slots.
+
+    The worker reloads from the returned slot path. Alternating slots preserves
+    strict per-step semantics without accumulating one checkpoint directory per
+    RL step.
+    """
+    if hasattr(hf_model, "module"):
+        hf_model = hf_model.module
+
+    os.makedirs(sync_root, exist_ok=True)
+    slot_path = os.path.join(sync_root, f"slot{slot_idx}")
+    tmp_path = f"{slot_path}.tmp"
+    shutil.rmtree(tmp_path, ignore_errors=True)
+    shutil.rmtree(slot_path, ignore_errors=True)
+    hf_model.save_pretrained(tmp_path, safe_serialization=True)
+
+    if tokenizer_source is not None:
+        for name in (
+            "tokenizer.json",
+            "tokenizer_config.json",
+            "special_tokens_map.json",
+            "added_tokens.json",
+            "merges.txt",
+            "vocab.json",
+        ):
+            src = os.path.join(tokenizer_source, name)
+            if os.path.exists(src):
+                shutil.copy2(src, os.path.join(tmp_path, name))
+
+    os.replace(tmp_path, slot_path)
+    return slot_path
+
+
 def prepare_batch(rollouts, rewards, tokenizer, max_seq_len, device):
     """Pack a list of rollouts into padded training tensors."""
     input_ids_list = []
@@ -87,40 +196,16 @@ def prepare_batch(rollouts, rewards, tokenizer, max_seq_len, device):
     }
 
 
-def _worker_load_weights(worker, weights):
-    """Top-level helper so it's picklable for collective_rpc on TP>1 workers."""
-    worker.model_runner.model.load_weights(weights)
+def vllm_reload_weights_inplace(vllm_engine, model_path):
+    """Reload checkpoint-format weights into an existing vLLM engine.
 
-
-def vllm_weight_sync(vllm_engine, hf_model):
-    """Push HF-model weights into the vLLM engine in-place.
-
-    We hand the HF state_dict straight to vLLM's `model.load_weights`, which
-    is the same path vLLM uses when loading from a HF checkpoint at startup.
-    That means name-mapping quirks (fused QKV, fused gate_up_proj, MoE expert
-    packing, etc.) are handled by vLLM itself — we don't maintain a table.
-
-    Works for both TP=1 (direct worker access) and TP>1 (collective_rpc).
-    Assumes the trainer and the vLLM engine use the same dtype (bf16 here).
+    Refreshes model parameters and invalidates generation-time caches without
+    tearing down the engine.
     """
-    # Unwrap DDP defensively in case the caller forgets
-    if hasattr(hf_model, "module"):
-        hf_model = hf_model.module
-
-    # Materialize the (name, tensor) pairs once. For small models (≤7B in bf16)
-    # this is a few GB and lives on GPU; load_weights will copy/shard as needed.
-    weights = list(hf_model.state_dict().items())
-
-    if hasattr(vllm_engine, "collective_rpc"):
-        # Modern vLLM (≥0.6.3): one call dispatches to every TP worker.
-        vllm_engine.collective_rpc(_worker_load_weights, args=(weights,))
-    else:
-        # Fallback for older vLLM: reach into the driver worker directly.
-        # Only correct for TP=1, which is the only case older vLLM colocates anyway.
-        worker = vllm_engine.llm_engine.model_executor.driver_worker
-        worker.model_runner.model.load_weights(weights)
-
-    # load_weights leaves transient buffers around; reclaim them so the next
-    # rollout doesn't OOM when training and inference share a GPU.
+    vllm_engine.collective_rpc(
+        "reload_weights",
+        kwargs={"weights_path": model_path, "is_checkpoint_format": True},
+    )
+    vllm_engine.reset_prefix_cache()
     if torch.cuda.is_available():
         torch.cuda.empty_cache()

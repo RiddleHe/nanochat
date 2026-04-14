@@ -43,8 +43,13 @@ import traceback
 from dataclasses import dataclass, field
 from typing import Any
 
-from nanochat.common import get_base_dir
 from nanochat.rl_sandbox import run_test
+
+
+# rStar test cases occasionally contain very large integers (many thousands of
+# digits). Python 3.11+ caps str->int at 4300 digits by default; disable it.
+if hasattr(sys, "set_int_max_str_digits"):
+    sys.set_int_max_str_digits(0)
 
 
 # ----------------------------------------------------------------------------
@@ -97,19 +102,24 @@ class JSONLRLDataset:
         return self.examples[i]
 
 
-def build_rl_dataset(name: str, split: str = "train") -> JSONLRLDataset:
-    """Resolve a dataset name to its on-disk JSONL and load it.
+# Dataset registry. Keys are (name, split); values are absolute paths.
+# Hardcoded for reproducibility on this machine; swap to a drive-zipped layout later.
+_RL_DATASET_PATHS = {
+    ("rstar_seed", "train"): "/local-ssd/mh3897/data/rl/rstar_seed_train_filtered.jsonl",
+}
 
-    Convention: <base_dir>/data/rl/<name>_<split>.jsonl
-    Prep scripts (scripts/prepare_*.py) are responsible for producing the file.
-    """
-    base = get_base_dir()
-    path = os.path.join(base, "data", "rl", f"{name}_{split}.jsonl")
-    if not os.path.exists(path):
-        raise FileNotFoundError(
-            f"RL dataset not found: {path}\n"
-            f"Run the corresponding prep script (e.g. scripts/prepare_{name}.py) first."
+
+def build_rl_dataset(name: str, split: str = "train") -> JSONLRLDataset:
+    """Resolve a dataset name to its on-disk JSONL and load it."""
+    key = (name, split)
+    if key not in _RL_DATASET_PATHS:
+        raise KeyError(
+            f"RL dataset not registered: {key}. "
+            f"Add an entry to _RL_DATASET_PATHS in nanochat/rl_data.py."
         )
+    path = _RL_DATASET_PATHS[key]
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"RL dataset not found on disk: {path}")
     return JSONLRLDataset(path)
 
 
