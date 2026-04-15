@@ -83,7 +83,7 @@ CUDA_VISIBLE_DEVICES="$TRAIN_GPUS" \
     --num-samples 8 \
     --train-batch-size 4 \
     --max-new-tokens 8192 \
-    --max-seq-len 16384 \
+    --max-seq-len 10240 \
     --reward-workers 8 \
     --k-tests 10 \
     --eval-every 20 \
