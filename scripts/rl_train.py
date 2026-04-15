@@ -58,6 +58,7 @@ if __name__ == "__main__":
     parser.add_argument("--num-steps", type=int, default=200, help="Number of RL steps")
     parser.add_argument("--prompts-per-step", type=int, default=8, help="Prompts per RL step")
     parser.add_argument("--train-batch-size", type=int, default=16, help="Training micro-batch size")
+    parser.add_argument("--ppo-epochs", type=int, default=1, help="Optimizer steps per rollout batch")
     parser.add_argument("--max-seq-len", type=int, default=2048)
     # Evaluation
     parser.add_argument("--eval-every", type=int, default=20)
@@ -249,46 +250,62 @@ if __name__ == "__main__":
         local_bsz = batch["input_ids"].shape[0]
         phase["broadcast_and_shard_s"] = time.time() - phase_t0
 
-        # 5. Old log-probs (no grad, frozen behavior model = current policy)
-        phase_t0 = time.time()
-        with torch.no_grad():
-            old_logprobs = get_logprobs(
-                raw_model, batch["input_ids"], batch["attention_mask"], batch["response_mask"],
-            )
-        phase["old_logprobs_s"] = time.time() - phase_t0
-
-        # 6. Policy update with grad accumulation over micro-batches
+        # 5. Old log-probs. With ppo_epochs == 1, weights are frozen across the
+        # single optimizer step, so old_logprobs ≡ logprobs.detach() per
+        # microbatch — skip the duplicate no-grad pass. With >1 epochs we need
+        # a genuinely frozen snapshot, chunked to fit long sequences.
         total_samples = batch["input_ids"].shape[0]
         micro_bs = args.train_batch_size
         n_microbatches = math.ceil(total_samples / micro_bs)
 
         phase_t0 = time.time()
-        optimizer.zero_grad()
+        if args.ppo_epochs > 1:
+            old_logprobs_chunks = []
+            with torch.no_grad():
+                for mb in range(n_microbatches):
+                    start = mb * micro_bs
+                    end = min(start + micro_bs, total_samples)
+                    old_logprobs_chunks.append(get_logprobs(
+                        raw_model,
+                        batch["input_ids"][start:end],
+                        batch["attention_mask"][start:end],
+                        batch["response_mask"][start:end],
+                    ))
+            old_logprobs = torch.cat(old_logprobs_chunks, dim=0)
+        else:
+            old_logprobs = None
+        phase["old_logprobs_s"] = time.time() - phase_t0
+
+        # 6. Policy update: ppo_epochs optimizer steps over the rollout batch,
+        # each with grad accumulation across micro-batches.
+        phase_t0 = time.time()
         total_loss = 0.0
-        for mb in range(n_microbatches):
-            start = mb * micro_bs
-            end = min(start + micro_bs, total_samples)
-            mb_ids = batch["input_ids"][start:end]
-            mb_attn = batch["attention_mask"][start:end]
-            mb_resp = batch["response_mask"][start:end]
-            mb_rewards = batch["rewards"][start:end]
-            mb_advantages = advantages[start:end]
-            mb_old_lp = old_logprobs[start:end]
+        for _epoch in range(args.ppo_epochs):
+            optimizer.zero_grad()
+            for mb in range(n_microbatches):
+                start = mb * micro_bs
+                end = min(start + micro_bs, total_samples)
+                mb_ids = batch["input_ids"][start:end]
+                mb_attn = batch["attention_mask"][start:end]
+                mb_resp = batch["response_mask"][start:end]
+                mb_rewards = batch["rewards"][start:end]
+                mb_advantages = advantages[start:end]
 
-            logprobs = get_logprobs(model, mb_ids, mb_attn, mb_resp)
-            loss = loss_fn(
-                logprobs=logprobs,
-                old_logprobs=mb_old_lp,
-                rewards=mb_rewards,
-                advantages=mb_advantages,
-                clip=args.clip,
-                kl_coeff=args.kl_coeff,
-            ) / n_microbatches
-            loss.backward()
-            total_loss += loss.item()
+                logprobs = get_logprobs(model, mb_ids, mb_attn, mb_resp)
+                mb_old_lp = logprobs.detach() if old_logprobs is None else old_logprobs[start:end]
+                loss = loss_fn(
+                    logprobs=logprobs,
+                    old_logprobs=mb_old_lp,
+                    rewards=mb_rewards,
+                    advantages=mb_advantages,
+                    clip=args.clip,
+                    kl_coeff=args.kl_coeff,
+                ) / n_microbatches
+                loss.backward()
+                total_loss += loss.item()
 
-        torch.nn.utils.clip_grad_norm_(raw_model.parameters(), 1.0)
-        optimizer.step()
+            torch.nn.utils.clip_grad_norm_(raw_model.parameters(), 1.0)
+            optimizer.step()
         phase["update_s"] = time.time() - phase_t0
 
         # 7. Checkpoint + ask remote worker to reload so next-step rollouts are on-policy
