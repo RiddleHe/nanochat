@@ -1,12 +1,16 @@
 # nanochat
 
-![nanochat logo](dev/nanochat.png)
+![nanochat logo](dev/nanochat_rl.png)
 
-Forked from [karpathy/nanochat](https://github.com/karpathy/nanochat). This fork is an experimental harness for pretraining architecture research, with a model registry system for comparing transformer variants at controlled compute budgets.
+Forked from [karpathy/nanochat](https://github.com/karpathy/nanochat). This fork makes it easy to do pretraining architecture research and RL algo research.
 
-## Adding a new model architecture
+# nanochat
 
-1. Create a new file `nanochat/gpt_yourmodel.py` with a config dataclass and model class. The model must implement the same interface as `GPT`: `forward(idx, targets, kv_cache, loss_reduction)`, `init_weights()`, `setup_optimizer(...)`, `estimate_flops()`, `num_scaling_params()`, `generate(...)`, `get_device()`.
+Pretraining architecture research on the nanochat stack.
+
+## Adding a new architecture
+
+1. Create a new file `nanochat/model/gpt_yourmodel.py` with a config dataclass and model class. The model must implement the same interface as `GPT`: `forward(idx, targets, kv_cache, loss_reduction)`, `init_weights()`, `setup_optimizer(...)`, `estimate_flops()`, `num_scaling_params()`, `generate(...)`, `get_device()`.
 
 2. Register it in `nanochat/model_registry.py`:
 ```python
@@ -37,25 +41,40 @@ torchrun --standalone --nproc_per_node=4 -m scripts.base_train -- \
 torchrun --standalone --nproc_per_node=4 -m scripts.base_eval -- --model-tag=my_experiment
 ```
 
-## RL
+## Leaderboard
 
-RL training docs live in [knowledge/rl_training.md](knowledge/rl_training.md).
+FLOP-controlled, depth-24 runs. Validation bpb is the minimum reached over training (lower is better). 
 
-That document covers:
-- the `rstar_seed` code-generation task and its canonical JSONL schema
-- the remote vLLM rollout architecture (trainer + worker on separate GPUs)
-- the `nanorl/runs/train.sh` launcher
-
-## Architecture experiments
-
-We compare transformer variants that differ in how information flows across depth, using FLOP-controlled training.
-
-| Model | `--model-type` | Residual mechanism |
+| Model | Mechanism | Min val bpb |
 |---|---|---|
-| Vanilla GPT | `gpt_nolambda` | Standard `h + f(h)` |
-| GPT + lambdas | `gpt` | Learned per-layer residual and embedding scaling |
-| AttnRes | `attn_res` | Softmax attention over all prior sublayer outputs |
-| Gated AttnRes | `gated_attn_res` | AttnRes + sigmoid bottleneck gate |
+| karpathy/nanochat default | — | 0.750794 |
+| AttnRes | Softmax attention over all prior sublayer outputs | 0.742577 |
+| karpathy/nanochat autoresearch 2 | — | 0.71800 |
+| AttnRes + load balancing | AttnRes with load-balancing aux loss | **0.698283** |
+
+# nanoRL
+
+Standalone RL package (`nanorl/`) that runs on top of HuggingFace base models (e.g. Qwen3-0.6B) with vLLM for rollouts. See [knowledge/rl_training.md](knowledge/rl_training.md) for full docs.
+
+## Adding a loss
+
+Add a function to `nanorl/loss.py` with signature `loss_fn(logprobs, old_logprobs, rewards, **kwargs) -> scalar` and register it in `ALGORITHMS`. If it needs a non-standard advantage estimator, add a branch to `compute_advantages`.
+
+## Adding data
+
+The pipeline consumes JSONL with rows `{id, prompt, kind, payload, meta}` where `kind` selects a verifier (`code_call_based`, `code_stdin_stdout`, ...). To add a task:
+
+1. Write a prep script in `nanorl/scripts/` that emits the JSONL.
+2. Register the path in `_RL_DATASET_PATHS` in `nanorl/data.py`.
+3. For a new `kind`, add an elif branch in `nanorl.data.verify` and a sibling helper.
+
+## Training
+
+```bash
+./nanorl/runs/train.sh [tag]
+```
+
+Launches a vLLM rollout worker on `ROLLOUT_GPU` and a `torchrun` trainer on `TRAIN_GPUS` (set inside the script). Strict-sync: each step's rollouts come from the just-checkpointed weights.
 
 ## Cite
 
