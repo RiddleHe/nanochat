@@ -2,14 +2,14 @@
 Minimal RL training loop for HuggingFace causal-LM models.
 
 Rollout generation is delegated to a separate vLLM worker process
-(`scripts/rl_rollout_worker.py`) on its own GPU. The trainer handles model
-loading (HF), the optimization loop, and checkpoint saving. Use the
-launcher at `runs/rl_train_remote_vllm.sh` to start both processes.
+(`nanorl/scripts/rollout_worker.py`) on its own GPU. The trainer handles
+model loading (HF), the optimization loop, and checkpoint saving. Use the
+launcher at `nanorl/runs/train.sh` to start both processes.
 
-Everything tweakable lives under nanochat/:
-  - nanochat/rl_loss.py    : pluggable loss functions (GRPO, DAPO, REINFORCE)
-  - nanochat/rl_rollout.py : remote-rollout helpers, log-prob scoring, batch packing
-  - nanochat/rl_data.py    : RL dataset + reward interface
+Everything tweakable lives under nanorl/:
+  - nanorl/loss.py    : pluggable loss functions (GRPO, DAPO, REINFORCE)
+  - nanorl/rollout.py : remote-rollout helpers, log-prob scoring, batch packing
+  - nanorl/data.py    : RL dataset + reward interface
 """
 
 import os
@@ -25,8 +25,8 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from nanochat.common import compute_init, compute_cleanup, print0, autodetect_device_type
-from nanochat.rl_loss import ALGORITHMS, compute_advantages
-from nanochat.rl_rollout import (
+from nanorl.loss import ALGORITHMS, compute_advantages
+from nanorl.rollout import (
     get_logprobs,
     generate_rollouts_remote,
     materialize_rollout_checkpoint,
@@ -34,7 +34,7 @@ from nanochat.rl_rollout import (
     prepare_batch,
     wait_for_rollout_worker,
 )
-from nanochat.rl_data import build_rl_dataset, distributed_rl_loader, RewardWorkerPool
+from nanorl.data import build_rl_dataset, distributed_rl_loader, RewardWorkerPool
 if __name__ == "__main__":
 
     # -----------------------------------------------------------------------------

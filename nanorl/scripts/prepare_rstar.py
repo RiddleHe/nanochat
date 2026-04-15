@@ -1,6 +1,6 @@
 """
 Prepare the rStar-Coder dataset into the canonical JSONL format consumed
-by nanochat's RL pipeline (nanochat/rl_data.py).
+by the nanorl pipeline (nanorl/data.py).
 
 Reads from HF: RiddleHe/rStar-Coder (preprocessed: test cases capped,
 schema simplified, JSON blobs pre-parsed into proper columns).
@@ -8,8 +8,8 @@ schema simplified, JSON blobs pre-parsed into proper columns).
 Writes to: <base_dir>/data/rl/rstar_seed_train.jsonl
 
 Usage:
-    python -m scripts.prepare_rstar --tokenizer Qwen/Qwen3-0.6B
-    python -m scripts.prepare_rstar --tokenizer Qwen/Qwen3-0.6B --limit 10
+    python -m nanorl.scripts.prepare_rstar --tokenizer Qwen/Qwen3-0.6B
+    python -m nanorl.scripts.prepare_rstar --tokenizer Qwen/Qwen3-0.6B --limit 10
 """
 
 from __future__ import annotations

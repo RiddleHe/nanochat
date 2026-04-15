@@ -76,7 +76,7 @@ Important quirks:
    LeetCode convention `class Solution:\n    def fn_name(self, ...)`.
    Models imitate this. The sandbox driver must handle both
    `fn = ns[fn_name]` AND `fn = Solution().fn_name` — already implemented
-   in `nanochat/rl_sandbox.py`.
+   in `nanorl/sandbox.py`.
 5. **Test cases are graded by complexity scale**, with input sizes
    spanning a wide range. The `test_case_type` field tags this. Useful
    for stratified subsampling: keep all human tests + a budget-capped
@@ -104,8 +104,8 @@ Important quirks:
 
 ## Canonical JSONL contract
 
-The on-disk file produced by `scripts/prepare_rstar.py` and consumed by
-`nanochat/rl_data.py`. One row per line:
+The on-disk file produced by `nanorl/scripts/prepare_rstar.py` and consumed by
+`nanorl/data.py`. One row per line:
 
 ```json
 {
@@ -129,7 +129,7 @@ The on-disk file produced by `scripts/prepare_rstar.py` and consumed by
 The `payload` shape is per-`kind`. The dataset loader doesn't care; the
 verifier dispatching on `kind` knows what fields to expect. To add a new
 verifier kind, add a JSONL row with that `kind`, add an elif in
-`nanochat.rl_data.verify`, write a sibling helper.
+`nanorl.data.verify`, write a sibling helper.
 
 ---
 

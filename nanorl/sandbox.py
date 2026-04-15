@@ -253,7 +253,7 @@ def run_test(
     time_limit_s: float = 4.0,
     memory_limit_mb: int = 256,
 ) -> TestResult:
-    """Top-level dispatcher used by the verifier registry in nanochat.rl_data.
+    """Top-level dispatcher used by the verifier registry in nanorl.data.
 
     `kind` is one of:
       - "code_call_based":   test = {"args": list, "expected": Any}; needs fn_name

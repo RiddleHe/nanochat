@@ -44,7 +44,7 @@ RL training docs live in [knowledge/rl_training.md](knowledge/rl_training.md).
 That document covers:
 - the `rstar_seed` code-generation task and its canonical JSONL schema
 - the remote vLLM rollout architecture (trainer + worker on separate GPUs)
-- the `runs/rl_train_remote_vllm.sh` launcher
+- the `nanorl/runs/train.sh` launcher
 
 ## Architecture experiments
 

@@ -43,7 +43,7 @@ import traceback
 from dataclasses import dataclass, field
 from typing import Any
 
-from nanochat.rl_sandbox import run_test
+from nanorl.sandbox import run_test
 
 
 # rStar test cases occasionally contain very large integers (many thousands of
@@ -115,7 +115,7 @@ def build_rl_dataset(name: str, split: str = "train") -> JSONLRLDataset:
     if key not in _RL_DATASET_PATHS:
         raise KeyError(
             f"RL dataset not registered: {key}. "
-            f"Add an entry to _RL_DATASET_PATHS in nanochat/rl_data.py."
+            f"Add an entry to _RL_DATASET_PATHS in nanorl/data.py."
         )
     path = _RL_DATASET_PATHS[key]
     if not os.path.exists(path):

@@ -3,7 +3,7 @@ set -euo pipefail
 
 TAG="${1:-default}"
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 BASE_DIR="$ROOT_DIR/.nanochat"
 
 MODEL="Qwen/Qwen3-0.6B"
@@ -49,7 +49,7 @@ echo "[launcher] run tag: $TAG"
 echo "[launcher] run dir: $RUN_DIR"
 echo "[launcher] starting rollout worker on GPU $ROLLOUT_GPU -> $WORKER_LOG"
 CUDA_VISIBLE_DEVICES="$ROLLOUT_GPU" \
-  python "$ROOT_DIR/scripts/rl_rollout_worker.py" \
+  python "$ROOT_DIR/nanorl/scripts/rollout_worker.py" \
     --model "$MODEL" \
     --host "$ROLLOUT_HOST" \
     --port "$ROLLOUT_PORT" \
@@ -70,7 +70,7 @@ curl -sf "$HEALTH_URL" | grep -q '"ok": *true' || { echo "rollout worker did not
 
 echo "[launcher] starting trainer on GPUs $TRAIN_GPUS -> $TRAIN_LOG"
 CUDA_VISIBLE_DEVICES="$TRAIN_GPUS" \
-  torchrun --standalone --nproc_per_node="$TRAIN_NPROC" -m scripts.rl_train \
+  torchrun --standalone --nproc_per_node="$TRAIN_NPROC" -m nanorl.scripts.train \
     --model "$MODEL" \
     --algorithm dapo \
     --task rstar_seed \

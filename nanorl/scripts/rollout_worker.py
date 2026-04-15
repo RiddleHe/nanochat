@@ -24,7 +24,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from transformers import AutoTokenizer
 from vllm import LLM
 
-from nanochat.rl_rollout import generate_rollouts, vllm_reload_weights_inplace
+from nanorl.rollout import generate_rollouts, vllm_reload_weights_inplace
 
 
 class RolloutState:

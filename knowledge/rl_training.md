@@ -5,18 +5,18 @@ A small RL training path for code-generation tasks. The reference task is
 
 ## Files
 
-- `nanochat/rl_data.py` — JSONL dataset loader, distributed prompt loader, reward worker pool, code verifier
-- `nanochat/rl_sandbox.py` — sandboxed Python subprocess execution for reward computation
-- `nanochat/rl_rollout.py` — rollout helpers, logprob computation, batch packing, weight sync
-- `nanochat/rl_loss.py` — GRPO, DAPO, REINFORCE
-- `scripts/rl_train.py` — main trainer
-- `scripts/rl_rollout_worker.py` — standalone HTTP rollout worker (for `remote_vllm`)
-- `runs/rl_train_remote_vllm.sh` — launcher for remote-vLLM runs
+- `nanorl/data.py` — JSONL dataset loader, distributed prompt loader, reward worker pool, code verifier
+- `nanorl/sandbox.py` — sandboxed Python subprocess execution for reward computation
+- `nanorl/rollout.py` — rollout helpers, logprob computation, batch packing, weight sync
+- `nanorl/loss.py` — GRPO, DAPO, REINFORCE
+- `nanorl/scripts/train.py` — main trainer
+- `nanorl/scripts/rollout_worker.py` — standalone HTTP rollout worker (for `remote_vllm`)
+- `nanorl/runs/train.sh` — launcher for remote-vLLM runs
 
 ## Data
 
 The canonical JSONL is referenced by absolute path from
-`_RL_DATASET_PATHS` in `nanochat/rl_data.py`. On this machine:
+`_RL_DATASET_PATHS` in `nanorl/data.py`. On this machine:
 
 ```
 rstar_seed / train → /local-ssd/mh3897/data/rl/rstar_seed_train_filtered.jsonl
@@ -66,7 +66,7 @@ MAX_NEW_TOKENS=256 \
 REWARD_WORKERS=8 \
 K_TESTS=10 \
 EVAL_EVERY=20 \
-./runs/rl_train_remote_vllm.sh
+./nanorl/runs/train.sh
 ```
 
 The launcher starts a rollout worker on `ROLLOUT_GPU`, waits for its
@@ -87,7 +87,7 @@ consumes it.
 
 ## Logs
 
-`scripts/rl_train.py` prints per-step phase timings (fetch, rollout, reward,
+`nanorl/scripts/train.py` prints per-step phase timings (fetch, rollout, reward,
 pack, broadcast, old-logprobs, update, sync) — useful for identifying
 whether step time is dominated by the reward sandbox, vLLM generation, or
 weight sync.
