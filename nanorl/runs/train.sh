@@ -6,7 +6,7 @@ TAG="${1:-default}"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 BASE_DIR="${NANOCHAT_BASE_DIR:-$ROOT_DIR/.nanochat}"
 
-MODEL="${MODEL:-Qwen/Qwen3-0.6B-Base}"
+MODEL="${MODEL:-Qwen/Qwen2.5-1.5B-Instruct}"
 ROLLOUT_HOST="${ROLLOUT_HOST:-127.0.0.1}"
 ROLLOUT_PORT="${ROLLOUT_PORT:-8047}"
 ROLLOUT_GPUS="${ROLLOUT_GPUS:-4,5,6,7}"
