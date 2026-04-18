@@ -34,7 +34,7 @@ from nanorl.rollout import (
     prepare_batch,
     wait_for_rollout_worker,
 )
-from nanorl.data import build_rl_dataset, distributed_rl_loader, RewardWorkerPool
+from nanorl.data import build_rl_dataset, distributed_rl_loader, RewardWorkerPool, apply_overlong_shaping
 if __name__ == "__main__":
 
     # -----------------------------------------------------------------------------
@@ -63,13 +63,12 @@ if __name__ == "__main__":
     # Evaluation
     parser.add_argument("--eval-every", type=int, default=20)
     # Task / Reward
-    parser.add_argument("--task", type=str, default="rstar_seed", help="RL dataset name")
     parser.add_argument("--reward-workers", type=int, default=0, help="Reward worker pool size")
-    parser.add_argument("--k-tests", type=int, default=10, help="Tests subsampled per rollout")
     # Runtime
     parser.add_argument("--device-type", type=str, default="")
-    parser.add_argument("--run", type=str, default="dummy", help="wandb run name")
+    parser.add_argument("--run-name", type=str, default="dummy", help="wandb run name")
     parser.add_argument("--save-dir", type=str, default="rl_checkpoints")
+    parser.add_argument("--save-every", type=int, default=0, help="Save a checkpoint every N steps (0 disables)")
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
 
@@ -98,6 +97,7 @@ if __name__ == "__main__":
     model = AutoModelForCausalLM.from_pretrained(args.model, torch_dtype=torch.bfloat16)
     model.to(device)
     model.train()
+    model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     if ddp:
         model = DDP(model, device_ids=[ddp_local_rank])
     raw_model = model.module if ddp else model
@@ -111,7 +111,7 @@ if __name__ == "__main__":
     # -----------------------------------------------------------------------------
     # RL dataset + reward worker pool + loss fn
     if master_process:
-        dataset = build_rl_dataset(args.task, split="train")
+        dataset = build_rl_dataset()
         loader = distributed_rl_loader(
             dataset,
             prompts_per_step=args.prompts_per_step,
@@ -119,7 +119,7 @@ if __name__ == "__main__":
             rank=0,
             seed=args.seed,
         )
-        rewarder = RewardWorkerPool(num_workers=args.reward_workers, k_tests=args.k_tests)
+        rewarder = RewardWorkerPool(num_workers=args.reward_workers)
     else:
         loader = None
         rewarder = None
@@ -216,12 +216,16 @@ if __name__ == "__main__":
                 args.temperature, args.top_k,
             )
             phase["rollout_s"] = time.time() - phase_t0
+            resp_lens = [len(r["response_ids"]) for r in rollouts]
+            n_truncated = sum(1 for n in resp_lens if n >= args.max_new_tokens)
+            print0(f"[step {step:04d}] truncated={n_truncated}/{len(resp_lens)}")
 
             # 3. Compute rewards on rank 0
             phase_t0 = time.time()
             expanded_examples = [examples[i // args.num_samples] for i in range(len(rollouts))]
             responses = [r["response"] for r in rollouts]
             rewards, _infos = rewarder.score(expanded_examples, responses, step=step)
+            rewards = apply_overlong_shaping(rewards, resp_lens, args.max_new_tokens)
             mean_reward = sum(rewards) / len(rewards) if rewards else 0.0
             phase["reward_s"] = time.time() - phase_t0
             reward_summary = summarize_rewards(rewards)
@@ -339,6 +343,13 @@ if __name__ == "__main__":
         if args.eval_every > 0 and (step + 1) % args.eval_every == 0:
             print0("Evaluating...")
             # TODO: pass@k evaluation hook
+
+        # 9. Periodic checkpoint
+        if args.save_every > 0 and (step + 1) % args.save_every == 0 and master_process:
+            step_path = os.path.join(args.save_dir, f"step_{step+1:06d}")
+            raw_model.save_pretrained(step_path, safe_serialization=True)
+            tokenizer.save_pretrained(step_path)
+            print0(f"[step {step:04d}] saved checkpoint to {step_path}")
 
     # -----------------------------------------------------------------------------
     # Save

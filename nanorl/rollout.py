@@ -14,7 +14,6 @@ import urllib.error
 import urllib.request
 
 import torch
-import torch.nn.functional as F
 
 
 def get_logprobs(model, input_ids, attention_mask, response_mask):
@@ -29,8 +28,10 @@ def get_logprobs(model, input_ids, attention_mask, response_mask):
     shift_logits = logits[:, :-1, :]
     shift_labels = input_ids[:, 1:]
     shift_mask = response_mask[:, 1:]
-    log_probs = F.log_softmax(shift_logits, dim=-1)
-    token_logprobs = log_probs.gather(-1, shift_labels.unsqueeze(-1)).squeeze(-1)
+    # log_softmax(x)[k] = x[k] - logsumexp(x). logsumexp saves only [B,T] for
+    # backward vs log_softmax's [B,T,V] — avoids a ~V× persistent allocation.
+    gathered = shift_logits.gather(-1, shift_labels.unsqueeze(-1)).squeeze(-1)
+    token_logprobs = gathered - torch.logsumexp(shift_logits, dim=-1)
     # Masked mean over response tokens
     masked_logprobs = (token_logprobs * shift_mask).sum(dim=-1) / shift_mask.sum(dim=-1).clamp(min=1)
     return masked_logprobs

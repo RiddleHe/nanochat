@@ -28,7 +28,7 @@ from nanorl.rollout import generate_rollouts, vllm_reload_weights_inplace
 
 
 class RolloutState:
-    def __init__(self, model_path, tokenizer_path, dtype, gpu_memory_utilization):
+    def __init__(self, model_path, tokenizer_path, dtype, gpu_memory_utilization, tensor_parallel_size):
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
@@ -38,6 +38,7 @@ class RolloutState:
             tokenizer=tokenizer_path,
             dtype=dtype,
             gpu_memory_utilization=gpu_memory_utilization,
+            tensor_parallel_size=tensor_parallel_size,
             trust_remote_code=True,
             disable_log_stats=True,
         )
@@ -114,6 +115,7 @@ def main():
     parser.add_argument("--port", type=int, default=8047)
     parser.add_argument("--dtype", type=str, default="bfloat16")
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.6)
+    parser.add_argument("--tensor-parallel-size", type=int, default=1)
     args = parser.parse_args()
 
     tokenizer_path = args.tokenizer or args.model
@@ -122,6 +124,7 @@ def main():
         tokenizer_path=tokenizer_path,
         dtype=args.dtype,
         gpu_memory_utilization=args.gpu_memory_utilization,
+        tensor_parallel_size=args.tensor_parallel_size,
     )
 
     server = ThreadingHTTPServer((args.host, args.port), Handler)

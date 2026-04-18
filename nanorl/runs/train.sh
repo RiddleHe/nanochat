@@ -4,13 +4,17 @@ set -euo pipefail
 TAG="${1:-default}"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-BASE_DIR="$ROOT_DIR/.nanochat"
+BASE_DIR="${NANOCHAT_BASE_DIR:-$ROOT_DIR/.nanochat}"
 
-MODEL="Qwen/Qwen3-0.6B"
-ROLLOUT_HOST="127.0.0.1"
-ROLLOUT_PORT="8047"
-ROLLOUT_GPU="3"
-TRAIN_GPUS="0,1,2"
+MODEL="${MODEL:-Qwen/Qwen3-0.6B-Base}"
+ROLLOUT_HOST="${ROLLOUT_HOST:-127.0.0.1}"
+ROLLOUT_PORT="${ROLLOUT_PORT:-8047}"
+ROLLOUT_GPUS="${ROLLOUT_GPUS:-4,5,6,7}"
+TRAIN_GPUS="${TRAIN_GPUS:-0,1,2,3}"
+ROLLOUT_GPU_MEM_UTIL="${ROLLOUT_GPU_MEM_UTIL:-0.85}"
+NUM_STEPS="${NUM_STEPS:-200}"
+SAVE_EVERY="${SAVE_EVERY:-20}"
+TRAIN_BATCH_SIZE="${TRAIN_BATCH_SIZE:-2}"
 
 RUN_DIR="$BASE_DIR/rl/$TAG"
 ROLLOUT_SYNC_DIR="$RUN_DIR/rollout_sync"
@@ -24,12 +28,16 @@ export ROLLOUT_HOST
 export ROLLOUT_PORT
 
 IFS=, read -r -a TRAIN_GPU_LIST <<< "$TRAIN_GPUS"
+IFS=, read -r -a ROLLOUT_GPU_LIST <<< "$ROLLOUT_GPUS"
 TRAIN_NPROC="${#TRAIN_GPU_LIST[@]}"
+ROLLOUT_TP="${#ROLLOUT_GPU_LIST[@]}"
 for gpu in "${TRAIN_GPU_LIST[@]}"; do
-  if [[ "$gpu" == "$ROLLOUT_GPU" ]]; then
-    echo "ROLLOUT_GPU ($ROLLOUT_GPU) must not overlap TRAIN_GPUS ($TRAIN_GPUS)" >&2
-    exit 1
-  fi
+  for rgpu in "${ROLLOUT_GPU_LIST[@]}"; do
+    if [[ "$gpu" == "$rgpu" ]]; then
+      echo "ROLLOUT_GPUS ($ROLLOUT_GPUS) must not overlap TRAIN_GPUS ($TRAIN_GPUS)" >&2
+      exit 1
+    fi
+  done
 done
 
 WORKER_PID=""
@@ -47,13 +55,14 @@ mkdir -p "$RUN_DIR" "$ROLLOUT_SYNC_DIR" "$SAVE_DIR"
 
 echo "[launcher] run tag: $TAG"
 echo "[launcher] run dir: $RUN_DIR"
-echo "[launcher] starting rollout worker on GPU $ROLLOUT_GPU -> $WORKER_LOG"
-CUDA_VISIBLE_DEVICES="$ROLLOUT_GPU" \
+echo "[launcher] starting rollout worker on GPUs $ROLLOUT_GPUS (tp=$ROLLOUT_TP) -> $WORKER_LOG"
+CUDA_VISIBLE_DEVICES="$ROLLOUT_GPUS" \
   python "$ROOT_DIR/nanorl/scripts/rollout_worker.py" \
     --model "$MODEL" \
     --host "$ROLLOUT_HOST" \
     --port "$ROLLOUT_PORT" \
-    --gpu-memory-utilization 0.45 \
+    --gpu-memory-utilization "$ROLLOUT_GPU_MEM_UTIL" \
+    --tensor-parallel-size "$ROLLOUT_TP" \
     >"$WORKER_LOG" 2>&1 &
 WORKER_PID="$!"
 
@@ -73,20 +82,19 @@ CUDA_VISIBLE_DEVICES="$TRAIN_GPUS" \
   torchrun --standalone --nproc_per_node="$TRAIN_NPROC" -m nanorl.scripts.train \
     --model "$MODEL" \
     --algorithm dapo \
-    --task rstar_seed \
-    --run "$TAG" \
+    --run-name "$TAG" \
     --rollout-worker-url "http://$ROLLOUT_HOST:$ROLLOUT_PORT" \
     --rollout-sync-dir "$ROLLOUT_SYNC_DIR" \
     --save-dir "$SAVE_DIR" \
-    --num-steps 200 \
+    --num-steps "$NUM_STEPS" \
     --prompts-per-step 16 \
     --num-samples 8 \
-    --train-batch-size 4 \
+    --train-batch-size "$TRAIN_BATCH_SIZE" \
     --max-new-tokens 8192 \
-    --max-seq-len 10240 \
+    --max-seq-len 12288 \
     --reward-workers 8 \
-    --k-tests 10 \
     --eval-every 20 \
+    --save-every "$SAVE_EVERY" \
     --lr 1e-6 \
     --kl-coeff 0.0 \
     --temperature 1.0 \
