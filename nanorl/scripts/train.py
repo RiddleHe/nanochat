@@ -300,7 +300,6 @@ if __name__ == "__main__":
                 mb_ids = batch["input_ids"][start:end]
                 mb_attn = batch["attention_mask"][start:end]
                 mb_resp = batch["response_mask"][start:end]
-                mb_rewards = batch["rewards"][start:end]
                 mb_advantages = advantages[start:end]
 
                 logprobs, shift_mask = get_logprobs(model, mb_ids, mb_attn, mb_resp)
