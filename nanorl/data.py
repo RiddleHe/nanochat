@@ -78,7 +78,7 @@ class JSONLRLDataset:
         return self.examples[i]
 
 
-RL_DATASET_PATH = "/local-ssd/mh3897/data/rl/dapo_math_17k.jsonl"
+RL_DATASET_PATH = os.environ.get("RL_DATASET_PATH", "/local-ssd/mh3897/data/rl/dapo_math_17k.jsonl")
 
 
 def build_rl_dataset() -> JSONLRLDataset:

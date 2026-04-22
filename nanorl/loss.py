@@ -1,53 +1,142 @@
 """
-RL loss functions for policy-gradient training.
+RL loss functions for policy-gradient training (per-token formulation).
 
 Each loss takes a uniform signature:
-    loss_fn(logprobs, old_logprobs, rewards, **kwargs) -> scalar tensor
 
-where `logprobs` and `old_logprobs` are per-sample masked-mean log-probs over
-response tokens (shape [B]) and `rewards` is a scalar reward per sample
-(shape [B]). Add new algorithms by registering them in ALGORITHMS below.
+    loss_fn(logprobs, old_logprobs, advantages, response_mask, **kwargs) -> scalar
+
+where
+
+    logprobs, old_logprobs : FloatTensor [B, T]   per-token log-probs (shifted)
+    advantages             : FloatTensor [B]      per-sample advantages
+    response_mask          : FloatTensor [B, T]   1 where position is a response
+                                                  token, 0 for prompt/pad/eos-pad
+
+The loss is formed per token (ratio, clip, advantage × logprob), then
+aggregated across all response tokens in the batch with a single uniform
+mean — DAPO's "token-mean" aggregation. This means longer responses
+contribute proportionally more, which is what DAPO argues for.
+
+Why *per-token* rather than per-sequence log-probs:
+    ratio = exp(logπ_new - logπ_old). If these logπ values are the
+    mean-pooled log-probs of a whole sequence, then per-sequence
+    ratio = geometric-mean of the individual token ratios, which is
+    almost always ~1 — the PPO/DAPO clip bounds (e.g. 0.8/1.28) never
+    bind. Per-token clipping is what makes clip-higher / clip-low
+    actually do anything.
+
+Add new algorithms by registering them in ALGORITHMS below.
 """
 
 import torch
 
 
-def compute_advantages(algorithm: str, rewards: torch.Tensor) -> torch.Tensor:
-    """Compute per-sample advantages using the same convention as the loss."""
+def compute_advantages(
+    algorithm: str,
+    rewards: torch.Tensor,
+    num_samples_per_prompt: int = 1,
+) -> torch.Tensor:
+    """Per-sample advantages. grpo/dapo use *group-relative* normalization.
+
+    For grpo/dapo, rewards are reshaped into ``[num_prompts, num_samples_per_prompt]``
+    and normalized within each prompt's group. This matches the original
+    GRPO/DAPO formulation where the baseline for an action is the *other
+    samples from the same prompt*, not a global batch mean. Normalizing
+    across the whole batch mixes prompt-level variance into each sample's
+    advantage, which is strictly worse signal-to-noise.
+
+    For reinforce, we fall back to plain mean-subtraction over the batch.
+
+    Callers that have only a single sample per prompt (or don't know
+    their group size) may pass ``num_samples_per_prompt=1`` and receive
+    the batch-mean-subtracted version.
+    """
     if algorithm in ("grpo", "dapo"):
-        return (rewards - rewards.mean()) / (rewards.std() + 1e-8)
+        if num_samples_per_prompt <= 1:
+            return rewards - rewards.mean()
+        n = rewards.numel()
+        assert n % num_samples_per_prompt == 0, (
+            f"rewards size {n} not divisible by num_samples_per_prompt "
+            f"{num_samples_per_prompt}"
+        )
+        grouped = rewards.view(-1, num_samples_per_prompt)
+        group_mean = grouped.mean(dim=-1, keepdim=True)
+        group_std = grouped.std(dim=-1, keepdim=True)
+        return ((grouped - group_mean) / (group_std + 1e-8)).view(-1)
     if algorithm == "reinforce":
         return rewards - rewards.mean()
     raise ValueError(f"unknown RL algorithm: {algorithm!r}")
 
 
-def grpo_loss(logprobs, old_logprobs, rewards, advantages=None, clip=0.2, kl_coeff=0.0, **kwargs):
-    """GRPO: group-relative policy optimization."""
-    if advantages is None:
-        advantages = compute_advantages("grpo", rewards)
-    ratio = (logprobs - old_logprobs).exp()
-    clipped = torch.clamp(ratio, 1 - clip, 1 + clip)
-    pg_loss = -torch.min(ratio * advantages, clipped * advantages).mean()
+def _masked_token_mean(values: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+    """DAPO token-mean: sum over all response tokens / count of response tokens."""
+    return (values * mask).sum() / mask.sum().clamp(min=1)
+
+
+def grpo_loss(
+    logprobs,
+    old_logprobs,
+    advantages,
+    response_mask,
+    clip=0.2,
+    kl_coeff=0.0,
+    **kwargs,
+):
+    """Per-token PPO-style surrogate with symmetric clip, token-mean aggregated."""
+    # Cast to fp32 for numerically stable exp / min.
+    lp = logprobs.float()
+    old_lp = old_logprobs.float()
+    adv = advantages.float().unsqueeze(-1)                          # [B, 1]
+    mask = response_mask.float()
+
+    ratio = (lp - old_lp).exp()                                      # [B, T]
+    clipped = torch.clamp(ratio, 1.0 - clip, 1.0 + clip)
+    per_token = -torch.min(ratio * adv, clipped * adv)               # [B, T]
+    loss = _masked_token_mean(per_token, mask)
+
     if kl_coeff > 0:
-        kl = (old_logprobs - logprobs).mean()
-        pg_loss = pg_loss + kl_coeff * kl
-    return pg_loss
+        # Simple per-token KL estimator: E[old_logp - new_logp] (low-variance
+        # on-policy approximation; sign convention matches original GRPO code).
+        kl_per_token = old_lp - lp                                   # [B, T]
+        kl = _masked_token_mean(kl_per_token, mask)
+        loss = loss + kl_coeff * kl
+    return loss
 
 
-def dapo_loss(logprobs, old_logprobs, rewards, advantages=None, clip_low=0.8, clip_high=1.28, **kwargs):
-    """DAPO: decoupled asymmetric policy optimization."""
-    if advantages is None:
-        advantages = compute_advantages("dapo", rewards)
-    ratio = (logprobs - old_logprobs).exp()
+def dapo_loss(
+    logprobs,
+    old_logprobs,
+    advantages,
+    response_mask,
+    clip_low=0.8,
+    clip_high=1.28,
+    **kwargs,
+):
+    """DAPO per-token clipped surrogate with asymmetric (clip-higher) bounds."""
+    lp = logprobs.float()
+    old_lp = old_logprobs.float()
+    adv = advantages.float().unsqueeze(-1)
+    mask = response_mask.float()
+
+    ratio = (lp - old_lp).exp()
     clipped = torch.clamp(ratio, clip_low, clip_high)
-    return -torch.min(ratio * advantages, clipped * advantages).mean()
+    per_token = -torch.min(ratio * adv, clipped * adv)
+    return _masked_token_mean(per_token, mask)
 
 
-def reinforce_loss(logprobs, old_logprobs, rewards, advantages=None, **kwargs):
-    """Simple REINFORCE with mean-subtracted advantages."""
-    if advantages is None:
-        advantages = compute_advantages("reinforce", rewards)
-    return -(logprobs * advantages).mean()
+def reinforce_loss(
+    logprobs,
+    old_logprobs,
+    advantages,
+    response_mask,
+    **kwargs,
+):
+    """Per-token REINFORCE with mean-subtracted advantage."""
+    lp = logprobs.float()
+    adv = advantages.float().unsqueeze(-1)
+    mask = response_mask.float()
+    per_token = -(lp * adv)
+    return _masked_token_mean(per_token, mask)
 
 
 ALGORITHMS = {

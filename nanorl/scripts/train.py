@@ -233,7 +233,13 @@ if __name__ == "__main__":
             # 4. Pack training batch on CPU, then broadcast to all ranks
             phase_t0 = time.time()
             batch = prepare_batch(rollouts, rewards, tokenizer, args.max_seq_len, "cpu")
-            advantages = compute_advantages(args.algorithm, batch["rewards"])
+            # Group-relative advantages: normalize within each prompt's
+            # num_samples rollouts, not across the whole batch.
+            advantages = compute_advantages(
+                args.algorithm,
+                batch["rewards"],
+                num_samples_per_prompt=args.num_samples,
+            )
             phase["pack_batch_s"] = time.time() - phase_t0
 
             print0(
@@ -269,12 +275,14 @@ if __name__ == "__main__":
                 for mb in range(n_microbatches):
                     start = mb * micro_bs
                     end = min(start + micro_bs, total_samples)
-                    old_logprobs_chunks.append(get_logprobs(
+                    lp_mb, _ = get_logprobs(
                         raw_model,
                         batch["input_ids"][start:end],
                         batch["attention_mask"][start:end],
                         batch["response_mask"][start:end],
-                    ))
+                    )
+                    old_logprobs_chunks.append(lp_mb)
+            # Shape: [B, T-1] per-token log-probs of the frozen snapshot.
             old_logprobs = torch.cat(old_logprobs_chunks, dim=0)
         else:
             old_logprobs = None
@@ -295,13 +303,13 @@ if __name__ == "__main__":
                 mb_rewards = batch["rewards"][start:end]
                 mb_advantages = advantages[start:end]
 
-                logprobs = get_logprobs(model, mb_ids, mb_attn, mb_resp)
+                logprobs, shift_mask = get_logprobs(model, mb_ids, mb_attn, mb_resp)
                 mb_old_lp = logprobs.detach() if old_logprobs is None else old_logprobs[start:end]
                 loss = loss_fn(
                     logprobs=logprobs,
                     old_logprobs=mb_old_lp,
-                    rewards=mb_rewards,
                     advantages=mb_advantages,
+                    response_mask=shift_mask,
                     clip=args.clip,
                     kl_coeff=args.kl_coeff,
                 ) / n_microbatches
