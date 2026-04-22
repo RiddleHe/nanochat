@@ -40,9 +40,15 @@ for model_type in "${MODEL_TYPES[@]}"; do
     TAG="arch_d${DEPTH}_${model_type}"
     LOG_FILE="$RESULTS_DIR/${TAG}_sft.log"
     CKPT_DIR="$NANOCHAT_BASE_DIR/base_checkpoints/${TAG}"
+    SFT_DIR="$NANOCHAT_BASE_DIR/chatsft_checkpoints/${TAG}"
 
     if ! ls "$CKPT_DIR"/model_*.pt &>/dev/null; then
         log "Skipping $model_type (no base checkpoint in $CKPT_DIR)"
+        continue
+    fi
+
+    if ls "$SFT_DIR"/model_*.pt &>/dev/null; then
+        log "Skipping $model_type (SFT checkpoint already exists in $SFT_DIR)"
         continue
     fi
 
