@@ -13,9 +13,18 @@ where
                                                   token, 0 for prompt/pad/eos-pad
 
 The loss is formed per token (ratio, clip, advantage × logprob), then
-aggregated across all response tokens in the batch with a single uniform
-mean — DAPO's "token-mean" aggregation. This means longer responses
-contribute proportionally more, which is what DAPO argues for.
+aggregated. Two aggregation strategies are provided:
+
+  - ``_masked_token_mean`` ("token-mean"): sum over all response tokens in
+    the batch / total response-token count. Longer responses contribute
+    proportionally more. Used by DAPO (its signature aggregation, argued
+    for in the paper for long-CoT).
+  - ``_masked_sequence_mean`` ("sequence-mean"): mean over response tokens
+    *within each sample* first, then mean over samples. Every sample
+    contributes equally regardless of length. Used by GRPO and REINFORCE
+    — their advantages are per-sample scalars, so length-normalizing
+    avoids implicitly weighting a sample by however long its response
+    happened to be.
 
 Why *per-token* rather than per-sequence log-probs:
     ratio = exp(logπ_new - logπ_old). If these logπ values are the
@@ -73,6 +82,12 @@ def _masked_token_mean(values: torch.Tensor, mask: torch.Tensor) -> torch.Tensor
     return (values * mask).sum() / mask.sum().clamp(min=1)
 
 
+def _masked_sequence_mean(values: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+    """GRPO/REINFORCE sequence-mean: per-sample token-mean, then mean over samples."""
+    seq_mean = (values * mask).sum(dim=-1) / mask.sum(dim=-1).clamp(min=1)   # [B]
+    return seq_mean.mean()
+
+
 def grpo_loss(
     logprobs,
     old_logprobs,
@@ -82,7 +97,7 @@ def grpo_loss(
     kl_coeff=0.0,
     **kwargs,
 ):
-    """Per-token PPO-style surrogate with symmetric clip, token-mean aggregated."""
+    """Per-token PPO-style surrogate with symmetric clip, sequence-mean aggregated."""
     # Cast to fp32 for numerically stable exp / min.
     lp = logprobs.float()
     old_lp = old_logprobs.float()
@@ -92,13 +107,13 @@ def grpo_loss(
     ratio = (lp - old_lp).exp()                                      # [B, T]
     clipped = torch.clamp(ratio, 1.0 - clip, 1.0 + clip)
     per_token = -torch.min(ratio * adv, clipped * adv)               # [B, T]
-    loss = _masked_token_mean(per_token, mask)
+    loss = _masked_sequence_mean(per_token, mask)
 
     if kl_coeff > 0:
         # Simple per-token KL estimator: E[old_logp - new_logp] (low-variance
         # on-policy approximation; sign convention matches original GRPO code).
         kl_per_token = old_lp - lp                                   # [B, T]
-        kl = _masked_token_mean(kl_per_token, mask)
+        kl = _masked_sequence_mean(kl_per_token, mask)
         loss = loss + kl_coeff * kl
     return loss
 
@@ -131,12 +146,12 @@ def reinforce_loss(
     response_mask,
     **kwargs,
 ):
-    """Per-token REINFORCE with mean-subtracted advantage."""
+    """Per-token REINFORCE with mean-subtracted advantage, sequence-mean aggregated."""
     lp = logprobs.float()
     adv = advantages.float().unsqueeze(-1)
     mask = response_mask.float()
     per_token = -(lp * adv)
-    return _masked_token_mean(per_token, mask)
+    return _masked_sequence_mean(per_token, mask)
 
 
 ALGORITHMS = {
