@@ -17,10 +17,16 @@ import torch
 
 
 def get_logprobs(model, input_ids, attention_mask, response_mask):
-    """Compute per-sample masked-mean log-probs over response tokens.
+    """Compute per-response-token log-probs under `model`.
 
-    Returns a tensor of shape [B], where each entry is the mean log-prob of
-    the response tokens under `model` (prompt tokens are masked out).
+    Returns a tuple ``(token_logprobs, shift_mask)`` each of shape ``[B, T-1]``:
+      - ``token_logprobs[b, t] = log π_θ(input_ids[b, t+1] | input_ids[b, :t+1])``
+      - ``shift_mask[b, t] = 1.0`` iff ``input_ids[b, t+1]`` is a response token.
+
+    Per-token (not per-sequence) log-probs are required so that PPO/DAPO/GRPO
+    can apply per-token importance ratios and per-token clipping — the
+    sample-level masked-mean form makes the clip bounds essentially non-
+    functional (the geometric mean of many per-token ratios is always ≈ 1).
     """
     with torch.amp.autocast('cuda', dtype=torch.bfloat16):
         logits = model(input_ids=input_ids, attention_mask=attention_mask).logits
@@ -32,9 +38,7 @@ def get_logprobs(model, input_ids, attention_mask, response_mask):
     # backward vs log_softmax's [B,T,V] — avoids a ~V× persistent allocation.
     gathered = shift_logits.gather(-1, shift_labels.unsqueeze(-1)).squeeze(-1)
     token_logprobs = gathered - torch.logsumexp(shift_logits, dim=-1)
-    # Masked mean over response tokens
-    masked_logprobs = (token_logprobs * shift_mask).sum(dim=-1) / shift_mask.sum(dim=-1).clamp(min=1)
-    return masked_logprobs
+    return token_logprobs, shift_mask
 
 
 def generate_rollouts(vllm_engine, tokenizer, prompts, num_samples, max_new_tokens,

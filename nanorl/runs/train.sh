@@ -15,6 +15,8 @@ ROLLOUT_GPU_MEM_UTIL="${ROLLOUT_GPU_MEM_UTIL:-0.85}"
 NUM_STEPS="${NUM_STEPS:-200}"
 SAVE_EVERY="${SAVE_EVERY:-20}"
 TRAIN_BATCH_SIZE="${TRAIN_BATCH_SIZE:-2}"
+LR="${LR:-1e-6}"
+PROMPTS_PER_STEP="${PROMPTS_PER_STEP:-16}"
 
 RUN_DIR="$BASE_DIR/rl/$TAG"
 ROLLOUT_SYNC_DIR="$RUN_DIR/rollout_sync"
@@ -87,7 +89,7 @@ CUDA_VISIBLE_DEVICES="$TRAIN_GPUS" \
     --rollout-sync-dir "$ROLLOUT_SYNC_DIR" \
     --save-dir "$SAVE_DIR" \
     --num-steps "$NUM_STEPS" \
-    --prompts-per-step 16 \
+    --prompts-per-step "$PROMPTS_PER_STEP" \
     --num-samples 8 \
     --train-batch-size "$TRAIN_BATCH_SIZE" \
     --max-new-tokens 8192 \
@@ -95,7 +97,7 @@ CUDA_VISIBLE_DEVICES="$TRAIN_GPUS" \
     --reward-workers 8 \
     --eval-every 20 \
     --save-every "$SAVE_EVERY" \
-    --lr 1e-6 \
+    --lr "$LR" \
     --kl-coeff 0.0 \
     --temperature 1.0 \
     --top-k -1 \
