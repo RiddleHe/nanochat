@@ -210,7 +210,7 @@ def cispo_loss(
     mask = response_mask.float()
 
     ratio = (lp - old_lp).exp()                               # [B, T]
-    # One-sided clip: only upper bound, no lower bound (per paper).
+    # One-sided clip: only upper bound, no lower bound.
     clipped = torch.clamp(ratio, max=1.0 + clip_high).detach()
 
     per_token_obj = clipped * adv * lp                        # objective
