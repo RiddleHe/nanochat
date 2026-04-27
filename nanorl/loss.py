@@ -60,7 +60,7 @@ def compute_advantages(
     their group size) may pass ``num_samples_per_prompt=1`` and receive
     the batch-mean-subtracted version.
     """
-    if algorithm in ("grpo", "dapo"):
+    if algorithm in ("grpo", "dapo", "gspo"):
         if num_samples_per_prompt <= 1:
             return rewards - rewards.mean()
         n = rewards.numel()
@@ -153,9 +153,73 @@ def reinforce_loss(
     per_token = -(lp * adv)
     return _masked_sequence_mean(per_token, mask)
 
+def gspo_loss(
+    logprobs,
+    old_logprobs,
+    advantages,
+    response_mask,
+    clip=0.2,
+    kl_coeff=0.0,
+    **kwargs,
+):
+    """Per-token PPO-style surrogate with symmetric clip, sequence-mean aggregated."""
+    # Cast to fp32 for numerically stable exp / min.
+    lp = logprobs.float()
+    old_lp = old_logprobs.float()
+    adv = advantages.float().unsqueeze(-1)                          # [B, 1]
+    mask = response_mask.float()
+
+    # 1. per-token log ratio
+    log_ratio_t = lp - old_lp                    # [B, T]
+    # 2. mask before summing
+    masked_log_ratio = log_ratio_t * mask        # [B, T]
+    # 3. sum over tokens
+    sum_log_ratio = masked_log_ratio.sum(dim=-1) # [B]
+    # 4. compute T per sequence
+    T = mask.sum(dim=-1).clamp_min(1.0)          # [B]
+    # 5. mean log ratio
+    mean_log_ratio = sum_log_ratio / T           # [B]
+    # 6. sequence-level ratio
+    ratio = mean_log_ratio.exp()                 # [B]                                 
+
+    clipped = torch.clamp(ratio, 1.0 - clip, 1.0 + clip)
+    per_token = -torch.min(ratio * adv, clipped * adv)               # [B, T]
+    loss = _masked_sequence_mean(per_token, mask)
+
+    if kl_coeff > 0:
+        # Simple per-token KL estimator: E[old_logp - new_logp] (low-variance
+        # on-policy approximation; sign convention matches original GRPO code).
+        kl_per_token = old_lp - lp                                   # [B, T]
+        kl = _masked_sequence_mean(kl_per_token, mask)
+        loss = loss + kl_coeff * kl
+    return loss
+
+def cispo_loss(
+    logprobs,
+    old_logprobs,
+    advantages,
+    response_mask,
+    clip_high=0.2,   # epsilon_high;
+    **kwargs,
+):
+    """CISPO loss (MiniMax-M1). One-sided IS-weight clip, stop-gradient on weight,
+    gradient flows through log π. Token-mean aggregation across the batch."""
+    lp = logprobs.float()
+    old_lp = old_logprobs.float()
+    adv = advantages.float().unsqueeze(-1)                    # [B, 1]
+    mask = response_mask.float()
+
+    ratio = (lp - old_lp).exp()                               # [B, T]
+    # One-sided clip: only upper bound, no lower bound (per paper).
+    clipped = torch.clamp(ratio, max=1.0 + clip_high).detach()
+
+    per_token_obj = clipped * adv * lp                        # objective
+    return -_masked_token_mean(per_token_obj, mask)           # loss = -objective
 
 ALGORITHMS = {
     "grpo": grpo_loss,
     "dapo": dapo_loss,
     "reinforce": reinforce_loss,
+    "gspo": gspo_loss,
+    "cispo": cispo_loss
 }
