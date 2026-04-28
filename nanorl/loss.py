@@ -81,7 +81,6 @@ def _masked_token_mean(values: torch.Tensor, mask: torch.Tensor) -> torch.Tensor
     """DAPO token-mean: sum over all response tokens / count of response tokens."""
     return (values * mask).sum() / mask.sum().clamp(min=1)
 
-
 def _masked_sequence_mean(values: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
     """GRPO/REINFORCE sequence-mean: per-sample token-mean, then mean over samples."""
     seq_mean = (values * mask).sum(dim=-1) / mask.sum(dim=-1).clamp(min=1)   # [B]
@@ -162,7 +161,7 @@ def gspo_loss(
     kl_coeff=0.0,
     **kwargs,
 ):
-    """Per-token PPO-style surrogate with symmetric clip, sequence-mean aggregated."""
+    """GSPO sequence-level clipped surrogate with length-normalized log-ratio."""
     # Cast to fp32 for numerically stable exp / min.
     lp = logprobs.float()
     old_lp = old_logprobs.float()
@@ -175,24 +174,26 @@ def gspo_loss(
     masked_log_ratio = log_ratio_t * mask        # [B, T]
     # 3. sum over tokens
     sum_log_ratio = masked_log_ratio.sum(dim=-1) # [B]
-    # 4. compute T per sequence
+    # 4. Compute T per sequence
     T = mask.sum(dim=-1).clamp_min(1.0)          # [B]
     # 5. mean log ratio
     mean_log_ratio = sum_log_ratio / T           # [B]
     # 6. sequence-level ratio
-    ratio = mean_log_ratio.exp()                 # [B]                                 
+    ratio = mean_log_ratio.exp().unsqueeze(-1)                 # [B,1]                                 
 
-    clipped = torch.clamp(ratio, 1.0 - clip, 1.0 + clip)
-    per_token = -torch.min(ratio * adv, clipped * adv)               # [B, T]
-    loss = _masked_sequence_mean(per_token, mask)
+    clipped = torch.clamp(ratio, 1.0 - clip, 1.0 + clip) #[B,1]              
+    policy_loss = -torch.min(ratio * adv, clipped * adv).mean() # scalar
 
     if kl_coeff > 0:
-        # Simple per-token KL estimator: E[old_logp - new_logp] (low-variance
-        # on-policy approximation; sign convention matches original GRPO code).
-        kl_per_token = old_lp - lp                                   # [B, T]
-        kl = _masked_sequence_mean(kl_per_token, mask)
-        loss = loss + kl_coeff * kl
-    return loss
+        # Simple sampled KL estimator against old policy:
+        # KL ≈ old_logp - new_logp, averaged over response tokens then batch.
+        kl_per_token = old_lp - lp                         # [B, T]
+        kl_per_seq = (kl_per_token * mask).sum(dim=-1) / T # [B]
+        kl_loss = kl_per_seq.mean()
+
+        policy_loss = policy_loss + kl_coeff * kl_loss
+
+    return policy_loss
 
 def cispo_loss(
     logprobs,
