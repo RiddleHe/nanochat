@@ -1,6 +1,8 @@
 """
-GPT model (rewrite, a lot simpler)
-Notable features:
+GPT base model: vanilla GPT-2 style architecture (no value embeddings, no per-layer
+resid/x0 lambdas), with the smear gate retained.
+
+Notable features (vs nanochat.model.gpt):
 - rotary embeddings (and no positional embeddings)
 - QK norm
 - untied weights for token embedding and lm_head
@@ -10,9 +12,9 @@ Notable features:
 - no bias in linear layers
 - Group-Query Attention (GQA) support for more efficient inference
 - Flash Attention 3 integration
+- Smear gate (cheap bigram-like info from previous token's embedding)
 """
 
-from functools import partial
 from dataclasses import dataclass
 
 import torch
@@ -26,7 +28,7 @@ from nanochat.optim import MuonAdamW, DistMuonAdamW
 from nanochat.flash_attention import flash_attn
 
 @dataclass
-class GPTConfig:
+class GPTBaseConfig:
     sequence_len: int = 2048
     vocab_size: int = 32768
     n_layer: int = 12
@@ -37,7 +39,25 @@ class GPTConfig:
     # Characters: L=long (full context), S=short (quarter context)
     # Examples: "L"=all full context, "SL"=alternating, "SSL"=two short then one long
     window_pattern: str = "SSSL"
-    use_lambdas: bool = True  # per-layer resid_lambdas and x0_lambdas
+    # If True, accumulate block outputs as a running mean instead of a sum:
+    # x_i = mean(block_1_out, ..., block_(i+1)_out), via x = (i * x + new_x) / (i+1).
+    # Keeps residual magnitude bounded without pinning it (rmsnorm would force ||x||=sqrt(d)).
+    normalize_residual: bool = False
+    # If True, blend the initial normalized embedding x0 back into the residual at the
+    # last 1/3 of blocks: x = 0.5 * x + 0.5 * x0 (applied before each late block).
+    add_init_res: bool = False
+    # If True, capture v from layer 0's attention (after c_v projection) and mix it into
+    # the last 1/3 of layers' v: v_i = 0.5 * v_i + 0.5 * v_layer0. Lightweight analogue
+    # of gpt.py's value-residual without per-layer learned VE tables.
+    add_init_value: bool = False
+    # Sub-mode of add_init_value: if True, each late layer applies its OWN c_v to norm(x0)
+    # to produce ve, instead of reusing layer 0's v. Disentangles "Wv_layer0 is special"
+    # from "x0 input is special".
+    init_value_self_wv: bool = False
+    # If True, detach `ve` before mixing into v. Forward signal still flows through ve,
+    # but no gradient flows back through it. Isolates "is the win from the backward
+    # skip-connection to the embedding?" from forward semantic leakage.
+    detach_init_value: bool = False
 
 
 def norm(x):
@@ -50,10 +70,6 @@ class Linear(nn.Linear):
     def forward(self, x):
         return F.linear(x, self.weight.to(dtype=x.dtype))
 
-
-def has_ve(layer_idx, n_layer):
-    """Returns True if GPT layer should have Value Embedding (alternating, last layer always included)."""
-    return layer_idx % 2 == (n_layer - 1) % 2
 
 def apply_rotary_emb(x, cos, sin):
     assert x.ndim == 4  # multihead attention
@@ -77,8 +93,6 @@ class CausalSelfAttention(nn.Module):
         self.c_k = Linear(self.n_embd, self.n_kv_head * self.head_dim, bias=False)
         self.c_v = Linear(self.n_embd, self.n_kv_head * self.head_dim, bias=False)
         self.c_proj = Linear(self.n_embd, self.n_embd, bias=False)
-        self.ve_gate_channels = 12
-        self.ve_gate = Linear(self.ve_gate_channels, self.n_kv_head, bias=False) if has_ve(layer_idx, config.n_layer) else None
 
     def forward(self, x, ve, cos_sin, window_size, kv_cache):
         B, T, C = x.size()
@@ -88,12 +102,11 @@ class CausalSelfAttention(nn.Module):
         q = self.c_q(x).view(B, T, self.n_head, self.head_dim)
         k = self.c_k(x).view(B, T, self.n_kv_head, self.head_dim)
         v = self.c_v(x).view(B, T, self.n_kv_head, self.head_dim)
+        v_init = v  # captured for add_init_value sharing (always returned, ignored if unused)
 
-        # Value residual (ResFormer): mix in value embedding with input-dependent gate per head
+        # add_init_value: blend in layer-0's v projection (passed via ve)
         if ve is not None:
-            ve = ve.view(B, T, self.n_kv_head, self.head_dim)
-            gate = 3 * torch.sigmoid(self.ve_gate(x[..., :self.ve_gate_channels]))  # (B, T, n_kv_head), range (0, 3)
-            v = v + gate.unsqueeze(-1) * ve
+            v = 0.5 * v + 0.5 * ve
 
         # Apply Rotary Embeddings to queries and keys to get relative positional encoding
         cos, sin = cos_sin
@@ -124,7 +137,7 @@ class CausalSelfAttention(nn.Module):
         # Re-assemble the heads and project back to residual stream
         y = y.contiguous().view(B, T, -1)
         y = self.c_proj(y)
-        return y
+        return y, v_init
 
 
 class MLP(nn.Module):
@@ -147,12 +160,13 @@ class Block(nn.Module):
         self.mlp = MLP(config)
 
     def forward(self, x, ve, cos_sin, window_size, kv_cache):
-        x = x + self.attn(norm(x), ve, cos_sin, window_size, kv_cache)
+        attn_out, v_init = self.attn(norm(x), ve, cos_sin, window_size, kv_cache)
+        x = x + attn_out
         x = x + self.mlp(norm(x))
-        return x
+        return x, v_init
 
 
-class GPT(nn.Module):
+class GPTBase(nn.Module):
     def __init__(self, config, pad_vocab_size_to=64):
         """
         NOTE a major footgun: this __init__ function runs in meta device context (!!)
@@ -174,20 +188,9 @@ class GPT(nn.Module):
             "h": nn.ModuleList([Block(config, layer_idx) for layer_idx in range(config.n_layer)]),
         })
         self.lm_head = Linear(config.n_embd, padded_vocab_size, bias=False)
-        # Per-layer learnable scalars (inspired by modded-nanogpt)
-        # resid_lambdas: scales the residual stream at each layer (init 1.0 = neutral)
-        # x0_lambdas: blends initial embedding back in at each layer (init 0.0 = disabled)
-        # Separate parameters so they can have different optimizer treatment
-        if config.use_lambdas:
-            self.resid_lambdas = nn.Parameter(torch.ones(config.n_layer))   # fake init, real init in init_weights()
-            self.x0_lambdas = nn.Parameter(torch.zeros(config.n_layer))     # fake init, real init in init_weights()
         # Smear: mix previous token's embedding into current token (cheap bigram-like info)
         self.smear_gate = Linear(24, 1, bias=False)
         self.smear_lambda = nn.Parameter(torch.zeros(1))
-        # Value embeddings (ResFormer-style): alternating layers, last layer always included
-        head_dim = config.n_embd // config.n_head
-        kv_dim = config.n_kv_head * head_dim
-        self.value_embeds = nn.ModuleDict({str(i): nn.Embedding(padded_vocab_size, kv_dim) for i in range(config.n_layer) if has_ve(i, config.n_layer)})
         # To support meta device initialization, we init the rotary embeddings here, but it's just "fake" meta tensors only.
         # As for rotary_seq_len, these rotary embeddings are pretty small/cheap in memory,
         # so let's just over-compute them by 10X, but assert fail if we ever reach that amount.
@@ -229,25 +232,6 @@ class GPT(nn.Module):
             torch.nn.init.uniform_(block.mlp.c_fc.weight, -s * 0.4, s * 0.4)  # 0.4x init scale for c_fc
             torch.nn.init.zeros_(block.mlp.c_proj.weight)
 
-        # Per-layer scalars
-        if self.config.use_lambdas:
-            # Per-layer resid init: stronger residual at early layers, weaker at deep layers
-            n_layer = self.config.n_layer
-            for i in range(n_layer):
-                self.resid_lambdas.data[i] = 1.15 - (0.10 * i / max(n_layer - 1, 1))
-            # Decaying x0 init: earlier layers get more input embedding blending
-            for i in range(n_layer):
-                self.x0_lambdas.data[i] = 0.20 - (0.15 * i / max(n_layer - 1, 1))
-
-        # Value embeddings (init like c_v: uniform with same std)
-        for ve in self.value_embeds.values():
-            torch.nn.init.uniform_(ve.weight, -s, s)
-
-        # Gate weights init with small positive values so gates start slightly above neutral
-        for block in self.transformer.h:
-            if block.attn.ve_gate is not None:
-                torch.nn.init.uniform_(block.attn.ve_gate.weight, 0.0, 0.02)
-
         # Rotary embeddings
         head_dim = self.config.n_embd // self.config.n_head
         cos, sin = self._precompute_rotary_embeddings(self.rotary_seq_len, head_dim)
@@ -258,8 +242,6 @@ class GPT(nn.Module):
         # because GradScaler cannot unscale fp16 gradients.
         if COMPUTE_DTYPE != torch.float16:
             self.transformer.wte.to(dtype=COMPUTE_DTYPE)
-            for ve in self.value_embeds.values():
-                ve.to(dtype=COMPUTE_DTYPE)
 
     def _precompute_rotary_embeddings(self, seq_len, head_dim, base=100000, device=None):
         # TODO: bump base theta more? e.g. 100K is more common more recently
@@ -323,11 +305,8 @@ class GPT(nn.Module):
         - Chinchilla counts exp/sum/divide in attention softmax as flops (a little sus and very tiny => we ignore)
         """
         nparams = sum(p.numel() for p in self.parameters())
-        # Exclude non-matmul params: embeddings and per-layer scalars
-        value_embeds_numel = sum(ve.weight.numel() for ve in self.value_embeds.values())
-        lambda_numel = (self.resid_lambdas.numel() + self.x0_lambdas.numel()) if self.config.use_lambdas else 0
-        nparams_exclude = (self.transformer.wte.weight.numel() + value_embeds_numel +
-                          lambda_numel +
+        # Exclude non-matmul params: embeddings and smear scalars
+        nparams_exclude = (self.transformer.wte.weight.numel() +
                           self.smear_gate.weight.numel() + self.smear_lambda.numel())
         h, q, t = self.config.n_head, self.config.n_embd // self.config.n_head, self.config.sequence_len
         # Sum attention FLOPs per layer, accounting for sliding window
@@ -353,16 +332,13 @@ class GPT(nn.Module):
         """
         # Count each group separately (mirrors the grouping in setup_optimizers)
         wte = sum(p.numel() for p in self.transformer.wte.parameters())
-        value_embeds = sum(p.numel() for p in self.value_embeds.parameters())
         lm_head = sum(p.numel() for p in self.lm_head.parameters())
         transformer_matrices = sum(p.numel() for p in self.transformer.h.parameters())
-        lambda_numel = (self.resid_lambdas.numel() + self.x0_lambdas.numel()) if self.config.use_lambdas else 0
-        scalars = lambda_numel + self.smear_gate.weight.numel() + self.smear_lambda.numel()
-        total = wte + value_embeds + lm_head + transformer_matrices + scalars
+        scalars = self.smear_gate.weight.numel() + self.smear_lambda.numel()
+        total = wte + lm_head + transformer_matrices + scalars
         assert total == sum(p.numel() for p in self.parameters()), "Parameter count mismatch"
         return {
             'wte': wte,
-            'value_embeds': value_embeds,
             'lm_head': lm_head,
             'transformer_matrices': transformer_matrices,
             'scalars': scalars,
@@ -375,13 +351,10 @@ class GPT(nn.Module):
 
         # Separate out all parameters into groups
         matrix_params = list(self.transformer.h.parameters())
-        value_embeds_params = list(self.value_embeds.parameters())
         embedding_params = list(self.transformer.wte.parameters())
         lm_head_params = list(self.lm_head.parameters())
-        resid_params = [self.resid_lambdas] if self.config.use_lambdas else []
-        x0_params = [self.x0_lambdas] if self.config.use_lambdas else []
         smear_params = [self.smear_gate.weight, self.smear_lambda]
-        assert len(list(self.parameters())) == len(matrix_params) + len(embedding_params) + len(lm_head_params) + len(value_embeds_params) + len(resid_params) + len(x0_params) + len(smear_params)
+        assert len(list(self.parameters())) == len(matrix_params) + len(embedding_params) + len(lm_head_params) + len(smear_params)
 
         # Scale the LR for the AdamW parameters by ∝1/√dmodel (tuned for 768 dim model)
         dmodel_lr_scale = (model_dim / 768) ** -0.5
@@ -392,13 +365,8 @@ class GPT(nn.Module):
             # AdamW groups (embeddings, lm_head, scalars)
             dict(kind='adamw', params=lm_head_params, lr=unembedding_lr * dmodel_lr_scale, betas=(0.8, 0.96), eps=1e-10, weight_decay=0.01),
             dict(kind='adamw', params=embedding_params, lr=embedding_lr * dmodel_lr_scale, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.001),
-            dict(kind='adamw', params=value_embeds_params, lr=embedding_lr * dmodel_lr_scale * 0.5, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.01),
             dict(kind='adamw', params=smear_params, lr=0.2, betas=(0.8, 0.95), eps=1e-10, weight_decay=0.0),
         ]
-        if resid_params:
-            param_groups.append(dict(kind='adamw', params=resid_params, lr=scalar_lr * 0.01, betas=(0.8, 0.95), eps=1e-10, weight_decay=0.05))
-        if x0_params:
-            param_groups.append(dict(kind='adamw', params=x0_params, lr=scalar_lr, betas=(0.96, 0.95), eps=1e-10, weight_decay=0.0))
         # Muon groups (matrix params, grouped by shape for stacking)
         for shape in sorted({p.shape for p in matrix_params}):
             group_params = [p for p in matrix_params if p.shape == shape]
@@ -449,14 +417,40 @@ class GPT(nn.Module):
                 x = x + gate * x_pre_smear
 
         # Forward the trunk of the Transformer
-        x0 = x  # save initial normalized embedding for x0 residual
-        n_layer = self.config.n_layer
-        use_lambdas = self.config.use_lambdas
+        x0 = x  # initial normalized embedding (post-smear), used for add_init_res
+        normalize_residual = self.config.normalize_residual
+        add_init_res = self.config.add_init_res
+        add_init_value = self.config.add_init_value
+        init_value_self_wv = self.config.init_value_self_wv
+        detach_init_value = self.config.detach_init_value
+        late_layer_start = (2 * self.config.n_layer) // 3  # add_init_* only fire from here on
+        # Pre-compute norm(x0) for the self_wv mode: each late layer applies its own c_v to it
+        x0_norm = norm(x0) if (add_init_value and init_value_self_wv) else None
+        n_kv_head = self.config.n_kv_head
+        head_dim = self.config.n_embd // self.config.n_head
+        ve = None  # filled by layer 0's v projection if add_init_value (shared mode)
         for i, block in enumerate(self.transformer.h):
-            if use_lambdas:
-                x = self.resid_lambdas[i] * x + self.x0_lambdas[i] * x0
-            ve = self.value_embeds[str(i)](idx).to(x.dtype) if str(i) in self.value_embeds else None
-            x = block(x, ve, cos_sin, self.window_sizes[i], kv_cache)
+            in_last_third = i >= late_layer_start
+            if add_init_res and in_last_third:
+                x = 0.5 * x + 0.5 * x0
+            if add_init_value and in_last_third:
+                if init_value_self_wv:
+                    block_ve = block.attn.c_v(x0_norm).view(B, T, n_kv_head, head_dim)
+                else:
+                    block_ve = ve
+                if detach_init_value:
+                    block_ve = block_ve.detach()
+            else:
+                block_ve = None
+            new_x, v_init = block(x, block_ve, cos_sin, self.window_sizes[i], kv_cache)
+            if add_init_value and not init_value_self_wv and i == 0:
+                ve = v_init
+            if normalize_residual:
+                # Running mean: x_i = mean(block_1_out, ..., block_(i+1)_out).
+                # Equivalent to x = ((i)/(i+1)) * x + (1/(i+1)) * new_x.
+                x = (i * x + new_x) / (i + 1)
+            else:
+                x = new_x
         x = norm(x)
 
         # Forward the lm_head (compute logits)
