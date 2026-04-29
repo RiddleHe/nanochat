@@ -54,9 +54,12 @@ class GPTBaseConfig:
     # to produce ve, instead of reusing layer 0's v. Disentangles "Wv_layer0 is special"
     # from "x0 input is special".
     init_value_self_wv: bool = False
-    # If True, detach `ve` before mixing into v. Forward signal still flows through ve,
-    # but no gradient flows back through it. Isolates "is the win from the backward
-    # skip-connection to the embedding?" from forward semantic leakage.
+    # If True, detach the gradient path back to the embedding through the ve route.
+    # In self_wv mode this detaches x0_norm BEFORE c_v, so each layer's c_v still gets
+    # gradient from the share path (only the input gradient is killed). In shared mode
+    # the whole captured ve is detached (which also kills layer 0's c_v gradient — less
+    # clean, only meaningful in self_wv mode). Used to isolate "is the win the backward
+    # gradient skip-connection to the embedding?" from the forward semantic leakage.
     detach_init_value: bool = False
 
 
@@ -175,6 +178,8 @@ class GPTBase(nn.Module):
         """
         super().__init__()
         self.config = config
+        assert not (config.detach_init_value and not config.init_value_self_wv), \
+            "detach_init_value only has clean semantics with init_value_self_wv=True"
         # Compute per-layer window sizes for sliding window attention
         # window_size is (left, right) tuple: (-1, 0) for full context, (N, 0) for sliding window
         self.window_sizes = self._compute_window_sizes(config)
@@ -424,8 +429,12 @@ class GPTBase(nn.Module):
         init_value_self_wv = self.config.init_value_self_wv
         detach_init_value = self.config.detach_init_value
         late_layer_start = (2 * self.config.n_layer) // 3  # add_init_* only fire from here on
-        # Pre-compute norm(x0) for the self_wv mode: each late layer applies its own c_v to it
+        # Pre-compute norm(x0) for the self_wv mode: each late layer applies its own c_v to it.
+        # When detach_init_value is set, we detach x0_norm here so the matmul W @ x0_norm.detach()
+        # still gives gradient to W (each layer's c_v) but stops gradient back to the embedding.
         x0_norm = norm(x0) if (add_init_value and init_value_self_wv) else None
+        if x0_norm is not None and detach_init_value:
+            x0_norm = x0_norm.detach()
         n_kv_head = self.config.n_kv_head
         head_dim = self.config.n_embd // self.config.n_head
         ve = None  # filled by layer 0's v projection if add_init_value (shared mode)
@@ -438,8 +447,6 @@ class GPTBase(nn.Module):
                     block_ve = block.attn.c_v(x0_norm).view(B, T, n_kv_head, head_dim)
                 else:
                     block_ve = ve
-                if detach_init_value:
-                    block_ve = block_ve.detach()
             else:
                 block_ve = None
             new_x, v_init = block(x, block_ve, cos_sin, self.window_sizes[i], kv_cache)
