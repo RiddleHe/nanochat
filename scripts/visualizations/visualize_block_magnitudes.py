@@ -60,11 +60,16 @@ for model_tag, label in zip(args.model_tags, args.labels):
 
     def make_attn_hook(layer_idx):
         def hook_fn(module, input, output):
+            # Some attention modules (e.g. gpt_base CausalSelfAttention) return (y, v_init)
+            if isinstance(output, tuple):
+                output = output[0]
             attn_outputs[layer_idx] = output.detach()
         return hook_fn
 
     def make_mlp_hook(layer_idx):
         def hook_fn(module, input, output):
+            if isinstance(output, tuple):
+                output = output[0]
             mlp_outputs[layer_idx] = output.detach()
         return hook_fn
 

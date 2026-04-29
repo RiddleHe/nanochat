@@ -6,12 +6,11 @@ each block attends to, averaged across samples and token positions.
 If the checkpoint dir has multiple checkpoints, each is a row of subplots
 (sorted by step), with step shown in the row title.
 
-Works with any AttnRes variant (attn_res, attn_res_balanced, etc.) as long
-as the model has `attn_res_queries` and the standard `_attn_res` mechanism.
+Works with any AttnRes variant as long as the model has `attn_res_queries`
+and the standard `_attn_res` mechanism.
 
 Usage:
     python -m scripts.visualizations.visualize_attn_res --model-tag arch_d12_attn_res --num-samples 100
-    python -m scripts.visualizations.visualize_attn_res --model-tag arch_d12_attn_res_balanced --num-samples 100
 """
 import argparse
 import glob
@@ -28,7 +27,7 @@ from nanochat.dataloader import tokenizing_distributed_data_loader_bos_bestfit
 from nanochat.model.gpt import norm
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--model-tag", type=str, required=True, help="model tag in base_checkpoints (e.g. arch_d12_attn_res, arch_d12_attn_res_balanced)")
+parser.add_argument("--model-tag", type=str, required=True, help="model tag in base_checkpoints (e.g. arch_d12_attn_res)")
 parser.add_argument("--step", type=int, default=None, help="specific step (default: all checkpoints)")
 parser.add_argument("--num-samples", type=int, default=100)
 parser.add_argument("--device-type", type=str, default="")

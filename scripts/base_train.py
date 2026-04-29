@@ -543,11 +543,6 @@ while True:
         optimizer.step()
     model.zero_grad(set_to_none=True)
     train_loss_f = train_loss.item() # .item() is a CPU-GPU sync point
-    # Grab component losses if the model provides them (e.g. GPTAttnResBalanced)
-    _lm_loss_f = getattr(orig_model, '_last_lm_loss', None)
-    _bal_loss_f = getattr(orig_model, '_last_balance_loss', None)
-    _lm_loss_f = _lm_loss_f.item() if _lm_loss_f is not None else None
-    _bal_loss_f = _bal_loss_f.item() if _bal_loss_f is not None else None
     synchronize()
     t1 = time.time()
     dt = t1 - t0
@@ -573,8 +568,7 @@ while True:
     else:
         eta_str = ""
     epoch = f"{dataloader_state_dict['epoch']} pq: {dataloader_state_dict['pq_idx']} rg: {dataloader_state_dict['rg_idx']}"
-    aux_str = f" | lm: {_lm_loss_f:.6f} | bal: {_bal_loss_f:.6f}" if _lm_loss_f is not None else ""
-    print0(f"step {step:05d}/{num_iterations:05d} ({pct_done:.2f}%) | loss: {debiased_smooth_loss:.6f}{aux_str} | lrm: {lrm:.2f} | dt: {dt * 1000:.2f}ms | tok/sec: {tok_per_sec:,} | bf16_mfu: {mfu:.2f} | epoch: {epoch} | total time: {total_training_time/60:.2f}m{eta_str}")
+    print0(f"step {step:05d}/{num_iterations:05d} ({pct_done:.2f}%) | loss: {debiased_smooth_loss:.6f} | lrm: {lrm:.2f} | dt: {dt * 1000:.2f}ms | tok/sec: {tok_per_sec:,} | bf16_mfu: {mfu:.2f} | epoch: {epoch} | total time: {total_training_time/60:.2f}m{eta_str}")
     if step % 100 == 0:
         log_data = {
             "step": step,
@@ -587,9 +581,6 @@ while True:
             "train/mfu": mfu,
             "train/epoch": epoch,
         }
-        if _lm_loss_f is not None:
-            log_data["train/lm_loss"] = _lm_loss_f
-            log_data["train/balance_loss"] = _bal_loss_f
         wandb_run.log(log_data)
 
     # state update
