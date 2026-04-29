@@ -1,28 +1,49 @@
 #!/bin/bash
 
-# Compare XSA variants: GPT baseline vs XSA pre-ve vs XSA post-ve
-# All with lambdas enabled. Configurable depth and FLOP budget.
+# Generic ablation runner: train one or more model variants under a shared config,
+# then extract validation bpb curves into a single CSV for plotting.
+#
+# Model types are passed as positional args (anything in MODELS / lazily registered
+# variants in nanochat/model_registry.py is valid).
 #
 # Usage:
-#   DEPTH=12 FLOPS=1e18 NPROC_PER_NODE=4 bash runs/compare_xsa.sh
-#   DEPTH=24 FLOPS=1.5e19 NPROC_PER_NODE=4 bash runs/compare_xsa.sh
+#   bash runs/ablations.sh gpt_base gpt attn_res
+#   DEPTH=24 NPROC_PER_NODE=4 bash runs/ablations.sh gpt_base gpt attn_res
+#   TAG_PREFIX=normres DEPTH=12 bash runs/ablations.sh gpt_base gpt
+#
+# Optional env overrides:
+#   DEPTH              (default 12)
+#   FLOPS              (default 1.5e18 for depth<24, 1.5e19 otherwise)
+#   DEVICE_BATCH_SIZE  (default 16 for depth<24, 4 otherwise)
+#   EVAL_EVERY         (default 50)
+#   NPROC_PER_NODE     (default 8)
+#   WANDB_RUN          (default "dummy")
+#   TAG_PREFIX         (default "arch") -- used for tag and results dir naming
+#   RESULTS_DIR        (default $NANOCHAT_BASE_DIR/${TAG_PREFIX}_d${DEPTH})
+#   NANOCHAT_BASE_DIR  (default $HOME/.cache/nanochat)
 
 set -eo pipefail
+
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <model_type> [model_type ...]" >&2
+    echo "Example: $0 gpt_base gpt attn_res" >&2
+    exit 1
+fi
+
+MODEL_TYPES=("$@")
 
 DEPTH="${DEPTH:-12}"
 if [ "$DEPTH" -ge 24 ]; then
     FLOPS="${FLOPS:-1.5e19}"
+    DEVICE_BATCH_SIZE="${DEVICE_BATCH_SIZE:-4}"
 else
-    FLOPS="${FLOPS:-1e18}"
-fi
-if [ "$DEPTH" -ge 24 ]; then
-    DEVICE_BATCH_SIZE="${DEVICE_BATCH_SIZE:-8}"
-else
+    FLOPS="${FLOPS:-1.5e18}"
     DEVICE_BATCH_SIZE="${DEVICE_BATCH_SIZE:-16}"
 fi
-EVAL_EVERY=50
+EVAL_EVERY="${EVAL_EVERY:-50}"
 NPROC_PER_NODE="${NPROC_PER_NODE:-8}"
 WANDB_RUN="${WANDB_RUN:-dummy}"
+TAG_PREFIX="${TAG_PREFIX:-arch}"
 
 export OMP_NUM_THREADS=1
 export NANOCHAT_BASE_DIR="${NANOCHAT_BASE_DIR:-$HOME/.cache/nanochat}"
@@ -42,10 +63,8 @@ fi
 python -m nanochat.dataset -n 170 &
 DATASET_PID=$!
 
-RESULTS_DIR="$NANOCHAT_BASE_DIR/xsa_comparison_d${DEPTH}"
+RESULTS_DIR="${RESULTS_DIR:-$NANOCHAT_BASE_DIR/${TAG_PREFIX}_d${DEPTH}}"
 mkdir -p "$RESULTS_DIR"
-
-MODEL_TYPES=("gpt" "gpt_xsa_pre_ve" "gpt_xsa_post_ve")
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
@@ -58,7 +77,7 @@ wait $DATASET_PID
 # =============================================================================
 
 for model_type in "${MODEL_TYPES[@]}"; do
-    TAG="arch_d${DEPTH}_${model_type}"
+    TAG="${TAG_PREFIX}_d${DEPTH}_${model_type}"
     LOG_FILE="$RESULTS_DIR/${TAG}_train.log"
     CKPT_DIR="$NANOCHAT_BASE_DIR/base_checkpoints/${TAG}"
 
@@ -99,7 +118,7 @@ CURVE_FILE="$RESULTS_DIR/val_loss_curves.csv"
 echo "model_type,step,flops,val_bpb" > "$CURVE_FILE"
 
 for model_type in "${MODEL_TYPES[@]}"; do
-    TAG="arch_d${DEPTH}_${model_type}"
+    TAG="${TAG_PREFIX}_d${DEPTH}_${model_type}"
     LOG_FILE="$RESULTS_DIR/${TAG}_train.log"
 
     if [ ! -f "$LOG_FILE" ]; then
@@ -126,6 +145,6 @@ for model_type in "${MODEL_TYPES[@]}"; do
 done
 
 log "=============================================="
-log "XSA Comparison Complete (d=$DEPTH)"
+log "Ablation complete (d=$DEPTH, models=${MODEL_TYPES[*]})"
 log "=============================================="
 log "Loss curves: $CURVE_FILE"
