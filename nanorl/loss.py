@@ -81,6 +81,7 @@ def _masked_token_mean(values: torch.Tensor, mask: torch.Tensor) -> torch.Tensor
     """DAPO token-mean: sum over all response tokens / count of response tokens."""
     return (values * mask).sum() / mask.sum().clamp(min=1)
 
+
 def _masked_sequence_mean(values: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
     """GRPO/REINFORCE sequence-mean: per-sample token-mean, then mean over samples."""
     seq_mean = (values * mask).sum(dim=-1) / mask.sum(dim=-1).clamp(min=1)   # [B]
@@ -152,6 +153,7 @@ def reinforce_loss(
     per_token = -(lp * adv)
     return _masked_sequence_mean(per_token, mask)
 
+
 def gspo_loss(
     logprobs,
     old_logprobs,
@@ -162,45 +164,31 @@ def gspo_loss(
     **kwargs,
 ):
     """GSPO sequence-level clipped surrogate with length-normalized log-ratio."""
-    # Cast to fp32 for numerically stable exp / min.
     lp = logprobs.float()
     old_lp = old_logprobs.float()
     adv = advantages.float().unsqueeze(-1)                          # [B, 1]
     mask = response_mask.float()
 
-    # 1. per-token log ratio
-    log_ratio_t = lp - old_lp                    # [B, T]
-    # 2. mask before summing
-    masked_log_ratio = log_ratio_t * mask        # [B, T]
-    # 3. sum over tokens
-    sum_log_ratio = masked_log_ratio.sum(dim=-1) # [B]
-    # 4. Compute T per sequence
-    T = mask.sum(dim=-1).clamp_min(1.0)          # [B]
-    # 5. mean log ratio
-    mean_log_ratio = sum_log_ratio / T           # [B]
-    # 6. sequence-level ratio
-    ratio = mean_log_ratio.exp().unsqueeze(-1)                 # [B,1]                                 
-
-    clipped = torch.clamp(ratio, 1.0 - clip, 1.0 + clip) #[B,1]              
-    policy_loss = -torch.min(ratio * adv, clipped * adv).mean() # scalar
+    seq_lengths = mask.sum(dim=-1).clamp(min=1)                     # [B]
+    seq_log_ratio = ((lp - old_lp) * mask).sum(dim=-1) / seq_lengths  # [B]
+    ratio = seq_log_ratio.exp().unsqueeze(-1)                       # [B, 1]
+    clipped = torch.clamp(ratio, 1.0 - clip, 1.0 + clip)            # [B, 1]
+    per_seq = -torch.min(ratio * adv, clipped * adv)                # [B, 1]
+    loss = _masked_sequence_mean(per_seq, mask)                     # broadcasts vs [B, T] mask
 
     if kl_coeff > 0:
-        # Simple sampled KL estimator against old policy:
-        # KL ≈ old_logp - new_logp, averaged over response tokens then batch.
-        kl_per_token = old_lp - lp                         # [B, T]
-        kl_per_seq = (kl_per_token * mask).sum(dim=-1) / T # [B]
-        kl_loss = kl_per_seq.mean()
+        kl_per_token = old_lp - lp                                  # [B, T]
+        kl = _masked_sequence_mean(kl_per_token, mask)
+        loss = loss + kl_coeff * kl
+    return loss
 
-        policy_loss = policy_loss + kl_coeff * kl_loss
-
-    return policy_loss
 
 def cispo_loss(
     logprobs,
     old_logprobs,
     advantages,
     response_mask,
-    clip_high=0.2,   # epsilon_high;
+    clip_high=0.2,
     **kwargs,
 ):
     """CISPO loss (MiniMax-M1). One-sided IS-weight clip, stop-gradient on weight,
@@ -211,16 +199,15 @@ def cispo_loss(
     mask = response_mask.float()
 
     ratio = (lp - old_lp).exp()                               # [B, T]
-    # One-sided clip: only upper bound, no lower bound.
     clipped = torch.clamp(ratio, max=1.0 + clip_high).detach()
+    per_token = -clipped * adv * lp                           # [B, T]
+    return _masked_token_mean(per_token, mask)
 
-    per_token_obj = clipped * adv * lp                        # objective
-    return -_masked_token_mean(per_token_obj, mask)           # loss = -objective
 
 ALGORITHMS = {
     "grpo": grpo_loss,
     "dapo": dapo_loss,
     "reinforce": reinforce_loss,
     "gspo": gspo_loss,
-    "cispo": cispo_loss
+    "cispo": cispo_loss,
 }
