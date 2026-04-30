@@ -36,6 +36,10 @@ class GPTBaseAddInitResConfig(GPTBaseConfig):
     add_init_res: bool = True
 
 @dataclass
+class GPTBaseAddInitResMlpConfig(GPTBaseConfig):
+    add_init_res_mlp: bool = True
+
+@dataclass
 class GPTBaseAddInitValueConfig(GPTBaseConfig):
     add_init_value: bool = True
 
@@ -49,6 +53,10 @@ class GPTBaseAddInitValueSelfWvDetachConfig(GPTBaseConfig):
     add_init_value: bool = True
     init_value_self_wv: bool = True
     detach_init_value: bool = True
+
+@dataclass
+class GPTBaseAddInitQkvConfig(GPTBaseConfig):
+    add_init_qkv: bool = True
 
 # -----------------------------------------------------------------------------
 # Standalone variants (each has its own model class in its own file)
@@ -67,9 +75,11 @@ MODELS = {
     "gpt_base":                (GPTBaseConfig,             GPTBase),
     "gpt_base_normres":        (GPTBaseNormResConfig,      GPTBase),
     "gpt_base_add_init_res":   (GPTBaseAddInitResConfig,   GPTBase),
+    "gpt_base_add_init_res_mlp": (GPTBaseAddInitResMlpConfig, GPTBase),
     "gpt_base_add_init_value":         (GPTBaseAddInitValueConfig,       GPTBase),
     "gpt_base_add_init_value_self_wv":        (GPTBaseAddInitValueSelfWvConfig,       GPTBase),
     "gpt_base_add_init_value_self_wv_detach": (GPTBaseAddInitValueSelfWvDetachConfig, GPTBase),
+    "gpt_base_add_init_qkv":                  (GPTBaseAddInitQkvConfig,               GPTBase),
     # standalone variants
     "attn_res":      (GPTAttnResConfig,     GPTAttnRes),
     "attn_res_sink": (GPTAttnResSinkConfig, GPTAttnResSink),

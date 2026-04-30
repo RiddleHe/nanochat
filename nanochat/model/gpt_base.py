@@ -46,6 +46,12 @@ class GPTBaseConfig:
     # If True, blend the initial normalized embedding x0 back into the residual at the
     # last 1/3 of blocks: x = 0.5 * x + 0.5 * x0 (applied before each late block).
     add_init_res: bool = False
+    # If True, blend x0 into the MLP input ONLY at the last 1/3 of blocks:
+    # mlp_in = 0.5 * norm(x) + 0.5 * norm(x0) (each branch normed separately so the two
+    # contributions have matched magnitudes regardless of how much the residual has grown).
+    # The residual stream and attention input are untouched. Isolates the MLP-path
+    # contribution of the x0 skip.
+    add_init_res_mlp: bool = False
     # If True, capture v from layer 0's attention (after c_v projection) and mix it into
     # the last 1/3 of layers' v: v_i = 0.5 * v_i + 0.5 * v_layer0. Lightweight analogue
     # of gpt.py's value-residual without per-layer learned VE tables.
@@ -61,6 +67,11 @@ class GPTBaseConfig:
     # clean, only meaningful in self_wv mode). Used to isolate "is the win the backward
     # gradient skip-connection to the embedding?" from the forward semantic leakage.
     detach_init_value: bool = False
+    # If True, at the last 1/3 of layers, blend q, k, v with projections of x0 through
+    # this SAME layer's c_q, c_k, c_v: q = 0.5*q + 0.5*c_q(norm(x0)), and same for k, v.
+    # Apples-to-apples to add_init_res for "what does the qkv skip buy?" without touching
+    # the residual stream that the MLP reads. Mutually exclusive with add_init_value.
+    add_init_qkv: bool = False
 
 
 def norm(x):
@@ -97,7 +108,7 @@ class CausalSelfAttention(nn.Module):
         self.c_v = Linear(self.n_embd, self.n_kv_head * self.head_dim, bias=False)
         self.c_proj = Linear(self.n_embd, self.n_embd, bias=False)
 
-    def forward(self, x, ve, cos_sin, window_size, kv_cache):
+    def forward(self, x, ve, x0_norm, cos_sin, window_size, kv_cache):
         B, T, C = x.size()
 
         # Project the input to get queries, keys, and values
@@ -106,6 +117,12 @@ class CausalSelfAttention(nn.Module):
         k = self.c_k(x).view(B, T, self.n_kv_head, self.head_dim)
         v = self.c_v(x).view(B, T, self.n_kv_head, self.head_dim)
         v_init = v  # captured for add_init_value sharing (always returned, ignored if unused)
+
+        # add_init_qkv: blend each of q, k, v with this layer's projection of norm(x0)
+        if x0_norm is not None:
+            q = 0.5 * q + 0.5 * self.c_q(x0_norm).view(B, T, self.n_head, self.head_dim)
+            k = 0.5 * k + 0.5 * self.c_k(x0_norm).view(B, T, self.n_kv_head, self.head_dim)
+            v = 0.5 * v + 0.5 * self.c_v(x0_norm).view(B, T, self.n_kv_head, self.head_dim)
 
         # add_init_value: blend in layer-0's v projection (passed via ve)
         if ve is not None:
@@ -162,10 +179,11 @@ class Block(nn.Module):
         self.attn = CausalSelfAttention(config, layer_idx)
         self.mlp = MLP(config)
 
-    def forward(self, x, ve, cos_sin, window_size, kv_cache):
-        attn_out, v_init = self.attn(norm(x), ve, cos_sin, window_size, kv_cache)
+    def forward(self, x, ve, x0_norm, cos_sin, window_size, kv_cache, x0_mlp=None):
+        attn_out, v_init = self.attn(norm(x), ve, x0_norm, cos_sin, window_size, kv_cache)
         x = x + attn_out
-        x = x + self.mlp(norm(x))
+        mlp_in = norm(x) if x0_mlp is None else 0.5 * norm(x0_mlp) + 0.5 * norm(x)
+        x = x + self.mlp(mlp_in)
         return x, v_init
 
 
@@ -180,6 +198,8 @@ class GPTBase(nn.Module):
         self.config = config
         assert not (config.detach_init_value and not config.init_value_self_wv), \
             "detach_init_value only has clean semantics with init_value_self_wv=True"
+        assert not (config.add_init_qkv and config.add_init_value), \
+            "add_init_qkv and add_init_value are mutually exclusive ablations"
         # Compute per-layer window sizes for sliding window attention
         # window_size is (left, right) tuple: (-1, 0) for full context, (N, 0) for sliding window
         self.window_sizes = self._compute_window_sizes(config)
@@ -428,11 +448,15 @@ class GPTBase(nn.Module):
         add_init_value = self.config.add_init_value
         init_value_self_wv = self.config.init_value_self_wv
         detach_init_value = self.config.detach_init_value
+        add_init_qkv = self.config.add_init_qkv
+        add_init_res_mlp = self.config.add_init_res_mlp
         late_layer_start = (2 * self.config.n_layer) // 3  # add_init_* only fire from here on
-        # Pre-compute norm(x0) for the self_wv mode: each late layer applies its own c_v to it.
+        # Pre-compute norm(x0) for paths that need it: add_init_value's self_wv mode (each
+        # late layer applies its own c_v to it) and add_init_qkv (each late layer applies
+        # its own c_q/c_k/c_v to it).
         # When detach_init_value is set, we detach x0_norm here so the matmul W @ x0_norm.detach()
         # still gives gradient to W (each layer's c_v) but stops gradient back to the embedding.
-        x0_norm = norm(x0) if (add_init_value and init_value_self_wv) else None
+        x0_norm = norm(x0) if ((add_init_value and init_value_self_wv) or add_init_qkv) else None
         if x0_norm is not None and detach_init_value:
             x0_norm = x0_norm.detach()
         n_kv_head = self.config.n_kv_head
@@ -449,7 +473,9 @@ class GPTBase(nn.Module):
                     block_ve = ve
             else:
                 block_ve = None
-            new_x, v_init = block(x, block_ve, cos_sin, self.window_sizes[i], kv_cache)
+            block_x0_norm = x0_norm if (add_init_qkv and in_last_third) else None
+            block_x0_mlp = x0 if (add_init_res_mlp and in_last_third) else None
+            new_x, v_init = block(x, block_ve, block_x0_norm, cos_sin, self.window_sizes[i], kv_cache, x0_mlp=block_x0_mlp)
             if add_init_value and not init_value_self_wv and i == 0:
                 ve = v_init
             if normalize_residual:
