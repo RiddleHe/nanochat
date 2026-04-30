@@ -10,11 +10,20 @@ import json
 import os
 import shutil
 import time
+import logging
+from typing import Any
 import urllib.error
 import urllib.request
+from vllm import SamplingParams
+from vllm.distributed.weight_transfer.nccl_engine import NCCLWeightTransferEngine, NCCLTrainerSendWeightsArgs
 
 import torch
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger("nanorl.rollout_worker")
 
 def get_logprobs(model, input_ids, attention_mask, response_mask):
     """Compute per-response-token log-probs under `model`.
@@ -48,7 +57,6 @@ def generate_rollouts(vllm_engine, tokenizer, prompts, num_samples, max_new_toke
     Returns a flat list of dicts, one per (prompt, sample) pair, ordered such
     that the N samples for prompt i occupy positions [i*N, (i+1)*N).
     """
-    from vllm import SamplingParams
     sampling_params = SamplingParams(
         n=num_samples,
         temperature=temperature,
@@ -57,7 +65,7 @@ def generate_rollouts(vllm_engine, tokenizer, prompts, num_samples, max_new_toke
         stop=[tokenizer.eos_token] if tokenizer.eos_token else None,
     )
     outputs = vllm_engine.generate(prompts, sampling_params)
-    results = []
+    results: list[dict[str,Any]] = []
     for output in outputs:
         prompt_text = output.prompt
         for completion in output.outputs:
@@ -199,6 +207,114 @@ def prepare_batch(rollouts, rewards, tokenizer, max_seq_len, device):
         "response_mask": torch.tensor(padded_masks, dtype=torch.float, device=device),
         "rewards": torch.tensor(rewards, dtype=torch.float, device=device),
     }
+
+def _dtype_name(dtype: torch.dtype) -> str:
+    return str(dtype).split(".")[-1]
+
+
+def _iter_fsdp_full_params(model):
+    for name, param in model.named_parameters():
+        if hasattr(param, "full_tensor"):
+            yield name, param.full_tensor()
+            continue
+        yield name, param
+
+
+def _iter_model_parameters(model, fsdp: bool):
+    if fsdp:
+        yield from _iter_fsdp_full_params(model)
+        return
+    yield from model.named_parameters()
+
+def collect_weight_metadata(model, fsdp: bool = False) -> dict[str, Any]:
+    names: list[str] = []
+    dtype_names: list[str] = []
+    shapes: list[list[int]] = []
+    for name, param in _iter_model_parameters(model, fsdp=fsdp):
+        names.append(name)
+        dtype_names.append(_dtype_name(param.dtype))
+        shapes.append(list(param.shape))
+    return {
+        "names": names,
+        "dtype_names": dtype_names,
+        "shapes": shapes,
+    }
+
+def remote_vllm_start_update_weights(base_url, metadata: dict[str, Any], packed: bool):
+    payload = {
+        "names": metadata["names"],
+        "dtype_names": metadata["dtype_names"],
+        "shapes": metadata["shapes"],
+        "packed": packed,
+        "is_checkpoint_format": True,
+    }
+    logger.info(f"Starting in-place vLLM weight update with {packed=}, {len(metadata['names'])=}")
+    resp = _remote_json_request(
+        base_url, "POST", "/update_weights_start", payload=payload, timeout=1800,
+    )
+    if not resp or not resp.get("ok"):
+        raise RuntimeError(f"rollout worker update-start failed: {resp}")
+    return resp
+
+def remote_vllm_finish_update_weights(base_url):
+    logger.info("Waiting for vLLM weight update to complete.")
+    resp = _remote_json_request(
+        base_url, "POST", "/update_weights_finish", payload={}, timeout=1800,
+    )
+    if not resp or not resp.get("ok"):
+        raise RuntimeError(f"rollout worker update-finish failed: {resp}")
+    return resp
+
+def sync_weights_to_vllm_inplace(
+    train_model,
+    base_url,
+    model_update_group,
+    *,
+    packed: bool = True,
+    fsdp: bool = False,
+):
+    """Sync trainer weights into the running vLLM worker without checkpoints."""
+
+    if hasattr(train_model, "module"):
+        train_model = train_model.module
+
+    metadata = collect_weight_metadata(train_model, fsdp=fsdp)
+    remote_vllm_start_update_weights(base_url, metadata, packed=packed)
+
+    param_iterator = _iter_model_parameters(train_model, fsdp=fsdp)
+    logger.info(f"Sending trainer weights via NCCL with {packed=}, {fsdp=}.")
+    NCCLWeightTransferEngine.trainer_send_weights(
+        param_iterator,
+        NCCLTrainerSendWeightsArgs(group=model_update_group, packed=packed),
+    )
+
+    remote_vllm_finish_update_weights(base_url)
+    logger.info("Completed in-place vLLM weight update.")
+
+def remote_vllm_init_weight_transfer(
+    base_url,
+    *,
+    master_address: str,
+    master_port: int,
+    rank_offset: int,
+    world_size: int,
+):
+    payload = {
+        "master_address": master_address,
+        "master_port": master_port,
+        "rank_offset": rank_offset,
+        "world_size": world_size,
+    }
+    logger.info(
+        "Initializing vLLM weight transfer engine with "
+        f"{master_address=}, {master_port=}, {rank_offset=}, {world_size=}."
+    )
+    resp = _remote_json_request(
+        base_url, "POST", "/init_weight_transfer", payload=payload, timeout=1800,
+    )
+    if not resp or not resp.get("ok"):
+        raise RuntimeError(f"rollout worker weight-transfer init failed: {resp}")
+    return resp
 
 
 def vllm_reload_weights_inplace(vllm_engine, model_path):
