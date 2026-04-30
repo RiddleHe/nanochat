@@ -9,9 +9,10 @@ BASE_DIR="${NANOCHAT_BASE_DIR:-$ROOT_DIR/.nanochat}"
 MODEL="${MODEL:-Qwen/Qwen2.5-1.5B-Instruct}"
 ROLLOUT_HOST="${ROLLOUT_HOST:-127.0.0.1}"
 ROLLOUT_PORT="${ROLLOUT_PORT:-8047}"
-ROLLOUT_GPUS="${ROLLOUT_GPUS:-4,5,6,7}"
-TRAIN_GPUS="${TRAIN_GPUS:-0,1,2,3}"
-ROLLOUT_GPU_MEM_UTIL="${ROLLOUT_GPU_MEM_UTIL:-0.85}"
+ROLLOUT_GPUS="${ROLLOUT_GPUS:-2}"
+TRAIN_GPUS="${TRAIN_GPUS:-3}"
+ROLLOUT_GPU_MEM_UTIL="${ROLLOUT_GPU_MEM_UTIL:-0.9}"
+WEIGHT_TRANSFER_BACKEND="${WEIGHT_TRANSFER_BACKEND:-nccl}"
 NUM_STEPS="${NUM_STEPS:-200}"
 SAVE_EVERY="${SAVE_EVERY:-20}"
 TRAIN_BATCH_SIZE="${TRAIN_BATCH_SIZE:-2}"
@@ -19,7 +20,6 @@ LR="${LR:-1e-6}"
 PROMPTS_PER_STEP="${PROMPTS_PER_STEP:-16}"
 
 RUN_DIR="$BASE_DIR/rl/$TAG"
-ROLLOUT_SYNC_DIR="$RUN_DIR/rollout_sync"
 SAVE_DIR="$RUN_DIR/checkpoints"
 WORKER_LOG="$RUN_DIR/rollout_worker.log"
 TRAIN_LOG="$RUN_DIR/train.log"
@@ -44,16 +44,28 @@ done
 
 WORKER_PID=""
 
+# Recursively kill a process and all its descendants (children first).
+kill_subtree() {
+  local pid=$1
+  local children
+  children=$(pgrep -P "$pid" 2>/dev/null) || true
+  for child in $children; do
+    kill_subtree "$child"
+  done
+  kill -TERM "$pid" 2>/dev/null || true
+}
+
 cleanup() {
-  if [[ -n "$WORKER_PID" ]] && kill -0 "$WORKER_PID" 2>/dev/null; then
-    kill "$WORKER_PID" 2>/dev/null || true
+  if [[ -n "$WORKER_PID" ]]; then
+    echo "[launcher] killing rollout worker subtree (root pid=$WORKER_PID)"
+    kill_subtree "$WORKER_PID"
     wait "$WORKER_PID" 2>/dev/null || true
   fi
 }
 
 trap cleanup EXIT INT TERM
 
-mkdir -p "$RUN_DIR" "$ROLLOUT_SYNC_DIR" "$SAVE_DIR"
+mkdir -p "$RUN_DIR" "$SAVE_DIR"
 
 echo "[launcher] run tag: $TAG"
 echo "[launcher] run dir: $RUN_DIR"
@@ -65,6 +77,7 @@ CUDA_VISIBLE_DEVICES="$ROLLOUT_GPUS" \
     --port "$ROLLOUT_PORT" \
     --gpu-memory-utilization "$ROLLOUT_GPU_MEM_UTIL" \
     --tensor-parallel-size "$ROLLOUT_TP" \
+    --weight-transfer-backend "$WEIGHT_TRANSFER_BACKEND" \
     >"$WORKER_LOG" 2>&1 &
 WORKER_PID="$!"
 
@@ -86,7 +99,7 @@ CUDA_VISIBLE_DEVICES="$TRAIN_GPUS" \
     --algorithm dapo \
     --run-name "$TAG" \
     --rollout-worker-url "http://$ROLLOUT_HOST:$ROLLOUT_PORT" \
-    --rollout-sync-dir "$ROLLOUT_SYNC_DIR" \
+    --rollout-worker-world-size "$ROLLOUT_TP" \
     --save-dir "$SAVE_DIR" \
     --num-steps "$NUM_STEPS" \
     --prompts-per-step "$PROMPTS_PER_STEP" \
