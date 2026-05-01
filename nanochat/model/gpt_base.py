@@ -48,6 +48,12 @@ class GPTBaseConfig:
     # The residual stream and attention input are untouched. Isolates the MLP-path
     # contribution of the x0 skip.
     add_init_res_mlp: bool = False
+    # Pre-norm variant of add_init_res_mlp: at the last 1/3 of blocks,
+    # mlp_in = norm(0.5 * x + 0.5 * x0) (average first, then a single norm). Differs from
+    # add_init_res_mlp in magnitude weighting: here the larger-magnitude branch dominates
+    # before normalization, instead of being equalized with x0. Mutually exclusive with
+    # add_init_res_mlp (both write mlp_in).
+    add_init_res_mlp_pre_norm: bool = False
     # If True, capture v from layer 0's attention (after c_v projection) and mix it into
     # the last 1/3 of layers' v: v_i = 0.5 * v_i + 0.5 * v_layer0. Lightweight analogue
     # of gpt.py's value-residual without per-layer learned VE tables. Shared-mode only:
@@ -58,11 +64,12 @@ class GPTBaseConfig:
     # special" from "x0 input is special" relative to add_init_v. Mutually exclusive
     # with add_init_v and add_init_qkv (all three write to v).
     add_init_res_v: bool = False
-    # If True, detach the gradient path back to the embedding through the c_v(norm(x0))
-    # route in add_init_res_v: x0_norm is detached BEFORE c_v, so each layer's c_v still
-    # gets gradient (only the input gradient back to the embedding is killed). Used to
-    # isolate "is the win the backward gradient skip-connection to the embedding?" from
-    # forward semantic leakage. Requires add_init_res_v=True.
+    # If True, detach x0 at block entry so every x0-using path (add_init_res,
+    # add_init_res_mlp, add_init_res_mlp_pre_norm, add_init_qkv, add_init_res_v) consumes
+    # a detached x0. Forward values are unchanged; only the gradient skip-connection back
+    # to the embedding through these paths is killed. Used to isolate "is the win the
+    # backward gradient skip to the embedding?" from forward semantic leakage. No effect
+    # on add_init_v, which routes through layer-0's v rather than x0.
     detach_init_value: bool = False
     # If True, at the last 1/3 of layers, blend q, k, v with projections of x0 through
     # this SAME layer's c_q, c_k, c_v: q = 0.5*q + 0.5*c_q(norm(x0)), and same for k, v.
@@ -121,10 +128,9 @@ class CausalSelfAttention(nn.Module):
         v_init = v  # captured for shared-mode add_init_v (always returned, ignored if unused)
 
         # Compute normalized x0 once if any late-layer x0->qkv path needs it.
+        # x0 is already detached at block entry if cfg.detach_init_value.
         need_x0n = self.is_late and (cfg.add_init_qkv or cfg.add_init_res_v)
         x0n = norm(x0) if need_x0n else None
-        if x0n is not None and cfg.detach_init_value:
-            x0n = x0n.detach()
 
         # add_init_qkv: blend each of q, k, v with this layer's projection of norm(x0)
         if self.is_late and cfg.add_init_qkv:
@@ -196,12 +202,16 @@ class Block(nn.Module):
 
     def forward(self, x, x0, ve, cos_sin, kv_cache):
         cfg = self.config
+        if cfg.detach_init_value:
+            x0 = x0.detach()
         if self.is_late and cfg.add_init_res:
             x = 0.5 * x + 0.5 * x0
         attn_out, v_init = self.attn(norm(x), x0, ve, cos_sin, kv_cache)
         x = x + attn_out
         if self.is_late and cfg.add_init_res_mlp:
             mlp_in = 0.5 * norm(x) + 0.5 * norm(x0)
+        elif self.is_late and cfg.add_init_res_mlp_pre_norm:
+            mlp_in = norm(0.5 * x + 0.5 * x0)
         else:
             mlp_in = norm(x)
         x = x + self.mlp(mlp_in)
@@ -217,10 +227,14 @@ class GPTBase(nn.Module):
         """
         super().__init__()
         self.config = config
-        assert not (config.detach_init_value and not config.add_init_res_v), \
-            "detach_init_value only has clean semantics with add_init_res_v=True"
+        x0_users = [config.add_init_res, config.add_init_res_mlp, config.add_init_res_mlp_pre_norm,
+                    config.add_init_qkv, config.add_init_res_v]
+        assert not (config.detach_init_value and not any(x0_users)), \
+            "detach_init_value requires at least one x0-using flag enabled"
         assert sum([config.add_init_qkv, config.add_init_v, config.add_init_res_v]) <= 1, \
             "add_init_qkv, add_init_v, add_init_res_v all write to v — at most one"
+        assert sum([config.add_init_res_mlp, config.add_init_res_mlp_pre_norm]) <= 1, \
+            "add_init_res_mlp and add_init_res_mlp_pre_norm both write mlp_in — at most one"
         # Compute per-layer window sizes for sliding window attention
         # window_size is (left, right) tuple: (-1, 0) for full context, (N, 0) for sliding window
         self.window_sizes = self._compute_window_sizes(config)

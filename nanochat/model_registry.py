@@ -36,6 +36,10 @@ class GPTBaseAddInitResMlpConfig(GPTBaseConfig):
     add_init_res_mlp: bool = True
 
 @dataclass
+class GPTBaseAddInitResMlpPreNormConfig(GPTBaseConfig):
+    add_init_res_mlp_pre_norm: bool = True
+
+@dataclass
 class GPTBaseAddInitVConfig(GPTBaseConfig):
     add_init_v: bool = True
 
@@ -69,6 +73,7 @@ MODELS = {
     "gpt_base":                (GPTBaseConfig,             GPTBase),
     "gpt_base_add_init_res":   (GPTBaseAddInitResConfig,   GPTBase),
     "gpt_base_add_init_res_mlp": (GPTBaseAddInitResMlpConfig, GPTBase),
+    "gpt_base_add_init_res_mlp_pre_norm": (GPTBaseAddInitResMlpPreNormConfig, GPTBase),
     "gpt_base_add_init_v":            (GPTBaseAddInitVConfig,           GPTBase),
     "gpt_base_add_init_res_v":        (GPTBaseAddInitResVConfig,        GPTBase),
     "gpt_base_add_init_res_v_detach": (GPTBaseAddInitResVDetachConfig,  GPTBase),
