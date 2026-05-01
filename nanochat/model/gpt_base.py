@@ -57,12 +57,14 @@ class GPTBaseConfig:
     # If True, capture v from layer 0's attention (after c_v projection) and mix it into
     # the last 1/3 of layers' v: v_i = 0.5 * v_i + 0.5 * v_layer0. Lightweight analogue
     # of gpt.py's value-residual without per-layer learned VE tables. Shared-mode only:
-    # for the per-layer-c_v variant, see add_init_res_v.
+    # for the per-layer-c_v variant, see add_init_res_v. Requires halve_value=True (which
+    # supplies the 0.5*v_i factor; this branch only adds 0.5*v_layer0).
     add_init_v: bool = False
     # If True, at the last 1/3 of layers, blend v with this SAME layer's projection of
     # norm(x0) through c_v: v = 0.5*v + 0.5*c_v(norm(x0)). Disentangles "Wv_layer0 is
     # special" from "x0 input is special" relative to add_init_v. Mutually exclusive
-    # with add_init_v and add_init_qkv (all three write to v).
+    # with add_init_v and add_init_qkv (all three write to v). Requires halve_value=True
+    # (provides the 0.5*v factor; this branch only adds 0.5*c_v(norm(x0))).
     add_init_res_v: bool = False
     # If True, detach x0 at block entry so every x0-using path (add_init_res,
     # add_init_res_mlp, add_init_res_mlp_pre_norm, add_init_qkv, add_init_res_v) consumes
@@ -75,8 +77,15 @@ class GPTBaseConfig:
     # this SAME layer's c_q, c_k, c_v: q = 0.5*q + 0.5*c_q(norm(x0)), and same for k, v.
     # Apples-to-apples to add_init_res for "what does the qkv skip buy?" without touching
     # the residual stream that the MLP reads. Mutually exclusive with add_init_v and
-    # add_init_res_v.
+    # add_init_res_v. Requires halve_value=True (supplies v's 0.5 factor; q/k branches
+    # do their own 0.5*q + 0.5*c_q(norm(x0)) blend, but v just adds 0.5*c_v(norm(x0))).
     add_init_qkv: bool = False
+    # If True, at the last 1/3 of layers, scale v by 0.5 after the c_v projection: v = 0.5*v.
+    # Stand-alone ablation that isolates the magnitude effect baked into add_init_v /
+    # add_init_qkv / add_init_res_v (each pairs 0.5*v with a +0.5*x skip). Required as a
+    # precondition by those three flags; can also be set on its own to test "does halving
+    # v at late layers help, with no skip path?". Composes with all non-v-writing flags.
+    halve_value: bool = False
 
 
 def norm(x):
@@ -127,24 +136,31 @@ class CausalSelfAttention(nn.Module):
         v = self.c_v(x).view(B, T, self.n_kv_head, self.head_dim)
         v_init = v  # captured for shared-mode add_init_v (always returned, ignored if unused)
 
+        # halve_value: at late layers, scale v by 0.5. Stand-alone ablation; also the
+        # precondition (asserted in __init__) for add_init_v / add_init_qkv / add_init_res_v,
+        # which then add a 0.5*x skip to recover the original 0.5*v + 0.5*x blend.
+        if self.is_late and cfg.halve_value:
+            v = 0.5 * v
+
         # Compute normalized x0 once if any late-layer x0->qkv path needs it.
         # x0 is already detached at block entry if cfg.detach_init_value.
         need_x0n = self.is_late and (cfg.add_init_qkv or cfg.add_init_res_v)
         x0n = norm(x0) if need_x0n else None
 
-        # add_init_qkv: blend each of q, k, v with this layer's projection of norm(x0)
+        # add_init_qkv: blend each of q, k, v with this layer's projection of norm(x0).
+        # v's 0.5 factor is supplied by halve_value upstream.
         if self.is_late and cfg.add_init_qkv:
             q = 0.5 * q + 0.5 * self.c_q(x0n).view(B, T, self.n_head, self.head_dim)
             k = 0.5 * k + 0.5 * self.c_k(x0n).view(B, T, self.n_kv_head, self.head_dim)
-            v = 0.5 * v + 0.5 * self.c_v(x0n).view(B, T, self.n_kv_head, self.head_dim)
+            v = v + 0.5 * self.c_v(x0n).view(B, T, self.n_kv_head, self.head_dim)
 
-        # add_init_v: blend in layer-0's v (shared mode)
+        # add_init_v: add layer-0's v into v (shared mode). v's 0.5 factor from halve_value.
         if self.is_late and cfg.add_init_v:
-            v = 0.5 * v + 0.5 * ve
+            v = v + 0.5 * ve
 
-        # add_init_res_v: blend in this layer's own c_v(norm(x0)) (self-wv mode)
+        # add_init_res_v: add this layer's own c_v(norm(x0)) (self-wv mode). v's 0.5 factor from halve_value.
         if self.is_late and cfg.add_init_res_v:
-            v = 0.5 * v + 0.5 * self.c_v(x0n).view(B, T, self.n_kv_head, self.head_dim)
+            v = v + 0.5 * self.c_v(x0n).view(B, T, self.n_kv_head, self.head_dim)
 
         # Apply Rotary Embeddings to queries and keys to get relative positional encoding
         cos, sin = cos_sin
@@ -231,8 +247,11 @@ class GPTBase(nn.Module):
                     config.add_init_qkv, config.add_init_res_v]
         assert not (config.detach_init_value and not any(x0_users)), \
             "detach_init_value requires at least one x0-using flag enabled"
-        assert sum([config.add_init_qkv, config.add_init_v, config.add_init_res_v]) <= 1, \
+        v_writers = [config.add_init_qkv, config.add_init_v, config.add_init_res_v]
+        assert sum(v_writers) <= 1, \
             "add_init_qkv, add_init_v, add_init_res_v all write to v — at most one"
+        assert not (any(v_writers) and not config.halve_value), \
+            "add_init_qkv/add_init_v/add_init_res_v require halve_value=True (supplies the 0.5*v factor)"
         assert sum([config.add_init_res_mlp, config.add_init_res_mlp_pre_norm]) <= 1, \
             "add_init_res_mlp and add_init_res_mlp_pre_norm both write mlp_in — at most one"
         # Compute per-layer window sizes for sliding window attention
