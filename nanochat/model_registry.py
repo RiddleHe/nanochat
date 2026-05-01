@@ -28,10 +28,6 @@ class GPTNoLambdaConfig(GPTConfig):
 from nanochat.model.gpt_base import GPTBaseConfig, GPTBase
 
 @dataclass
-class GPTBaseNormResConfig(GPTBaseConfig):
-    normalize_residual: bool = True
-
-@dataclass
 class GPTBaseAddInitResConfig(GPTBaseConfig):
     add_init_res: bool = True
 
@@ -40,18 +36,16 @@ class GPTBaseAddInitResMlpConfig(GPTBaseConfig):
     add_init_res_mlp: bool = True
 
 @dataclass
-class GPTBaseAddInitValueConfig(GPTBaseConfig):
-    add_init_value: bool = True
+class GPTBaseAddInitVConfig(GPTBaseConfig):
+    add_init_v: bool = True
 
 @dataclass
-class GPTBaseAddInitValueSelfWvConfig(GPTBaseConfig):
-    add_init_value: bool = True
-    init_value_self_wv: bool = True
+class GPTBaseAddInitResVConfig(GPTBaseConfig):
+    add_init_res_v: bool = True
 
 @dataclass
-class GPTBaseAddInitValueSelfWvDetachConfig(GPTBaseConfig):
-    add_init_value: bool = True
-    init_value_self_wv: bool = True
+class GPTBaseAddInitResVDetachConfig(GPTBaseConfig):
+    add_init_res_v: bool = True
     detach_init_value: bool = True
 
 @dataclass
@@ -73,13 +67,12 @@ MODELS = {
     "gpt_nolambda":     (GPTNoLambdaConfig,     GPT),
     # gpt_base.py family
     "gpt_base":                (GPTBaseConfig,             GPTBase),
-    "gpt_base_normres":        (GPTBaseNormResConfig,      GPTBase),
     "gpt_base_add_init_res":   (GPTBaseAddInitResConfig,   GPTBase),
     "gpt_base_add_init_res_mlp": (GPTBaseAddInitResMlpConfig, GPTBase),
-    "gpt_base_add_init_value":         (GPTBaseAddInitValueConfig,       GPTBase),
-    "gpt_base_add_init_value_self_wv":        (GPTBaseAddInitValueSelfWvConfig,       GPTBase),
-    "gpt_base_add_init_value_self_wv_detach": (GPTBaseAddInitValueSelfWvDetachConfig, GPTBase),
-    "gpt_base_add_init_qkv":                  (GPTBaseAddInitQkvConfig,               GPTBase),
+    "gpt_base_add_init_v":            (GPTBaseAddInitVConfig,           GPTBase),
+    "gpt_base_add_init_res_v":        (GPTBaseAddInitResVConfig,        GPTBase),
+    "gpt_base_add_init_res_v_detach": (GPTBaseAddInitResVDetachConfig,  GPTBase),
+    "gpt_base_add_init_qkv":          (GPTBaseAddInitQkvConfig,         GPTBase),
     # standalone variants
     "attn_res":      (GPTAttnResConfig,     GPTAttnRes),
     "attn_res_sink": (GPTAttnResSinkConfig, GPTAttnResSink),
