@@ -63,6 +63,9 @@ class RolloutState:
         self.engine = LLM(
             **llm_kwargs,
         )
+        if weight_transfer_backend:
+            logger.info(f"Reloading worker checkpoint after dummy init with {model_path=}.")
+            vllm_reload_weights_inplace(self.engine, model_path)
 
     def reload(self, model_path):
         vllm_reload_weights_inplace(self.engine, model_path)
