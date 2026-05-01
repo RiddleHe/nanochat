@@ -1,5 +1,3 @@
-# nanochat
-
 ![nanochat logo](dev/nanochat_rl.png)
 
 Forked from [karpathy/nanochat](https://github.com/karpathy/nanochat). This fork makes it easy to do pretraining architecture research and RL algo research.
@@ -10,14 +8,19 @@ Pretraining architecture research on the nanochat stack.
 
 ## Adding a new architecture
 
-1. Create a new file `nanochat/model/gpt_yourmodel.py` with a config dataclass and model class. The model must implement the same interface as `GPT`: `forward(idx, targets, kv_cache, loss_reduction)`, `init_weights()`, `setup_optimizer(...)`, `estimate_flops()`, `num_scaling_params()`, `generate(...)`, `get_device()`.
+1. Create `nanochat/model/gpt_yourmodel.py` with a config dataclass and model class. The model must implement the same interface as `GPT`: `forward(idx, targets, kv_cache, loss_reduction)`, `init_weights()`, `setup_optimizer(...)`, `estimate_flops()`, `num_scaling_params()`, `generate(...)`, `get_device()`.
 
-2. Register it in `nanochat/model_registry.py`:
+2. Import and register at the top level of `nanochat/model_registry.py`:
 ```python
-def _register_variants():
-    from nanochat.model.gpt_yourmodel import YourModelConfig, YourModel
-    register("yourmodel", YourModelConfig, YourModel)
+from nanochat.model.gpt_yourmodel import YourModelConfig, YourModel
+
+MODELS = {
+    ...
+    "yourmodel": (YourModelConfig, YourModel),
+}
 ```
+
+Alternatively, you can add a config flag to `nanochat/model/gpt_base.py` and register it in `nanochat/model_registry.py` by subclassing the base config inline (e.g. `class GPTBaseAddInitResMlpConfig(GPTBaseConfig): add_init_res_mlp: bool = True`) and adding a `MODELS` entry pointing at the existing model class. No new model file needed.
 
 The `model_type` is saved in checkpoint metadata, so evaluation auto-detects the right model class.
 
@@ -41,16 +44,6 @@ torchrun --standalone --nproc_per_node=4 -m scripts.base_train -- \
 torchrun --standalone --nproc_per_node=4 -m scripts.base_eval -- --model-tag=my_experiment
 ```
 
-## Leaderboard
-
-FLOP-controlled, depth-24 runs. Validation bpb is the minimum reached over training (lower is better). 
-
-| Model | Mechanism | Min val bpb |
-|---|---|---|
-| karpathy/nanochat default | — | 0.750794 |
-| AttnRes | Softmax attention over all prior sublayer outputs | 0.742577 |
-| karpathy/nanochat autoresearch 2 | — | 0.71800 |
-| AttnRes + load balancing | AttnRes with load-balancing aux loss | **0.698283** |
 
 # nanoRL
 
