@@ -32,8 +32,9 @@ class GPTBaseAddInitResConfig(GPTBaseConfig):
     add_init_res: bool = True
 
 @dataclass
-class GPTBaseAddInitResMlpConfig(GPTBaseConfig):
-    add_init_res_mlp: bool = True
+class GPTBaseAddInitResDetachConfig(GPTBaseConfig):
+    add_init_res: bool = True
+    detach_init_value: bool = True
 
 @dataclass
 class GPTBaseAddInitResMlpPreNormConfig(GPTBaseConfig):
@@ -84,8 +85,8 @@ MODELS = {
     "gpt_nolambda":     (GPTNoLambdaConfig,     GPT),
     # gpt_base.py family
     "gpt_base":                (GPTBaseConfig,             GPTBase),
-    "gpt_base_add_init_res":   (GPTBaseAddInitResConfig,   GPTBase),
-    "gpt_base_add_init_res_mlp": (GPTBaseAddInitResMlpConfig, GPTBase),
+    "gpt_base_add_init_res":         (GPTBaseAddInitResConfig,         GPTBase),
+    "gpt_base_add_init_res_detach":  (GPTBaseAddInitResDetachConfig,   GPTBase),
     "gpt_base_add_init_res_mlp_pre_norm": (GPTBaseAddInitResMlpPreNormConfig, GPTBase),
     "gpt_base_add_init_res_mlp_pre_norm_detach": (GPTBaseAddInitResMlpPreNormDetachConfig, GPTBase),
     "gpt_base_add_init_v":            (GPTBaseAddInitVConfig,           GPTBase),

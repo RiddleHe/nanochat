@@ -42,17 +42,9 @@ class GPTBaseConfig:
     # If True, blend the initial normalized embedding x0 back into the residual at the
     # last 1/3 of blocks: x = 0.5 * x + 0.5 * x0 (applied before each late block).
     add_init_res: bool = False
-    # If True, blend x0 into the MLP input ONLY at the last 1/3 of blocks:
-    # mlp_in = 0.5 * norm(x) + 0.5 * norm(x0) (each branch normed separately so the two
-    # contributions have matched magnitudes regardless of how much the residual has grown).
-    # The residual stream and attention input are untouched. Isolates the MLP-path
-    # contribution of the x0 skip.
-    add_init_res_mlp: bool = False
-    # Pre-norm variant of add_init_res_mlp: at the last 1/3 of blocks,
-    # mlp_in = norm(0.5 * x + 0.5 * x0) (average first, then a single norm). Differs from
-    # add_init_res_mlp in magnitude weighting: here the larger-magnitude branch dominates
-    # before normalization, instead of being equalized with x0. Mutually exclusive with
-    # add_init_res_mlp (both write mlp_in).
+    # At the last 1/3 of blocks, mlp_in = norm(0.5 * x + 0.5 * x0) (average first, then a
+    # single norm). The residual stream and attention input are untouched. Isolates the
+    # MLP-path contribution of the x0 skip.
     add_init_res_mlp_pre_norm: bool = False
     # If True, capture v from layer 0's attention (after c_v projection) and mix it into
     # the last 1/3 of layers' v: v_i = 0.5 * v_i + 0.5 * v_layer0. Lightweight analogue
@@ -66,12 +58,12 @@ class GPTBaseConfig:
     # with add_init_v and add_init_qkv (all three write to v). Requires halve_value=True
     # (provides the 0.5*v factor; this branch only adds 0.5*c_v(norm(x0))).
     add_init_res_v: bool = False
-    # If True, detach x0 at block entry so every x0-using path (add_init_res,
-    # add_init_res_mlp, add_init_res_mlp_pre_norm, add_init_qkv, add_init_res_v) consumes
-    # a detached x0. Forward values are unchanged; only the gradient skip-connection back
-    # to the embedding through these paths is killed. Used to isolate "is the win the
-    # backward gradient skip to the embedding?" from forward semantic leakage. No effect
-    # on add_init_v, which routes through layer-0's v rather than x0.
+    # If True, detach x0 before the block loop so every x0-using path (add_init_res,
+    # add_init_res_mlp_pre_norm, add_init_qkv, add_init_res_v) consumes a detached x0.
+    # Forward values are unchanged; only the gradient skip-connection back to the
+    # embedding through these paths is killed. Used to isolate "is the win the backward
+    # gradient skip to the embedding?" from forward semantic leakage. No effect on
+    # add_init_v, which routes through layer-0's v rather than x0.
     detach_init_value: bool = False
     # If True, at the last 1/3 of layers, blend q, k, v with projections of x0 through
     # this SAME layer's c_q, c_k, c_v: q = 0.5*q + 0.5*c_q(norm(x0)), and same for k, v.
@@ -218,15 +210,11 @@ class Block(nn.Module):
 
     def forward(self, x, x0, ve, cos_sin, kv_cache):
         cfg = self.config
-        if cfg.detach_init_value:
-            x0 = x0.detach()
         if self.is_late and cfg.add_init_res:
             x = 0.5 * x + 0.5 * x0
         attn_out, v_init = self.attn(norm(x), x0, ve, cos_sin, kv_cache)
         x = x + attn_out
-        if self.is_late and cfg.add_init_res_mlp:
-            mlp_in = 0.5 * norm(x) + 0.5 * norm(x0)
-        elif self.is_late and cfg.add_init_res_mlp_pre_norm:
+        if self.is_late and cfg.add_init_res_mlp_pre_norm:
             mlp_in = norm(0.5 * x + 0.5 * x0)
         else:
             mlp_in = norm(x)
@@ -243,7 +231,7 @@ class GPTBase(nn.Module):
         """
         super().__init__()
         self.config = config
-        x0_users = [config.add_init_res, config.add_init_res_mlp, config.add_init_res_mlp_pre_norm,
+        x0_users = [config.add_init_res, config.add_init_res_mlp_pre_norm,
                     config.add_init_qkv, config.add_init_res_v]
         assert not (config.detach_init_value and not any(x0_users)), \
             "detach_init_value requires at least one x0-using flag enabled"
@@ -252,8 +240,6 @@ class GPTBase(nn.Module):
             "add_init_qkv, add_init_v, add_init_res_v all write to v — at most one"
         assert not (any(v_writers) and not config.halve_value), \
             "add_init_qkv/add_init_v/add_init_res_v require halve_value=True (supplies the 0.5*v factor)"
-        assert sum([config.add_init_res_mlp, config.add_init_res_mlp_pre_norm]) <= 1, \
-            "add_init_res_mlp and add_init_res_mlp_pre_norm both write mlp_in — at most one"
         # Compute per-layer window sizes for sliding window attention
         # window_size is (left, right) tuple: (-1, 0) for full context, (N, 0) for sliding window
         self.window_sizes = self._compute_window_sizes(config)
@@ -500,8 +486,12 @@ class GPTBase(nn.Module):
 
         # Forward the trunk of the Transformer.
         # x0 = post-smear residual; used by all add_init_* paths inside Block/Attention.
+        # detach_init_value: detach once here (idempotent — same as detaching per-block).
+        # x is passed un-detached, so add_init_v's layer-0 v capture is unaffected.
         # ve = layer-0 v capture, only consumed by add_init_v (shared-mode value residual).
         x0 = x
+        if self.config.detach_init_value:
+            x0 = x0.detach()
         ve = None
         for i, block in enumerate(self.transformer.h):
             x, v_init = block(x, x0, ve, cos_sin, kv_cache)
