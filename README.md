@@ -20,7 +20,7 @@ MODELS = {
 }
 ```
 
-Alternatively, you can add a config flag to `nanochat/model/gpt_base.py` and register it in `nanochat/model_registry.py` by subclassing the base config inline (e.g. `class GPTBaseAddInitResMlpConfig(GPTBaseConfig): add_init_res_mlp: bool = True`) and adding a `MODELS` entry pointing at the existing model class. No new model file needed.
+Alternatively, you can add a config flag to `nanochat/model/gpt_base.py` and register it in `nanochat/model_registry.py` by subclassing the base config inline (e.g. `class GPTBaseAddInitResConfig(GPTBaseConfig): add_init_res: bool = True`) and adding a `MODELS` entry pointing at the existing model class. No new model file needed.
 
 The `model_type` is saved in checkpoint metadata, so evaluation auto-detects the right model class.
 
