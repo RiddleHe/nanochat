@@ -49,14 +49,12 @@ class GPTBaseConfig:
     # If True, capture v from layer 0's attention (after c_v projection) and mix it into
     # the last 1/3 of layers' v: v_i = 0.5 * v_i + 0.5 * v_layer0. Lightweight analogue
     # of gpt.py's value-residual without per-layer learned VE tables. Shared-mode only:
-    # for the per-layer-c_v variant, see add_init_res_v. Requires halve_value=True (which
-    # supplies the 0.5*v_i factor; this branch only adds 0.5*v_layer0).
+    # for the per-layer-c_v variant, see add_init_res_v.
     add_init_v: bool = False
     # If True, at the last 1/3 of layers, blend v with this SAME layer's projection of
     # norm(x0) through c_v: v = 0.5*v + 0.5*c_v(norm(x0)). Disentangles "Wv_layer0 is
     # special" from "x0 input is special" relative to add_init_v. Mutually exclusive
-    # with add_init_v and add_init_qkv (all three write to v). Requires halve_value=True
-    # (provides the 0.5*v factor; this branch only adds 0.5*c_v(norm(x0))).
+    # with add_init_v and add_init_qkv (all three write to v).
     add_init_res_v: bool = False
     # If True, detach x0 before the block loop so every x0-using path (add_init_res,
     # add_init_res_mlp_pre_norm, add_init_qkv, add_init_res_v) consumes a detached x0.
@@ -69,15 +67,15 @@ class GPTBaseConfig:
     # this SAME layer's c_q, c_k, c_v: q = 0.5*q + 0.5*c_q(norm(x0)), and same for k, v.
     # Apples-to-apples to add_init_res for "what does the qkv skip buy?" without touching
     # the residual stream that the MLP reads. Mutually exclusive with add_init_v and
-    # add_init_res_v. Requires halve_value=True (supplies v's 0.5 factor; q/k branches
-    # do their own 0.5*q + 0.5*c_q(norm(x0)) blend, but v just adds 0.5*c_v(norm(x0))).
+    # add_init_res_v.
     add_init_qkv: bool = False
-    # If True, at the last 1/3 of layers, scale v by 0.5 after the c_v projection: v = 0.5*v.
-    # Stand-alone ablation that isolates the magnitude effect baked into add_init_v /
-    # add_init_qkv / add_init_res_v (each pairs 0.5*v with a +0.5*x skip). Required as a
-    # precondition by those three flags; can also be set on its own to test "does halving
-    # v at late layers help, with no skip path?". Composes with all non-v-writing flags.
-    halve_value: bool = False
+    # If True, replace the hardcoded 0.5/0.5 blends in add_init_res / add_init_v /
+    # add_init_res_v / add_init_qkv with per-late-layer learnable scalars (alpha, beta),
+    # init to (1.0, 0.0). At step 0 the model is identical to a no-skip vanilla baseline;
+    # the optimizer learns how much x0 (or layer-0 v) contribution each late layer wants.
+    # alpha multiplies the "main" branch, beta multiplies the x0/ve "skip" branch.
+    # No effect on add_init_res_mlp_pre_norm (its norm-of-sum form is left fixed).
+    learn_init_coeffs: bool = False
 
 
 def norm(x):
@@ -116,6 +114,17 @@ class CausalSelfAttention(nn.Module):
         self.c_k = Linear(self.n_embd, self.n_kv_head * self.head_dim, bias=False)
         self.c_v = Linear(self.n_embd, self.n_kv_head * self.head_dim, bias=False)
         self.c_proj = Linear(self.n_embd, self.n_embd, bias=False)
+        # Learnable blend coeffs (init 1.0/0.0 in init_weights) for late-layer x0 skips,
+        # gated on cfg.learn_init_coeffs and which v-writing flag is active.
+        v_writer = config.add_init_v or config.add_init_res_v or config.add_init_qkv
+        if self.is_late and config.learn_init_coeffs and v_writer:
+            self.alpha_v = nn.Parameter(torch.empty(1))
+            self.beta_v = nn.Parameter(torch.empty(1))
+        if self.is_late and config.learn_init_coeffs and config.add_init_qkv:
+            self.alpha_q = nn.Parameter(torch.empty(1))
+            self.beta_q = nn.Parameter(torch.empty(1))
+            self.alpha_k = nn.Parameter(torch.empty(1))
+            self.beta_k = nn.Parameter(torch.empty(1))
 
     def forward(self, x, x0, ve, cos_sin, kv_cache):
         B, T, C = x.size()
@@ -128,31 +137,39 @@ class CausalSelfAttention(nn.Module):
         v = self.c_v(x).view(B, T, self.n_kv_head, self.head_dim)
         v_init = v  # captured for shared-mode add_init_v (always returned, ignored if unused)
 
-        # halve_value: at late layers, scale v by 0.5. Stand-alone ablation; also the
-        # precondition (asserted in __init__) for add_init_v / add_init_qkv / add_init_res_v,
-        # which then add a 0.5*x skip to recover the original 0.5*v + 0.5*x blend.
-        if self.is_late and cfg.halve_value:
-            v = 0.5 * v
-
         # Compute normalized x0 once if any late-layer x0->qkv path needs it.
-        # x0 is already detached at block entry if cfg.detach_init_value.
+        # x0 is already detached at GPTBase.forward entry if cfg.detach_init_value.
         need_x0n = self.is_late and (cfg.add_init_qkv or cfg.add_init_res_v)
         x0n = norm(x0) if need_x0n else None
 
         # add_init_qkv: blend each of q, k, v with this layer's projection of norm(x0).
-        # v's 0.5 factor is supplied by halve_value upstream.
         if self.is_late and cfg.add_init_qkv:
-            q = 0.5 * q + 0.5 * self.c_q(x0n).view(B, T, self.n_head, self.head_dim)
-            k = 0.5 * k + 0.5 * self.c_k(x0n).view(B, T, self.n_kv_head, self.head_dim)
-            v = v + 0.5 * self.c_v(x0n).view(B, T, self.n_kv_head, self.head_dim)
+            cqx = self.c_q(x0n).view(B, T, self.n_head, self.head_dim)
+            ckx = self.c_k(x0n).view(B, T, self.n_kv_head, self.head_dim)
+            cvx = self.c_v(x0n).view(B, T, self.n_kv_head, self.head_dim)
+            if cfg.learn_init_coeffs:
+                q = self.alpha_q * q + self.beta_q * cqx
+                k = self.alpha_k * k + self.beta_k * ckx
+                v = self.alpha_v * v + self.beta_v * cvx
+            else:
+                q = 0.5 * q + 0.5 * cqx
+                k = 0.5 * k + 0.5 * ckx
+                v = 0.5 * v + 0.5 * cvx
 
-        # add_init_v: add layer-0's v into v (shared mode). v's 0.5 factor from halve_value.
-        if self.is_late and cfg.add_init_v:
-            v = v + 0.5 * ve
+        # add_init_v: blend layer-0's captured v into v (shared mode).
+        elif self.is_late and cfg.add_init_v:
+            if cfg.learn_init_coeffs:
+                v = self.alpha_v * v + self.beta_v * ve
+            else:
+                v = 0.5 * v + 0.5 * ve
 
-        # add_init_res_v: add this layer's own c_v(norm(x0)) (self-wv mode). v's 0.5 factor from halve_value.
-        if self.is_late and cfg.add_init_res_v:
-            v = v + 0.5 * self.c_v(x0n).view(B, T, self.n_kv_head, self.head_dim)
+        # add_init_res_v: blend this layer's own c_v(norm(x0)) (self-wv mode).
+        elif self.is_late and cfg.add_init_res_v:
+            cvx = self.c_v(x0n).view(B, T, self.n_kv_head, self.head_dim)
+            if cfg.learn_init_coeffs:
+                v = self.alpha_v * v + self.beta_v * cvx
+            else:
+                v = 0.5 * v + 0.5 * cvx
 
         # Apply Rotary Embeddings to queries and keys to get relative positional encoding
         cos, sin = cos_sin
@@ -207,11 +224,18 @@ class Block(nn.Module):
         self.is_late = layer_idx >= (2 * config.n_layer) // 3
         self.attn = CausalSelfAttention(config, layer_idx, window_size)
         self.mlp = MLP(config)
+        # Learnable blend coeffs (init 1.0/0.0 in init_weights) for add_init_res.
+        if self.is_late and config.learn_init_coeffs and config.add_init_res:
+            self.alpha_res = nn.Parameter(torch.empty(1))
+            self.beta_res = nn.Parameter(torch.empty(1))
 
     def forward(self, x, x0, ve, cos_sin, kv_cache):
         cfg = self.config
         if self.is_late and cfg.add_init_res:
-            x = 0.5 * x + 0.5 * x0
+            if cfg.learn_init_coeffs:
+                x = self.alpha_res * x + self.beta_res * x0
+            else:
+                x = 0.5 * x + 0.5 * x0
         attn_out, v_init = self.attn(norm(x), x0, ve, cos_sin, kv_cache)
         x = x + attn_out
         if self.is_late and cfg.add_init_res_mlp_pre_norm:
@@ -238,8 +262,10 @@ class GPTBase(nn.Module):
         v_writers = [config.add_init_qkv, config.add_init_v, config.add_init_res_v]
         assert sum(v_writers) <= 1, \
             "add_init_qkv, add_init_v, add_init_res_v all write to v — at most one"
-        assert not (any(v_writers) and not config.halve_value), \
-            "add_init_qkv/add_init_v/add_init_res_v require halve_value=True (supplies the 0.5*v factor)"
+        coeff_users = [config.add_init_res, config.add_init_v,
+                       config.add_init_res_v, config.add_init_qkv]
+        assert not (config.learn_init_coeffs and not any(coeff_users)), \
+            "learn_init_coeffs requires at least one of add_init_res/v/res_v/qkv"
         # Compute per-layer window sizes for sliding window attention
         # window_size is (left, right) tuple: (-1, 0) for full context, (N, 0) for sliding window
         self.window_sizes = self._compute_window_sizes(config)
@@ -299,6 +325,16 @@ class GPTBase(nn.Module):
             torch.nn.init.zeros_(block.attn.c_proj.weight) # projections are zero
             torch.nn.init.uniform_(block.mlp.c_fc.weight, -s * 0.4, s * 0.4)  # 0.4x init scale for c_fc
             torch.nn.init.zeros_(block.mlp.c_proj.weight)
+            # Learnable blend coeffs: alpha (main) -> 1.0, beta (skip) -> 0.0.
+            # At step 0, the model is identical to a no-skip vanilla baseline.
+            if hasattr(block, 'alpha_res'):
+                block.alpha_res.fill_(1.0); block.beta_res.fill_(0.0)
+            attn = block.attn
+            if hasattr(attn, 'alpha_v'):
+                attn.alpha_v.fill_(1.0); attn.beta_v.fill_(0.0)
+            if hasattr(attn, 'alpha_q'):
+                attn.alpha_q.fill_(1.0); attn.beta_q.fill_(0.0)
+                attn.alpha_k.fill_(1.0); attn.beta_k.fill_(0.0)
 
         # Rotary embeddings
         head_dim = self.config.n_embd // self.config.n_head
@@ -373,9 +409,16 @@ class GPTBase(nn.Module):
         - Chinchilla counts exp/sum/divide in attention softmax as flops (a little sus and very tiny => we ignore)
         """
         nparams = sum(p.numel() for p in self.parameters())
-        # Exclude non-matmul params: embeddings and smear scalars
+        # Exclude non-matmul params: embeddings, smear scalars, learnable blend coeffs
+        coeff_numel = sum(
+            getattr(m, n).numel()
+            for m in [b for b in self.transformer.h] + [b.attn for b in self.transformer.h]
+            for n in ('alpha_res', 'beta_res', 'alpha_q', 'beta_q', 'alpha_k', 'beta_k', 'alpha_v', 'beta_v')
+            if hasattr(m, n)
+        )
         nparams_exclude = (self.transformer.wte.weight.numel() +
-                          self.smear_gate.weight.numel() + self.smear_lambda.numel())
+                          self.smear_gate.weight.numel() + self.smear_lambda.numel() +
+                          coeff_numel)
         h, q, t = self.config.n_head, self.config.n_embd // self.config.n_head, self.config.sequence_len
         # Sum attention FLOPs per layer, accounting for sliding window
         attn_flops = 0
@@ -417,12 +460,28 @@ class GPTBase(nn.Module):
         model_dim = self.config.n_embd
         ddp, rank, local_rank, world_size = get_dist_info()
 
+        # Collect learnable blend coeffs (alpha = main path, beta = skip path) into
+        # named lists so they can go into the right AdamW groups (mirrors gpt.py's
+        # resid_lambdas/x0_lambdas treatment).
+        alpha_params, beta_params = [], []
+        for block in self.transformer.h:
+            for n in ('alpha_res',):
+                if hasattr(block, n): alpha_params.append(getattr(block, n))
+            for n in ('beta_res',):
+                if hasattr(block, n): beta_params.append(getattr(block, n))
+            for n in ('alpha_q', 'alpha_k', 'alpha_v'):
+                if hasattr(block.attn, n): alpha_params.append(getattr(block.attn, n))
+            for n in ('beta_q', 'beta_k', 'beta_v'):
+                if hasattr(block.attn, n): beta_params.append(getattr(block.attn, n))
+        coeff_params = alpha_params + beta_params
+
         # Separate out all parameters into groups
-        matrix_params = list(self.transformer.h.parameters())
+        all_block_params = list(self.transformer.h.parameters())
+        matrix_params = [p for p in all_block_params if p.dim() >= 2]  # exclude scalar coeffs
         embedding_params = list(self.transformer.wte.parameters())
         lm_head_params = list(self.lm_head.parameters())
         smear_params = [self.smear_gate.weight, self.smear_lambda]
-        assert len(list(self.parameters())) == len(matrix_params) + len(embedding_params) + len(lm_head_params) + len(smear_params)
+        assert len(list(self.parameters())) == len(matrix_params) + len(embedding_params) + len(lm_head_params) + len(smear_params) + len(coeff_params)
 
         # Scale the LR for the AdamW parameters by ∝1/√dmodel (tuned for 768 dim model)
         dmodel_lr_scale = (model_dim / 768) ** -0.5
@@ -435,6 +494,13 @@ class GPTBase(nn.Module):
             dict(kind='adamw', params=embedding_params, lr=embedding_lr * dmodel_lr_scale, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.001),
             dict(kind='adamw', params=smear_params, lr=0.2, betas=(0.8, 0.95), eps=1e-10, weight_decay=0.0),
         ]
+        # Learnable blend coeffs (only present when learn_init_coeffs is set).
+        # alpha (main, init 1.0): low LR + weight decay, like gpt.py's resid_lambdas.
+        # beta  (skip, init 0.0): high LR no decay,        like gpt.py's x0_lambdas.
+        if alpha_params:
+            param_groups.append(dict(kind='adamw', params=alpha_params, lr=scalar_lr * 0.01, betas=(0.8, 0.95), eps=1e-10, weight_decay=0.05))
+        if beta_params:
+            param_groups.append(dict(kind='adamw', params=beta_params, lr=scalar_lr, betas=(0.96, 0.95), eps=1e-10, weight_decay=0.0))
         # Muon groups (matrix params, grouped by shape for stacking)
         for shape in sorted({p.shape for p in matrix_params}):
             group_params = [p for p in matrix_params if p.shape == shape]

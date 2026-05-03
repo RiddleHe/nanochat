@@ -48,27 +48,19 @@ class GPTBaseAddInitResMlpPreNormDetachConfig(GPTBaseConfig):
 @dataclass
 class GPTBaseAddInitVConfig(GPTBaseConfig):
     add_init_v: bool = True
-    halve_value: bool = True
 
 @dataclass
 class GPTBaseAddInitResVConfig(GPTBaseConfig):
     add_init_res_v: bool = True
-    halve_value: bool = True
 
 @dataclass
 class GPTBaseAddInitResVDetachConfig(GPTBaseConfig):
     add_init_res_v: bool = True
     detach_init_value: bool = True
-    halve_value: bool = True
 
 @dataclass
 class GPTBaseAddInitQkvConfig(GPTBaseConfig):
     add_init_qkv: bool = True
-    halve_value: bool = True
-
-@dataclass
-class GPTBaseHalveValueConfig(GPTBaseConfig):
-    halve_value: bool = True
 
 # -----------------------------------------------------------------------------
 # Standalone variants (each has its own model class in its own file)
@@ -93,7 +85,6 @@ MODELS = {
     "gpt_base_add_init_res_v":        (GPTBaseAddInitResVConfig,        GPTBase),
     "gpt_base_add_init_res_v_detach": (GPTBaseAddInitResVDetachConfig,  GPTBase),
     "gpt_base_add_init_qkv":          (GPTBaseAddInitQkvConfig,         GPTBase),
-    "gpt_base_halve_value":           (GPTBaseHalveValueConfig,         GPTBase),
     # standalone variants
     "attn_res":      (GPTAttnResConfig,     GPTAttnRes),
     "attn_res_sink": (GPTAttnResSinkConfig, GPTAttnResSink),
