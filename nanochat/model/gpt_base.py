@@ -148,9 +148,13 @@ class CausalSelfAttention(nn.Module):
             ckx = self.c_k(x0n).view(B, T, self.n_kv_head, self.head_dim)
             cvx = self.c_v(x0n).view(B, T, self.n_kv_head, self.head_dim)
             if cfg.learn_init_coeffs:
-                q = self.alpha_q * q + self.beta_q * cqx
-                k = self.alpha_k * k + self.beta_k * ckx
-                v = self.alpha_v * v + self.beta_v * cvx
+                # Cast scalar params to activation dtype to keep q/k/v in bf16 for FA3.
+                aq, bq = self.alpha_q.to(q.dtype), self.beta_q.to(q.dtype)
+                ak, bk = self.alpha_k.to(k.dtype), self.beta_k.to(k.dtype)
+                av, bv = self.alpha_v.to(v.dtype), self.beta_v.to(v.dtype)
+                q = aq * q + bq * cqx
+                k = ak * k + bk * ckx
+                v = av * v + bv * cvx
             else:
                 q = 0.5 * q + 0.5 * cqx
                 k = 0.5 * k + 0.5 * ckx
@@ -159,7 +163,8 @@ class CausalSelfAttention(nn.Module):
         # add_init_v: blend layer-0's captured v into v (shared mode).
         elif self.is_late and cfg.add_init_v:
             if cfg.learn_init_coeffs:
-                v = self.alpha_v * v + self.beta_v * ve
+                av, bv = self.alpha_v.to(v.dtype), self.beta_v.to(v.dtype)
+                v = av * v + bv * ve
             else:
                 v = 0.5 * v + 0.5 * ve
 
@@ -167,7 +172,8 @@ class CausalSelfAttention(nn.Module):
         elif self.is_late and cfg.add_init_res_v:
             cvx = self.c_v(x0n).view(B, T, self.n_kv_head, self.head_dim)
             if cfg.learn_init_coeffs:
-                v = self.alpha_v * v + self.beta_v * cvx
+                av, bv = self.alpha_v.to(v.dtype), self.beta_v.to(v.dtype)
+                v = av * v + bv * cvx
             else:
                 v = 0.5 * v + 0.5 * cvx
 
@@ -233,7 +239,10 @@ class Block(nn.Module):
         cfg = self.config
         if self.is_late and cfg.add_init_res:
             if cfg.learn_init_coeffs:
-                x = self.alpha_res * x + self.beta_res * x0
+                # Cast scalar params to activation dtype: master weights stay fp32 for
+                # optimizer precision, but the multiply must run in bf16 to keep FA3 happy.
+                a, b = self.alpha_res.to(x.dtype), self.beta_res.to(x.dtype)
+                x = a * x + b * x0
             else:
                 x = 0.5 * x + 0.5 * x0
         attn_out, v_init = self.attn(norm(x), x0, ve, cos_sin, kv_cache)
