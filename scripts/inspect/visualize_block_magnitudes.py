@@ -5,7 +5,7 @@ Runs validation samples through one or more models and plots (overlaid):
   2. Variance of block output magnitudes vs layer index
 
 Usage:
-    python -m scripts.visualizations.visualize_block_magnitudes \
+    python -m scripts.inspect.visualize_block_magnitudes \
         --model-tags arch_d12_gpt_nolambda arch_d12_attn_res \
         --labels "Baseline" "AttnRes" \
         --num-samples 100 --device-type cuda

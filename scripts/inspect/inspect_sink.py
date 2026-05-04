@@ -1,7 +1,7 @@
 """Print sink logit values from an AttnRes+Sink checkpoint.
 
 Usage:
-    python -m scripts.inspect_sink --model-tag arch_d12_attn_res_sink
+    python -m scripts.inspect.inspect_sink --model-tag arch_d12_attn_res_sink
 """
 import argparse
 import torch

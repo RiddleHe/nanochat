@@ -10,7 +10,7 @@ Works with any AttnRes variant as long as the model has `attn_res_queries`
 and the standard `_attn_res` mechanism.
 
 Usage:
-    python -m scripts.visualizations.visualize_attn_res --model-tag arch_d12_attn_res --num-samples 100
+    python -m scripts.inspect.visualize_attn_res --model-tag arch_d12_attn_res --num-samples 100
 """
 import argparse
 import glob

@@ -8,7 +8,7 @@ winners easy to spot at a glance. The CORE centered metric for each
 model is printed in a box at the bottom.
 
 Usage:
-    python -m scripts.visualizations.visualize_base_eval \\
+    python -m scripts.inspect.visualize_base_eval \\
       --csvs path/to/model_a.csv path/to/model_b.csv path/to/model_c.csv \\
       --labels "GPT" "AttnRes" "AttnRes+LB" \\
       --title "Benchmark Comparison: AttnRes Variants" \\

@@ -14,7 +14,7 @@ the per-token loss on the answer span.
 Reference: "The Curse of Depth in Large Language Models" (arxiv 2502.05795)
 
 Usage:
-    python -m scripts.visualizations.visualize_angular_distance \
+    python -m scripts.inspect.visualize_angular_distance \
         --model-tags arch_d12_gpt_nolambda arch_d12_attn_res \
         --labels "GPT baseline" "AttnRes" \
         --num-samples 50 \

@@ -1,8 +1,8 @@
 """Plot val BPB comparison: two subplots — full training and last 10% zoomed.
 
 Usage:
-    python scripts/visualizations/visualize_val_bpb.py --logs a.log b.log --labels "Model A" "Model B"
-    python scripts/visualizations/visualize_val_bpb.py --logs a.log b.log --labels "A" "B" --output out.png
+    python scripts/inspect/visualize_val_bpb.py --logs a.log b.log --labels "Model A" "Model B"
+    python scripts/inspect/visualize_val_bpb.py --logs a.log b.log --labels "A" "B" --output out.png
 """
 import re
 import argparse

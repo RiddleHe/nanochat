@@ -12,7 +12,7 @@ Cosine similarity is computed PER HEAD over the head_dim axis, then averaged acr
   3. cos_sim(v_0, y_i)  per layer
 
 Usage:
-    python -m scripts.visualizations.visualize_value_attn_cossim \\
+    python -m scripts.inspect.visualize_value_attn_cossim \\
         --model-tag arch_d12_gpt_base --num-samples 100
 """
 import argparse

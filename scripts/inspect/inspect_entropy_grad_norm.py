@@ -29,8 +29,18 @@ and ~4k seq len, budget ~10s-30s per sequence depending on length. For a
 128-rollout batch this runs on the order of an hour; the task is sequential
 (per-token backwards cannot be fused in stock autograd).
 
-Assumes a vLLM rollout worker is already serving at --rollout-worker-url. Use
-`scripts/mech_interp/run.sh` to launch a worker and this script together.
+By default, assumes a vLLM rollout worker is already serving at
+--rollout-worker-url. Pass --start-worker to spawn one as a subprocess on
+--worker-gpus, wait for its /health endpoint, then run the analysis (and tear
+down the worker on exit).
+
+Usage:
+    # External worker (single-host setup):
+    python -m scripts.inspect.inspect_entropy_grad_norm --rollout-worker-url http://127.0.0.1:8047
+
+    # Launcher mode (spawns + tears down the worker):
+    CUDA_VISIBLE_DEVICES=0 python -m scripts.inspect.inspect_entropy_grad_norm \
+        --start-worker --worker-gpus 1 --batch-size 2
 """
 
 from __future__ import annotations
@@ -38,7 +48,11 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
+import sys
 import time
+from pathlib import Path
+from urllib.parse import urlparse
 
 import numpy as np
 import torch
@@ -50,6 +64,56 @@ from nanorl.rollout import (
     wait_for_rollout_worker,
 )
 from nanorl.data import build_rl_dataset, distributed_rl_loader
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+ROLLOUT_WORKER_SCRIPT = REPO_ROOT / "nanorl" / "scripts" / "rollout_worker.py"
+
+
+def maybe_start_worker(args):
+    """Optionally spawn the rollout worker as a subprocess. Returns Popen or None."""
+    if not args.start_worker:
+        return None
+    if not ROLLOUT_WORKER_SCRIPT.exists():
+        raise FileNotFoundError(f"rollout worker script not found: {ROLLOUT_WORKER_SCRIPT}")
+    parsed = urlparse(args.rollout_worker_url)
+    host = parsed.hostname or "127.0.0.1"
+    port = parsed.port or 8047
+    tp_size = max(1, len([g for g in args.worker_gpus.split(",") if g.strip()]))
+    log_path = Path(args.worker_log)
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    env = os.environ.copy()
+    env["CUDA_VISIBLE_DEVICES"] = args.worker_gpus
+    cmd = [
+        sys.executable, str(ROLLOUT_WORKER_SCRIPT),
+        "--model", args.model,
+        "--host", host,
+        "--port", str(port),
+        "--gpu-memory-utilization", str(args.worker_gpu_mem_util),
+        "--tensor-parallel-size", str(tp_size),
+    ]
+    print(f"[launcher] spawning rollout worker on GPUs={args.worker_gpus} -> {log_path}")
+    log_f = open(log_path, "w")
+    proc = subprocess.Popen(cmd, env=env, stdout=log_f, stderr=subprocess.STDOUT)
+    print(f"[launcher] waiting for rollout worker health at {args.rollout_worker_url}/health")
+    try:
+        wait_for_rollout_worker(args.rollout_worker_url, timeout_s=600)
+    except Exception:
+        if proc.poll() is None:
+            proc.terminate()
+        raise
+    print("[launcher] rollout worker healthy")
+    return proc
+
+
+def cleanup_worker(proc):
+    if proc is None or proc.poll() is not None:
+        return
+    print("[launcher] terminating rollout worker")
+    proc.terminate()
+    try:
+        proc.wait(timeout=30)
+    except subprocess.TimeoutExpired:
+        proc.kill()
 
 
 def parse_args():
@@ -80,6 +144,23 @@ def parse_args():
         ),
     )
     p.add_argument("--device", default="cuda")
+    # Launcher knobs (only used when --start-worker is set).
+    p.add_argument("--start-worker", action="store_true",
+                   help="spawn the vLLM rollout worker as a subprocess and tear it down on exit")
+    p.add_argument("--worker-gpus", default="1",
+                   help="CUDA_VISIBLE_DEVICES for the spawned worker (comma list); tensor-parallel size = len(list)")
+    p.add_argument("--worker-gpu-mem-util", type=float, default=0.85)
+    p.add_argument(
+        "--worker-log",
+        default=os.path.join(
+            os.environ.get(
+                "NANOCHAT_BASE_DIR",
+                os.path.join(os.path.dirname(__file__), "..", "..", ".nanochat"),
+            ),
+            "mech_interp",
+            "rollout_worker.log",
+        ),
+    )
     return p.parse_args()
 
 
@@ -391,4 +472,9 @@ def run(args):
 
 
 if __name__ == "__main__":
-    run(parse_args())
+    args = parse_args()
+    worker_proc = maybe_start_worker(args)
+    try:
+        run(args)
+    finally:
+        cleanup_worker(worker_proc)

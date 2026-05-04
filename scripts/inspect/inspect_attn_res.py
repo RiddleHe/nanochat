@@ -1,8 +1,8 @@
 """Inspect AttnRes pseudo-query vectors from a checkpoint.
 
 Usage:
-    python -m scripts.inspect_attn_res --checkpoint /path/to/model_NNNNNN.pt
-    python -m scripts.inspect_attn_res --model-tag arch_attn_res  # auto-find latest
+    python -m scripts.inspect.inspect_attn_res --checkpoint /path/to/model_NNNNNN.pt
+    python -m scripts.inspect.inspect_attn_res --model-tag arch_attn_res  # auto-find latest
 """
 import argparse
 import torch

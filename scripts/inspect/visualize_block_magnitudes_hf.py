@@ -5,7 +5,7 @@ Runs validation samples through one or more HF models and plots:
   with +/- 1 std shaded region.
 
 Usage:
-    python -m scripts.visualizations.visualize_block_magnitudes_hf \
+    python -m scripts.inspect.visualize_block_magnitudes_hf \
         --models Qwen/Qwen3-8B \
         --labels "Qwen3 8B" \
         --num-samples 100 --device-type cuda

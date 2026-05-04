@@ -5,8 +5,8 @@ For balanced logs (those with `lm:` field), the raw `lm:` value is extracted
 and smoothed with a debiased EMA (beta=0.9) to match base_train.py behavior.
 
 Usage:
-    python scripts/visualizations/visualize_train_lm_loss.py --logs a.log b.log --labels "Model A" "Model B"
-    python scripts/visualizations/visualize_train_lm_loss.py --logs a.log b.log --labels "A" "B" --output out.png
+    python scripts/inspect/visualize_train_lm_loss.py --logs a.log b.log --labels "Model A" "Model B"
+    python scripts/inspect/visualize_train_lm_loss.py --logs a.log b.log --labels "A" "B" --output out.png
 """
 import re
 import argparse
