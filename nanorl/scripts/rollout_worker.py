@@ -57,15 +57,15 @@ class RolloutState:
             "disable_log_stats": True,
         }
         if weight_transfer_backend:
-            llm_kwargs["load_format"] = "dummy"
-            # it can either be IPC (colocate trainer and inference) or nccl (different gpus)
+            # Backend can be IPC (colocate trainer and inference) or nccl (different gpus).
+            # Do NOT set load_format="dummy" — the trainer pushes weights at end-of-step,
+            # so step 0's rollout would otherwise serve random weights, and the
+            # reload-after-dummy escape hatch raises NotImplementedError because
+            # vLLM's DummyModelLoader has no get_all_weights.
             llm_kwargs["weight_transfer_config"] = WeightTransferConfig(backend=weight_transfer_backend)
         self.engine = LLM(
             **llm_kwargs,
         )
-        if weight_transfer_backend:
-            logger.info(f"Reloading worker checkpoint after dummy init with {model_path=}.")
-            vllm_reload_weights_inplace(self.engine, model_path)
 
     def reload(self, model_path):
         vllm_reload_weights_inplace(self.engine, model_path)
