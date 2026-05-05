@@ -2,13 +2,12 @@
 Rollout / batch utilities for RL training.
 
 Generation runs in a separate vLLM worker process. The trainer calls the
-`*_remote` helpers (HTTP to the worker); the worker itself reuses
-`generate_rollouts` and `vllm_reload_weights_inplace` from this module.
+`*_remote` helpers (HTTP to the worker) and pushes weights into the worker
+in-place via NCCL using `sync_weights_to_vllm_inplace`. The worker itself
+uses `generate_rollouts` from this module.
 """
 
 import json
-import os
-import shutil
 import time
 import logging
 from typing import Any
@@ -134,50 +133,6 @@ def generate_rollouts_remote(base_url, prompts, num_samples, max_new_tokens,
     }
     resp = _remote_json_request(base_url, "POST", "/generate", payload=payload, timeout=1800)
     return resp["rollouts"]
-
-
-def remote_vllm_reload(base_url, model_path):
-    """Ask the rollout worker to reload weights from a checkpoint path."""
-    resp = _remote_json_request(
-        base_url, "POST", "/reload", payload={"model_path": model_path}, timeout=1800,
-    )
-    if not resp or not resp.get("ok"):
-        raise RuntimeError(f"rollout worker reload failed for {model_path}: {resp}")
-    return resp
-
-
-def materialize_rollout_checkpoint(hf_model, sync_root, slot_idx, tokenizer_source=None):
-    """Write a HF checkpoint into one of two alternating sync slots.
-
-    The worker reloads from the returned slot path. Alternating slots preserves
-    strict per-step semantics without accumulating one checkpoint directory per
-    RL step.
-    """
-    if hasattr(hf_model, "module"):
-        hf_model = hf_model.module
-
-    os.makedirs(sync_root, exist_ok=True)
-    slot_path = os.path.join(sync_root, f"slot{slot_idx}")
-    tmp_path = f"{slot_path}.tmp"
-    shutil.rmtree(tmp_path, ignore_errors=True)
-    shutil.rmtree(slot_path, ignore_errors=True)
-    hf_model.save_pretrained(tmp_path, safe_serialization=True)
-
-    if tokenizer_source is not None:
-        for name in (
-            "tokenizer.json",
-            "tokenizer_config.json",
-            "special_tokens_map.json",
-            "added_tokens.json",
-            "merges.txt",
-            "vocab.json",
-        ):
-            src = os.path.join(tokenizer_source, name)
-            if os.path.exists(src):
-                shutil.copy2(src, os.path.join(tmp_path, name))
-
-    os.replace(tmp_path, slot_path)
-    return slot_path
 
 
 def prepare_batch(rollouts, rewards, tokenizer, max_seq_len, device):
@@ -317,16 +272,3 @@ def remote_vllm_init_weight_transfer(
     return resp
 
 
-def vllm_reload_weights_inplace(vllm_engine, model_path):
-    """Reload checkpoint-format weights into an existing vLLM engine.
-
-    Refreshes model parameters and invalidates generation-time caches without
-    tearing down the engine.
-    """
-    vllm_engine.collective_rpc(
-        "reload_weights",
-        kwargs={"weights_path": model_path, "is_checkpoint_format": True},
-    )
-    vllm_engine.reset_prefix_cache()
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()

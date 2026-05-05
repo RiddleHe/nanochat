@@ -5,15 +5,16 @@ This process owns a single vLLM engine on a dedicated GPU. The trainer talks to
 it over localhost HTTP:
 
   - GET  /health
-  - POST /generate   {prompts, num_samples, max_new_tokens, temperature, top_k}
-  - POST /reload     {model_path}
+  - POST /generate              {prompts, num_samples, max_new_tokens, temperature, top_k}
+  - POST /init_weight_transfer  {master_address, master_port, rank_offset, world_size}
+  - POST /update_weights_start  {names, dtype_names, shapes, packed, ...}
+  - POST /update_weights_finish {}
 
 The trainer keeps semantics strict by:
   1. generating step-t rollouts from weights W_t
   2. updating the policy to W_{t+1}
-  3. checkpointing W_{t+1}
-  4. asking this worker to reload the checkpoint
-  5. only then starting step t+1
+  3. pushing W_{t+1} into this worker in-place via NCCL (start/finish)
+  4. only then starting step t+1
 """
 
 import argparse
@@ -27,7 +28,7 @@ from typing import Literal
 from transformers import AutoTokenizer
 from vllm import LLM
 from vllm.config import WeightTransferConfig
-from nanorl.rollout import generate_rollouts, vllm_reload_weights_inplace
+from nanorl.rollout import generate_rollouts
 
 logging.basicConfig(
     level=logging.INFO,
@@ -66,10 +67,6 @@ class RolloutState:
         self.engine = LLM(
             **llm_kwargs,
         )
-
-    def reload(self, model_path):
-        vllm_reload_weights_inplace(self.engine, model_path)
-        self.model_path = model_path
 
     def wait_for_generation_slot(self):
         while True:
@@ -180,13 +177,6 @@ class Handler(BaseHTTPRequestHandler):
                 payload["top_k"],
             )
             self._write_json({"ok": True, "rollouts": rollouts})
-            return
-
-        if self.path == "/reload":
-            payload = self._read_json()
-            state = self.server.state
-            state.reload(payload["model_path"])
-            self._write_json({"ok": True, "model_path": state.model_path})
             return
 
         if self.path == "/update_weights_start":
