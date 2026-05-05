@@ -16,25 +16,27 @@ import os
 import math
 import time
 import argparse
+import socket as _socket
 from statistics import mean
-
 import torch
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from vllm.distributed.weight_transfer.nccl_engine import NCCLWeightTransferEngine
 
 from nanochat.common import compute_init, compute_cleanup, print0, autodetect_device_type
 from nanorl.loss import ALGORITHMS, compute_advantages
 from nanorl.rollout import (
     get_logprobs,
     generate_rollouts_remote,
-    materialize_rollout_checkpoint,
-    remote_vllm_reload,
+    remote_vllm_init_weight_transfer,
+    sync_weights_to_vllm_inplace,
     prepare_batch,
     wait_for_rollout_worker,
 )
 from nanorl.data import build_rl_dataset, distributed_rl_loader, RewardWorkerPool, apply_overlong_shaping
+
 if __name__ == "__main__":
 
     # -----------------------------------------------------------------------------
@@ -52,7 +54,7 @@ if __name__ == "__main__":
     parser.add_argument("--temperature", type=float, default=1.0)
     parser.add_argument("--top-k", type=int, default=50)
     parser.add_argument("--rollout-worker-url", type=str, default="http://127.0.0.1:8047")
-    parser.add_argument("--rollout-sync-dir", type=str, default="")
+    parser.add_argument("--rollout-worker-world-size", type=int, default=1)
     # Training
     parser.add_argument("--lr", type=float, default=1e-6, help="Learning rate")
     parser.add_argument("--num-steps", type=int, default=200, help="Number of RL steps")
@@ -103,11 +105,35 @@ if __name__ == "__main__":
     raw_model = model.module if ddp else model
 
     # -----------------------------------------------------------------------------
-    # Remote vLLM rollout worker (rank 0 handshake)
+    # Remote vLLM rollout worker (rank 0 handshake + NCCL init).
+    # NCCL transfer group is just (rank 0 trainer) + (rollout workers); under DDP
+    # every trainer rank holds a full weight replica, so only rank 0 needs to send.
+    master_addr = os.environ.get("MASTER_ADDR", "127.0.0.1")
+    weight_transfer_world_size = 1 + args.rollout_worker_world_size
+    model_update_group = None
     if master_process:
         health = wait_for_rollout_worker(args.rollout_worker_url, timeout_s=300)
         print0(f"Remote vLLM rollout worker ready: {health['model_path']}")
+        # Pick a free port for the weight-transfer rendezvous, separate from
+        # MASTER_PORT which torchrun already has bound.
+        with _socket.socket(_socket.AF_INET, _socket.SOCK_STREAM) as _s:
+            _s.bind((master_addr, 0))
+            weight_transfer_port = _s.getsockname()[1]
 
+        remote_vllm_init_weight_transfer(
+            args.rollout_worker_url,
+            master_address=master_addr,
+            master_port=weight_transfer_port,
+            rank_offset=1,  # rollout workers occupy ranks [1, weight_transfer_world_size)
+            world_size=weight_transfer_world_size,
+        )
+
+        model_update_group = NCCLWeightTransferEngine.trainer_init({
+            "master_address": master_addr,
+            "master_port": weight_transfer_port,
+            "world_size": weight_transfer_world_size,
+        })
+        print0("NCCL weight transfer group initialized.")
     # -----------------------------------------------------------------------------
     # RL dataset + reward worker pool + loss fn
     if master_process:
@@ -319,17 +345,18 @@ if __name__ == "__main__":
             optimizer.step()
         phase["update_s"] = time.time() - phase_t0
 
-        # 7. Checkpoint + ask remote worker to reload so next-step rollouts are on-policy
+        # 7. Push W_{t+1} into the rollout worker in-place via NCCL so next-step
+        # rollouts are on-policy. Under DDP all trainer ranks hold the same
+        # weights; only rank 0 sends.
         phase_t0 = time.time()
         if master_process:
-            sync_root = args.rollout_sync_dir or os.path.join(args.save_dir, "rollout_sync")
-            checkpoint_path = materialize_rollout_checkpoint(
-                raw_model,
-                sync_root=sync_root,
-                slot_idx=step % 2,
-                tokenizer_source=args.model,
+            sync_weights_to_vllm_inplace(
+                train_model=raw_model,
+                base_url=args.rollout_worker_url,
+                model_update_group=model_update_group,
+                packed=True,
+                fsdp=False,
             )
-            remote_vllm_reload(args.rollout_worker_url, checkpoint_path)
         phase["sync_rollout_s"] = time.time() - phase_t0
 
         dt = time.time() - t0
