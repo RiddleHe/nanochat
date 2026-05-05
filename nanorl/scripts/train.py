@@ -46,6 +46,9 @@ if __name__ == "__main__":
     parser.add_argument("--algorithm", type=str, default="grpo", choices=list(ALGORITHMS.keys()))
     parser.add_argument("--clip", type=float, default=0.2, help="PPO/GRPO clip range")
     parser.add_argument("--kl-coeff", type=float, default=0.0, help="KL penalty coefficient")
+    parser.add_argument("--entropy-top-frac", type=float, default=None,
+                        help="If set (e.g. 0.2), restrict gradient to the top-fraction of "
+                             "highest-entropy response tokens per batch (paper 80/20 rule).")
     # Generation
     parser.add_argument("--num-samples", type=int, default=16, help="Completions per prompt")
     parser.add_argument("--max-new-tokens", type=int, default=256, help="Max generation length")
@@ -275,7 +278,7 @@ if __name__ == "__main__":
                 for mb in range(n_microbatches):
                     start = mb * micro_bs
                     end = min(start + micro_bs, total_samples)
-                    lp_mb, _ = get_logprobs(
+                    lp_mb, _, _ = get_logprobs(
                         raw_model,
                         batch["input_ids"][start:end],
                         batch["attention_mask"][start:end],
@@ -302,13 +305,15 @@ if __name__ == "__main__":
                 mb_resp = batch["response_mask"][start:end]
                 mb_advantages = advantages[start:end]
 
-                logprobs, shift_mask = get_logprobs(model, mb_ids, mb_attn, mb_resp)
+                logprobs, shift_mask, entropy = get_logprobs(model, mb_ids, mb_attn, mb_resp)
                 mb_old_lp = logprobs.detach() if old_logprobs is None else old_logprobs[start:end]
                 loss = loss_fn(
                     logprobs=logprobs,
                     old_logprobs=mb_old_lp,
                     advantages=mb_advantages,
                     response_mask=shift_mask,
+                    entropy=entropy,
+                    entropy_top_frac=args.entropy_top_frac,
                     clip=args.clip,
                     kl_coeff=args.kl_coeff,
                 ) / n_microbatches

@@ -17,16 +17,17 @@ import torch
 
 
 def get_logprobs(model, input_ids, attention_mask, response_mask):
-    """Compute per-response-token log-probs under `model`.
+    """Compute per-response-token log-probs and entropies under `model`.
 
-    Returns a tuple ``(token_logprobs, shift_mask)`` each of shape ``[B, T-1]``:
+    Returns a tuple ``(token_logprobs, shift_mask, entropy)`` each of shape
+    ``[B, T-1]``:
       - ``token_logprobs[b, t] = log π_θ(input_ids[b, t+1] | input_ids[b, :t+1])``
+        — differentiable, this is what the loss is built from.
       - ``shift_mask[b, t] = 1.0`` iff ``input_ids[b, t+1]`` is a response token.
-
-    Per-token (not per-sequence) log-probs are required so that PPO/DAPO/GRPO
-    can apply per-token importance ratios and per-token clipping — the
-    sample-level masked-mean form makes the clip bounds essentially non-
-    functional (the geometric mean of many per-token ratios is always ≈ 1).
+      - ``entropy[b, t]`` = entropy of the next-token distribution at position t,
+        ``- Σ_v π(v) log π(v)``. Computed under ``no_grad`` because we only use
+        entropy for thresholding (paper's forking-token mask), not as a
+        differentiable signal.
     """
     with torch.amp.autocast('cuda', dtype=torch.bfloat16):
         logits = model(input_ids=input_ids, attention_mask=attention_mask).logits
@@ -38,7 +39,13 @@ def get_logprobs(model, input_ids, attention_mask, response_mask):
     # backward vs log_softmax's [B,T,V] — avoids a ~V× persistent allocation.
     gathered = shift_logits.gather(-1, shift_labels.unsqueeze(-1)).squeeze(-1)
     token_logprobs = gathered - torch.logsumexp(shift_logits, dim=-1)
-    return token_logprobs, shift_mask
+    # Per-token entropy — only needed for top-entropy masking / diagnostics,
+    # never backpropped through, so compute under no_grad to avoid persisting
+    # the [B, T-1, V] log-softmax tensor in the backward graph.
+    with torch.no_grad():
+        full_log_probs = shift_logits.float().log_softmax(dim=-1)
+        entropy = -(full_log_probs.exp() * full_log_probs).sum(dim=-1)
+    return token_logprobs, shift_mask, entropy
 
 
 def generate_rollouts(vllm_engine, tokenizer, prompts, num_samples, max_new_tokens,
