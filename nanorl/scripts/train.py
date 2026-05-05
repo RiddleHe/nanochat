@@ -108,10 +108,12 @@ if __name__ == "__main__":
     raw_model = model.module if ddp else model
 
     # -----------------------------------------------------------------------------
-    # Remote vLLM rollout worker (rank 0 handshake + all-rank NCCL init)
+    # Remote vLLM rollout worker (rank 0 handshake + NCCL init).
+    # NCCL transfer group is just (rank 0 trainer) + (rollout workers); under DDP
+    # every trainer rank holds a full weight replica, so only rank 0 needs to send.
     master_addr = os.environ.get("MASTER_ADDR", "127.0.0.1")
-    trainer_world_size = ddp_world_size
-    world_size = trainer_world_size + args.rollout_worker_world_size
+    weight_transfer_world_size = 1 + args.rollout_worker_world_size
+    model_update_group = None
     if master_process:
         health = wait_for_rollout_worker(args.rollout_worker_url, timeout_s=300)
         print0(f"Remote vLLM rollout worker ready: {health['model_path']}")
@@ -120,29 +122,21 @@ if __name__ == "__main__":
         with _socket.socket(_socket.AF_INET, _socket.SOCK_STREAM) as _s:
             _s.bind((master_addr, 0))
             weight_transfer_port = _s.getsockname()[1]
-    else:
-        weight_transfer_port = 0
 
-    if ddp:
-        rendezvous_port = torch.tensor([weight_transfer_port], dtype=torch.long, device=device)
-        dist.broadcast(rendezvous_port, src=0)
-        weight_transfer_port = int(rendezvous_port.item())
-
-    if master_process:
         remote_vllm_init_weight_transfer(
             args.rollout_worker_url,
             master_address=master_addr,
             master_port=weight_transfer_port,
-            rank_offset=trainer_world_size,
-            world_size=world_size,
+            rank_offset=1,  # rollout workers occupy ranks [1, weight_transfer_world_size)
+            world_size=weight_transfer_world_size,
         )
 
-    model_update_group = NCCLWeightTransferEngine.trainer_init({
-        "master_address": master_addr,
-        "master_port": weight_transfer_port,
-        "world_size": world_size,
-    })
-    print0("NCCL weight transfer group initialized.")
+        model_update_group = NCCLWeightTransferEngine.trainer_init({
+            "master_address": master_addr,
+            "master_port": weight_transfer_port,
+            "world_size": weight_transfer_world_size,
+        })
+        print0("NCCL weight transfer group initialized.")
     # -----------------------------------------------------------------------------
     # RL dataset + reward worker pool + loss fn
     if master_process:
