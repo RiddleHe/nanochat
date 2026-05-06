@@ -81,6 +81,16 @@ class GPTBaseAddInitPreNormLearnConfig(GPTBaseConfig):
     add_init_pre_norm: bool = True
     learn_init_coeffs: bool = True
 
+@dataclass
+class GPTBaseAddInitPreNormAttnOnlyLearnConfig(GPTBaseConfig):
+    add_init_pre_norm_attn_only: bool = True
+    learn_init_coeffs: bool = True
+
+@dataclass
+class GPTBaseAddInitPreNormMlpOnlyLearnConfig(GPTBaseConfig):
+    add_init_pre_norm_mlp_only: bool = True
+    learn_init_coeffs: bool = True
+
 # -----------------------------------------------------------------------------
 # Standalone variants (each has its own model class in its own file)
 # -----------------------------------------------------------------------------
@@ -108,6 +118,8 @@ MODELS = {
     "gpt_base_add_init_res_v_learn":  (GPTBaseAddInitResVLearnConfig,   GPTBase),
     "gpt_base_add_init_qkv_learn":    (GPTBaseAddInitQkvLearnConfig,    GPTBase),
     "gpt_base_add_init_pre_norm_learn": (GPTBaseAddInitPreNormLearnConfig, GPTBase),
+    "gpt_base_add_init_pre_norm_attn_only_learn": (GPTBaseAddInitPreNormAttnOnlyLearnConfig, GPTBase),
+    "gpt_base_add_init_pre_norm_mlp_only_learn":  (GPTBaseAddInitPreNormMlpOnlyLearnConfig,  GPTBase),
     # standalone variants
     "attn_res":      (GPTAttnResConfig,     GPTAttnRes),
     "attn_res_sink": (GPTAttnResSinkConfig, GPTAttnResSink),

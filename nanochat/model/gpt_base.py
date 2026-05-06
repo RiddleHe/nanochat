@@ -53,6 +53,14 @@ class GPTBaseConfig:
     # Compatible with v-writers (add_init_qkv, add_init_v, add_init_res_v), which
     # touch q/k/v rather than the pre-norm input.
     add_init_pre_norm: bool = False
+    # Single-sided variants of add_init_pre_norm: mix x0 only at one of the two
+    # pre-norm sites. attn_only sets attn_in = norm(α_a x + β_a x0) but leaves
+    # mlp_in = norm(x); mlp_only is the dual. Used to localize which sub-layer's
+    # x0 input is responsible for any pre_norm gain. Both require
+    # learn_init_coeffs and are mutually exclusive with add_init_pre_norm /
+    # add_init_res (all target pre-norm input sites).
+    add_init_pre_norm_attn_only: bool = False
+    add_init_pre_norm_mlp_only: bool = False
     # If True, capture v from layer 0's attention (after c_v projection) and mix it into
     # the last 1/3 of layers' v: v_i = 0.5 * v_i + 0.5 * v_layer0. Lightweight analogue
     # of gpt.py's value-residual without per-layer learned VE tables. Shared-mode only:
@@ -241,12 +249,16 @@ class Block(nn.Module):
         if self.is_late and config.learn_init_coeffs and config.add_init_res:
             self.alpha_res = nn.Parameter(torch.empty(1))
             self.beta_res = nn.Parameter(torch.empty(1))
-        # Learnable blend coeffs for add_init_pre_norm: independent (alpha, beta) at
-        # the attn pre-norm and mlp pre-norm input mixing sites.
-        if self.is_late and config.add_init_pre_norm:
-            assert config.learn_init_coeffs, "add_init_pre_norm requires learn_init_coeffs"
+        # Learnable blend coeffs for add_init_pre_norm{,_attn_only,_mlp_only}:
+        # independent (alpha, beta) at each pre-norm input mixing site. Each side
+        # is allocated only when its corresponding flag is on, so attn_only /
+        # mlp_only models carry only one pair (matches their forward path).
+        attn_in_user = config.add_init_pre_norm or config.add_init_pre_norm_attn_only
+        mlp_in_user  = config.add_init_pre_norm or config.add_init_pre_norm_mlp_only
+        if self.is_late and attn_in_user:
             self.alpha_attn_in = nn.Parameter(torch.empty(1))
             self.beta_attn_in = nn.Parameter(torch.empty(1))
+        if self.is_late and mlp_in_user:
             self.alpha_mlp_in = nn.Parameter(torch.empty(1))
             self.beta_mlp_in = nn.Parameter(torch.empty(1))
 
@@ -260,14 +272,14 @@ class Block(nn.Module):
                 x = a * x + b * x0
             else:
                 x = 0.5 * x + 0.5 * x0
-        if self.is_late and cfg.add_init_pre_norm:
+        if self.is_late and (cfg.add_init_pre_norm or cfg.add_init_pre_norm_attn_only):
             a_a, b_a = self.alpha_attn_in.to(x.dtype), self.beta_attn_in.to(x.dtype)
             attn_in = norm(a_a * x + b_a * x0)
         else:
             attn_in = norm(x)
         attn_out, v_init = self.attn(attn_in, x0, ve, cos_sin, kv_cache)
         x = x + attn_out
-        if self.is_late and cfg.add_init_pre_norm:
+        if self.is_late and (cfg.add_init_pre_norm or cfg.add_init_pre_norm_mlp_only):
             a_m, b_m = self.alpha_mlp_in.to(x.dtype), self.beta_mlp_in.to(x.dtype)
             mlp_in = norm(a_m * x + b_m * x0)
         else:
@@ -286,21 +298,27 @@ class GPTBase(nn.Module):
         super().__init__()
         self.config = config
         x0_users = [config.add_init_res, config.add_init_pre_norm,
+                    config.add_init_pre_norm_attn_only, config.add_init_pre_norm_mlp_only,
                     config.add_init_qkv, config.add_init_res_v]
         assert not (config.detach_init_value and not any(x0_users)), \
             "detach_init_value requires at least one x0-using flag enabled"
         v_writers = [config.add_init_qkv, config.add_init_v, config.add_init_res_v]
         assert sum(v_writers) <= 1, \
             "add_init_qkv, add_init_v, add_init_res_v all write to v — at most one"
-        pre_norm_writers = [config.add_init_res, config.add_init_pre_norm]
+        pre_norm_writers = [config.add_init_res, config.add_init_pre_norm,
+                            config.add_init_pre_norm_attn_only,
+                            config.add_init_pre_norm_mlp_only]
         assert sum(pre_norm_writers) <= 1, \
-            "add_init_res and add_init_pre_norm both target pre-norm input — at most one"
-        coeff_users = [config.add_init_res, config.add_init_pre_norm, config.add_init_v,
-                       config.add_init_res_v, config.add_init_qkv]
+            "add_init_res / add_init_pre_norm{,_attn_only,_mlp_only} all target pre-norm input — at most one"
+        coeff_users = [config.add_init_res, config.add_init_pre_norm,
+                       config.add_init_pre_norm_attn_only, config.add_init_pre_norm_mlp_only,
+                       config.add_init_v, config.add_init_res_v, config.add_init_qkv]
         assert not (config.learn_init_coeffs and not any(coeff_users)), \
-            "learn_init_coeffs requires at least one of add_init_res/pre_norm/v/res_v/qkv"
-        assert not (config.add_init_pre_norm and not config.learn_init_coeffs), \
-            "add_init_pre_norm requires learn_init_coeffs (no fixed-coeff form)"
+            "learn_init_coeffs requires at least one of add_init_res/pre_norm{,_attn_only,_mlp_only}/v/res_v/qkv"
+        pre_norm_any = (config.add_init_pre_norm or config.add_init_pre_norm_attn_only
+                        or config.add_init_pre_norm_mlp_only)
+        assert not (pre_norm_any and not config.learn_init_coeffs), \
+            "add_init_pre_norm{,_attn_only,_mlp_only} requires learn_init_coeffs (no fixed-coeff form)"
         # Compute per-layer window sizes for sliding window attention
         # window_size is (left, right) tuple: (-1, 0) for full context, (N, 0) for sliding window
         self.window_sizes = self._compute_window_sizes(config)
@@ -366,6 +384,7 @@ class GPTBase(nn.Module):
                 block.alpha_res.fill_(1.0); block.beta_res.fill_(0.0)
             if hasattr(block, 'alpha_attn_in'):
                 block.alpha_attn_in.fill_(1.0); block.beta_attn_in.fill_(0.0)
+            if hasattr(block, 'alpha_mlp_in'):
                 block.alpha_mlp_in.fill_(1.0); block.beta_mlp_in.fill_(0.0)
             attn = block.attn
             if hasattr(attn, 'alpha_v'):
