@@ -37,15 +37,6 @@ class GPTBaseAddInitResDetachConfig(GPTBaseConfig):
     detach_init_value: bool = True
 
 @dataclass
-class GPTBaseAddInitResMlpPreNormConfig(GPTBaseConfig):
-    add_init_res_mlp_pre_norm: bool = True
-
-@dataclass
-class GPTBaseAddInitResMlpPreNormDetachConfig(GPTBaseConfig):
-    add_init_res_mlp_pre_norm: bool = True
-    detach_init_value: bool = True
-
-@dataclass
 class GPTBaseAddInitVConfig(GPTBaseConfig):
     add_init_v: bool = True
 
@@ -85,6 +76,11 @@ class GPTBaseAddInitQkvLearnConfig(GPTBaseConfig):
     add_init_qkv: bool = True
     learn_init_coeffs: bool = True
 
+@dataclass
+class GPTBaseAddInitPreNormLearnConfig(GPTBaseConfig):
+    add_init_pre_norm: bool = True
+    learn_init_coeffs: bool = True
+
 # -----------------------------------------------------------------------------
 # Standalone variants (each has its own model class in its own file)
 # -----------------------------------------------------------------------------
@@ -102,8 +98,6 @@ MODELS = {
     "gpt_base":                (GPTBaseConfig,             GPTBase),
     "gpt_base_add_init_res":         (GPTBaseAddInitResConfig,         GPTBase),
     "gpt_base_add_init_res_detach":  (GPTBaseAddInitResDetachConfig,   GPTBase),
-    "gpt_base_add_init_res_mlp_pre_norm": (GPTBaseAddInitResMlpPreNormConfig, GPTBase),
-    "gpt_base_add_init_res_mlp_pre_norm_detach": (GPTBaseAddInitResMlpPreNormDetachConfig, GPTBase),
     "gpt_base_add_init_v":            (GPTBaseAddInitVConfig,           GPTBase),
     "gpt_base_add_init_res_v":        (GPTBaseAddInitResVConfig,        GPTBase),
     "gpt_base_add_init_res_v_detach": (GPTBaseAddInitResVDetachConfig,  GPTBase),
@@ -113,6 +107,7 @@ MODELS = {
     "gpt_base_add_init_v_learn":      (GPTBaseAddInitVLearnConfig,      GPTBase),
     "gpt_base_add_init_res_v_learn":  (GPTBaseAddInitResVLearnConfig,   GPTBase),
     "gpt_base_add_init_qkv_learn":    (GPTBaseAddInitQkvLearnConfig,    GPTBase),
+    "gpt_base_add_init_pre_norm_learn": (GPTBaseAddInitPreNormLearnConfig, GPTBase),
     # standalone variants
     "attn_res":      (GPTAttnResConfig,     GPTAttnRes),
     "attn_res_sink": (GPTAttnResSinkConfig, GPTAttnResSink),

@@ -42,10 +42,17 @@ class GPTBaseConfig:
     # If True, blend the initial normalized embedding x0 back into the residual at the
     # last 1/3 of blocks: x = 0.5 * x + 0.5 * x0 (applied before each late block).
     add_init_res: bool = False
-    # At the last 1/3 of blocks, mlp_in = norm(0.5 * x + 0.5 * x0) (average first, then a
-    # single norm). The residual stream and attention input are untouched. Isolates the
-    # MLP-path contribution of the x0 skip.
-    add_init_res_mlp_pre_norm: bool = False
+    # If True, at the last 1/3 of blocks, mix x0 only at the two pre-norm sites with
+    # INDEPENDENT learnable coeffs: attn_in = norm(α_a * x + β_a * x0) and
+    # mlp_in  = norm(α_m * (x + attn_out) + β_m * x0). The residual stream itself is
+    # NOT modified — α/β only scale the inputs to norm at this layer. Compared to
+    # add_init_res, this (a) decouples the attn-vs-mlp x0 ratio, and (b) avoids
+    # depositing β*x0 (and α-scaling x) into the residual stream that propagates to
+    # later layers. Requires learn_init_coeffs (no fixed-coeff form). Mutually
+    # exclusive with add_init_res (both target the same pre-norm input sites).
+    # Compatible with v-writers (add_init_qkv, add_init_v, add_init_res_v), which
+    # touch q/k/v rather than the pre-norm input.
+    add_init_pre_norm: bool = False
     # If True, capture v from layer 0's attention (after c_v projection) and mix it into
     # the last 1/3 of layers' v: v_i = 0.5 * v_i + 0.5 * v_layer0. Lightweight analogue
     # of gpt.py's value-residual without per-layer learned VE tables. Shared-mode only:
@@ -57,7 +64,7 @@ class GPTBaseConfig:
     # with add_init_v and add_init_qkv (all three write to v).
     add_init_res_v: bool = False
     # If True, detach x0 before the block loop so every x0-using path (add_init_res,
-    # add_init_res_mlp_pre_norm, add_init_qkv, add_init_res_v) consumes a detached x0.
+    # add_init_pre_norm, add_init_qkv, add_init_res_v) consumes a detached x0.
     # Forward values are unchanged; only the gradient skip-connection back to the
     # embedding through these paths is killed. Used to isolate "is the win the backward
     # gradient skip to the embedding?" from forward semantic leakage. No effect on
@@ -74,7 +81,7 @@ class GPTBaseConfig:
     # init to (1.0, 0.0). At step 0 the model is identical to a no-skip vanilla baseline;
     # the optimizer learns how much x0 (or layer-0 v) contribution each late layer wants.
     # alpha multiplies the "main" branch, beta multiplies the x0/ve "skip" branch.
-    # No effect on add_init_res_mlp_pre_norm (its norm-of-sum form is left fixed).
+    # Required by add_init_pre_norm (no fixed-coeff form is supported for it).
     learn_init_coeffs: bool = False
 
 
@@ -234,6 +241,14 @@ class Block(nn.Module):
         if self.is_late and config.learn_init_coeffs and config.add_init_res:
             self.alpha_res = nn.Parameter(torch.empty(1))
             self.beta_res = nn.Parameter(torch.empty(1))
+        # Learnable blend coeffs for add_init_pre_norm: independent (alpha, beta) at
+        # the attn pre-norm and mlp pre-norm input mixing sites.
+        if self.is_late and config.add_init_pre_norm:
+            assert config.learn_init_coeffs, "add_init_pre_norm requires learn_init_coeffs"
+            self.alpha_attn_in = nn.Parameter(torch.empty(1))
+            self.beta_attn_in = nn.Parameter(torch.empty(1))
+            self.alpha_mlp_in = nn.Parameter(torch.empty(1))
+            self.beta_mlp_in = nn.Parameter(torch.empty(1))
 
     def forward(self, x, x0, ve, cos_sin, kv_cache):
         cfg = self.config
@@ -245,10 +260,16 @@ class Block(nn.Module):
                 x = a * x + b * x0
             else:
                 x = 0.5 * x + 0.5 * x0
-        attn_out, v_init = self.attn(norm(x), x0, ve, cos_sin, kv_cache)
+        if self.is_late and cfg.add_init_pre_norm:
+            a_a, b_a = self.alpha_attn_in.to(x.dtype), self.beta_attn_in.to(x.dtype)
+            attn_in = norm(a_a * x + b_a * x0)
+        else:
+            attn_in = norm(x)
+        attn_out, v_init = self.attn(attn_in, x0, ve, cos_sin, kv_cache)
         x = x + attn_out
-        if self.is_late and cfg.add_init_res_mlp_pre_norm:
-            mlp_in = norm(0.5 * x + 0.5 * x0)
+        if self.is_late and cfg.add_init_pre_norm:
+            a_m, b_m = self.alpha_mlp_in.to(x.dtype), self.beta_mlp_in.to(x.dtype)
+            mlp_in = norm(a_m * x + b_m * x0)
         else:
             mlp_in = norm(x)
         x = x + self.mlp(mlp_in)
@@ -264,17 +285,22 @@ class GPTBase(nn.Module):
         """
         super().__init__()
         self.config = config
-        x0_users = [config.add_init_res, config.add_init_res_mlp_pre_norm,
+        x0_users = [config.add_init_res, config.add_init_pre_norm,
                     config.add_init_qkv, config.add_init_res_v]
         assert not (config.detach_init_value and not any(x0_users)), \
             "detach_init_value requires at least one x0-using flag enabled"
         v_writers = [config.add_init_qkv, config.add_init_v, config.add_init_res_v]
         assert sum(v_writers) <= 1, \
             "add_init_qkv, add_init_v, add_init_res_v all write to v — at most one"
-        coeff_users = [config.add_init_res, config.add_init_v,
+        pre_norm_writers = [config.add_init_res, config.add_init_pre_norm]
+        assert sum(pre_norm_writers) <= 1, \
+            "add_init_res and add_init_pre_norm both target pre-norm input — at most one"
+        coeff_users = [config.add_init_res, config.add_init_pre_norm, config.add_init_v,
                        config.add_init_res_v, config.add_init_qkv]
         assert not (config.learn_init_coeffs and not any(coeff_users)), \
-            "learn_init_coeffs requires at least one of add_init_res/v/res_v/qkv"
+            "learn_init_coeffs requires at least one of add_init_res/pre_norm/v/res_v/qkv"
+        assert not (config.add_init_pre_norm and not config.learn_init_coeffs), \
+            "add_init_pre_norm requires learn_init_coeffs (no fixed-coeff form)"
         # Compute per-layer window sizes for sliding window attention
         # window_size is (left, right) tuple: (-1, 0) for full context, (N, 0) for sliding window
         self.window_sizes = self._compute_window_sizes(config)
@@ -338,6 +364,9 @@ class GPTBase(nn.Module):
             # At step 0, the model is identical to a no-skip vanilla baseline.
             if hasattr(block, 'alpha_res'):
                 block.alpha_res.fill_(1.0); block.beta_res.fill_(0.0)
+            if hasattr(block, 'alpha_attn_in'):
+                block.alpha_attn_in.fill_(1.0); block.beta_attn_in.fill_(0.0)
+                block.alpha_mlp_in.fill_(1.0); block.beta_mlp_in.fill_(0.0)
             attn = block.attn
             if hasattr(attn, 'alpha_v'):
                 attn.alpha_v.fill_(1.0); attn.beta_v.fill_(0.0)
@@ -422,7 +451,9 @@ class GPTBase(nn.Module):
         coeff_numel = sum(
             getattr(m, n).numel()
             for m in [b for b in self.transformer.h] + [b.attn for b in self.transformer.h]
-            for n in ('alpha_res', 'beta_res', 'alpha_q', 'beta_q', 'alpha_k', 'beta_k', 'alpha_v', 'beta_v')
+            for n in ('alpha_res', 'beta_res',
+                      'alpha_attn_in', 'beta_attn_in', 'alpha_mlp_in', 'beta_mlp_in',
+                      'alpha_q', 'beta_q', 'alpha_k', 'beta_k', 'alpha_v', 'beta_v')
             if hasattr(m, n)
         )
         nparams_exclude = (self.transformer.wte.weight.numel() +
@@ -474,9 +505,9 @@ class GPTBase(nn.Module):
         # resid_lambdas/x0_lambdas treatment).
         alpha_params, beta_params = [], []
         for block in self.transformer.h:
-            for n in ('alpha_res',):
+            for n in ('alpha_res', 'alpha_attn_in', 'alpha_mlp_in'):
                 if hasattr(block, n): alpha_params.append(getattr(block, n))
-            for n in ('beta_res',):
+            for n in ('beta_res', 'beta_attn_in', 'beta_mlp_in'):
                 if hasattr(block, n): beta_params.append(getattr(block, n))
             for n in ('alpha_q', 'alpha_k', 'alpha_v'):
                 if hasattr(block.attn, n): alpha_params.append(getattr(block.attn, n))
