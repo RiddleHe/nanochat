@@ -77,11 +77,6 @@ class GPTBaseAddInitQkvLearnConfig(GPTBaseConfig):
     learn_init_coeffs: bool = True
 
 @dataclass
-class GPTBaseAddInitPreNormLearnConfig(GPTBaseConfig):
-    add_init_pre_norm: bool = True
-    learn_init_coeffs: bool = True
-
-@dataclass
 class GPTBaseAddInitPreNormAttnOnlyLearnConfig(GPTBaseConfig):
     add_init_pre_norm_attn_only: bool = True
     learn_init_coeffs: bool = True
@@ -117,7 +112,6 @@ MODELS = {
     "gpt_base_add_init_v_learn":      (GPTBaseAddInitVLearnConfig,      GPTBase),
     "gpt_base_add_init_res_v_learn":  (GPTBaseAddInitResVLearnConfig,   GPTBase),
     "gpt_base_add_init_qkv_learn":    (GPTBaseAddInitQkvLearnConfig,    GPTBase),
-    "gpt_base_add_init_pre_norm_learn": (GPTBaseAddInitPreNormLearnConfig, GPTBase),
     "gpt_base_add_init_pre_norm_attn_only_learn": (GPTBaseAddInitPreNormAttnOnlyLearnConfig, GPTBase),
     "gpt_base_add_init_pre_norm_mlp_only_learn":  (GPTBaseAddInitPreNormMlpOnlyLearnConfig,  GPTBase),
     # standalone variants

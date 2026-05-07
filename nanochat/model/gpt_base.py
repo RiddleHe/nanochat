@@ -42,23 +42,14 @@ class GPTBaseConfig:
     # If True, blend the initial normalized embedding x0 back into the residual at the
     # last 1/3 of blocks: x = 0.5 * x + 0.5 * x0 (applied before each late block).
     add_init_res: bool = False
-    # If True, at the last 1/3 of blocks, mix x0 only at the two pre-norm sites with
-    # INDEPENDENT learnable coeffs: attn_in = norm(α_a * x + β_a * x0) and
-    # mlp_in  = norm(α_m * (x + attn_out) + β_m * x0). The residual stream itself is
-    # NOT modified — α/β only scale the inputs to norm at this layer. Compared to
-    # add_init_res, this (a) decouples the attn-vs-mlp x0 ratio, and (b) avoids
-    # depositing β*x0 (and α-scaling x) into the residual stream that propagates to
-    # later layers. Requires learn_init_coeffs (no fixed-coeff form). Mutually
-    # exclusive with add_init_res (both target the same pre-norm input sites).
-    # Compatible with v-writers (add_init_qkv, add_init_v, add_init_res_v), which
-    # touch q/k/v rather than the pre-norm input.
-    add_init_pre_norm: bool = False
-    # Single-sided variants of add_init_pre_norm: mix x0 only at one of the two
-    # pre-norm sites. attn_only sets attn_in = norm(α_a x + β_a x0) but leaves
-    # mlp_in = norm(x); mlp_only is the dual. Used to localize which sub-layer's
-    # x0 input is responsible for any pre_norm gain. Both require
-    # learn_init_coeffs and are mutually exclusive with add_init_pre_norm /
-    # add_init_res (all target pre-norm input sites).
+    # Mix x0 at one pre-norm input site with learnable (α, β) coeffs, leaving the
+    # residual stream untouched. attn_only sets attn_in = norm(α_a x + β_a x0) and
+    # leaves mlp_in = norm(x); mlp_only is the dual: attn_in = norm(x) and
+    # mlp_in = norm(α_m (x + attn_out) + β_m x0). Used to localize which sub-layer's
+    # x0 input is responsible for any pre-norm gain. Both require learn_init_coeffs
+    # and are mutually exclusive with each other and with add_init_res (all target
+    # pre-norm input sites). Compatible with v-writers (add_init_qkv, add_init_v,
+    # add_init_res_v), which touch q/k/v rather than the pre-norm input.
     add_init_pre_norm_attn_only: bool = False
     add_init_pre_norm_mlp_only: bool = False
     # If True, capture v from layer 0's attention (after c_v projection) and mix it into
@@ -72,7 +63,7 @@ class GPTBaseConfig:
     # with add_init_v and add_init_qkv (all three write to v).
     add_init_res_v: bool = False
     # If True, detach x0 before the block loop so every x0-using path (add_init_res,
-    # add_init_pre_norm, add_init_qkv, add_init_res_v) consumes a detached x0.
+    # add_init_pre_norm_{attn,mlp}_only, add_init_qkv, add_init_res_v) consumes a detached x0.
     # Forward values are unchanged; only the gradient skip-connection back to the
     # embedding through these paths is killed. Used to isolate "is the win the backward
     # gradient skip to the embedding?" from forward semantic leakage. No effect on
@@ -89,7 +80,7 @@ class GPTBaseConfig:
     # init to (1.0, 0.0). At step 0 the model is identical to a no-skip vanilla baseline;
     # the optimizer learns how much x0 (or layer-0 v) contribution each late layer wants.
     # alpha multiplies the "main" branch, beta multiplies the x0/ve "skip" branch.
-    # Required by add_init_pre_norm (no fixed-coeff form is supported for it).
+    # Required by add_init_pre_norm_{attn,mlp}_only (no fixed-coeff form is supported).
     learn_init_coeffs: bool = False
 
 
@@ -249,16 +240,12 @@ class Block(nn.Module):
         if self.is_late and config.learn_init_coeffs and config.add_init_res:
             self.alpha_res = nn.Parameter(torch.empty(1))
             self.beta_res = nn.Parameter(torch.empty(1))
-        # Learnable blend coeffs for add_init_pre_norm{,_attn_only,_mlp_only}:
-        # independent (alpha, beta) at each pre-norm input mixing site. Each side
-        # is allocated only when its corresponding flag is on, so attn_only /
-        # mlp_only models carry only one pair (matches their forward path).
-        attn_in_user = config.add_init_pre_norm or config.add_init_pre_norm_attn_only
-        mlp_in_user  = config.add_init_pre_norm or config.add_init_pre_norm_mlp_only
-        if self.is_late and attn_in_user:
+        # Learnable blend coeffs for add_init_pre_norm_{attn,mlp}_only: a single
+        # (alpha, beta) pair at the one pre-norm input mixing site that flag turns on.
+        if self.is_late and config.add_init_pre_norm_attn_only:
             self.alpha_attn_in = nn.Parameter(torch.empty(1))
             self.beta_attn_in = nn.Parameter(torch.empty(1))
-        if self.is_late and mlp_in_user:
+        if self.is_late and config.add_init_pre_norm_mlp_only:
             self.alpha_mlp_in = nn.Parameter(torch.empty(1))
             self.beta_mlp_in = nn.Parameter(torch.empty(1))
 
@@ -272,14 +259,14 @@ class Block(nn.Module):
                 x = a * x + b * x0
             else:
                 x = 0.5 * x + 0.5 * x0
-        if self.is_late and (cfg.add_init_pre_norm or cfg.add_init_pre_norm_attn_only):
+        if self.is_late and cfg.add_init_pre_norm_attn_only:
             a_a, b_a = self.alpha_attn_in.to(x.dtype), self.beta_attn_in.to(x.dtype)
             attn_in = norm(a_a * x + b_a * x0)
         else:
             attn_in = norm(x)
         attn_out, v_init = self.attn(attn_in, x0, ve, cos_sin, kv_cache)
         x = x + attn_out
-        if self.is_late and (cfg.add_init_pre_norm or cfg.add_init_pre_norm_mlp_only):
+        if self.is_late and cfg.add_init_pre_norm_mlp_only:
             a_m, b_m = self.alpha_mlp_in.to(x.dtype), self.beta_mlp_in.to(x.dtype)
             mlp_in = norm(a_m * x + b_m * x0)
         else:
@@ -297,7 +284,7 @@ class GPTBase(nn.Module):
         """
         super().__init__()
         self.config = config
-        x0_users = [config.add_init_res, config.add_init_pre_norm,
+        x0_users = [config.add_init_res,
                     config.add_init_pre_norm_attn_only, config.add_init_pre_norm_mlp_only,
                     config.add_init_qkv, config.add_init_res_v]
         assert not (config.detach_init_value and not any(x0_users)), \
@@ -305,20 +292,20 @@ class GPTBase(nn.Module):
         v_writers = [config.add_init_qkv, config.add_init_v, config.add_init_res_v]
         assert sum(v_writers) <= 1, \
             "add_init_qkv, add_init_v, add_init_res_v all write to v — at most one"
-        pre_norm_writers = [config.add_init_res, config.add_init_pre_norm,
+        pre_norm_writers = [config.add_init_res,
                             config.add_init_pre_norm_attn_only,
                             config.add_init_pre_norm_mlp_only]
         assert sum(pre_norm_writers) <= 1, \
-            "add_init_res / add_init_pre_norm{,_attn_only,_mlp_only} all target pre-norm input — at most one"
-        coeff_users = [config.add_init_res, config.add_init_pre_norm,
+            "add_init_res / add_init_pre_norm_{attn,mlp}_only all target pre-norm input — at most one"
+        coeff_users = [config.add_init_res,
                        config.add_init_pre_norm_attn_only, config.add_init_pre_norm_mlp_only,
                        config.add_init_v, config.add_init_res_v, config.add_init_qkv]
         assert not (config.learn_init_coeffs and not any(coeff_users)), \
-            "learn_init_coeffs requires at least one of add_init_res/pre_norm{,_attn_only,_mlp_only}/v/res_v/qkv"
-        pre_norm_any = (config.add_init_pre_norm or config.add_init_pre_norm_attn_only
+            "learn_init_coeffs requires at least one of add_init_res/pre_norm_{attn,mlp}_only/v/res_v/qkv"
+        pre_norm_any = (config.add_init_pre_norm_attn_only
                         or config.add_init_pre_norm_mlp_only)
         assert not (pre_norm_any and not config.learn_init_coeffs), \
-            "add_init_pre_norm{,_attn_only,_mlp_only} requires learn_init_coeffs (no fixed-coeff form)"
+            "add_init_pre_norm_{attn,mlp}_only requires learn_init_coeffs (no fixed-coeff form)"
         # Compute per-layer window sizes for sliding window attention
         # window_size is (left, right) tuple: (-1, 0) for full context, (N, 0) for sliding window
         self.window_sizes = self._compute_window_sizes(config)
