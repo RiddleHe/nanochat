@@ -18,6 +18,7 @@ SAVE_EVERY="${SAVE_EVERY:-20}"
 TRAIN_BATCH_SIZE="${TRAIN_BATCH_SIZE:-2}"
 LR="${LR:-1e-6}"
 PROMPTS_PER_STEP="${PROMPTS_PER_STEP:-16}"
+ENTROPY_TOP_FRAC="${ENTROPY_TOP_FRAC:-}"
 
 RUN_DIR="$BASE_DIR/rl/$TAG"
 SAVE_DIR="$RUN_DIR/checkpoints"
@@ -114,4 +115,5 @@ CUDA_VISIBLE_DEVICES="$TRAIN_GPUS" \
     --kl-coeff 0.0 \
     --temperature 1.0 \
     --top-k -1 \
+    ${ENTROPY_TOP_FRAC:+--entropy-top-frac "$ENTROPY_TOP_FRAC"} \
     2>&1 | tee "$TRAIN_LOG"
