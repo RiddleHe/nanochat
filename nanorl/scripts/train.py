@@ -48,6 +48,7 @@ if __name__ == "__main__":
     parser.add_argument("--algorithm", type=str, default="grpo", choices=list(ALGORITHMS.keys()))
     parser.add_argument("--clip", type=float, default=0.2, help="PPO/GRPO clip range")
     parser.add_argument("--kl-coeff", type=float, default=0.0, help="KL penalty coefficient")
+    parser.add_argument("--tis-clip", type=float, default=0.0, help="TIS importance-weight clip C (0 disables)")
     # Generation
     parser.add_argument("--num-samples", type=int, default=16, help="Completions per prompt")
     parser.add_argument("--max-new-tokens", type=int, default=256, help="Max generation length")
@@ -197,6 +198,7 @@ if __name__ == "__main__":
                 "attention_mask": torch.empty((total_samples, max_len), dtype=torch.long, device=device),
                 "response_mask": torch.empty((total_samples, max_len), dtype=torch.float32, device=device),
                 "rewards": torch.empty(total_samples, dtype=torch.float32, device=device),
+                "inference_logprobs": torch.empty((total_samples, max_len - 1), dtype=torch.float32, device=device),
             }
             advantages = torch.empty(total_samples, dtype=torch.float32, device=device)
 
@@ -205,6 +207,7 @@ if __name__ == "__main__":
             dist.broadcast(batch["attention_mask"], src=0)
             dist.broadcast(batch["response_mask"], src=0)
             dist.broadcast(batch["rewards"], src=0)
+            dist.broadcast(batch["inference_logprobs"], src=0)
             dist.broadcast(advantages, src=0)
 
         return batch, advantages, float(reward_meta.item())
@@ -330,13 +333,16 @@ if __name__ == "__main__":
 
                 logprobs, shift_mask = get_logprobs(model, mb_ids, mb_attn, mb_resp)
                 mb_old_lp = logprobs.detach() if old_logprobs is None else old_logprobs[start:end]
+                mb_inf_lp = batch["inference_logprobs"][start:end]
                 loss = loss_fn(
                     logprobs=logprobs,
                     old_logprobs=mb_old_lp,
+                    inference_logprobs=mb_inf_lp,
                     advantages=mb_advantages,
                     response_mask=shift_mask,
                     clip=args.clip,
                     kl_coeff=args.kl_coeff,
+                    C=args.tis_clip,
                 ) / n_microbatches
                 loss.backward()
                 total_loss += loss.item()

@@ -61,6 +61,7 @@ def generate_rollouts(vllm_engine, tokenizer, prompts, num_samples, max_new_toke
         temperature=temperature,
         top_k=top_k,
         max_tokens=max_new_tokens,
+        logprobs=1,
         stop=[tokenizer.eos_token] if tokenizer.eos_token else None,
     )
     outputs = vllm_engine.generate(prompts, sampling_params)
@@ -68,11 +69,16 @@ def generate_rollouts(vllm_engine, tokenizer, prompts, num_samples, max_new_toke
     for output in outputs:
         prompt_text = output.prompt
         for completion in output.outputs:
+            inference_logprobs = [
+                lp_dict[token_id].logprob
+                for token_id, lp_dict in zip(completion.token_ids, completion.logprobs)
+            ]
             results.append({
                 "prompt": prompt_text,
                 "response": completion.text,
                 "prompt_ids": list(output.prompt_token_ids),
                 "response_ids": list(completion.token_ids),
+                "inference_logprobs": inference_logprobs,
             })
     return results
 
@@ -139,6 +145,8 @@ def prepare_batch(rollouts, rewards, tokenizer, max_seq_len, device):
     """Pack a list of rollouts into padded training tensors."""
     input_ids_list = []
     response_mask_list = []
+    prompt_lens = []
+    response_lens = []
     for rollout in rollouts:
         prompt_ids = rollout["prompt_ids"]
         response_ids = rollout["response_ids"]
@@ -149,6 +157,8 @@ def prepare_batch(rollouts, rewards, tokenizer, max_seq_len, device):
         mask = [0] * len(prompt_ids) + [1] * len(response_ids)
         input_ids_list.append(full_ids)
         response_mask_list.append(mask)
+        prompt_lens.append(len(prompt_ids))
+        response_lens.append(len(response_ids))
 
     max_len = max(len(ids) for ids in input_ids_list)
     pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else 0
@@ -156,11 +166,22 @@ def prepare_batch(rollouts, rewards, tokenizer, max_seq_len, device):
     padded_masks = [m + [0] * (max_len - len(m)) for m in response_mask_list]
     attn_masks = [[1] * len(ids) + [0] * (max_len - len(ids)) for ids in input_ids_list]
 
+    # Build inference_logprobs aligned with shift_mask shape [B, max_len-1].
+    # token_logprobs[b, t] = logprob of input_ids[b, t+1], so response token i
+    # (0-indexed within the response) lands at position P-1+i in the shifted tensor.
+    inf_lp_list = []
+    for rollout, P, R in zip(rollouts, prompt_lens, response_lens):
+        row = [0.0] * (max_len - 1)
+        for i, lp in enumerate(rollout["inference_logprobs"][:R]):
+            row[P - 1 + i] = lp
+        inf_lp_list.append(row)
+
     return {
         "input_ids": torch.tensor(padded_ids, dtype=torch.long, device=device),
         "attention_mask": torch.tensor(attn_masks, dtype=torch.long, device=device),
         "response_mask": torch.tensor(padded_masks, dtype=torch.float, device=device),
         "rewards": torch.tensor(rewards, dtype=torch.float, device=device),
+        "inference_logprobs": torch.tensor(inf_lp_list, dtype=torch.float, device=device),
     }
 
 def _dtype_name(dtype: torch.dtype) -> str:

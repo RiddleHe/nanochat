@@ -95,6 +95,8 @@ def grpo_loss(
     response_mask,
     clip=0.2,
     kl_coeff=0.0,
+    inference_logprobs=None,
+    C: float = 0.0,
     **kwargs,
 ):
     """Per-token PPO-style surrogate with symmetric clip, sequence-mean aggregated."""
@@ -107,6 +109,11 @@ def grpo_loss(
     ratio = (lp - old_lp).exp()                                      # [B, T]
     clipped = torch.clamp(ratio, 1.0 - clip, 1.0 + clip)
     per_token = -torch.min(ratio * adv, clipped * adv)               # [B, T]
+    if C > 0.0 and inference_logprobs is not None:
+        inf_lp = inference_logprobs.float()
+        tis_ratio = (lp - inf_lp).exp()
+        per_token = per_token * tis_ratio.clamp(max=C).detach()
+        
     loss = _masked_sequence_mean(per_token, mask)
 
     if kl_coeff > 0:
@@ -125,6 +132,8 @@ def dapo_loss(
     response_mask,
     clip_low=0.8,
     clip_high=1.28,
+    inference_logprobs=None,
+    C: float = 0.0,
     **kwargs,
 ):
     """DAPO per-token clipped surrogate with asymmetric (clip-higher) bounds."""
@@ -136,6 +145,10 @@ def dapo_loss(
     ratio = (lp - old_lp).exp()
     clipped = torch.clamp(ratio, clip_low, clip_high)
     per_token = -torch.min(ratio * adv, clipped * adv)
+    if C > 0.0 and inference_logprobs is not None:
+        inf_lp = inference_logprobs.float()
+        tis_ratio = (lp - inf_lp).exp()
+        per_token = per_token * tis_ratio.clamp(max=C).detach()
     return _masked_token_mean(per_token, mask)
 
 
@@ -144,6 +157,8 @@ def reinforce_loss(
     old_logprobs,
     advantages,
     response_mask,
+    inference_logprobs=None,
+    C: float = 0.0,
     **kwargs,
 ):
     """Per-token REINFORCE with mean-subtracted advantage, sequence-mean aggregated."""
@@ -151,6 +166,10 @@ def reinforce_loss(
     adv = advantages.float().unsqueeze(-1)
     mask = response_mask.float()
     per_token = -(lp * adv)
+    if C > 0.0 and inference_logprobs is not None:
+        inf_lp = inference_logprobs.float()
+        tis_ratio = (lp - inf_lp).exp()
+        per_token = per_token * tis_ratio.clamp(max=C).detach()
     return _masked_sequence_mean(per_token, mask)
 
 
@@ -161,6 +180,8 @@ def gspo_loss(
     response_mask,
     clip=0.2,
     kl_coeff=0.0,
+    inference_logprobs=None,
+    C: float = 0.0,
     **kwargs,
 ):
     """GSPO sequence-level clipped surrogate with length-normalized log-ratio."""
@@ -174,6 +195,10 @@ def gspo_loss(
     ratio = seq_log_ratio.exp().unsqueeze(-1)                       # [B, 1]
     clipped = torch.clamp(ratio, 1.0 - clip, 1.0 + clip)            # [B, 1]
     per_seq = -torch.min(ratio * adv, clipped * adv)                # [B, 1]
+    if C > 0.0 and inference_logprobs is not None:
+        inf_lp = inference_logprobs.float()
+        tis_ratio = (lp - inf_lp).exp()
+        per_seq = per_seq * tis_ratio.clamp(max=C).detach()
     loss = _masked_sequence_mean(per_seq, mask)                     # broadcasts vs [B, T] mask
 
     if kl_coeff > 0:
@@ -189,6 +214,8 @@ def cispo_loss(
     advantages,
     response_mask,
     clip_high=0.2,
+    inference_logprobs=None,
+    C: float = 0.0,
     **kwargs,
 ):
     """CISPO loss (MiniMax-M1). One-sided IS-weight clip, stop-gradient on weight,
@@ -201,6 +228,10 @@ def cispo_loss(
     ratio = (lp - old_lp).exp()                               # [B, T]
     clipped = torch.clamp(ratio, max=1.0 + clip_high).detach()
     per_token = -clipped * adv * lp                           # [B, T]
+    if C > 0.0 and inference_logprobs is not None:
+        inf_lp = inference_logprobs.float()
+        tis_ratio = (lp - inf_lp).exp()
+        per_token = per_token * tis_ratio.clamp(max=C).detach()
     return _masked_token_mean(per_token, mask)
 
 
