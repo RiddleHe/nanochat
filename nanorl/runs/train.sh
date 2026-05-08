@@ -71,7 +71,7 @@ echo "[launcher] run tag: $TAG"
 echo "[launcher] run dir: $RUN_DIR"
 echo "[launcher] starting rollout worker on GPUs $ROLLOUT_GPUS (tp=$ROLLOUT_TP) -> $WORKER_LOG"
 CUDA_VISIBLE_DEVICES="$ROLLOUT_GPUS" \
-  python "$ROOT_DIR/nanorl/scripts/rollout_worker.py" \
+  uv run python "$ROOT_DIR/nanorl/scripts/rollout_worker.py" \
     --model "$MODEL" \
     --host "$ROLLOUT_HOST" \
     --port "$ROLLOUT_PORT" \
@@ -94,7 +94,7 @@ curl -sf "$HEALTH_URL" | grep -q '"ok": *true' || { echo "rollout worker did not
 
 echo "[launcher] starting trainer on GPUs $TRAIN_GPUS -> $TRAIN_LOG"
 CUDA_VISIBLE_DEVICES="$TRAIN_GPUS" \
-  torchrun --standalone --nproc_per_node="$TRAIN_NPROC" -m nanorl.scripts.train \
+  uv run torchrun --standalone --nproc_per_node="$TRAIN_NPROC" -m nanorl.scripts.train \
     --model "$MODEL" \
     --algorithm dapo \
     --run-name "$TAG" \
