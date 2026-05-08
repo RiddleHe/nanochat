@@ -53,6 +53,14 @@ class GPTBaseAddInitResVDetachConfig(GPTBaseConfig):
 class GPTBaseAddInitQkvConfig(GPTBaseConfig):
     add_init_qkv: bool = True
 
+@dataclass
+class GPTBaseVFromX0Config(GPTBaseConfig):
+    v_from_x0: bool = True
+
+@dataclass
+class GPTBaseVExcludeSelfConfig(GPTBaseConfig):
+    v_exclude_self: bool = True
+
 # Learnable-coefficient variants: (alpha, beta) per late layer init to (1.0, 0.0).
 # At step 0 the model is identical to vanilla; the optimizer learns how much x0 /
 # layer-0 v contribution each late layer wants.
@@ -107,6 +115,8 @@ MODELS = {
     "gpt_base_add_init_res_v":        (GPTBaseAddInitResVConfig,        GPTBase),
     "gpt_base_add_init_res_v_detach": (GPTBaseAddInitResVDetachConfig,  GPTBase),
     "gpt_base_add_init_qkv":          (GPTBaseAddInitQkvConfig,         GPTBase),
+    "gpt_base_v_from_x0":             (GPTBaseVFromX0Config,            GPTBase),
+    "gpt_base_v_exclude_self":        (GPTBaseVExcludeSelfConfig,       GPTBase),
     # learnable-coefficient variants
     "gpt_base_add_init_res_learn":    (GPTBaseAddInitResLearnConfig,    GPTBase),
     "gpt_base_add_init_v_learn":      (GPTBaseAddInitVLearnConfig,      GPTBase),

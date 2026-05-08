@@ -75,6 +75,24 @@ class GPTBaseConfig:
     # the residual stream that the MLP reads. Mutually exclusive with add_init_v and
     # add_init_res_v.
     add_init_qkv: bool = False
+    # If True, at the last 1/3 of layers, compute v directly from x0 instead of x:
+    # v = c_v(norm(x0)). Replaces (rather than blends with) the standard v = c_v(x)
+    # path, isolating "what if v has no current-stream content at all?" from the
+    # blended add_init_res_v variant. No learned coeffs (fixed replacement).
+    # Mutually exclusive with add_init_v / add_init_res_v / add_init_qkv (all four
+    # write to v).
+    v_from_x0: bool = False
+    # If True, at the last 1/3 of layers, apply Exclusive Self-Attention (XSA;
+    # Zhai 2026, https://arxiv.org/abs/2603.09078): subtract the self-value from
+    # the attention output before c_proj. The paper's exact form is the vector
+    # rejection y - (y·v̂)v̂; this variant uses the cruder simplification
+    #   y_i ← y_i - v_i
+    # (i.e. assume a_ii ≈ 1, drop the projection scalar). v_i still flows through
+    # the residual stream, so the token's own value content is not lost — only
+    # removed from the attention path, encouraging attention to provide purely
+    # contextual (non-self) information. No learned coeffs. Independent of the
+    # x0 / v_writer flags above; modifies y, not v.
+    v_exclude_self: bool = False
     # If True, replace the hardcoded 0.5/0.5 blends in add_init_res / add_init_v /
     # add_init_res_v / add_init_qkv with per-late-layer learnable scalars (alpha, beta),
     # init to (1.0, 0.0). At step 0 the model is identical to a no-skip vanilla baseline;
@@ -145,7 +163,7 @@ class CausalSelfAttention(nn.Module):
 
         # Compute normalized x0 once if any late-layer x0->qkv path needs it.
         # x0 is already detached at GPTBase.forward entry if cfg.detach_init_value.
-        need_x0n = self.is_late and (cfg.add_init_qkv or cfg.add_init_res_v)
+        need_x0n = self.is_late and (cfg.add_init_qkv or cfg.add_init_res_v or cfg.v_from_x0)
         x0n = norm(x0) if need_x0n else None
 
         # add_init_qkv: blend each of q, k, v with this layer's projection of norm(x0).
@@ -183,6 +201,10 @@ class CausalSelfAttention(nn.Module):
             else:
                 v = 0.5 * v + 0.5 * cvx
 
+        # v_from_x0: replace v entirely with this layer's c_v(norm(x0)) (no blend).
+        elif self.is_late and cfg.v_from_x0:
+            v = self.c_v(x0n).view(B, T, self.n_kv_head, self.head_dim)
+
         # Apply Rotary Embeddings to queries and keys to get relative positional encoding
         cos, sin = cos_sin
         q, k = apply_rotary_emb(q, cos, sin), apply_rotary_emb(k, cos, sin)
@@ -208,6 +230,13 @@ class CausalSelfAttention(nn.Module):
             # Advance position after last layer processes
             if self.layer_idx == kv_cache.n_layers - 1:
                 kv_cache.advance(T)
+
+        # XSA (cfg.v_exclude_self): subtract the self-value from the attention
+        # output before c_proj. With GQA, broadcast v across query-head groups.
+        if self.is_late and cfg.v_exclude_self:
+            group = self.n_head // self.n_kv_head
+            v_q = v if group == 1 else v.repeat_interleave(group, dim=2)
+            y = y - v_q
 
         # Re-assemble the heads and project back to residual stream
         y = y.contiguous().view(B, T, -1)
@@ -286,12 +315,12 @@ class GPTBase(nn.Module):
         self.config = config
         x0_users = [config.add_init_res,
                     config.add_init_pre_norm_attn_only, config.add_init_pre_norm_mlp_only,
-                    config.add_init_qkv, config.add_init_res_v]
+                    config.add_init_qkv, config.add_init_res_v, config.v_from_x0]
         assert not (config.detach_init_value and not any(x0_users)), \
             "detach_init_value requires at least one x0-using flag enabled"
-        v_writers = [config.add_init_qkv, config.add_init_v, config.add_init_res_v]
+        v_writers = [config.add_init_qkv, config.add_init_v, config.add_init_res_v, config.v_from_x0]
         assert sum(v_writers) <= 1, \
-            "add_init_qkv, add_init_v, add_init_res_v all write to v — at most one"
+            "add_init_qkv, add_init_v, add_init_res_v, v_from_x0 all write to v — at most one"
         pre_norm_writers = [config.add_init_res,
                             config.add_init_pre_norm_attn_only,
                             config.add_init_pre_norm_mlp_only]
