@@ -74,7 +74,23 @@ def compute_advantages(
         return ((grouped - group_mean) / (group_std + 1e-8)).view(-1)
     if algorithm == "reinforce":
         return rewards - rewards.mean()
+    if algorithm == "maxrl":
+        return compute_maxrl_advantages(rewards)
     raise ValueError(f"unknown RL algorithm: {algorithm!r}")
+
+
+def compute_maxrl_advantages(binary_reward: torch.Tensor) -> torch.Tensor:
+    """MaxRL group-relative advantage from binary (0/1) rewards.
+
+    Zero-out advantages when the group mean is 0 (all wrong) to avoid
+    a degenerate gradient signal — there is nothing to reinforce.
+    """
+    reward_mean = binary_reward.mean(dim=0, keepdim=True)
+    return torch.where(
+        reward_mean > 0,
+        (binary_reward - reward_mean) / reward_mean,
+        torch.zeros_like(binary_reward),
+    )
 
 
 def _masked_token_mean(values: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
@@ -235,10 +251,33 @@ def cispo_loss(
     return _masked_token_mean(per_token, mask)
 
 
+def maxrl_loss(
+    logprobs,
+    old_logprobs,
+    advantages,
+    response_mask,
+    inference_logprobs=None,
+    C: float = 0.0,
+    **kwargs,
+):
+    """MaxRL loss (Tajwar et al., 2026). REINFORCE with binary-reward advantages.
+
+    Advantages must come from ``compute_maxrl_advantages`` (or ``compute_advantages``
+    with algorithm="maxrl"), which expects rewards to be binary (1.0 = correct and
+    well-formatted, 0.0 otherwise).
+    """
+    lp = logprobs.float()
+    adv = advantages.float().unsqueeze(-1)   # [B, 1]
+    mask = response_mask.float()
+    per_token = -(lp * adv)                  # [B, T]
+    return _masked_sequence_mean(per_token, mask)
+
+
 ALGORITHMS = {
     "grpo": grpo_loss,
     "dapo": dapo_loss,
     "reinforce": reinforce_loss,
     "gspo": gspo_loss,
     "cispo": cispo_loss,
+    "maxrl": maxrl_loss,
 }

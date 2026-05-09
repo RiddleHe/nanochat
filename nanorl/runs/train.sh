@@ -13,11 +13,15 @@ ROLLOUT_GPUS="${ROLLOUT_GPUS:-2}"
 TRAIN_GPUS="${TRAIN_GPUS:-3}"
 ROLLOUT_GPU_MEM_UTIL="${ROLLOUT_GPU_MEM_UTIL:-0.9}"
 WEIGHT_TRANSFER_BACKEND="${WEIGHT_TRANSFER_BACKEND:-nccl}"
-NUM_STEPS="${NUM_STEPS:-200}"
-SAVE_EVERY="${SAVE_EVERY:-20}"
+NUM_STEPS="${NUM_STEPS:-2}"
+SAVE_EVERY="${SAVE_EVERY:-2}"
 TRAIN_BATCH_SIZE="${TRAIN_BATCH_SIZE:-2}"
 LR="${LR:-1e-6}"
 PROMPTS_PER_STEP="${PROMPTS_PER_STEP:-16}"
+EVAL_EVERY="${EVAL_EVERY:-2}"
+EVAL_K="${EVAL_K:-4}"
+EVAL_MAX_TOKENS="${EVAL_MAX_TOKENS:-8192}"
+USE_WANDB="${USE_WANDB:-true}"
 
 RUN_DIR="$BASE_DIR/rl/$TAG"
 SAVE_DIR="$RUN_DIR/checkpoints"
@@ -108,10 +112,13 @@ CUDA_VISIBLE_DEVICES="$TRAIN_GPUS" \
     --max-new-tokens 8192 \
     --max-seq-len 12288 \
     --reward-workers 8 \
-    --eval-every 20 \
+    --eval-every "$EVAL_EVERY" \
+    --eval-k "$EVAL_K" \
+    --eval-max-tokens "$EVAL_MAX_TOKENS" \
     --save-every "$SAVE_EVERY" \
     --lr "$LR" \
     --kl-coeff 0.0 \
     --temperature 1.0 \
     --top-k -1 \
+    $( [[ "$USE_WANDB" == "true" ]] && echo "--wandb" ) \
     2>&1 | tee "$TRAIN_LOG"

@@ -36,6 +36,7 @@ from nanorl.rollout import (
     wait_for_rollout_worker,
 )
 from nanorl.data import build_rl_dataset, distributed_rl_loader, RewardWorkerPool, apply_overlong_shaping
+from nanorl.scripts.eval_aime import run_eval
 
 if __name__ == "__main__":
 
@@ -65,11 +66,14 @@ if __name__ == "__main__":
     parser.add_argument("--max-seq-len", type=int, default=2048)
     # Evaluation
     parser.add_argument("--eval-every", type=int, default=20)
+    parser.add_argument("--eval-k", type=int, default=4, help="k for pass@k on AIME eval")
+    parser.add_argument("--eval-max-tokens", type=int, default=8192, help="Max tokens for eval generation")
     # Task / Reward
     parser.add_argument("--reward-workers", type=int, default=0, help="Reward worker pool size")
     # Runtime
     parser.add_argument("--device-type", type=str, default="")
     parser.add_argument("--run-name", type=str, default="dummy", help="wandb run name")
+    parser.add_argument("--wandb", action="store_true", help="Enable wandb logging")
     parser.add_argument("--save-dir", type=str, default="rl_checkpoints")
     parser.add_argument("--save-every", type=int, default=0, help="Save a checkpoint every N steps (0 disables)")
     parser.add_argument("--seed", type=int, default=0)
@@ -151,6 +155,12 @@ if __name__ == "__main__":
         loader = None
         rewarder = None
     loss_fn = ALGORITHMS[args.algorithm]
+
+    # -----------------------------------------------------------------------------
+    # Wandb
+    if master_process and args.wandb:
+        import wandb as _wandb
+        _wandb.init(project="nanochat-rl", name=args.run_name, config=vars(args))
 
     # -----------------------------------------------------------------------------
     # Optimizer
@@ -321,6 +331,8 @@ if __name__ == "__main__":
         # each with grad accumulation across micro-batches.
         phase_t0 = time.time()
         total_loss = 0.0
+        entropy_sum = 0.0
+        entropy_tokens = 0
         for _epoch in range(args.ppo_epochs):
             optimizer.zero_grad()
             for mb in range(n_microbatches):
@@ -347,8 +359,14 @@ if __name__ == "__main__":
                 loss.backward()
                 total_loss += loss.item()
 
+                if _epoch == args.ppo_epochs - 1:
+                    with torch.no_grad():
+                        entropy_sum += (-logprobs * shift_mask).sum().item()
+                        entropy_tokens += shift_mask.sum().item()
+
             torch.nn.utils.clip_grad_norm_(raw_model.parameters(), 1.0)
             optimizer.step()
+        avg_entropy = entropy_sum / entropy_tokens if entropy_tokens > 0 else 0.0
         phase["update_s"] = time.time() - phase_t0
 
         # 7. Push W_{t+1} into the rollout worker in-place via NCCL so next-step
@@ -368,7 +386,7 @@ if __name__ == "__main__":
         dt = time.time() - t0
         print0(
             f"step {step:04d}/{args.num_steps:04d} | loss: {total_loss:.4f} | reward: {mean_reward:.4f} "
-            f"| local_bsz: {local_bsz} | dt: {dt:.1f}s "
+            f"| entropy: {avg_entropy:.4f} | local_bsz: {local_bsz} | dt: {dt:.1f}s "
             f"| phases(fetch={phase.get('fetch_prompts_s', 0.0):.1f}s "
             f"rollout={phase.get('rollout_s', 0.0):.1f}s "
             f"reward={phase.get('reward_s', 0.0):.1f}s "
@@ -378,11 +396,20 @@ if __name__ == "__main__":
             f"update={phase['update_s']:.1f}s "
             f"sync={phase['sync_rollout_s']:.1f}s)"
         )
+        if master_process and args.wandb:
+            import wandb as _wandb
+            _wandb.log({"train/loss": total_loss, "train/reward": mean_reward, "train/entropy": avg_entropy}, step=step)
 
         # 8. Evaluation
-        if args.eval_every > 0 and (step + 1) % args.eval_every == 0:
+        if args.eval_every > 0 and (step + 1) % args.eval_every == 0 and master_process:
             print0("Evaluating...")
-            # TODO: pass@k evaluation hook
+            run_eval(
+                rollout_worker_url=args.rollout_worker_url,
+                tokenizer=tokenizer,
+                eval_k=args.eval_k,
+                eval_max_tokens=args.eval_max_tokens,
+                step=step,
+            )
 
         # 9. Periodic checkpoint
         if args.save_every > 0 and (step + 1) % args.save_every == 0 and master_process:
