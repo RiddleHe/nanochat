@@ -93,15 +93,15 @@ class GPTBaseConfig:
     # to-1 constraint on the attention-output magnitude.
     v_from_x0: bool = False
     # If True, at the last 1/3 of layers, apply Exclusive Self-Attention (XSA;
-    # Zhai 2026, https://arxiv.org/abs/2603.09078): subtract the self-value from
-    # the attention output before c_proj. The paper's exact form is the vector
-    # rejection y - (y·v̂)v̂; this variant uses the cruder simplification
-    #   y_i ← y_i - v_i
-    # (i.e. assume a_ii ≈ 1, drop the projection scalar). v_i still flows through
-    # the residual stream, so the token's own value content is not lost — only
-    # removed from the attention path, encouraging attention to provide purely
-    # contextual (non-self) information. No learned coeffs. Independent of the
-    # x0 / v_writer flags above; modifies y, not v.
+    # Zhai 2026, https://arxiv.org/abs/2603.09078): remove the component of the
+    # attention output that lies along v via vector rejection, before c_proj:
+    #   v̂_i = v_i / ||v_i||
+    #   y_i ← y_i - (y_i · v̂_i) v̂_i
+    # The result is guaranteed orthogonal to v_i. v_i still flows through the
+    # residual stream, so the token's own value content is not lost — only the
+    # parallel-to-v component of the attention path is removed, encouraging
+    # attention to provide purely contextual (non-self) information. No learned
+    # coeffs. Independent of the x0 / v_writer flags; modifies y, not v.
     v_exclude_self: bool = False
     # If True, at the last 1/3 of layers, scale the standard v = c_v(x) projection
     # by the per-late-layer learnable gamma_v (init 1.0). Apples-to-apples control
@@ -278,12 +278,14 @@ class CausalSelfAttention(nn.Module):
             if self.layer_idx == kv_cache.n_layers - 1:
                 kv_cache.advance(T)
 
-        # XSA (cfg.v_exclude_self): subtract the self-value from the attention
-        # output before c_proj. With GQA, broadcast v across query-head groups.
+        # XSA (cfg.v_exclude_self): vector-reject y onto v, i.e. remove the
+        # component of y along v before c_proj. With GQA, broadcast v across
+        # query-head groups so each query head rejects onto its own KV-group's v.
         if self.is_late and cfg.v_exclude_self:
             group = self.n_head // self.n_kv_head
             v_q = v if group == 1 else v.repeat_interleave(group, dim=2)
-            y = y - v_q
+            v_hat = F.normalize(v_q, dim=-1)
+            y = y - (y * v_hat).sum(dim=-1, keepdim=True) * v_hat
 
         # Re-assemble the heads and project back to residual stream
         y = y.contiguous().view(B, T, -1)

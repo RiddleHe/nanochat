@@ -61,6 +61,11 @@ class GPTBaseVFromX0Config(GPTBaseConfig):
 class GPTBaseVExcludeSelfConfig(GPTBaseConfig):
     v_exclude_self: bool = True
 
+@dataclass
+class GPTBaseVFromX0ExcludeSelfConfig(GPTBaseConfig):
+    v_from_x0: bool = True
+    v_exclude_self: bool = True
+
 # Learnable-coefficient variants: (alpha, beta) per late layer init to (1.0, 0.0).
 # At step 0 the model is identical to vanilla; the optimizer learns how much x0 /
 # layer-0 v contribution each late layer wants.
@@ -134,6 +139,7 @@ MODELS = {
     "gpt_base_v_from_x0_learn":       (GPTBaseVFromX0LearnConfig,       GPTBase),
     "gpt_base_v_scale_learn":         (GPTBaseVScaleLearnConfig,        GPTBase),
     "gpt_base_v_exclude_self":        (GPTBaseVExcludeSelfConfig,       GPTBase),
+    "gpt_base_v_from_x0_exclude_self": (GPTBaseVFromX0ExcludeSelfConfig, GPTBase),
     # learnable-coefficient variants
     "gpt_base_add_init_res_learn":    (GPTBaseAddInitResLearnConfig,    GPTBase),
     "gpt_base_add_init_v_learn":      (GPTBaseAddInitVLearnConfig,      GPTBase),
