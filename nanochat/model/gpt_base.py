@@ -75,6 +75,12 @@ class GPTBaseConfig:
     # the residual stream that the MLP reads. Mutually exclusive with add_init_v and
     # add_init_res_v.
     add_init_qkv: bool = False
+    # Same forward shape as add_init_qkv, but with a SINGLE (alpha, beta) pair shared
+    # across q/k/v at each late layer instead of three independent pairs. Used to
+    # disentangle "norm-then-add" (vs add_init_pre_norm_attn_only's add-then-norm) from
+    # "independent per-projection coeffs" as explanations for why add_init_qkv beats
+    # add_init_pre_norm_attn_only. Requires learn_init_coeffs (no fixed-coeff form).
+    add_init_qkv_shared: bool = False
     # If True, at the last 1/3 of layers, compute v directly from x0 instead of x:
     # v = c_v(norm(x0)). Replaces (rather than blends with) the standard v = c_v(x)
     # path, isolating "what if v has no current-stream content at all?" from the
@@ -149,6 +155,11 @@ class CausalSelfAttention(nn.Module):
             self.beta_q = nn.Parameter(torch.empty(1))
             self.alpha_k = nn.Parameter(torch.empty(1))
             self.beta_k = nn.Parameter(torch.empty(1))
+        # Single shared (alpha, beta) pair for add_init_qkv_shared (one pair per
+        # late layer, used for q, k, v all together).
+        if self.is_late and config.add_init_qkv_shared:
+            self.alpha_qkv = nn.Parameter(torch.empty(1))
+            self.beta_qkv = nn.Parameter(torch.empty(1))
 
     def forward(self, x, x0, ve, cos_sin, kv_cache):
         B, T, C = x.size()
@@ -163,7 +174,7 @@ class CausalSelfAttention(nn.Module):
 
         # Compute normalized x0 once if any late-layer x0->qkv path needs it.
         # x0 is already detached at GPTBase.forward entry if cfg.detach_init_value.
-        need_x0n = self.is_late and (cfg.add_init_qkv or cfg.add_init_res_v or cfg.v_from_x0)
+        need_x0n = self.is_late and (cfg.add_init_qkv or cfg.add_init_res_v or cfg.v_from_x0 or cfg.add_init_qkv_shared)
         x0n = norm(x0) if need_x0n else None
 
         # add_init_qkv: blend each of q, k, v with this layer's projection of norm(x0).
@@ -183,6 +194,18 @@ class CausalSelfAttention(nn.Module):
                 q = 0.5 * q + 0.5 * cqx
                 k = 0.5 * k + 0.5 * ckx
                 v = 0.5 * v + 0.5 * cvx
+
+        # add_init_qkv_shared: same as add_init_qkv but with one (alpha, beta) pair
+        # shared across q, k, v. Tests whether per-projection coefficient independence
+        # is the load-bearing piece behind add_init_qkv > add_init_pre_norm_attn_only.
+        elif self.is_late and cfg.add_init_qkv_shared:
+            cqx = self.c_q(x0n).view(B, T, self.n_head, self.head_dim)
+            ckx = self.c_k(x0n).view(B, T, self.n_kv_head, self.head_dim)
+            cvx = self.c_v(x0n).view(B, T, self.n_kv_head, self.head_dim)
+            a, b = self.alpha_qkv.to(q.dtype), self.beta_qkv.to(q.dtype)
+            q = a * q + b * cqx
+            k = a * k + b * ckx
+            v = a * v + b * cvx
 
         # add_init_v: blend layer-0's captured v into v (shared mode).
         elif self.is_late and cfg.add_init_v:
@@ -315,12 +338,14 @@ class GPTBase(nn.Module):
         self.config = config
         x0_users = [config.add_init_res,
                     config.add_init_pre_norm_attn_only, config.add_init_pre_norm_mlp_only,
-                    config.add_init_qkv, config.add_init_res_v, config.v_from_x0]
+                    config.add_init_qkv, config.add_init_qkv_shared,
+                    config.add_init_res_v, config.v_from_x0]
         assert not (config.detach_init_value and not any(x0_users)), \
             "detach_init_value requires at least one x0-using flag enabled"
-        v_writers = [config.add_init_qkv, config.add_init_v, config.add_init_res_v, config.v_from_x0]
+        v_writers = [config.add_init_qkv, config.add_init_qkv_shared,
+                     config.add_init_v, config.add_init_res_v, config.v_from_x0]
         assert sum(v_writers) <= 1, \
-            "add_init_qkv, add_init_v, add_init_res_v, v_from_x0 all write to v — at most one"
+            "add_init_qkv, add_init_qkv_shared, add_init_v, add_init_res_v, v_from_x0 all write to v — at most one"
         pre_norm_writers = [config.add_init_res,
                             config.add_init_pre_norm_attn_only,
                             config.add_init_pre_norm_mlp_only]
@@ -328,13 +353,16 @@ class GPTBase(nn.Module):
             "add_init_res / add_init_pre_norm_{attn,mlp}_only all target pre-norm input — at most one"
         coeff_users = [config.add_init_res,
                        config.add_init_pre_norm_attn_only, config.add_init_pre_norm_mlp_only,
-                       config.add_init_v, config.add_init_res_v, config.add_init_qkv]
+                       config.add_init_v, config.add_init_res_v, config.add_init_qkv,
+                       config.add_init_qkv_shared]
         assert not (config.learn_init_coeffs and not any(coeff_users)), \
-            "learn_init_coeffs requires at least one of add_init_res/pre_norm_{attn,mlp}_only/v/res_v/qkv"
+            "learn_init_coeffs requires at least one of add_init_res/pre_norm_{attn,mlp}_only/v/res_v/qkv{,_shared}"
         pre_norm_any = (config.add_init_pre_norm_attn_only
                         or config.add_init_pre_norm_mlp_only)
         assert not (pre_norm_any and not config.learn_init_coeffs), \
             "add_init_pre_norm_{attn,mlp}_only requires learn_init_coeffs (no fixed-coeff form)"
+        assert not (config.add_init_qkv_shared and not config.learn_init_coeffs), \
+            "add_init_qkv_shared requires learn_init_coeffs (no fixed-coeff form)"
         # Compute per-layer window sizes for sliding window attention
         # window_size is (left, right) tuple: (-1, 0) for full context, (N, 0) for sliding window
         self.window_sizes = self._compute_window_sizes(config)
@@ -408,6 +436,8 @@ class GPTBase(nn.Module):
             if hasattr(attn, 'alpha_q'):
                 attn.alpha_q.fill_(1.0); attn.beta_q.fill_(0.0)
                 attn.alpha_k.fill_(1.0); attn.beta_k.fill_(0.0)
+            if hasattr(attn, 'alpha_qkv'):
+                attn.alpha_qkv.fill_(1.0); attn.beta_qkv.fill_(0.0)
 
         # Rotary embeddings
         head_dim = self.config.n_embd // self.config.n_head
@@ -488,7 +518,8 @@ class GPTBase(nn.Module):
             for m in [b for b in self.transformer.h] + [b.attn for b in self.transformer.h]
             for n in ('alpha_res', 'beta_res',
                       'alpha_attn_in', 'beta_attn_in', 'alpha_mlp_in', 'beta_mlp_in',
-                      'alpha_q', 'beta_q', 'alpha_k', 'beta_k', 'alpha_v', 'beta_v')
+                      'alpha_q', 'beta_q', 'alpha_k', 'beta_k', 'alpha_v', 'beta_v',
+                      'alpha_qkv', 'beta_qkv')
             if hasattr(m, n)
         )
         nparams_exclude = (self.transformer.wte.weight.numel() +
@@ -544,9 +575,9 @@ class GPTBase(nn.Module):
                 if hasattr(block, n): alpha_params.append(getattr(block, n))
             for n in ('beta_res', 'beta_attn_in', 'beta_mlp_in'):
                 if hasattr(block, n): beta_params.append(getattr(block, n))
-            for n in ('alpha_q', 'alpha_k', 'alpha_v'):
+            for n in ('alpha_q', 'alpha_k', 'alpha_v', 'alpha_qkv'):
                 if hasattr(block.attn, n): alpha_params.append(getattr(block.attn, n))
-            for n in ('beta_q', 'beta_k', 'beta_v'):
+            for n in ('beta_q', 'beta_k', 'beta_v', 'beta_qkv'):
                 if hasattr(block.attn, n): beta_params.append(getattr(block.attn, n))
         coeff_params = alpha_params + beta_params
 
