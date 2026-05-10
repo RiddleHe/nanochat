@@ -12,7 +12,7 @@ eval_bundle/
 CLAUDE.md
 papers/
 wandb/
-# knowledge/
+knowledge/
 results/
 eval_logs/
 .nanochat/

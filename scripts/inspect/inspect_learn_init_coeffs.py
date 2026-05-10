@@ -29,29 +29,37 @@ from pathlib import Path
 import torch
 
 
-COEFF_NAMES = ("alpha_res", "beta_res",
-               "alpha_q",   "beta_q",
-               "alpha_k",   "beta_k",
-               "alpha_v",   "beta_v")
+COEFF_NAMES = ("alpha_res",     "beta_res",
+               "alpha_q",       "beta_q",
+               "alpha_k",       "beta_k",
+               "alpha_v",       "beta_v",
+               "alpha_attn_in", "beta_attn_in",
+               "alpha_mlp_in",  "beta_mlp_in")
 
 # Color scheme for the plot (consistent across subplots).
 PLOT_COLORS = {
-    "alpha_res": "tab:blue",
-    "alpha_v":   "tab:blue",
-    "beta_res":  "tab:orange",
-    "beta_v":    "tab:orange",
-    "alpha_q":   "tab:green",
-    "beta_q":    "tab:red",
-    "alpha_k":   "tab:purple",
-    "beta_k":    "tab:brown",
+    "alpha_res":     "tab:blue",
+    "alpha_v":       "tab:blue",
+    "beta_res":      "tab:orange",
+    "beta_v":        "tab:orange",
+    "alpha_q":       "tab:green",
+    "beta_q":        "tab:red",
+    "alpha_k":       "tab:purple",
+    "beta_k":        "tab:brown",
+    "alpha_attn_in": "tab:blue",
+    "beta_attn_in":  "tab:orange",
+    "alpha_mlp_in":  "tab:blue",
+    "beta_mlp_in":   "tab:orange",
 }
 
 # Display names for the plot legend: alpha = "current" (main path), beta = "init" (x0 skip).
 PLOT_DISPLAY_NAMES = {
-    "alpha_res": "current_res", "beta_res": "init_res",
-    "alpha_q":   "current_q",   "beta_q":   "init_q",
-    "alpha_k":   "current_k",   "beta_k":   "init_k",
-    "alpha_v":   "current_v",   "beta_v":   "init_v",
+    "alpha_res":     "current_res",     "beta_res":     "init_res",
+    "alpha_q":       "current_q",       "beta_q":       "init_q",
+    "alpha_k":       "current_k",       "beta_k":       "init_k",
+    "alpha_v":       "current_v",       "beta_v":       "init_v",
+    "alpha_attn_in": "current_attn_in", "beta_attn_in": "init_attn_in",
+    "alpha_mlp_in":  "current_mlp_in",  "beta_mlp_in":  "init_mlp_in",
 }
 
 KEY_RE = re.compile(r"^(?:_orig_mod\.)?(?:module\.)?transformer\.h\.(\d+)\.(?:attn\.)?(\w+)$")
@@ -111,8 +119,13 @@ def render_plot(variant_to_coeffs: dict[str, dict], output: Path) -> None:
     if not items:
         print("nothing to plot")
         return
-    fig, axes = plt.subplots(2, 2, figsize=(12, 9), sharex=True)
+    n = len(items)
+    ncols = min(2, n)
+    nrows = (n + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=(6 * ncols, 4.5 * nrows), sharex=True, squeeze=False)
     axes = axes.flatten()
+    for extra_ax in axes[n:]:
+        extra_ax.set_visible(False)
     for ax, (variant, coeffs) in zip(axes, items):
         title = variant.replace("arch_d12_gpt_base_", "")
         if not coeffs:
