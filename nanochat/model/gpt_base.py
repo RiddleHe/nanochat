@@ -84,9 +84,13 @@ class GPTBaseConfig:
     # If True, at the last 1/3 of layers, compute v directly from x0 instead of x:
     # v = c_v(norm(x0)). Replaces (rather than blends with) the standard v = c_v(x)
     # path, isolating "what if v has no current-stream content at all?" from the
-    # blended add_init_res_v variant. No learned coeffs (fixed replacement).
-    # Mutually exclusive with add_init_v / add_init_res_v / add_init_qkv (all four
-    # write to v).
+    # blended add_init_res_v variant. Mutually exclusive with add_init_v /
+    # add_init_res_v / add_init_qkv (all four write to v).
+    # When learn_init_coeffs=True, an additional per-late-layer learnable scalar
+    # gamma_v (init 1.0) scales the result: v = gamma_v * c_v(norm(x0)). At step
+    # 0 this matches the no-learn variant; the optimizer can push gamma_v above
+    # 1.0 to amplify the x0 contribution, effectively breaking the softmax sum-
+    # to-1 constraint on the attention-output magnitude.
     v_from_x0: bool = False
     # If True, at the last 1/3 of layers, apply Exclusive Self-Attention (XSA;
     # Zhai 2026, https://arxiv.org/abs/2603.09078): subtract the self-value from
@@ -99,6 +103,14 @@ class GPTBaseConfig:
     # contextual (non-self) information. No learned coeffs. Independent of the
     # x0 / v_writer flags above; modifies y, not v.
     v_exclude_self: bool = False
+    # If True, at the last 1/3 of layers, scale the standard v = c_v(x) projection
+    # by the per-late-layer learnable gamma_v (init 1.0). Apples-to-apples control
+    # for v_from_x0 + learn_init_coeffs: same scaling structure, but the projection
+    # input is x (current stream) rather than norm(x0) (initial embedding), so any
+    # bpb gain is attributable to "having an unbounded coefficient on v" rather
+    # than "x0 is the right input to project". Requires learn_init_coeffs (no
+    # fixed-coeff form), mutually exclusive with the other v-writers.
+    v_scale_learn: bool = False
     # If True, replace the hardcoded 0.5/0.5 blends in add_init_res / add_init_v /
     # add_init_res_v / add_init_qkv with per-late-layer learnable scalars (alpha, beta),
     # init to (1.0, 0.0). At step 0 the model is identical to a no-skip vanilla baseline;
@@ -160,6 +172,11 @@ class CausalSelfAttention(nn.Module):
         if self.is_late and config.add_init_qkv_shared:
             self.alpha_qkv = nn.Parameter(torch.empty(1))
             self.beta_qkv = nn.Parameter(torch.empty(1))
+        # gamma_v: per-late-layer scalar (init 1.0) that multiplies the v projection.
+        # Shared by v_from_x0 (scales c_v(norm(x0))) and v_scale_learn (scales c_v(x))
+        # — flags are mutually exclusive, so only one path activates the same param.
+        if self.is_late and config.learn_init_coeffs and (config.v_from_x0 or config.v_scale_learn):
+            self.gamma_v = nn.Parameter(torch.empty(1))
 
     def forward(self, x, x0, ve, cos_sin, kv_cache):
         B, T, C = x.size()
@@ -224,9 +241,16 @@ class CausalSelfAttention(nn.Module):
             else:
                 v = 0.5 * v + 0.5 * cvx
 
-        # v_from_x0: replace v entirely with this layer's c_v(norm(x0)) (no blend).
+        # v_from_x0: replace v entirely with this layer's c_v(norm(x0)). When
+        # learn_init_coeffs is set, gamma_v scales the result (init 1.0).
         elif self.is_late and cfg.v_from_x0:
             v = self.c_v(x0n).view(B, T, self.n_kv_head, self.head_dim)
+            if cfg.learn_init_coeffs:
+                v = self.gamma_v.to(v.dtype) * v
+
+        # v_scale_learn: control variant — scale the standard c_v(x) by gamma_v.
+        elif self.is_late and cfg.v_scale_learn:
+            v = self.gamma_v.to(v.dtype) * v
 
         # Apply Rotary Embeddings to queries and keys to get relative positional encoding
         cos, sin = cos_sin
@@ -343,9 +367,10 @@ class GPTBase(nn.Module):
         assert not (config.detach_init_value and not any(x0_users)), \
             "detach_init_value requires at least one x0-using flag enabled"
         v_writers = [config.add_init_qkv, config.add_init_qkv_shared,
-                     config.add_init_v, config.add_init_res_v, config.v_from_x0]
+                     config.add_init_v, config.add_init_res_v,
+                     config.v_from_x0, config.v_scale_learn]
         assert sum(v_writers) <= 1, \
-            "add_init_qkv, add_init_qkv_shared, add_init_v, add_init_res_v, v_from_x0 all write to v — at most one"
+            "add_init_qkv, add_init_qkv_shared, add_init_v, add_init_res_v, v_from_x0, v_scale_learn all write to v — at most one"
         pre_norm_writers = [config.add_init_res,
                             config.add_init_pre_norm_attn_only,
                             config.add_init_pre_norm_mlp_only]
@@ -354,15 +379,18 @@ class GPTBase(nn.Module):
         coeff_users = [config.add_init_res,
                        config.add_init_pre_norm_attn_only, config.add_init_pre_norm_mlp_only,
                        config.add_init_v, config.add_init_res_v, config.add_init_qkv,
-                       config.add_init_qkv_shared]
+                       config.add_init_qkv_shared,
+                       config.v_from_x0, config.v_scale_learn]
         assert not (config.learn_init_coeffs and not any(coeff_users)), \
-            "learn_init_coeffs requires at least one of add_init_res/pre_norm_{attn,mlp}_only/v/res_v/qkv{,_shared}"
+            "learn_init_coeffs requires at least one of add_init_res/pre_norm_{attn,mlp}_only/v/res_v/qkv{,_shared}/v_from_x0/v_scale_learn"
         pre_norm_any = (config.add_init_pre_norm_attn_only
                         or config.add_init_pre_norm_mlp_only)
         assert not (pre_norm_any and not config.learn_init_coeffs), \
             "add_init_pre_norm_{attn,mlp}_only requires learn_init_coeffs (no fixed-coeff form)"
         assert not (config.add_init_qkv_shared and not config.learn_init_coeffs), \
             "add_init_qkv_shared requires learn_init_coeffs (no fixed-coeff form)"
+        assert not (config.v_scale_learn and not config.learn_init_coeffs), \
+            "v_scale_learn requires learn_init_coeffs (no fixed-coeff form — at gamma_v=1 this is gpt_base)"
         # Compute per-layer window sizes for sliding window attention
         # window_size is (left, right) tuple: (-1, 0) for full context, (N, 0) for sliding window
         self.window_sizes = self._compute_window_sizes(config)
@@ -438,6 +466,10 @@ class GPTBase(nn.Module):
                 attn.alpha_k.fill_(1.0); attn.beta_k.fill_(0.0)
             if hasattr(attn, 'alpha_qkv'):
                 attn.alpha_qkv.fill_(1.0); attn.beta_qkv.fill_(0.0)
+            # gamma_v (v_from_x0 / v_scale_learn + learn_init_coeffs): init 1.0 —
+            # at step 0 the model matches the corresponding no-learn variant.
+            if hasattr(attn, 'gamma_v'):
+                attn.gamma_v.fill_(1.0)
 
         # Rotary embeddings
         head_dim = self.config.n_embd // self.config.n_head
@@ -519,7 +551,7 @@ class GPTBase(nn.Module):
             for n in ('alpha_res', 'beta_res',
                       'alpha_attn_in', 'beta_attn_in', 'alpha_mlp_in', 'beta_mlp_in',
                       'alpha_q', 'beta_q', 'alpha_k', 'beta_k', 'alpha_v', 'beta_v',
-                      'alpha_qkv', 'beta_qkv')
+                      'alpha_qkv', 'beta_qkv', 'gamma_v')
             if hasattr(m, n)
         )
         nparams_exclude = (self.transformer.wte.weight.numel() +
@@ -579,6 +611,10 @@ class GPTBase(nn.Module):
                 if hasattr(block.attn, n): alpha_params.append(getattr(block.attn, n))
             for n in ('beta_q', 'beta_k', 'beta_v', 'beta_qkv'):
                 if hasattr(block.attn, n): beta_params.append(getattr(block.attn, n))
+            # gamma_v (v_from_x0 + learn_init_coeffs, init 1.0): grouped with the
+            # betas so it gets the high-LR / no-decay treatment, matching the user
+            # intent that this scalar should be free to grow above 1.0 if helpful.
+            if hasattr(block.attn, 'gamma_v'): beta_params.append(block.attn.gamma_v)
         coeff_params = alpha_params + beta_params
 
         # Separate out all parameters into groups
