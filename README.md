@@ -75,7 +75,7 @@ If you build on this fork:
 
 ```bibtex
 @misc{nanochat-arch,
-  author = {Muyu He},
+  author = {Muyu He, Yuchen Liu},
   title = {nanochat-arch: Architecture experiments on nanochat},
   year = {2026},
   publisher = {GitHub},
