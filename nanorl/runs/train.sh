@@ -18,6 +18,10 @@ SAVE_EVERY="${SAVE_EVERY:-20}"
 TRAIN_BATCH_SIZE="${TRAIN_BATCH_SIZE:-2}"
 LR="${LR:-1e-6}"
 PROMPTS_PER_STEP="${PROMPTS_PER_STEP:-16}"
+EVAL_EVERY="${EVAL_EVERY:-2}"
+EVAL_K="${EVAL_K:-4}"
+EVAL_MAX_TOKENS="${EVAL_MAX_TOKENS:-8192}"
+USE_WANDB="${USE_WANDB:-true}"
 
 RUN_DIR="$BASE_DIR/rl/$TAG"
 SAVE_DIR="$RUN_DIR/checkpoints"
@@ -71,7 +75,7 @@ echo "[launcher] run tag: $TAG"
 echo "[launcher] run dir: $RUN_DIR"
 echo "[launcher] starting rollout worker on GPUs $ROLLOUT_GPUS (tp=$ROLLOUT_TP) -> $WORKER_LOG"
 CUDA_VISIBLE_DEVICES="$ROLLOUT_GPUS" \
-  python "$ROOT_DIR/nanorl/scripts/rollout_worker.py" \
+  uv run python "$ROOT_DIR/nanorl/scripts/rollout_worker.py" \
     --model "$MODEL" \
     --host "$ROLLOUT_HOST" \
     --port "$ROLLOUT_PORT" \
@@ -94,7 +98,7 @@ curl -sf "$HEALTH_URL" | grep -q '"ok": *true' || { echo "rollout worker did not
 
 echo "[launcher] starting trainer on GPUs $TRAIN_GPUS -> $TRAIN_LOG"
 CUDA_VISIBLE_DEVICES="$TRAIN_GPUS" \
-  torchrun --standalone --nproc_per_node="$TRAIN_NPROC" -m nanorl.scripts.train \
+  uv run torchrun --standalone --nproc_per_node="$TRAIN_NPROC" -m nanorl.scripts.train \
     --model "$MODEL" \
     --algorithm dapo \
     --run-name "$TAG" \
@@ -108,10 +112,13 @@ CUDA_VISIBLE_DEVICES="$TRAIN_GPUS" \
     --max-new-tokens 8192 \
     --max-seq-len 12288 \
     --reward-workers 8 \
-    --eval-every 20 \
+    --eval-every "$EVAL_EVERY" \
+    --eval-k "$EVAL_K" \
+    --eval-max-tokens "$EVAL_MAX_TOKENS" \
     --save-every "$SAVE_EVERY" \
     --lr "$LR" \
     --kl-coeff 0.0 \
     --temperature 1.0 \
     --top-k -1 \
+    $( [[ "$USE_WANDB" == "true" ]] && echo "--wandb" ) \
     2>&1 | tee "$TRAIN_LOG"
