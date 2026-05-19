@@ -130,6 +130,17 @@ class GPTBaseConfig:
     # x0-skip gain. Requires learn_init_coeffs (no fixed-coeff form). Independent
     # of v-writers (touches y/c_proj, not v) and of pre-norm writers.
     add_init_proj: bool = False
+    # If True, every layer is a target — overrides on_every_two_layers and the
+    # default last-1/3 selection. Useful for variants that should apply to the
+    # whole trunk (e.g. value-emb tables at every layer, not just late ones).
+    on_every_layer: bool = False
+    # If True, target = second half of layers (`layer_idx >= n_layer // 2`).
+    # Consecutive-half analog of on_every_two_layers (which picks 6 of 12 but
+    # interleaved). For d12 → {6,7,8,9,10,11}, 6 of 12.
+    on_second_half_layers: bool = False
+    # If True, target = last 2/3 of layers (`layer_idx >= n_layer // 3`).
+    # Doubles the default last-1/3 set. For d12 → {4..11}, 8 of 12.
+    on_last_two_thirds_layers: bool = False
     # Switches the layer set that all gpt_base routing flags apply to. The set
     # is exposed on each Block/CausalSelfAttention as `is_target` (see
     # `_is_target_layer`). Default (False): "last 1/3" (for d12 → {8,9,10,11},
@@ -204,11 +215,27 @@ def norm(x):
 
 def _is_target_layer(layer_idx, config):
     """Single source of truth for which layers receive gpt_base routing flags
-    (all add_init_*, v_from_*, value-emb variants, etc.). Default: layer in the
-    last 1/3 of the trunk. With on_every_two_layers=True: gpt.py's has_ve pattern
-    — alternating, last layer always included."""
+    (all add_init_*, v_from_*, value-emb variants, etc.). Precedence:
+    on_every_layer > on_every_two_layers > on_second_half_layers > default
+    (last 1/3). on_every_two_layers uses gpt.py's has_ve pattern (alternating,
+    last layer always included).
+    """
+    # v_from_v1 / add_init_v consume `ve` (the shared layer-0 v capture) at
+    # target layers; layer 0 must compute c_v(x) to populate ve in the first
+    # place. Always exclude layer 0 from the target set under these flags, so
+    # ve is populated before any consumer sees it. No-op for default/every2/
+    # second_half (layer 0 wasn't in those sets); only matters under
+    # on_every_layer.
+    if (config.v_from_v1 or config.add_init_v) and layer_idx == 0:
+        return False
+    if config.on_every_layer:
+        return True
     if config.on_every_two_layers:
         return layer_idx % 2 == (config.n_layer - 1) % 2
+    if config.on_second_half_layers:
+        return layer_idx >= config.n_layer // 2
+    if config.on_last_two_thirds_layers:
+        return layer_idx >= config.n_layer // 3
     return layer_idx >= (2 * config.n_layer) // 3
 
 class Linear(nn.Linear):

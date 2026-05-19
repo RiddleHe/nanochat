@@ -79,6 +79,70 @@ class GPTBaseAddInitValueEmbNanogptEvery2Config(GPTBaseConfig):
     on_every_two_layers: bool = True
 
 @dataclass
+class GPTBaseVFromValueEmbLearnEvery2Config(GPTBaseConfig):
+    v_from_value_emb: bool = True
+    learn_init_coeffs: bool = True
+    on_every_two_layers: bool = True
+
+@dataclass
+class GPTBaseVFromX0LearnEvery2Config(GPTBaseConfig):
+    v_from_x0: bool = True
+    learn_init_coeffs: bool = True
+    on_every_two_layers: bool = True
+
+@dataclass
+class GPTBaseVFromValueEmbLearnEveryLayerConfig(GPTBaseConfig):
+    v_from_value_emb: bool = True
+    learn_init_coeffs: bool = True
+    on_every_layer: bool = True
+
+@dataclass
+class GPTBaseVFromValueEmbLearnSecondHalfConfig(GPTBaseConfig):
+    v_from_value_emb: bool = True
+    learn_init_coeffs: bool = True
+    on_second_half_layers: bool = True
+
+@dataclass
+class GPTBaseVFromValueEmbLearnLastTwoThirdsConfig(GPTBaseConfig):
+    v_from_value_emb: bool = True
+    learn_init_coeffs: bool = True
+    on_last_two_thirds_layers: bool = True
+
+@dataclass
+class GPTBaseAddInitValueEmbLearnEvery2Config(GPTBaseConfig):
+    add_init_value_emb: bool = True
+    learn_init_coeffs: bool = True
+    on_every_two_layers: bool = True
+
+@dataclass
+class GPTBaseAddInitValueEmbLearnEveryLayerConfig(GPTBaseConfig):
+    add_init_value_emb: bool = True
+    learn_init_coeffs: bool = True
+    on_every_layer: bool = True
+
+@dataclass
+class GPTBaseVFromV1EveryLayerConfig(GPTBaseConfig):
+    v_from_v1: bool = True
+    on_every_layer: bool = True
+
+@dataclass
+class GPTBaseVFromV1LearnEvery2Config(GPTBaseConfig):
+    v_from_v1: bool = True
+    learn_init_coeffs: bool = True
+    on_every_two_layers: bool = True
+
+@dataclass
+class GPTBaseAddInitResVLearnEveryLayerConfig(GPTBaseConfig):
+    add_init_res_v: bool = True
+    learn_init_coeffs: bool = True
+    on_every_layer: bool = True
+
+@dataclass
+class GPTBaseAddInitValueEmbNanogptEveryLayerConfig(GPTBaseConfig):
+    add_init_value_emb_nanogpt: bool = True
+    on_every_layer: bool = True
+
+@dataclass
 class GPTBaseVExcludeSelfConfig(GPTBaseConfig):
     v_exclude_self: bool = True
 
@@ -191,6 +255,17 @@ MODELS = {
     "gpt_base_add_init_value_emb_learn":(GPTBaseAddInitValueEmbLearnConfig, GPTBase),
     "gpt_base_add_init_value_emb_nanogpt":(GPTBaseAddInitValueEmbNanogptConfig, GPTBase),
     "gpt_base_add_init_value_emb_nanogpt_every2":(GPTBaseAddInitValueEmbNanogptEvery2Config, GPTBase),
+    "gpt_base_v_from_value_emb_learn_every2":(GPTBaseVFromValueEmbLearnEvery2Config, GPTBase),
+    "gpt_base_v_from_x0_learn_every2":(GPTBaseVFromX0LearnEvery2Config, GPTBase),
+    "gpt_base_v_from_value_emb_learn_every_layer":(GPTBaseVFromValueEmbLearnEveryLayerConfig, GPTBase),
+    "gpt_base_v_from_value_emb_learn_second_half":(GPTBaseVFromValueEmbLearnSecondHalfConfig, GPTBase),
+    "gpt_base_v_from_value_emb_learn_last_two_thirds":(GPTBaseVFromValueEmbLearnLastTwoThirdsConfig, GPTBase),
+    "gpt_base_add_init_value_emb_learn_every2":(GPTBaseAddInitValueEmbLearnEvery2Config, GPTBase),
+    "gpt_base_add_init_value_emb_learn_every_layer":(GPTBaseAddInitValueEmbLearnEveryLayerConfig, GPTBase),
+    "gpt_base_v_from_v1_every_layer":(GPTBaseVFromV1EveryLayerConfig, GPTBase),
+    "gpt_base_v_from_v1_learn_every2":(GPTBaseVFromV1LearnEvery2Config, GPTBase),
+    "gpt_base_add_init_res_v_learn_every_layer":(GPTBaseAddInitResVLearnEveryLayerConfig, GPTBase),
+    "gpt_base_add_init_value_emb_nanogpt_every_layer":(GPTBaseAddInitValueEmbNanogptEveryLayerConfig, GPTBase),
     "gpt_base_v_from_v1_scaling_vec": (GPTBaseVFromV1ScalingVecConfig,  GPTBase),
     "gpt_base_v_scale_learn":         (GPTBaseVScaleLearnConfig,        GPTBase),
     "gpt_base_v_exclude_self":        (GPTBaseVExcludeSelfConfig,       GPTBase),
