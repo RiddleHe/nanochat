@@ -25,6 +25,7 @@ dependencies = [
     "uvicorn>=0.36.0",
     "wandb>=0.21.3",
     "zstandard>=0.25.0",
+    "lm-eval>=0.4.12",
 ]
 
 [dependency-groups]
