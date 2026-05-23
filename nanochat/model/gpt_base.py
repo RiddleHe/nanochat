@@ -178,6 +178,13 @@ class GPTBaseConfig:
     # table is excluded from the matmul-FLOPs term (it's a lookup, not a
     # matmul). Mutually exclusive with the other v-writers.
     add_init_value_emb: bool = False
+    # If True (applies to v_from_value_emb / add_init_value_emb /
+    # add_init_value_emb_nanogpt), use a SINGLE shared nn.Embedding across all
+    # target layers instead of per-layer VE tables. Cuts the VE parameter count
+    # by a factor of #target_layers (e.g. 4x at d12 default last-1/3). Aligned
+    # init uses the first target layer's c_v as the projection anchor. Per-layer
+    # ve_gate (nanogpt) stays per-layer; only the value-table itself is shared.
+    value_emb_shared: bool = False
     # If True, at the last 1/3 of layers, replace v with a per-late-layer
     # learned value embedding table indexed by token id: v = VE_l[idx]. Mirrors
     # gpt.py's value_embeds (per-layer Embedding(vocab, n_kv_head*head_dim)) but
@@ -621,10 +628,21 @@ class GPTBase(nn.Module):
         if config.v_from_value_emb or config.add_init_value_emb or config.add_init_value_emb_nanogpt:
             head_dim = config.n_embd // config.n_head
             kv_dim = config.n_kv_head * head_dim
-            self.value_embeds = nn.ModuleDict({
-                str(i): nn.Embedding(padded_vocab_size, kv_dim)
-                for i in range(config.n_layer) if _is_target_layer(i, config)
-            })
+            if config.value_emb_shared:
+                # Single Embedding instance referenced under every target-layer
+                # key. nn.Module.parameters() dedupes by memo, so optimizer +
+                # scaling-params counts are unaffected; estimate_flops dedupes
+                # explicitly below.
+                shared = nn.Embedding(padded_vocab_size, kv_dim)
+                self.value_embeds = nn.ModuleDict({
+                    str(i): shared
+                    for i in range(config.n_layer) if _is_target_layer(i, config)
+                })
+            else:
+                self.value_embeds = nn.ModuleDict({
+                    str(i): nn.Embedding(padded_vocab_size, kv_dim)
+                    for i in range(config.n_layer) if _is_target_layer(i, config)
+                })
         # Smear: mix previous token's embedding into current token (cheap bigram-like info)
         self.smear_gate = Linear(24, 1, bias=False)
         self.smear_lambda = nn.Parameter(torch.zeros(1))
@@ -702,24 +720,40 @@ class GPTBase(nn.Module):
         # VE_l[t] = c_v_l(norm(wte[t])). With smear_lambda=0 at init, v at late
         # layers matches v_from_x0 at step 0 for v_from_value_emb, and the
         # add_init_value_emb blend (0.5/0.5 or beta=0) reduces to gpt_base.
-        # Computed in fp32 here; cast to COMPUTE_DTYPE below alongside wte.
+        # With value_emb_shared, the single shared table is initialized once
+        # using the FIRST target layer's c_v as anchor (arbitrary; step-0 only
+        # matches v_from_x0 at that anchor layer). Computed in fp32 here; cast
+        # to COMPUTE_DTYPE below alongside wte.
         if self.config.v_from_value_emb or self.config.add_init_value_emb:
             wte_normed = F.rms_norm(self.transformer.wte.weight.float(), (n_embd,))
-            for blk in self.transformer.h:
-                if not blk.is_target:
-                    continue
-                ve_init = F.linear(wte_normed, blk.attn.c_v.weight.float())
-                self.value_embeds[str(blk.layer_idx)].weight.copy_(ve_init)
+            if self.config.value_emb_shared:
+                first_target = next(blk for blk in self.transformer.h if blk.is_target)
+                ve_init = F.linear(wte_normed, first_target.attn.c_v.weight.float())
+                # All keys reference the same Embedding instance — write once.
+                next(iter(self.value_embeds.values())).weight.copy_(ve_init)
+            else:
+                for blk in self.transformer.h:
+                    if not blk.is_target:
+                        continue
+                    ve_init = F.linear(wte_normed, blk.attn.c_v.weight.float())
+                    self.value_embeds[str(blk.layer_idx)].weight.copy_(ve_init)
 
         # gpt.py-style init for add_init_value_emb_nanogpt: VE table uniform[-s, s]
         # (same scale as c_v); ve_gate.weight uniform[0, 0.02] so initial gate
         # 3*sigmoid(~0+) ≈ 1.5 (live from step 0 so VE rows get gradient flow).
         if self.config.add_init_value_emb_nanogpt:
-            for blk in self.transformer.h:
-                if not blk.is_target:
-                    continue
-                torch.nn.init.uniform_(self.value_embeds[str(blk.layer_idx)].weight, -s, s)
-                torch.nn.init.uniform_(blk.attn.ve_gate.weight, 0.0, 0.02)
+            if self.config.value_emb_shared:
+                torch.nn.init.uniform_(next(iter(self.value_embeds.values())).weight, -s, s)
+                for blk in self.transformer.h:
+                    if not blk.is_target:
+                        continue
+                    torch.nn.init.uniform_(blk.attn.ve_gate.weight, 0.0, 0.02)
+            else:
+                for blk in self.transformer.h:
+                    if not blk.is_target:
+                        continue
+                    torch.nn.init.uniform_(self.value_embeds[str(blk.layer_idx)].weight, -s, s)
+                    torch.nn.init.uniform_(blk.attn.ve_gate.weight, 0.0, 0.02)
 
         # Rotary embeddings
         head_dim = self.config.n_embd // self.config.n_head
@@ -827,7 +861,12 @@ class GPTBase(nn.Module):
         # implicit in the 6*nparams term (~3.5K FLOPs/tok, 5e-6 of total).
         value_embeds_numel = 0
         if self.config.v_from_value_emb or self.config.add_init_value_emb or self.config.add_init_value_emb_nanogpt:
-            value_embeds_numel = sum(ve.weight.numel() for ve in self.value_embeds.values())
+            # Dedupe by id() to handle value_emb_shared (same instance under many keys).
+            seen_ve = set()
+            for ve in self.value_embeds.values():
+                if id(ve) in seen_ve: continue
+                seen_ve.add(id(ve))
+                value_embeds_numel += ve.weight.numel()
         nparams_exclude = (self.transformer.wte.weight.numel() +
                           value_embeds_numel +
                           self.smear_gate.weight.numel() + self.smear_lambda.numel() +

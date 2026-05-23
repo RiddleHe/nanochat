@@ -195,6 +195,12 @@ class GPTBaseVFromValueEmbLearnConfig(GPTBaseConfig):
     learn_init_coeffs: bool = True
 
 @dataclass
+class GPTBaseVFromValueEmbLearnSharedConfig(GPTBaseConfig):
+    v_from_value_emb: bool = True
+    learn_init_coeffs: bool = True
+    value_emb_shared: bool = True
+
+@dataclass
 class GPTBaseAddInitValueEmbLearnConfig(GPTBaseConfig):
     add_init_value_emb: bool = True
     learn_init_coeffs: bool = True
@@ -251,6 +257,7 @@ MODELS = {
     "gpt_base_v_from_v1_learn":       (GPTBaseVFromV1LearnConfig,       GPTBase),
     "gpt_base_v_from_value_emb":      (GPTBaseVFromValueEmbConfig,      GPTBase),
     "gpt_base_v_from_value_emb_learn":(GPTBaseVFromValueEmbLearnConfig, GPTBase),
+    "gpt_base_v_from_value_emb_learn_shared":(GPTBaseVFromValueEmbLearnSharedConfig, GPTBase),
     "gpt_base_add_init_value_emb":    (GPTBaseAddInitValueEmbConfig,    GPTBase),
     "gpt_base_add_init_value_emb_learn":(GPTBaseAddInitValueEmbLearnConfig, GPTBase),
     "gpt_base_add_init_value_emb_nanogpt":(GPTBaseAddInitValueEmbNanogptConfig, GPTBase),
