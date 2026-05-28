@@ -432,11 +432,14 @@ class CausalSelfAttention(nn.Module):
 
         # v_from_value_emb: replace v entirely with the per-late-layer learned
         # value embedding table looked up by token id. `ve` here is the table
-        # lookup result (shape (B, T, n_kv_head*head_dim)) prepared by
-        # GPTBase.forward. When learn_init_coeffs is set, gamma_v scales the
-        # result (init 1.0).
+        # lookup result prepared by GPTBase.forward. Its length matches T in
+        # training/prefill, but during v-cache-free inference it covers the
+        # full history (T0+T) so attention has every position's V available
+        # without a persistent V cache. Use ve.shape[1] instead of T.
+        # When learn_init_coeffs is set, gamma_v scales the result (init 1.0).
         elif self.is_target and cfg.v_from_value_emb:
-            v = ve.view(B, T, self.n_kv_head, self.head_dim)
+            ve_len = ve.shape[1]
+            v = ve.view(B, ve_len, self.n_kv_head, self.head_dim)
             if cfg.learn_init_coeffs:
                 v = self.gamma_v.to(v.dtype) * v
 
@@ -456,6 +459,19 @@ class CausalSelfAttention(nn.Module):
         if kv_cache is None:
             # Training: causal attention with optional sliding window
             y = flash_attn.flash_attn_func(q, k, v, causal=True, window_size=self.window_size)
+        elif (self.is_target and cfg.v_from_value_emb
+                and getattr(kv_cache, "v_from_value_emb", False)):
+            # v_from_value_emb inference: no V cache exists. K cache is still used.
+            # `v` arriving here was gathered for the full history (T0+T positions)
+            # by GPTBase.forward; manually append k to k_cache and call flash_attn_func
+            # with the full-history k_cache slice + the gathered v.
+            k_cache = kv_cache.k_cache[self.layer_idx]
+            pos = int(kv_cache.cache_seqlens[0].item())
+            k_cache[:, pos:pos+T] = k
+            k_full = k_cache[:, :pos+T]
+            y = flash_attn.flash_attn_func(q, k_full, v, causal=True, window_size=self.window_size)
+            if self.layer_idx == kv_cache.n_layers - 1:
+                kv_cache.advance(T)
         else:
             # Inference: use flash_attn_with_kvcache which handles cache management
             k_cache, v_cache = kv_cache.get_layer_cache(self.layer_idx)
@@ -1071,12 +1087,26 @@ class GPTBase(nn.Module):
             x0 = x0.detach()
         ve = None
         capture_v1 = self.config.add_init_v or self.config.v_from_v1
+        # v_from_value_emb inference: maintain token-id history so attention can
+        # gather V from the per-layer VE table without keeping a persistent V cache.
+        # Updated once here (not per layer) since all layers share the same history.
+        if kv_cache is not None and getattr(kv_cache, "v_from_value_emb", False):
+            T0 = kv_cache.get_pos()
+            kv_cache.token_ids_history[:, T0:T0+T] = idx
         for i, block in enumerate(self.transformer.h):
             # ve fed to block: per-late-layer VE table lookup under
             # v_from_value_emb / add_init_value_emb / add_init_value_emb_nanogpt,
             # otherwise the captured layer-0 v (for add_init_v / v_from_v1) or None.
             if (self.config.v_from_value_emb or self.config.add_init_value_emb or self.config.add_init_value_emb_nanogpt) and str(i) in self.value_embeds:
-                ve_in = self.value_embeds[str(i)](idx).to(x.dtype)
+                if (self.config.v_from_value_emb and kv_cache is not None
+                        and getattr(kv_cache, "v_from_value_emb", False)):
+                    # Inference no-V-cache path: gather V for the entire history+new,
+                    # not just the new tokens — attention needs full sequence's V.
+                    T0 = kv_cache.get_pos()
+                    full_ids = kv_cache.token_ids_history[:, :T0+T]
+                    ve_in = self.value_embeds[str(i)](full_ids).to(x.dtype)
+                else:
+                    ve_in = self.value_embeds[str(i)](idx).to(x.dtype)
             else:
                 ve_in = ve
             x, v_init = block(x, x0, ve_in, cos_sin, kv_cache)

@@ -87,17 +87,45 @@ class KVCache:
     - Tensors are (B, T, H, D) not (B, H, T, D)
     - FA3 updates the cache in-place during flash_attn_with_kvcache
     - Position tracked per batch element via cache_seqlens tensor
+
+    v_from_value_emb mode (v_from_value_emb=True): V cache slots are allocated
+    ONLY for non-target layers (the early/passthrough layers that still compute
+    V = c_v(x)). Target layers (which derive V from a per-layer embedding table
+    keyed by token id) skip their V cache slot — these slots hold None instead
+    of a tensor. token_ids_history is kept so attention can gather V from the
+    embedding table at inference time without persistent V storage.
     """
 
-    def __init__(self, batch_size, num_heads, seq_len, head_dim, num_layers, device, dtype):
+    def __init__(self, batch_size, num_heads, seq_len, head_dim, num_layers, device, dtype,
+                 v_from_value_emb=False, target_layers=None):
         self.batch_size = batch_size
         self.max_seq_len = seq_len
         self.n_layers = num_layers
         self.n_heads = num_heads
         self.head_dim = head_dim
-        # Pre-allocate cache tensors: (n_layers, B, T, H, D)
+        self.v_from_value_emb = v_from_value_emb
+        # Pre-allocate K cache (always needed): (n_layers, B, T, H, D)
         self.k_cache = torch.zeros(num_layers, batch_size, seq_len, num_heads, head_dim, device=device, dtype=dtype)
-        self.v_cache = torch.zeros(num_layers, batch_size, seq_len, num_heads, head_dim, device=device, dtype=dtype)
+        if v_from_value_emb:
+            assert target_layers is not None, "v_from_value_emb cache requires target_layers"
+            # Per-layer v_cache slots: tensor for non-target layers, None for target layers
+            # (target layers gather V from VE_table on the fly, so no slot needed).
+            self.target_layers = set(target_layers)
+            self.v_cache_per_layer = []
+            for i in range(num_layers):
+                if i in self.target_layers:
+                    self.v_cache_per_layer.append(None)
+                else:
+                    self.v_cache_per_layer.append(
+                        torch.zeros(batch_size, seq_len, num_heads, head_dim, device=device, dtype=dtype)
+                    )
+            self.v_cache = None  # use v_cache_per_layer instead
+            self.token_ids_history = torch.zeros(batch_size, seq_len, dtype=torch.long, device=device)
+        else:
+            self.v_cache = torch.zeros(num_layers, batch_size, seq_len, num_heads, head_dim, device=device, dtype=dtype)
+            self.v_cache_per_layer = None
+            self.target_layers = None
+            self.token_ids_history = None
         # Current sequence length per batch element (FA3 needs int32)
         self.cache_seqlens = torch.zeros(batch_size, dtype=torch.int32, device=device)
         # Previous token's normalized embedding for smear (set by model forward pass)
@@ -113,8 +141,14 @@ class KVCache:
         return self.cache_seqlens[0].item()
 
     def get_layer_cache(self, layer_idx):
-        """Return (k_cache, v_cache) views for a specific layer."""
-        return self.k_cache[layer_idx], self.v_cache[layer_idx]
+        """Return (k_cache, v_cache) views for a specific layer. v_cache may be
+        None when v_from_value_emb mode is on AND layer_idx is a target layer."""
+        k = self.k_cache[layer_idx]
+        if self.v_cache_per_layer is not None:
+            v = self.v_cache_per_layer[layer_idx]  # tensor or None
+        else:
+            v = self.v_cache[layer_idx]
+        return k, v
 
     def advance(self, num_tokens):
         """Advance the cache position by num_tokens."""
@@ -128,9 +162,16 @@ class KVCache:
         assert self.get_pos() == 0, "Cannot prefill a non-empty KV cache"
         assert self.n_layers == other.n_layers and self.n_heads == other.n_heads and self.head_dim == other.head_dim
         assert self.max_seq_len >= other.max_seq_len
+        assert self.v_from_value_emb == other.v_from_value_emb, "cache mode mismatch"
         other_pos = other.get_pos()
         self.k_cache[:, :, :other_pos, :, :] = other.k_cache[:, :, :other_pos, :, :]
-        self.v_cache[:, :, :other_pos, :, :] = other.v_cache[:, :, :other_pos, :, :]
+        if self.v_from_value_emb:
+            self.token_ids_history[:, :other_pos] = other.token_ids_history[:, :other_pos]
+            for i in range(self.n_layers):
+                if self.v_cache_per_layer[i] is not None:
+                    self.v_cache_per_layer[i][:, :other_pos, :, :] = other.v_cache_per_layer[i][:, :other_pos, :, :]
+        else:
+            self.v_cache[:, :, :other_pos, :, :] = other.v_cache[:, :, :other_pos, :, :]
         self.cache_seqlens.fill_(other_pos)
         # Copy smear state: expand batch=1 prev_embedding to num_samples
         if other.prev_embedding is not None:
@@ -198,7 +239,18 @@ class Engine:
 
         # 1) Run a batch 1 prefill of the prompt tokens
         m = self.model.config
-        kv_model_kwargs = {"num_heads": m.n_kv_head, "head_dim": m.n_embd // m.n_head, "num_layers": m.n_layer}
+        v_from_value_emb = getattr(m, "v_from_value_emb", False)
+        target_layers = None
+        if v_from_value_emb:
+            from nanochat.model.gpt_base import _is_target_layer
+            target_layers = [i for i in range(m.n_layer) if _is_target_layer(i, m)]
+        kv_model_kwargs = {
+            "num_heads": m.n_kv_head,
+            "head_dim": m.n_embd // m.n_head,
+            "num_layers": m.n_layer,
+            "v_from_value_emb": v_from_value_emb,
+            "target_layers": target_layers,
+        }
         kv_cache_prefill = KVCache(
             batch_size=1,
             seq_len=len(tokens),
