@@ -13,7 +13,7 @@
 #
 # Optional env overrides:
 #   DEPTH              (default 12)
-#   FLOPS              (default 1.5e18 for depth<24, 1.5e19 otherwise)
+#   FLOPS              (default 1.5e18 for depth<24, 3.91e19 otherwise — compute-optimal at ratio ~10.5)
 #   DEVICE_BATCH_SIZE  (default 16 for depth<24, 4 otherwise)
 #   EVAL_EVERY         (default 50)
 #   NPROC_PER_NODE     (default 8)
@@ -34,7 +34,7 @@ MODEL_TYPES=("$@")
 
 DEPTH="${DEPTH:-12}"
 if [ "$DEPTH" -ge 24 ]; then
-    FLOPS="${FLOPS:-1.5e19}"
+    FLOPS="${FLOPS:-3.91e19}"
     DEVICE_BATCH_SIZE="${DEVICE_BATCH_SIZE:-4}"
 else
     FLOPS="${FLOPS:-1.5e18}"
