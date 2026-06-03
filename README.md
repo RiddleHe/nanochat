@@ -1,77 +1,28 @@
 ![nanochat logo](dev/nanochat_rl.png)
 
-Forked from [karpathy/nanochat](https://github.com/karpathy/nanochat). This fork makes it easy to do pretraining architecture research and RL algo research.
+This repo hosts two distinct training frameworks that are both extremely hackable: `nanochat/` manages pretraining runs for architecture ablations, and `nanorl/` manages RL runs for objective-function ablations. Forked from [karpathy/nanochat](https://github.com/karpathy/nanochat).
 
 # nanochat
 
-Pretraining architecture research on the nanochat stack.
+## How to add a new architecture
 
-## Adding a new architecture
+Most variants are best expressed by adding a boolean flag on the config dataclass in `nanochat/model/gpt_base.py`, a corresponding branch in the attention or block forward (often gated to the last third of layers via the `is_target` helper), and any new learnable scalars in `__init__` with their starting values set in `init_weights`. Then register a small config subclass and a name in `nanochat/model_registry.py` so the training script can find it. If a variant is large enough to warrant its own file, create `nanochat/model/gpt_<name>.py` with a matching config and model class and register that instead — the checkpoint metadata records the model type, so evaluation auto-detects the right class.
 
-1. Create `nanochat/model/gpt_yourmodel.py` with a config dataclass and model class. The model must implement the same interface as `GPT`: `forward(idx, targets, kv_cache, loss_reduction)`, `init_weights()`, `setup_optimizer(...)`, `estimate_flops()`, `num_scaling_params()`, `generate(...)`, `get_device()`.
+## How to train and evaluate the model
 
-2. Import and register at the top level of `nanochat/model_registry.py`:
-```python
-from nanochat.model.gpt_yourmodel import YourModelConfig, YourModel
-
-MODELS = {
-    ...
-    "yourmodel": (YourModelConfig, YourModel),
-}
-```
-
-Alternatively, you can add a config flag to `nanochat/model/gpt_base.py` and register it in `nanochat/model_registry.py` by subclassing the base config inline (e.g. `class GPTBaseAddInitResConfig(GPTBaseConfig): add_init_res: bool = True`) and adding a `MODELS` entry pointing at the existing model class. No new model file needed.
-
-The `model_type` is saved in checkpoint metadata, so evaluation auto-detects the right model class.
-
-## Training
-
-```bash
-# Setup (one-time)
-uv sync --extra gpu
-source .venv/bin/activate
-python -m nanochat.dataset -n 170   # download data
-python -m scripts.tok_train          # train tokenizer
-
-# Train a model
-torchrun --standalone --nproc_per_node=4 -m scripts.base_train -- \
-    --depth=12 --model-type=gpt --model-tag=my_experiment
-```
-
-## Evaluation
-
-```bash
-torchrun --standalone --nproc_per_node=4 -m scripts.base_eval -- --model-tag=my_experiment
-```
-
+Pretraining is launched from `scripts/base_train.py` via `torchrun`, which handles distributed setup, learning-rate schedule, gradient accumulation, and periodic validation. For ablation studies, `runs/ablations.sh` wraps a batch of variants at the depth-appropriate compute budget (FLOPs defaults baked in for d12 and d24), skips anything already trained, and aggregates val-loss curves into a single CSV for direct comparison. After training, `scripts/base_eval.py` scores the model on the DCLM CORE suite — 21 ICL tasks listed in `configs/core.yaml` using fixtures from `eval_bundle/` — and produces per-task accuracy plus a centered aggregate.
 
 # nanoRL
 
-Standalone RL package (`nanorl/`) that runs on top of HuggingFace base models (e.g. Qwen3-0.6B) with vLLM for rollouts. See [knowledge/rl_training.md](knowledge/rl_training.md) for full docs.
+## How to add a new objective function
 
-## Adding a loss
+Add a function to `nanorl/loss.py` and register it in the `ALGORITHMS` dictionary. The function receives the current and reference log-probabilities, rewards, and any extra kwargs, and returns a scalar loss. If the objective requires a non-standard advantage estimator (e.g. token-level instead of trajectory-level), extend `compute_advantages` with a matching branch.
 
-Add a function to `nanorl/loss.py` with signature `loss_fn(logprobs, old_logprobs, rewards, **kwargs) -> scalar` and register it in `ALGORITHMS`. If it needs a non-standard advantage estimator, add a branch to `compute_advantages`.
+## How to train the model
 
-## Adding data
+Training is driven by the script under `nanorl/runs/`, which launches a vLLM rollout worker for fast batched sampling and a separate `torchrun` trainer; the two stay strictly in sync so every step's rollouts come from the just-checkpointed weights. See `knowledge/rl_training.md` for the longer guide.
 
-The pipeline consumes JSONL with rows `{id, prompt, kind, payload, meta}` where `kind` selects a verifier (`code_call_based`, `code_stdin_stdout`, ...). To add a task:
-
-1. Write a prep script in `nanorl/scripts/` that emits the JSONL.
-2. Register the path in `_RL_DATASET_PATHS` in `nanorl/data.py`.
-3. For a new `kind`, add an elif branch in `nanorl.data.verify` and a sibling helper.
-
-## Training
-
-```bash
-./nanorl/runs/train.sh [tag]
-```
-
-Launches a vLLM rollout worker on `ROLLOUT_GPU` and a `torchrun` trainer on `TRAIN_GPUS` (set inside the script). Strict-sync: each step's rollouts come from the just-checkpointed weights.
-
-## Cite
-
-If you build on this fork:
+# Cite
 
 ```bibtex
 @misc{nanochat-arch,

@@ -16,6 +16,7 @@ knowledge/
 results/
 eval_logs/
 .nanochat/
-.claude/
+.claude/*
+!.claude/skills/
 
 .DS_Store
