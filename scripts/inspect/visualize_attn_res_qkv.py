@@ -134,3 +134,40 @@ os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
 fig.tight_layout()
 fig.savefig(args.output, dpi=150, bbox_inches="tight")
 print(f"saved {args.output}", flush=True)
+
+# ---- line plot: per-layer summary of where q/k/v read from ----
+def source0_weight(arr):
+    """Weight each layer puts on source 0 (the token embedding)."""
+    return arr[:, 0]
+
+def center_of_mass(arr):
+    """Normalized read 'recency' per layer: 0 = token emb (source 0),
+    1 = the most recent available source. Lower => reads earlier layers."""
+    com = np.full(arr.shape[0], np.nan)
+    for i in range(arr.shape[0]):
+        row = arr[i]
+        valid = ~np.isnan(row)
+        n = valid.sum()
+        if n <= 1:
+            com[i] = 0.0
+            continue
+        j = np.arange(arr.shape[1])[valid]
+        w = row[valid]
+        com[i] = float((j * w).sum() / w.sum() / (n - 1))
+    return com
+
+colors = {"Q": "#1f77b4", "K": "#2ca02c", "V": "#d62728", "MLP": "#7f7f7f"}
+fig2, (axA, axB) = plt.subplots(1, 2, figsize=(13, 4.5))
+for name, arr in arrs:
+    ls = "--" if name == "MLP" else "-"
+    axA.plot(range(n_layer), source0_weight(arr), marker="o", ms=4, ls=ls, color=colors[name], label=name)
+    axB.plot(range(n_layer), center_of_mass(arr), marker="o", ms=4, ls=ls, color=colors[name], label=name)
+axA.set_title("Weight on source 0 (token embedding) per layer")
+axA.set_xlabel("layer index"); axA.set_ylabel("attention weight on token embedding"); axA.legend(); axA.grid(alpha=0.3)
+axB.set_title("Read recency per layer  (0 = token emb, 1 = most recent)")
+axB.set_xlabel("layer index"); axB.set_ylabel("normalized center of mass"); axB.legend(); axB.grid(alpha=0.3)
+fig2.suptitle(f"attn_res_qkv ({args.model_tag}): Q/K/V depth-attention summary", y=1.02)
+line_output = os.path.splitext(args.output)[0] + "_lines.png"
+fig2.tight_layout()
+fig2.savefig(line_output, dpi=150, bbox_inches="tight")
+print(f"saved {line_output}", flush=True)
