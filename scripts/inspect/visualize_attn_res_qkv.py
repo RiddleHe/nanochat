@@ -171,3 +171,33 @@ line_output = os.path.splitext(args.output)[0] + "_lines.png"
 fig2.tight_layout()
 fig2.savefig(line_output, dpi=150, bbox_inches="tight")
 print(f"saved {line_output}", flush=True)
+
+# ---- focused bar chart: last third of layers (BoV's target region) ----
+def early_weight(arr, k=3):
+    """Weight on the first k sources (token embedding + earliest layers)."""
+    out = np.zeros(arr.shape[0])
+    for i in range(arr.shape[0]):
+        row = arr[i][:k]
+        out[i] = np.nansum(row)
+    return out
+qkv = [(n, a) for n, a in arrs if n in ("Q", "K", "V")]
+start = (2 * n_layer) // 3  # last third
+layers = list(range(start, n_layer))
+fig3, (axL, axR) = plt.subplots(1, 2, figsize=(13, 4.5))
+width = 0.26
+for k, (name, arr) in enumerate(qkv):
+    s0 = source0_weight(arr)[layers]
+    e3 = early_weight(arr, 3)[layers]
+    xs = np.arange(len(layers)) + (k - 1) * width
+    axL.bar(xs, s0, width, color=colors[name], label=name)
+    axR.bar(xs, e3, width, color=colors[name], label=name)
+for ax, ttl in [(axL, "Weight on token embedding (source 0)"),
+                (axR, "Weight on the 3 earliest sources (token-anchored)")]:
+    ax.set_xticks(np.arange(len(layers))); ax.set_xticklabels([f"L{l}" for l in layers])
+    ax.set_xlabel("layer (last third = BoV's target region)"); ax.set_ylabel("attention weight")
+    ax.set_title(ttl); ax.legend(); ax.grid(alpha=0.3, axis="y")
+fig3.suptitle(f"attn_res_qkv: in the last third, V keeps reading the original token; Q/K do not", y=1.02)
+bar_output = os.path.splitext(args.output)[0] + "_lastthird.png"
+fig3.tight_layout()
+fig3.savefig(bar_output, dpi=150, bbox_inches="tight")
+print(f"saved {bar_output}", flush=True)
