@@ -88,6 +88,40 @@ def _load_hf(hf_model, device):
     }
 
 
+class _NanochatTok:
+    """Duck-types the two HF tokenizer methods this script uses."""
+    def __init__(self, tok):
+        self._tok = tok
+
+    def encode(self, text, add_special_tokens=False):
+        return self._tok.encode(text)
+
+    def decode(self, ids, skip_special_tokens=False):
+        return self._tok.decode(ids)
+
+
+def _load_nanochat(model_tag, step, device):
+    """nanochat checkpoint adapter. Unembed path mirrors GPTBase.forward:
+    functional RMSNorm + lm_head sliced to the real vocab (softcap is
+    monotonic, so it cannot change top-k order and is skipped)."""
+    from nanochat.checkpoint_manager import load_model
+    from nanochat.model.gpt import norm
+    model, tok, meta = load_model("base", device, phase="eval",
+                                  model_tag=model_tag, step=step)
+    model.eval()
+    vocab_size = meta["model_config"]["vocab_size"]
+    return {
+        "model": model, "tokenizer": _NanochatTok(tok),
+        "blocks": model.transformer.h,
+        "final_norm": norm,
+        "lm_head": lambda x: model.lm_head(x)[..., :vocab_size],
+        "embed_in": model.transformer.wte,
+        "n_layer": meta["model_config"]["n_layer"],
+        "name": model_tag,
+        "prepend_bos": tok.get_bos_token_id(),
+    }
+
+
 # ----------------------------------------------------------------------------
 # Logit-lens core
 # ----------------------------------------------------------------------------
@@ -160,6 +194,8 @@ def run_one_entity(adapter, ent_key, source, expected_text=None, lens="logit"):
         exp_id, exp_str = None, None
 
     src_ids = adapter["tokenizer"].encode(source, add_special_tokens=False)
+    if adapter.get("prepend_bos") is not None:
+        src_ids = [adapter["prepend_bos"]] + src_ids
     src_pos = len(src_ids) - 1
 
     residuals = capture_layer_residuals(adapter, src_ids, src_pos)
@@ -271,8 +307,11 @@ def regenerate_plot(out_dir):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--hf-model", required=True,
-                    help="HF causal-LM name (this script is HF-only).")
+    src = ap.add_mutually_exclusive_group(required=True)
+    src.add_argument("--hf-model", help="HF causal-LM name.")
+    src.add_argument("--model-tag", help="nanochat checkpoint tag.")
+    ap.add_argument("--step", type=int, default=None,
+                    help="nanochat step (last if omitted)")
     ap.add_argument("--source-set", choices=list(SOURCE_SETS), default="alt",
                     help="alt = incomplete-sentence prompts (last source token "
                          "is a connective; expected next is the entity-binding "
@@ -291,7 +330,8 @@ def main():
     args = ap.parse_args()
 
     device = torch.device(args.device)
-    adapter = _load_hf(args.hf_model, device)
+    adapter = (_load_hf(args.hf_model, device) if args.hf_model
+               else _load_nanochat(args.model_tag, args.step, device))
     print(f"Model: {adapter['name']}  n_layer={adapter['n_layer']}  "
           f"source_set={args.source_set}  lens={args.lens}")
     os.makedirs(args.out_dir, exist_ok=True)
