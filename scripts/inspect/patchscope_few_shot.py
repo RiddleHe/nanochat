@@ -5,6 +5,12 @@ source-prompt token and inject it into the `x` placeholder slot of a few-shot
 description target prompt at a *fixed* target layer (default L=6). Every source
 layer thus gets the same downstream stack to integrate the few-shot context.
 
+--target-layer -1 sweeps every target layer as well, producing the full
+source-layer x target-layer decode matrix (n_layer^2 generations per entity).
+--normalize norm-matches the injected residual to the target residual it
+replaces (direction from source, magnitude from target), keeping cross-layer
+injections in-distribution.
+
 Two source-prompt sets:
   --source-set canonical : the patchscopes-paper set (e.g. "Diana, princess of
                            Wales"). Last token is generic (e.g. " Wales"),
@@ -272,7 +278,7 @@ def capture_source_block_contributions(adapter, src_ids, src_pos):
 
 
 def patched_generate(adapter, tgt_ids, target_layer, tgt_pos, src_vec,
-                     max_tokens, op="replace"):
+                     max_tokens, op="replace", normalize=False):
     """Hook on block `target_layer`: at the prefill step (input length covers
     tgt_pos), modify the residual at position tgt_pos using `src_vec` and `op`.
       op='replace': overwrite (standard patchscope; works when src_vec is
@@ -290,7 +296,16 @@ def patched_generate(adapter, tgt_ids, target_layer, tgt_pos, src_vec,
             return out
         new_x = x.clone()
         if op == "replace":
-            new_x[:, tgt_pos, :] = src_vec.to(new_x.dtype)
+            v = src_vec.to(new_x.dtype)
+            if normalize:
+                # Norm-match: keep the source vector's DIRECTION but rescale to
+                # the MAGNITUDE of the residual it replaces at this target
+                # layer/position. Residual-stream norms grow with depth, so a
+                # source-layer-L residual dropped raw into target_layer L' is
+                # off-scale (and goes OOD); this puts it back in-distribution.
+                orig_norm = new_x[:, tgt_pos, :].norm(dim=-1, keepdim=True)
+                v = v * (orig_norm / (v.norm() + 1e-8))
+            new_x[:, tgt_pos, :] = v
         elif op == "add":
             new_x[:, tgt_pos, :] = new_x[:, tgt_pos, :] + src_vec.to(new_x.dtype)
         else:
@@ -306,7 +321,7 @@ def patched_generate(adapter, tgt_ids, target_layer, tgt_pos, src_vec,
 
 
 def run_one_source(adapter, source, target, target_layer, max_tokens,
-                   inject_mode="residual"):
+                   inject_mode="residual", normalize=False):
     """inject_mode='residual' (existing): extract residual-stream output at
         each src layer and REPLACE target residual at tgt_layer with it.
     inject_mode='block': extract each block's contribution (output - input)
@@ -331,7 +346,8 @@ def run_one_source(adapter, source, target, target_layer, max_tokens,
     results = []
     for src_layer in range(adapter["n_layer"]):
         text = patched_generate(adapter, tgt_ids, target_layer, tgt_pos,
-                                src_vecs[src_layer], max_tokens, op=op)
+                                src_vecs[src_layer], max_tokens, op=op,
+                                normalize=normalize)
         results.append((src_layer, text.lstrip().split("\n")[0]))
     return results
 
@@ -473,7 +489,19 @@ def main():
     ap.add_argument("--step", type=int, default=None,
                     help="nanochat step (last if omitted)")
     ap.add_argument("--target-layer", type=int, default=6,
-                    help="Target block to inject into (default 6).")
+                    help="Target block to inject into (default 6). Use -1 to "
+                         "sweep ALL target layers and emit the full "
+                         "source-layer x target-layer matrix (n_layer^2 "
+                         "generations per entity; can be slow).")
+    ap.add_argument("--normalize", action="store_true",
+                    help="Norm-match the injected residual to the target "
+                         "residual it replaces (direction from source, "
+                         "magnitude from target). Fixes cross-layer scale "
+                         "mismatch; recommended for cross-layer / matrix runs. "
+                         "Only affects op=replace (residual inject_mode). Off "
+                         "by default to preserve comparability with existing "
+                         "runs; normalized outputs get a 'norm__' filename "
+                         "segment.")
     ap.add_argument("--source-set", choices=list(SOURCE_SETS), default="canonical",
                     help="Which set of source prompts to use.")
     ap.add_argument("--inject-mode", choices=["residual", "block"],
@@ -500,8 +528,9 @@ def main():
     adapter = (_load_hf(args.hf_model, device) if args.hf_model
                else _load_nanochat(args.model_tag, args.step, device))
     n_layer = adapter["n_layer"]
-    assert 0 <= args.target_layer < n_layer, \
-        f"--target-layer {args.target_layer} out of range for n_layer={n_layer}"
+    assert args.target_layer == -1 or 0 <= args.target_layer < n_layer, \
+        f"--target-layer {args.target_layer} out of range for n_layer={n_layer} " \
+        f"(or -1 for the full matrix)"
 
     sources = SOURCE_SETS[args.source_set]
     print(f"Model: {adapter['name']}  n_layer={n_layer}  "
@@ -510,34 +539,53 @@ def main():
     print(f"Target prompt: {args.target!r}")
     os.makedirs(args.out_dir, exist_ok=True)
 
-    # File naming: keep legacy name for residual mode (no extra segment); add
-    # an inject-mode segment for any other mode.
+    # Single target layer, or -1 => sweep ALL target layers (source x target matrix).
+    matrix_mode = args.target_layer == -1
+    target_layers = list(range(n_layer)) if matrix_mode else [args.target_layer]
+    tgt_tag = "ALL" if matrix_mode else str(args.target_layer)
+
+    # File naming: keep legacy name for residual mode (no extra segment); add an
+    # inject-mode segment for any other mode, and a norm segment when the
+    # injected vector is norm-matched to the target residual.
     mode_seg = "" if args.inject_mode == "residual" else f"{args.inject_mode}__"
+    norm_seg = "norm__" if args.normalize else ""
+
     for ent_key in ENTITIES:
         source = sources[ent_key]
         print(f"\n===== Source [{ent_key}]: {source!r} =====")
-        results = run_one_source(adapter, source, args.target,
-                                 args.target_layer, args.max_tokens,
-                                 inject_mode=args.inject_mode)
-        for src_layer, text in results:
-            print(f"  S{src_layer:02d}->T{args.target_layer:02d}: {text}")
+        rows = []  # (src_layer, tgt_layer, text)
+        for tl in target_layers:
+            res = run_one_source(adapter, source, args.target, tl,
+                                 args.max_tokens, inject_mode=args.inject_mode,
+                                 normalize=args.normalize)
+            for src_layer, text in res:
+                rows.append((src_layer, tl, text))
+            if matrix_mode:
+                print(f"  target layer {tl:02d}/{n_layer - 1} done")
+            else:
+                for src_layer, text in res:
+                    print(f"  S{src_layer:02d}->T{tl:02d}: {text}")
         out_path = os.path.join(
             args.out_dir,
-            f"{adapter['name']}__tgt{args.target_layer}__"
-            f"{args.source_set}__{mode_seg}{ent_key}.txt")
+            f"{adapter['name']}__tgt{tgt_tag}__"
+            f"{args.source_set}__{norm_seg}{mode_seg}{ent_key}.txt")
         with open(out_path, "w") as f:
             f.write(f"model\t{adapter['name']}\n")
             f.write(f"entity_key\t{ent_key}\n")
             f.write(f"source\t{source}\n")
             f.write(f"source_set\t{args.source_set}\n")
             f.write(f"inject_mode\t{args.inject_mode}\n")
+            f.write(f"normalize\t{args.normalize}\n")
             f.write(f"target\t{args.target}\n")
-            f.write(f"target_layer\t{args.target_layer}\n")
-            for src_layer, text in results:
-                f.write(f"S{src_layer:02d}_T{args.target_layer:02d}\t{text}\n")
-        print(f"  -> {out_path}")
+            f.write(f"target_layer\t{tgt_tag}\n")
+            for src_layer, tl, text in rows:
+                f.write(f"S{src_layer:02d}_T{tl:02d}\t{text}\n")
+        print(f"  -> {out_path}  ({len(rows)} rows)")
 
-    if not args.no_plot:
+    # Auto-plot only for the legacy single-target line grid. Matrix mode and
+    # normalized runs just produce output files (verification / matrix plotting
+    # is done separately).
+    if not args.no_plot and not matrix_mode and not args.normalize:
         print()
         regenerate_plot(args.out_dir, args.target_layer, args.source_set,
                         inject_mode=args.inject_mode)
