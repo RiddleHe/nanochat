@@ -12,7 +12,7 @@ just unreadable — and does the model use it?
 - Models:
   - Attention d24: `arch_d24_gpt_base_100B` (step 95363), 24 layers, d=1536
   - BoV d24: `arch_d24_gpt_base_v_from_value_emb_learn_100B` (step 95368), 24 layers
-  - `Qwen/Qwen3-8B-Base`, 36 layers, d=3584
+  - `Qwen/Qwen3-8B-Base`, 36 layers, d=4096
 - Shared data (Steps 1, 2, 2b, B, C): 15 entities x 12 templates = 180 sentences.
   Each sentence names the entity early and ENDS in a generic role noun shared
   within its category (all 3 scientists end in "scientist", etc.), so the last
