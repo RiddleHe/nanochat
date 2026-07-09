@@ -68,7 +68,7 @@ train_variant() {  # $1=model_type  $2=model_tag
   CUDA_VISIBLE_DEVICES=$G /hdd/mh3897/cc/nanochat/.venv/bin/torchrun \
     --standalone --nproc_per_node=$N -m scripts.base_train -- \
     --depth=24 --model-type="$1" --model-tag="$2" \
-    --target-flops=3.91e19 --run=dummy
+    --target-flops=3.91e19 --device-batch-size=16 --run=dummy
   log "training $2 exit=$?"
 }
 train_variant gpt_base_v_from_value_emb_learn_last_two_thirds arch_d24_gpt_base_v_from_value_emb_learn_last_two_thirds
