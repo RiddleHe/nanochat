@@ -150,7 +150,7 @@ def main():
     print(f"mid(L6-18) recovery {float(recov[6:19].mean()):.2f} | deep(L24+) recovery {deep:.2f}", flush=True)
 
     res = {"model": args.hf_model, "n_layer": n_layer, "n_pairs": n_used,
-           "recovery": recov.tolist()}
+           "patch": args.patch, "recovery": recov.tolist()}
     with open(os.path.join(args.out, "step_d_qwen.json"), "w") as f:
         json.dump(res, f, indent=1)
 
@@ -158,10 +158,10 @@ def main():
     ax.plot(range(n_layer), recov.tolist(), "-o", ms=3, color=PALETTE[3])
     ax.axhline(0, color="0.7", lw=0.8)
     ax.axvspan(2 * n_layer // 3, n_layer - 1, color="0.93", zorder=0)
-    ax.set_xlabel("patched layer (bound role-token state)")
-    ax.set_ylabel("logit-diff recovery toward clean entity")
-    ax.set_title(f"{args.hf_model}: causal effect of the entity-token state, by layer\n"
-                 "high = the model's OWN output uses this layer's entity info")
+    ax.set_xlabel(f"patched layer ({args.patch}-token state, clean into corrupted)")
+    ax.set_ylabel("logit-diff recovery toward clean entity (1 = fully flipped)")
+    ax.set_title(f"{args.hf_model}: causal effect of the {args.patch}-token state, by layer\n"
+                 "high = layers after this point still read the entity position")
     ax.grid(alpha=0.3); fig.tight_layout()
     p = os.path.join(args.out, "step_d_causal.png")
     fig.savefig(p, dpi=150, bbox_inches="tight")
