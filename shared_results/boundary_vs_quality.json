@@ -1,0 +1,29 @@
+{
+ "12": {
+  "base_bpb": 0.8540073445355457,
+  "base_step": 3766,
+  "points": {
+   "0": 0.0048552885715938965,
+   "4": -0.010002209624108804,
+   "6": -0.013593539115706266,
+   "8": -0.01290374685664386
+  },
+  "boundary": 8,
+  "every2_delta": -0.014205048439255297,
+  "missing": []
+ },
+ "24": {
+  "base_bpb": 0.7217896693040232,
+  "base_step": 7809,
+  "points": {
+   "12": -0.008289251598571079,
+   "16": -0.008174586324690258
+  },
+  "boundary": 14,
+  "every2_delta": -0.005292122521073805,
+  "missing": [
+   "arch_d24_gpt_base_v_from_value_emb_learn_every_layer",
+   "arch_d24_gpt_base_v_from_value_emb_learn_last_two_thirds"
+  ]
+ }
+}
