@@ -71,6 +71,7 @@ def main():
     cats = {"subject name": [], "subject name (max head)": [],
             "last token (itself)": [], "first token (sink)": [], "rest": []}
     per_sent = []
+    per_token, token_labels = [], None
     example = None
     for name, role in ENTITIES[: args.max_sentences]:
         pre = tok(PREFIX, add_special_tokens=True)["input_ids"]
@@ -80,12 +81,14 @@ def main():
         s0, s1 = len(pre), len(pre) + len(span)
         with torch.inference_mode():
             out = model(torch.tensor([ids], device=device), output_attentions=True)
-        rows, name_max = [], []
+        rows, name_max, mx_rows = [], [], []
         for att in out.attentions:
             h = att[0, :, -1, :].float()           # (heads, T)
             rows.append(h.mean(0))
             name_max.append(h[:, s0:s1].sum(1).max())
+            mx_rows.append(h.max(0).values)         # per-position max over heads
         A = torch.stack(rows, 0)                    # (n_layer, T)
+        Mx = torch.stack(mx_rows, 0)                # (n_layer, T) max-head per token
         T = A.shape[1]
         name_mean = A[:, s0:s1].sum(1)
         per_sent.append({
@@ -95,6 +98,12 @@ def main():
             "first token (sink)": A[:, 0],
             "rest": 1.0 - (name_mean + A[:, T - 1] + A[:, 0]),
         })
+        if len(span) == 1:                          # aligned positions across sentences
+            per_token.append(Mx)
+            if token_labels is None:
+                token_labels = [tok.decode([i]) for i in ids]
+                token_labels[s0] = "<NAME>"
+                token_labels = ["<ROLE>" if t.strip() == role else t for t in token_labels]
         if example is None:
             example = (A, [tok.decode([i]) for i in ids])
         print(f"  {name}: done", flush=True)
@@ -102,10 +111,41 @@ def main():
     for k in cats:
         cats[k] = torch.stack([d[k] for d in per_sent], 0).mean(0)
 
+    Mavg = torch.stack(per_token, 0).mean(0) if per_token else None  # (n_layer, T)
     res = {"model": args.hf_model, "n_layer": n_layer, "boundary": args.boundary,
-           "mass": {k: v.tolist() for k, v in cats.items()}}
+           "mass": {k: v.tolist() for k, v in cats.items()},
+           "per_token_maxhead": Mavg.tolist() if Mavg is not None else None,
+           "token_labels": token_labels}
     with open(os.path.join(args.out, "entity_attention.json"), "w") as f:
         json.dump(res, f, indent=1)
+
+    if Mavg is not None:
+        figT, axT = plt.subplots(figsize=(10, 5.2))
+        cmap = plt.cm.tab20
+        T = Mavg.shape[1]
+        for j in range(T):
+            lbl = token_labels[j]
+            if lbl == "<NAME>":
+                axT.plot(range(n_layer), Mavg[:, j].tolist(), "-o", ms=3, lw=2.4,
+                         color="#c0392b", label=f"{j}: {lbl}", zorder=5)
+            elif j == 0:
+                axT.plot(range(n_layer), Mavg[:, j].tolist(), "--", lw=1.6,
+                         color="0.4", label=f"{j}: {lbl} (sink)")
+            else:
+                axT.plot(range(n_layer), Mavg[:, j].tolist(), "-", lw=1.1,
+                         color=cmap(j % 20), alpha=0.85, label=f"{j}: {lbl}")
+        if args.boundary is not None:
+            axT.axvline(args.boundary, color="r", ls="--", lw=1)
+        axT.set_xlabel("layer")
+        axT.set_ylabel("strongest-head attention from the final token")
+        axT.set_title(f"{args.hf_model}: per-token max-head attention of the final "
+                      f"position ({len(per_token)} aligned sentences averaged)")
+        axT.legend(fontsize=7, ncol=2)
+        axT.grid(alpha=0.3)
+        figT.tight_layout()
+        pT = os.path.join(args.out, "entity_attention_per_token.png")
+        figT.savefig(pT, dpi=150, bbox_inches="tight")
+        print(f"saved {pT}", flush=True)
 
     fig, (ax, ax2) = plt.subplots(1, 2, figsize=(14, 4.8),
                                   gridspec_kw={"width_ratios": [1, 1.2]})
