@@ -124,14 +124,14 @@ def patched(model, layers, ids, L, pos, vec, device):
         handle.remove()
 
 
-def run_topk_example(model, tok, layers, n_layer, device, out,
+def run_topk_example(model, tok, layers, n_layer, device, out, template=TEMPLATE,
                      clean="Einstein", corrupt="Newton", role="scientist", k=10):
     """For one pair, dump the final position's top-k tokens+probs per patched
     layer (plus unpatched clean/corrupted reference rows) as json + a rendered
     table figure. Contextualizes the entity probabilities: what actually tops
     the distribution, and where the entity names rank."""
-    ids_c = tok(TEMPLATE.format(name=clean, role=role), add_special_tokens=True)["input_ids"]
-    ids_x = tok(TEMPLATE.format(name=corrupt, role=role), add_special_tokens=True)["input_ids"]
+    ids_c = tok(template.format(name=clean, role=role), add_special_tokens=True)["input_ids"]
+    ids_x = tok(template.format(name=corrupt, role=role), add_special_tokens=True)["input_ids"]
     pos = find_pos(tok, ids_c, clean)
     ct = tok(" " + clean, add_special_tokens=False)["input_ids"][0]
     xt = tok(" " + corrupt, add_special_tokens=False)["input_ids"][0]
@@ -181,6 +181,8 @@ def main():
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--patch", choices=["subject", "role"], default="subject")
     ap.add_argument("--max-pairs", type=int, default=None)
+    ap.add_argument("--template", default=TEMPLATE,
+                    help="sentence template with {name} and {role}")
     ap.add_argument("--topk-example", action="store_true",
                     help="run only the Einstein->Newton example and dump the "
                          "final position's top-10 tokens per patched layer")
@@ -192,7 +194,8 @@ def main():
     if args.topk_example:
         model, tok, layers, n_layer = load_hf(args.hf_model, device)
         print(f"{args.hf_model}: {n_layer} layers, top-k example mode", flush=True)
-        run_topk_example(model, tok, layers, n_layer, device, args.out)
+        run_topk_example(model, tok, layers, n_layer, device, args.out,
+                         template=args.template)
         return
 
     model, tok, layers, n_layer = load_hf(args.hf_model, device)
@@ -206,8 +209,8 @@ def main():
     ref = {"clean_run_P_clean": 0.0, "corr_run_P_corr": 0.0}
     n_used = 0
     for clean, corrupt, role in pairs:
-        ids_c = tok(TEMPLATE.format(name=clean, role=role), add_special_tokens=True)["input_ids"]
-        ids_x = tok(TEMPLATE.format(name=corrupt, role=role), add_special_tokens=True)["input_ids"]
+        ids_c = tok(args.template.format(name=clean, role=role), add_special_tokens=True)["input_ids"]
+        ids_x = tok(args.template.format(name=corrupt, role=role), add_special_tokens=True)["input_ids"]
         if len(ids_c) != len(ids_x):
             continue
         pos = find_pos(tok, ids_c, role if args.patch == "role" else clean)
