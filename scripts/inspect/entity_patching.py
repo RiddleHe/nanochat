@@ -124,16 +124,76 @@ def patched(model, layers, ids, L, pos, vec, device):
         handle.remove()
 
 
+def run_topk_example(model, tok, layers, n_layer, device, out,
+                     clean="Einstein", corrupt="Newton", role="scientist", k=10):
+    """For one pair, dump the final position's top-k tokens+probs per patched
+    layer (plus unpatched clean/corrupted reference rows) as json + a rendered
+    table figure. Contextualizes the entity probabilities: what actually tops
+    the distribution, and where the entity names rank."""
+    ids_c = tok(TEMPLATE.format(name=clean, role=role), add_special_tokens=True)["input_ids"]
+    ids_x = tok(TEMPLATE.format(name=corrupt, role=role), add_special_tokens=True)["input_ids"]
+    pos = find_pos(tok, ids_c, clean)
+    ct = tok(" " + clean, add_special_tokens=False)["input_ids"][0]
+    xt = tok(" " + corrupt, add_special_tokens=False)["input_ids"][0]
+    states, log_c = capture(model, layers, ids_c, pos, device, n_layer)
+    _, log_x = capture(model, layers, ids_x, pos, device, n_layer)
+
+    def topk(logits):
+        sm = F.softmax(logits, -1)
+        v, i = sm.topk(k)
+        return [(tok.decode([int(t)]), float(p)) for p, t in zip(v, i)]
+
+    rows = [("clean run", topk(log_c)), ("corrupt run", topk(log_x))]
+    for L in range(n_layer):
+        rows.append((f"patch L{L:02d}", topk(patched(model, layers, ids_x, L, pos,
+                                                     states[L], device))))
+        print(f"  {rows[-1][0]}: " + "  ".join(f"{t!r} {p:.1%}" for t, p in rows[-1][1][:5]),
+              flush=True)
+
+    with open(os.path.join(out, "entity_patching_topk.json"), "w") as f:
+        json.dump({"clean": clean, "corrupt": corrupt, "role": role,
+                   "rows": [{"row": r, "topk": tk} for r, tk in rows]}, f, indent=1)
+
+    fig, ax = plt.subplots(figsize=(14, 0.62 + 0.30 * len(rows)))
+    ax.axis("off")
+    ax.set_xlim(0, 1 + k * 1.3)
+    ax.set_ylim(-len(rows), 1.2)
+    ax.text(0, 0.7, f"corrupted sentence patched with clean '{clean}' state; "
+            f"final-position top-{k} (teal = {clean}, red = {corrupt})", fontsize=9)
+    for r, (label, tk) in enumerate(rows):
+        y = -r
+        ax.text(0, y, label, fontsize=8, family="monospace", weight="bold")
+        for j, (t, p) in enumerate(tk):
+            color = ("#2c8a8a" if t.strip() == clean
+                     else "#c0392b" if t.strip() == corrupt else "0.25")
+            ax.text(1 + j * 1.3, y, f"{t.strip() or repr(t)} {p:.1%}",
+                    fontsize=7.5, family="monospace", color=color,
+                    weight="bold" if color != "0.25" else "normal")
+    fig.tight_layout()
+    p = os.path.join(out, "entity_patching_topk.png")
+    fig.savefig(p, dpi=150, bbox_inches="tight")
+    print(f"saved {p}", flush=True)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--hf-model", default="Qwen/Qwen3-8B-Base")
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--patch", choices=["subject", "role"], default="subject")
     ap.add_argument("--max-pairs", type=int, default=None)
+    ap.add_argument("--topk-example", action="store_true",
+                    help="run only the Einstein->Newton example and dump the "
+                         "final position's top-10 tokens per patched layer")
     ap.add_argument("--out", default="results/entity_patching")
     args = ap.parse_args()
     device = torch.device(args.device)
     os.makedirs(args.out, exist_ok=True)
+
+    if args.topk_example:
+        model, tok, layers, n_layer = load_hf(args.hf_model, device)
+        print(f"{args.hf_model}: {n_layer} layers, top-k example mode", flush=True)
+        run_topk_example(model, tok, layers, n_layer, device, args.out)
+        return
 
     model, tok, layers, n_layer = load_hf(args.hf_model, device)
     pairs = within_pairs(tok)[: args.max_pairs]
