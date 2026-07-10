@@ -1,4 +1,4 @@
-"""Step D: causal interchange patching — at which layer does the model stop
+"""Entity interchange patching: causal interchange patching — at which layer does the model stop
 USING an entity's information?
 
 Setup. Pairs of sentences differ only in the entity name (same token length):
@@ -15,9 +15,9 @@ layers after L still consume that position; if nothing changes, they no
 longer read it.
 
 One run produces BOTH views from the same patched logits:
-  step_d_recovery.png : normalized logit-diff recovery per layer
+  entity_patching_recovery.png : normalized logit-diff recovery per layer
                         (1 = output fully flips to the clean entity)
-  step_d_probs.png    : softmax P(clean entity) and P(corrupt entity) per
+  entity_patching_probs.png    : softmax P(clean entity) and P(corrupt entity) per
                         layer, two lines, with clean/corrupted-run reference
                         levels
 
@@ -27,7 +27,7 @@ skipped. `--patch role` patches the role noun instead (documented confound:
 the corrupt name remains readable in the prompt, so recovery ~0 everywhere).
 
 Usage:
-  python -m scripts.inspect.step_d --hf-model Qwen/Qwen3-8B-Base --device cpu
+  python -m scripts.inspect.entity_patching --hf-model Qwen/Qwen3-8B-Base --device cpu
   # quick smoke: --max-pairs 1
 """
 import argparse
@@ -130,7 +130,7 @@ def main():
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--patch", choices=["subject", "role"], default="subject")
     ap.add_argument("--max-pairs", type=int, default=None)
-    ap.add_argument("--out", default="results/step_d")
+    ap.add_argument("--out", default="results/entity_patching")
     args = ap.parse_args()
     device = torch.device(args.device)
     os.makedirs(args.out, exist_ok=True)
@@ -182,7 +182,7 @@ def main():
            "patch": args.patch, "recovery": recov.tolist(),
            "P_clean_entity": p_clean.tolist(), "P_corrupt_entity": p_corr.tolist(),
            "references": ref}
-    with open(os.path.join(args.out, "step_d.json"), "w") as f:
+    with open(os.path.join(args.out, "entity_patching.json"), "w") as f:
         json.dump(res, f, indent=1)
 
     fig, ax = plt.subplots(figsize=(8, 4.5))
@@ -192,7 +192,7 @@ def main():
     ax.set_ylabel("logit-diff recovery toward clean entity (1 = fully flipped)")
     ax.set_title(f"{args.hf_model}: where is the entity position still read?")
     ax.grid(alpha=0.3); fig.tight_layout()
-    fig.savefig(os.path.join(args.out, "step_d_recovery.png"), dpi=150, bbox_inches="tight")
+    fig.savefig(os.path.join(args.out, "entity_patching_recovery.png"), dpi=150, bbox_inches="tight")
 
     fig2, ax2 = plt.subplots(figsize=(8.5, 4.8))
     ax2.plot(range(n_layer), p_clean.tolist(), "-o", ms=3, color=TEAL,
@@ -207,8 +207,8 @@ def main():
     ax2.set_ylabel("softmax probability at final position")
     ax2.set_title(f"{args.hf_model}: entity probabilities under interchange patching")
     ax2.legend(fontsize=8); ax2.grid(alpha=0.3); fig2.tight_layout()
-    fig2.savefig(os.path.join(args.out, "step_d_probs.png"), dpi=150, bbox_inches="tight")
-    print(f"saved {args.out}/step_d_recovery.png and step_d_probs.png", flush=True)
+    fig2.savefig(os.path.join(args.out, "entity_patching_probs.png"), dpi=150, bbox_inches="tight")
+    print(f"saved {args.out}/entity_patching_recovery.png and entity_patching_probs.png", flush=True)
 
 
 if __name__ == "__main__":

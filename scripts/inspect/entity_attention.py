@@ -1,6 +1,6 @@
 """Raw attention check: where does the final token LOOK, layer by layer?
 
-Companion to step_d.py, with no intervention at all: feed the same sentences
+Companion to entity_patching.py, with no intervention at all: feed the same sentences
 unmodified and read the attention weights of the LAST token over all previous
 positions, per layer. If the name is attended in early/mid layers and dropped
 late, that directly corroborates the causal boundary without any patching.
@@ -21,7 +21,7 @@ useful); this complements the causal test, it does not replace it.
 Runs on CPU fine (short sentences). Requires eager attention for weights.
 
 Usage:
-  python -m scripts.inspect.attn_to_subject --hf-model Qwen/Qwen3-8B-Base --device cpu
+  python -m scripts.inspect.entity_attention --hf-model Qwen/Qwen3-8B-Base --device cpu
   # quick smoke: --max-sentences 1
 """
 import argparse
@@ -54,7 +54,7 @@ def main():
     ap.add_argument("--boundary", type=int, default=None,
                     help="optional measured causal boundary to overlay")
     ap.add_argument("--max-sentences", type=int, default=None)
-    ap.add_argument("--out", default="results/attn")
+    ap.add_argument("--out", default="results/entity_attention")
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
     device = torch.device(args.device)
@@ -104,7 +104,7 @@ def main():
 
     res = {"model": args.hf_model, "n_layer": n_layer, "boundary": args.boundary,
            "mass": {k: v.tolist() for k, v in cats.items()}}
-    with open(os.path.join(args.out, "attn_to_subject.json"), "w") as f:
+    with open(os.path.join(args.out, "entity_attention.json"), "w") as f:
         json.dump(res, f, indent=1)
 
     fig, (ax, ax2) = plt.subplots(1, 2, figsize=(14, 4.8),
@@ -127,7 +127,7 @@ def main():
         ax2.axhline(args.boundary, color="r", ls="--", lw=1)
     fig.colorbar(im, ax=ax2, fraction=0.03)
     fig.tight_layout()
-    p = os.path.join(args.out, "attn_to_subject.png")
+    p = os.path.join(args.out, "entity_attention.png")
     fig.savefig(p, dpi=150, bbox_inches="tight")
     print(f"saved {p}", flush=True)
 
