@@ -27,6 +27,26 @@ class GPTNoLambdaConfig(GPTConfig):
 # -----------------------------------------------------------------------------
 from nanochat.model.gpt_base import GPTBaseConfig, GPTBase
 
+@dataclass
+class SkipAheadDenseConfig(GPTBaseConfig):
+    skip_ahead_mode: str = "dense"
+    skip_gate_source: str = "current"
+
+@dataclass
+class SkipAheadSparseConfig(GPTBaseConfig):
+    skip_ahead_mode: str = "sparse"
+    skip_gate_source: str = "current"
+
+@dataclass
+class SkipAheadDenseX0Config(GPTBaseConfig):
+    skip_ahead_mode: str = "dense"
+    skip_gate_source: str = "x0"
+
+@dataclass
+class SkipAheadSparseX0Config(GPTBaseConfig):
+    skip_ahead_mode: str = "sparse"
+    skip_gate_source: str = "x0"
+
 # -----------------------------------------------------------------------------
 # Registry: model_type string -> (ConfigClass, ModelClass)
 # -----------------------------------------------------------------------------
@@ -35,7 +55,11 @@ MODELS = {
     "gpt":              (GPTConfig,             GPT),
     "gpt_nolambda":     (GPTNoLambdaConfig,     GPT),
     # gpt_base.py family
-    "gpt_base":         (GPTBaseConfig,         GPTBase),
+    "gpt_base":              (GPTBaseConfig,              GPTBase),
+    "skip_ahead_dense":      (SkipAheadDenseConfig,       GPTBase),
+    "skip_ahead_sparse":     (SkipAheadSparseConfig,      GPTBase),
+    "skip_ahead_dense_x0":   (SkipAheadDenseX0Config,     GPTBase),
+    "skip_ahead_sparse_x0":  (SkipAheadSparseX0Config,    GPTBase),
 }
 
 

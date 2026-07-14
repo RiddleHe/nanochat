@@ -39,6 +39,12 @@ class GPTBaseConfig:
     # Characters: L=long (full context), S=short (quarter context)
     # Examples: "L"=all full context, "SL"=alternating, "SSL"=two short then one long
     window_pattern: str = "SSSL"
+    # Skip-ahead routing. "none" preserves the original GPTBase architecture.
+    # Dense gates use 2*sigmoid(logit); sparse gates hard-zero values below the threshold
+    # while using a straight-through gradient through the dense gate.
+    skip_ahead_mode: str = "none"  # one of: none, dense, sparse
+    skip_gate_source: str = "current"  # one of: current, x0
+    skip_threshold: float = 0.5
 
 
 def norm(x):
@@ -140,10 +146,20 @@ class Block(nn.Module):
         self.attn = CausalSelfAttention(config, layer_idx, window_size)
         self.mlp = MLP(config)
 
-    def forward(self, x, cos_sin, kv_cache):
-        x = x + self.attn(norm(x), cos_sin, kv_cache)
-        x = x + self.mlp(norm(x))
-        return x
+    def forward(self, x, cos_sin, kv_cache, gate=None):
+        if gate is None:
+            # Keep the baseline execution path unchanged when skip-ahead is disabled.
+            x = x + self.attn(norm(x), cos_sin, kv_cache)
+            x = x + self.mlp(norm(x))
+            return x
+
+        # Treat the attention+MLP pair as one residual update. The MLP sees the
+        # normal post-attention state, then the scalar gate controls the complete
+        # layer contribution: x_next = x + gate * F_layer(x).
+        attn_out = self.attn(norm(x), cos_sin, kv_cache)
+        h = x + attn_out
+        mlp_out = self.mlp(norm(h))
+        return x + gate * (attn_out + mlp_out)
 
 
 class GPTBase(nn.Module):
@@ -155,6 +171,12 @@ class GPTBase(nn.Module):
         """
         super().__init__()
         self.config = config
+        assert config.skip_ahead_mode in {"none", "dense", "sparse"}, \
+            f"Invalid skip_ahead_mode: {config.skip_ahead_mode}"
+        assert config.skip_gate_source in {"current", "x0"}, \
+            f"Invalid skip_gate_source: {config.skip_gate_source}"
+        assert config.skip_threshold >= 0.0, \
+            f"skip_threshold must be non-negative, got {config.skip_threshold}"
         # Compute per-layer window sizes for sliding window attention
         # window_size is (left, right) tuple: (-1, 0) for full context, (N, 0) for sliding window
         self.window_sizes = self._compute_window_sizes(config)
@@ -171,6 +193,12 @@ class GPTBase(nn.Module):
             ]),
         })
         self.lm_head = Linear(config.n_embd, padded_vocab_size, bias=False)
+        # One input-dependent scalar gate per transformer layer. Keep these out
+        # of transformer.h so their 1 x d weights can use AdamW instead of Muon.
+        self.skip_gates = nn.ModuleList([
+            Linear(config.n_embd, 1, bias=False)
+            for _ in range(config.n_layer)
+        ]) if config.skip_ahead_mode != "none" else nn.ModuleList()
         # Smear: mix previous token's embedding into current token (cheap bigram-like info)
         self.smear_gate = Linear(24, 1, bias=False)
         self.smear_lambda = nn.Parameter(torch.zeros(1))
@@ -214,6 +242,11 @@ class GPTBase(nn.Module):
             torch.nn.init.zeros_(block.attn.c_proj.weight) # projections are zero
             torch.nn.init.uniform_(block.mlp.c_fc.weight, -s * 0.4, s * 0.4)  # 0.4x init scale for c_fc
             torch.nn.init.zeros_(block.mlp.c_proj.weight)
+
+        # Zero logits give 2*sigmoid(0) = 1, so every skip-ahead variant starts
+        # exactly at the original GPTBase computation.
+        for gate in self.skip_gates:
+            torch.nn.init.zeros_(gate.weight)
 
         # Rotary embeddings
         head_dim = self.config.n_embd // self.config.n_head
@@ -317,13 +350,15 @@ class GPTBase(nn.Module):
         wte = sum(p.numel() for p in self.transformer.wte.parameters())
         lm_head = sum(p.numel() for p in self.lm_head.parameters())
         transformer_matrices = sum(p.numel() for p in self.transformer.h.parameters())
+        skip_gates = sum(p.numel() for p in self.skip_gates.parameters())
         scalars = self.smear_gate.weight.numel() + self.smear_lambda.numel()
-        total = wte + lm_head + transformer_matrices + scalars
+        total = wte + lm_head + transformer_matrices + skip_gates + scalars
         assert total == sum(p.numel() for p in self.parameters()), "Parameter count mismatch"
         return {
             'wte': wte,
             'lm_head': lm_head,
             'transformer_matrices': transformer_matrices,
+            'skip_gates': skip_gates,
             'scalars': scalars,
             'total': total,
         }
@@ -336,8 +371,10 @@ class GPTBase(nn.Module):
         matrix_params = [p for p in self.transformer.h.parameters() if p.dim() >= 2]
         embedding_params = list(self.transformer.wte.parameters())
         lm_head_params = list(self.lm_head.parameters())
+        skip_gate_params = list(self.skip_gates.parameters())
         smear_params = [self.smear_gate.weight, self.smear_lambda]
-        assert len(list(self.parameters())) == len(matrix_params) + len(embedding_params) + len(lm_head_params) + len(smear_params)
+        assert len(list(self.parameters())) == (len(matrix_params) + len(embedding_params) +
+            len(lm_head_params) + len(skip_gate_params) + len(smear_params))
 
         # Scale the LR for the AdamW parameters by ∝1/√dmodel (tuned for 768 dim model)
         dmodel_lr_scale = (model_dim / 768) ** -0.5
@@ -350,6 +387,11 @@ class GPTBase(nn.Module):
             dict(kind='adamw', params=embedding_params, lr=embedding_lr * dmodel_lr_scale, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.001),
             dict(kind='adamw', params=smear_params, lr=0.2, betas=(0.8, 0.95), eps=1e-10, weight_decay=0.0),
         ]
+        if skip_gate_params:
+            param_groups.append(dict(
+                kind='adamw', params=skip_gate_params, lr=scalar_lr * dmodel_lr_scale,
+                betas=(0.8, 0.95), eps=1e-10, weight_decay=0.0,
+            ))
         # Muon groups (matrix params, grouped by shape for stacking)
         for shape in sorted({p.shape for p in matrix_params}):
             group_params = [p for p in matrix_params if p.shape == shape]
@@ -363,6 +405,23 @@ class GPTBase(nn.Module):
         for group in optimizer.param_groups:
             group["initial_lr"] = group["lr"]
         return optimizer
+
+    def _compute_skip_gate(self, layer_idx, x, x0):
+        """Return a (B, T, 1) dense or hard-zero skip-ahead gate."""
+        source = x if self.config.skip_gate_source == "current" else x0
+        logits = self.skip_gates[layer_idx](norm(source))
+        soft_gate = 2.0 * torch.sigmoid(logits)
+        if self.config.skip_ahead_mode == "dense":
+            return soft_gate
+
+        # Forward: exactly zero below threshold, continuous soft value otherwise.
+        # Backward: act as soft_gate everywhere so a skipped gate can turn back on.
+        hard_gate = torch.where(
+            soft_gate >= self.config.skip_threshold,
+            soft_gate,
+            torch.zeros_like(soft_gate),
+        )
+        return soft_gate + (hard_gate - soft_gate).detach()
 
     def forward(self, idx, targets=None, kv_cache=None, loss_reduction='mean'):
         B, T = idx.size()
@@ -400,8 +459,14 @@ class GPTBase(nn.Module):
                 x = x + gate * x_pre_smear
 
         # Forward the trunk of the Transformer.
-        for block in self.transformer.h:
-            x = block(x, cos_sin, kv_cache)
+        if self.config.skip_ahead_mode == "none":
+            for block in self.transformer.h:
+                x = block(x, cos_sin, kv_cache)
+        else:
+            x0 = x
+            for layer_idx, block in enumerate(self.transformer.h):
+                gate = self._compute_skip_gate(layer_idx, x, x0)
+                x = block(x, cos_sin, kv_cache, gate=gate)
         x = norm(x)
 
         # Forward the lm_head (compute logits)
