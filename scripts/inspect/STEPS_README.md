@@ -116,6 +116,40 @@ causally SPENT in late layers.
 
 ---
 
+## E1 — inference-time deep-layer window masking   (`deep_window_mask.py`, Qwen3-8B)
+
+Tests "deep layers need no attention beyond a local window": pre-hook replaces
+attention_mask with causal window W in layers >= start (first `sink`=4 tokens
+stay visible everywhere — deep-layer attention sink, blinding it adds ~0.6
+nats of unrelated damage). Metric: mean NLL on 40x2048 wikitext-103 val tokens.
+```
+CUDA_VISIBLE_DEVICES=0 <py> -m scripts.inspect.deep_window_mask --out results/deep_window
+# band variant (mask only [s,e)): --bands 4:24 8:24 24:36 --start-layers --windows
+```
+Result: NO cliff at the hand-off boundary. Start-layer sweep W=256: L0 +0.141,
+L4-20 flat ~+0.12, L24 +0.082, L32 +0.040. Bands: mid L8-24 costs 0.0030
+nats/layer, deep L24-36 costs 0.0068/layer (2.3x). W=1024 from L24 nearly free
+(+0.007). => windowing is CHEAPEST mid, most expensive late.
+
+## E2 — hand-off vs entity-readout distance   (`handoff_distance.py`, Qwen3-8B)
+
+Same interchange patching as Step D but with N filler tokens between the
+entity clause and " The {role} was"; patches BOTH the entity position and the
+final position per layer; also logs the clean-corrupt logit-diff (denominator,
+stays ~10 up to N=1400 => binding intact).
+```
+CUDA_VISIBLE_DEVICES=1 <py> -m scripts.inspect.handoff_distance --out results/handoff_distance
+```
+Result: hand-off ONSET distance-invariant (entity-pos influence starts falling
+at L23-24 for all N). COMPLETION distance-dependent: N=0 readout has the info
+by L26; N>=100 only by L31-34, with the entity position keeping ~0.4 causal
+influence through L30+. Saturates by N~100 (local vs far, two regimes).
+=> deep layers DO long-range reads for distant entities; the "deep layers can
+all be local" hypothesis is refuted; evidence favors windows early/mid + full
+attention late (consistent with E1, Meta FAIR 2510.04800, MixAttention, YOCO).
+
+---
+
 ## Combined conclusion
 
 Late-layer entity information is (1) linearly decodable [Step 1, ~0.94],

@@ -42,3 +42,20 @@ in `scripts/inspect/` (see `STEPS_README.md` there for setups/commands).
   on nanochat baselines (d12: L8, d24: L14). Script: `step_d_nanochat.py`.
 - `boundary_vs_quality.json` / `.png` — swap-start sweep val_bpb vs measured
   boundary (d12 complete; d24 missing points training now).
+
+## Sliding-window direction (E1/E2, Qwen3-8B)
+- `deep_window_mask.json` / `.png` — E1: inference-time window masking of
+  layers >= start (W sweep, sink 4 vs 0), wikitext-103 val NLL. No cliff at
+  the boundary: deep layers (L24+) are the MOST expensive to window
+  (+0.082 nats alone vs +0.036 extra for all of L8-23). W=1024 nearly free
+  (+0.007). Sink must stay visible. Script: `deep_window_mask.py`.
+- `deep_window_bands.json` — E1b: band masking [start,end). Per masked layer:
+  mid L8-24 ~0.0030 nats, deep L24-36 ~0.0068 (2.3x). Windows are cheaper in
+  the middle, full attention matters most LATE.
+- `handoff_distance.json` / `.png` — E2: entity-pos vs last-pos patching with
+  N filler tokens between entity and readout (N=0..1400, 16 pairs). Hand-off
+  ONSET is distance-invariant (L23-24); COMPLETION is not: local N=0 arrives
+  at readout by L26, distant (N>=100) only by L31-34 while the entity position
+  keeps ~0.4 causal influence through L30+. Effect saturates by N~100 (two
+  regimes: local vs far). Kills the "deep layers need no distant tokens"
+  hypothesis; supports the flipped placement (windows early/mid, full late).

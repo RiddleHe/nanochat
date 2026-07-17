@@ -1,0 +1,150 @@
+{
+ "model": "Qwen/Qwen3-8B-Base",
+ "n_layer": 36,
+ "seq_len": 2048,
+ "n_windows": 40,
+ "sink": 4,
+ "baseline_nll": 1.9077560238449178,
+ "start_sweep": [
+  {
+   "start_layer": 0,
+   "window": 256,
+   "sink": 4,
+   "nll": 2.0483016125446536
+  },
+  {
+   "start_layer": 4,
+   "window": 256,
+   "sink": 4,
+   "nll": 2.03017608538219
+  },
+  {
+   "start_layer": 8,
+   "window": 256,
+   "sink": 4,
+   "nll": 2.025405569220964
+  },
+  {
+   "start_layer": 12,
+   "window": 256,
+   "sink": 4,
+   "nll": 2.027073188636381
+  },
+  {
+   "start_layer": 16,
+   "window": 256,
+   "sink": 4,
+   "nll": 2.0301189532557173
+  },
+  {
+   "start_layer": 20,
+   "window": 256,
+   "sink": 4,
+   "nll": 2.025849488914799
+  },
+  {
+   "start_layer": 22,
+   "window": 256,
+   "sink": 4,
+   "nll": 2.014312684506862
+  },
+  {
+   "start_layer": 24,
+   "window": 256,
+   "sink": 4,
+   "nll": 1.9897439260627214
+  },
+  {
+   "start_layer": 26,
+   "window": 256,
+   "sink": 4,
+   "nll": 1.9810300021038791
+  },
+  {
+   "start_layer": 28,
+   "window": 256,
+   "sink": 4,
+   "nll": 1.9637149484668874
+  },
+  {
+   "start_layer": 32,
+   "window": 256,
+   "sink": 4,
+   "nll": 1.94727496066557
+  }
+ ],
+ "window_sweep": [
+  {
+   "start_layer": 24,
+   "window": 1024,
+   "sink": 4,
+   "nll": 1.9144779654439041
+  },
+  {
+   "start_layer": 24,
+   "window": 1024,
+   "sink": 0,
+   "nll": 2.0453545596929197
+  },
+  {
+   "start_layer": 24,
+   "window": 512,
+   "sink": 4,
+   "nll": 1.9408650109869245
+  },
+  {
+   "start_layer": 24,
+   "window": 512,
+   "sink": 0,
+   "nll": 2.320174775824759
+  },
+  {
+   "start_layer": 24,
+   "window": 256,
+   "sink": 4,
+   "nll": 1.9897439260627214
+  },
+  {
+   "start_layer": 24,
+   "window": 256,
+   "sink": 0,
+   "nll": 2.625300381226719
+  },
+  {
+   "start_layer": 24,
+   "window": 128,
+   "sink": 4,
+   "nll": 2.0777990597425346
+  },
+  {
+   "start_layer": 24,
+   "window": 128,
+   "sink": 0,
+   "nll": 2.945836221595246
+  },
+  {
+   "start_layer": 24,
+   "window": 64,
+   "sink": 4,
+   "nll": 2.2111214999751923
+  },
+  {
+   "start_layer": 24,
+   "window": 64,
+   "sink": 0,
+   "nll": 3.2998427159505526
+  },
+  {
+   "start_layer": 24,
+   "window": 16,
+   "sink": 4,
+   "nll": 2.5630360180771405
+  },
+  {
+   "start_layer": 24,
+   "window": 16,
+   "sink": 0,
+   "nll": 4.028516883272395
+  }
+ ]
+}

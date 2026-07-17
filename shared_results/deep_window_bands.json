@@ -1,0 +1,47 @@
+{
+ "model": "Qwen/Qwen3-8B-Base",
+ "n_layer": 36,
+ "seq_len": 2048,
+ "n_windows": 40,
+ "sink": 4,
+ "baseline_nll": 1.9077560238449178,
+ "start_sweep": [],
+ "window_sweep": [],
+ "band_sweep": [
+  {
+   "start_layer": 0,
+   "end_layer": 24,
+   "window": 256,
+   "sink": 4,
+   "nll": 1.9844541876736534
+  },
+  {
+   "start_layer": 4,
+   "end_layer": 24,
+   "window": 256,
+   "sink": 4,
+   "nll": 1.9660871497351307
+  },
+  {
+   "start_layer": 8,
+   "end_layer": 24,
+   "window": 256,
+   "sink": 4,
+   "nll": 1.9561168467526793
+  },
+  {
+   "start_layer": 4,
+   "end_layer": 32,
+   "window": 256,
+   "sink": 4,
+   "nll": 1.9853039866840192
+  },
+  {
+   "start_layer": 24,
+   "end_layer": 36,
+   "window": 256,
+   "sink": 4,
+   "nll": 1.9897439260627214
+  }
+ ]
+}
