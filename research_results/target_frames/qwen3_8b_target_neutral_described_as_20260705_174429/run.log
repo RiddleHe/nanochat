@@ -1,0 +1,239 @@
+Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 267.13it/s]
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+The attention mask is not set and cannot be inferred from input because pad token is same as eos token. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
+Model: Qwen_Qwen3-8B  n_layer=36  target_layer=-1  source_set=canonical  inject_mode=residual
+Target prompt: 'Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x'
+Target full prompt: 'Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x can be described as'
+Target placeholder: 'x'
+Target suffix: ' can be described as'
+Target query: ''
+
+===== Source [diana]: 'Diana, princess of Wales' =====
+  target full prompt: 'Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x can be described as'
+  target placeholder: 'x'
+  target suffix: ' can be described as'
+  target query: ''
+  chosen tgt_pos: 29
+  decoded target token at tgt_pos: ' x'
+  target tokens: 34  target-with-placeholder tokens: 30
+  target layer 00/35 done
+  target layer 01/35 done
+  target layer 02/35 done
+  target layer 03/35 done
+  target layer 04/35 done
+  target layer 05/35 done
+  target layer 06/35 done
+  target layer 07/35 done
+  target layer 08/35 done
+  target layer 09/35 done
+  target layer 10/35 done
+  target layer 11/35 done
+  target layer 12/35 done
+  target layer 13/35 done
+  target layer 14/35 done
+  target layer 15/35 done
+  target layer 16/35 done
+  target layer 17/35 done
+  target layer 18/35 done
+  target layer 19/35 done
+  target layer 20/35 done
+  target layer 21/35 done
+  target layer 22/35 done
+  target layer 23/35 done
+  target layer 24/35 done
+  target layer 25/35 done
+  target layer 26/35 done
+  target layer 27/35 done
+  target layer 28/35 done
+  target layer 29/35 done
+  target layer 30/35 done
+  target layer 31/35 done
+  target layer 32/35 done
+  target layer 33/35 done
+  target layer 34/35 done
+  target layer 35/35 done
+  -> /ssd/mh3897/patchscope_results/qwen3_8b_target_neutral_described_as_20260705_174429/Qwen_Qwen3-8B__tgtALL__canonical__norm__diana.txt  (1296 rows)
+
+===== Source [alexander]: 'Alexander the Great' =====
+  target full prompt: 'Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x can be described as'
+  target placeholder: 'x'
+  target suffix: ' can be described as'
+  target query: ''
+  chosen tgt_pos: 29
+  decoded target token at tgt_pos: ' x'
+  target tokens: 34  target-with-placeholder tokens: 30
+  target layer 00/35 done
+  target layer 01/35 done
+  target layer 02/35 done
+  target layer 03/35 done
+  target layer 04/35 done
+  target layer 05/35 done
+  target layer 06/35 done
+  target layer 07/35 done
+  target layer 08/35 done
+  target layer 09/35 done
+  target layer 10/35 done
+  target layer 11/35 done
+  target layer 12/35 done
+  target layer 13/35 done
+  target layer 14/35 done
+  target layer 15/35 done
+  target layer 16/35 done
+  target layer 17/35 done
+  target layer 18/35 done
+  target layer 19/35 done
+  target layer 20/35 done
+  target layer 21/35 done
+  target layer 22/35 done
+  target layer 23/35 done
+  target layer 24/35 done
+  target layer 25/35 done
+  target layer 26/35 done
+  target layer 27/35 done
+  target layer 28/35 done
+  target layer 29/35 done
+  target layer 30/35 done
+  target layer 31/35 done
+  target layer 32/35 done
+  target layer 33/35 done
+  target layer 34/35 done
+  target layer 35/35 done
+  -> /ssd/mh3897/patchscope_results/qwen3_8b_target_neutral_described_as_20260705_174429/Qwen_Qwen3-8B__tgtALL__canonical__norm__alexander.txt  (1296 rows)
+
+===== Source [ali]: 'Muhammad Ali' =====
+  target full prompt: 'Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x can be described as'
+  target placeholder: 'x'
+  target suffix: ' can be described as'
+  target query: ''
+  chosen tgt_pos: 29
+  decoded target token at tgt_pos: ' x'
+  target tokens: 34  target-with-placeholder tokens: 30
+  target layer 00/35 done
+  target layer 01/35 done
+  target layer 02/35 done
+  target layer 03/35 done
+  target layer 04/35 done
+  target layer 05/35 done
+  target layer 06/35 done
+  target layer 07/35 done
+  target layer 08/35 done
+  target layer 09/35 done
+  target layer 10/35 done
+  target layer 11/35 done
+  target layer 12/35 done
+  target layer 13/35 done
+  target layer 14/35 done
+  target layer 15/35 done
+  target layer 16/35 done
+  target layer 17/35 done
+  target layer 18/35 done
+  target layer 19/35 done
+  target layer 20/35 done
+  target layer 21/35 done
+  target layer 22/35 done
+  target layer 23/35 done
+  target layer 24/35 done
+  target layer 25/35 done
+  target layer 26/35 done
+  target layer 27/35 done
+  target layer 28/35 done
+  target layer 29/35 done
+  target layer 30/35 done
+  target layer 31/35 done
+  target layer 32/35 done
+  target layer 33/35 done
+  target layer 34/35 done
+  target layer 35/35 done
+  -> /ssd/mh3897/patchscope_results/qwen3_8b_target_neutral_described_as_20260705_174429/Qwen_Qwen3-8B__tgtALL__canonical__norm__ali.txt  (1296 rows)
+
+===== Source [jurassic]: 'Jurassic Park' =====
+  target full prompt: 'Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x can be described as'
+  target placeholder: 'x'
+  target suffix: ' can be described as'
+  target query: ''
+  chosen tgt_pos: 29
+  decoded target token at tgt_pos: ' x'
+  target tokens: 34  target-with-placeholder tokens: 30
+  target layer 00/35 done
+  target layer 01/35 done
+  target layer 02/35 done
+  target layer 03/35 done
+  target layer 04/35 done
+  target layer 05/35 done
+  target layer 06/35 done
+  target layer 07/35 done
+  target layer 08/35 done
+  target layer 09/35 done
+  target layer 10/35 done
+  target layer 11/35 done
+  target layer 12/35 done
+  target layer 13/35 done
+  target layer 14/35 done
+  target layer 15/35 done
+  target layer 16/35 done
+  target layer 17/35 done
+  target layer 18/35 done
+  target layer 19/35 done
+  target layer 20/35 done
+  target layer 21/35 done
+  target layer 22/35 done
+  target layer 23/35 done
+  target layer 24/35 done
+  target layer 25/35 done
+  target layer 26/35 done
+  target layer 27/35 done
+  target layer 28/35 done
+  target layer 29/35 done
+  target layer 30/35 done
+  target layer 31/35 done
+  target layer 32/35 done
+  target layer 33/35 done
+  target layer 34/35 done
+  target layer 35/35 done
+  -> /ssd/mh3897/patchscope_results/qwen3_8b_target_neutral_described_as_20260705_174429/Qwen_Qwen3-8B__tgtALL__canonical__norm__jurassic.txt  (1296 rows)
+
+===== Source [nyc]: 'New York City' =====
+  target full prompt: 'Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x can be described as'
+  target placeholder: 'x'
+  target suffix: ' can be described as'
+  target query: ''
+  chosen tgt_pos: 29
+  decoded target token at tgt_pos: ' x'
+  target tokens: 34  target-with-placeholder tokens: 30
+  target layer 00/35 done
+  target layer 01/35 done
+  target layer 02/35 done
+  target layer 03/35 done
+  target layer 04/35 done
+  target layer 05/35 done
+  target layer 06/35 done
+  target layer 07/35 done
+  target layer 08/35 done
+  target layer 09/35 done
+  target layer 10/35 done
+  target layer 11/35 done
+  target layer 12/35 done
+  target layer 13/35 done
+  target layer 14/35 done
+  target layer 15/35 done
+  target layer 16/35 done
+  target layer 17/35 done
+  target layer 18/35 done
+  target layer 19/35 done
+  target layer 20/35 done
+  target layer 21/35 done
+  target layer 22/35 done
+  target layer 23/35 done
+  target layer 24/35 done
+  target layer 25/35 done
+  target layer 26/35 done
+  target layer 27/35 done
+  target layer 28/35 done
+  target layer 29/35 done
+  target layer 30/35 done
+  target layer 31/35 done
+  target layer 32/35 done
+  target layer 33/35 done
+  target layer 34/35 done
+  target layer 35/35 done
+  -> /ssd/mh3897/patchscope_results/qwen3_8b_target_neutral_described_as_20260705_174429/Qwen_Qwen3-8B__tgtALL__canonical__norm__nyc.txt  (1296 rows)

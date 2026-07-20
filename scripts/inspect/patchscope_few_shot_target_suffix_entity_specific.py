@@ -39,12 +39,13 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 
-TARGET_DEFAULT = (
+TARGET_PLACEHOLDER_DEFAULT = "x"
+TARGET_PREFIX_DEFAULT = (
     "Syria: Country in the Middle East, "
     "Leonardo DiCaprio: American actor, "
     "Samsung: South Korean multinational major appliance and consumer electronics corporation, "
-    "x"
 )
+TARGET_DEFAULT = TARGET_PREFIX_DEFAULT + TARGET_PLACEHOLDER_DEFAULT
 
 # Each entity has a short key, a display title (for plot column headers), and
 # one source prompt per source-set. The binary-decode criteria are keyed by
@@ -72,6 +73,29 @@ SOURCE_SETS = {
         "ali": "the boxer Muhammad",
         "jurassic": "the film Jurassic",
         "nyc": "Manhattan, New",
+    },
+}
+
+ENTITY_SPECIFIC_TARGETS = {
+    "Diana, princess of Wales": {
+        "target_suffix": " was known for her public life",
+        "target_query": ". This person was",
+    },
+    "Alexander the Great": {
+        "target_suffix": " was known for his military conquests",
+        "target_query": ". This person was",
+    },
+    "Muhammad Ali": {
+        "target_suffix": " was known for his boxing career",
+        "target_query": ". This person was",
+    },
+    "Jurassic Park": {
+        "target_suffix": " is known as a popular film about dinosaurs",
+        "target_query": ". This work was",
+    },
+    "New York City": {
+        "target_suffix": " is known as a major city in the United States",
+        "target_query": ". This place was",
     },
 }
 
@@ -277,6 +301,21 @@ def capture_source_block_contributions(adapter, src_ids, src_pos):
             for i in range(adapter["n_layer"])}
 
 
+def build_target_with_suffix(target, target_placeholder, target_suffix, target_query):
+    """Build target prompt with placeholder followed by suffix/query text."""
+    if target_placeholder not in target:
+        raise ValueError(
+            f"target placeholder {target_placeholder!r} not found in target {target!r}")
+    target_before_x, remainder = target.split(target_placeholder, 1)
+    if remainder:
+        raise ValueError(
+            "--target should contain the few-shot prefix ending at the placeholder; "
+            f"found trailing text after {target_placeholder!r}: {remainder!r}")
+    target_with_x = target_before_x + target_placeholder
+    target_full = target_with_x + target_suffix + target_query
+    return target_before_x, target_with_x, target_full
+
+
 def patched_generate(adapter, tgt_ids, target_layer, tgt_pos, src_vec,
                      max_tokens, op="replace", normalize=False):
     """Hook on block `target_layer`: at the prefill step (input length covers
@@ -321,19 +360,26 @@ def patched_generate(adapter, tgt_ids, target_layer, tgt_pos, src_vec,
 
 
 def run_one_source(adapter, source, target, target_layer, max_tokens,
-                   inject_mode="residual", normalize=False):
-    """inject_mode='residual' (existing): extract residual-stream output at
-        each src layer and REPLACE target residual at tgt_layer with it.
-    inject_mode='block': extract each block's contribution (output - input)
-        at the src last token, ADD it on top of target residual at tgt_layer."""
+                   inject_mode="residual", normalize=False,
+                   target_placeholder=TARGET_PLACEHOLDER_DEFAULT,
+                   target_suffix=" was known for her public life",
+                   target_query=". This person was"):
+    """Patch at the target placeholder while generation starts after suffix/query."""
+    target_before_x, target_with_x, target_full = build_target_with_suffix(
+        target, target_placeholder, target_suffix, target_query)
     src_ids = adapter["encode"](source)
-    tgt_ids = adapter["encode"](target)
+    target_with_x_ids = adapter["encode"](target_with_x)
+    tgt_ids = adapter["encode"](target_full)
     assert len(src_ids) >= 1, f"Source must tokenize to >=1 token: {source!r}"
+    assert len(target_with_x_ids) >= 1, (
+        f"Target with placeholder must tokenize to >=1 token: {target_with_x!r}")
+    assert len(target_with_x_ids) <= len(tgt_ids), (
+        "Target-with-placeholder tokenization is longer than full target; check suffix/query")
     assert len(tgt_ids) >= 2, f"Target needs >=2 tokens; got {len(tgt_ids)}"
     if len(src_ids) < 2:  # nanochat smear-gate needs T>1
         src_ids = [src_ids[0]] + src_ids
     src_pos = len(src_ids) - 1
-    tgt_pos = len(tgt_ids) - 1
+    tgt_pos = len(target_with_x_ids) - 1
 
     if inject_mode == "residual":
         src_vecs = capture_source_hiddens(adapter, src_ids, src_pos)
@@ -349,7 +395,20 @@ def run_one_source(adapter, source, target, target_layer, max_tokens,
                                 src_vecs[src_layer], max_tokens, op=op,
                                 normalize=normalize)
         results.append((src_layer, text.lstrip().split("\n")[0]))
-    return results
+    tgt_token = adapter["decode"]([tgt_ids[tgt_pos]])
+    return results, {
+        "target_before_x": target_before_x,
+        "target_with_x": target_with_x,
+        "target_full": target_full,
+        "target_placeholder": target_placeholder,
+        "target_suffix": target_suffix,
+        "target_query": target_query,
+        "tgt_pos": tgt_pos,
+        "tgt_token_id": tgt_ids[tgt_pos],
+        "tgt_token": tgt_token,
+        "target_token_count": len(tgt_ids),
+        "target_with_x_token_count": len(target_with_x_ids),
+    }
 
 
 # ----------------------------------------------------------------------------
@@ -516,7 +575,16 @@ def main():
                          "(output - input at the source last token), the "
                          "delta that block alone added to the residual stream.")
     ap.add_argument("--target", default=TARGET_DEFAULT,
-                    help="Few-shot description prompt; `x` placeholder is replaced.")
+                    help="Few-shot description prompt ending at the placeholder.")
+    ap.add_argument("--target-placeholder", default=TARGET_PLACEHOLDER_DEFAULT,
+                    help="Placeholder token/string to patch in the target prompt.")
+    ap.add_argument("--target-suffix", default=" was known for her public life",
+                    help="Target-side suffix appended immediately after the placeholder.")
+    ap.add_argument("--target-query", default=". This person was",
+                    help="Target-side query appended after --target-suffix; generation starts after this full prompt.")
+    ap.add_argument("--entity-specific-target", action="store_true",
+                    help="Use entity-specific target suffix/query strings keyed by the source phrase. "
+                         "When unset, use the global --target-suffix and --target-query values.")
     ap.add_argument("--max-tokens", type=int, default=20)
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--out-dir", default="./results/patchscopes")
@@ -536,7 +604,14 @@ def main():
     print(f"Model: {adapter['name']}  n_layer={n_layer}  "
           f"target_layer={args.target_layer}  source_set={args.source_set}  "
           f"inject_mode={args.inject_mode}")
+    target_before_x, target_with_x, target_full = build_target_with_suffix(
+        args.target, args.target_placeholder, args.target_suffix, args.target_query)
     print(f"Target prompt: {args.target!r}")
+    print(f"Target full prompt: {target_full!r}")
+    print(f"Target placeholder: {args.target_placeholder!r}")
+    print(f"Target suffix: {args.target_suffix!r}")
+    print(f"Target query: {args.target_query!r}")
+    print(f"Entity-specific target: {args.entity_specific_target}")
     os.makedirs(args.out_dir, exist_ok=True)
 
     # Single target layer, or -1 => sweep ALL target layers (source x target matrix).
@@ -552,12 +627,39 @@ def main():
 
     for ent_key in ENTITIES:
         source = sources[ent_key]
+        if args.entity_specific_target:
+            if source not in ENTITY_SPECIFIC_TARGETS:
+                raise ValueError(
+                    f"No entity-specific target suffix/query configured for source {source!r}")
+            target_suffix = ENTITY_SPECIFIC_TARGETS[source]["target_suffix"]
+            target_query = ENTITY_SPECIFIC_TARGETS[source]["target_query"]
+        else:
+            target_suffix = args.target_suffix
+            target_query = args.target_query
         print(f"\n===== Source [{ent_key}]: {source!r} =====")
+        print(f"  entity phrase: {source!r}")
+        print(f"  entity-specific target: {args.entity_specific_target}")
+        print(f"  target suffix used: {target_suffix!r}")
+        print(f"  target query used: {target_query!r}")
         rows = []  # (src_layer, tgt_layer, text)
+        target_info = None
         for tl in target_layers:
-            res = run_one_source(adapter, source, args.target, tl,
-                                 args.max_tokens, inject_mode=args.inject_mode,
-                                 normalize=args.normalize)
+            res, target_info = run_one_source(
+                adapter, source, args.target, tl, args.max_tokens,
+                inject_mode=args.inject_mode, normalize=args.normalize,
+                target_placeholder=args.target_placeholder,
+                target_suffix=target_suffix,
+                target_query=target_query)
+            if tl == target_layers[0]:
+                print(f"  target full prompt: {target_info['target_full']!r}")
+                print(f"  target placeholder: {target_info['target_placeholder']!r}")
+                print(f"  target suffix: {target_info['target_suffix']!r}")
+                print(f"  target query: {target_info['target_query']!r}")
+                print(f"  chosen tgt_pos: {target_info['tgt_pos']}")
+                print(f"  decoded target token at tgt_pos: {target_info['tgt_token']!r}")
+                print(f"  target tokens: {target_info['target_token_count']}  "
+                      f"target-with-placeholder tokens: "
+                      f"{target_info['target_with_x_token_count']}")
             for src_layer, text in res:
                 rows.append((src_layer, tl, text))
             if matrix_mode:
@@ -573,10 +675,25 @@ def main():
             f.write(f"model\t{adapter['name']}\n")
             f.write(f"entity_key\t{ent_key}\n")
             f.write(f"source\t{source}\n")
+            if target_info is not None:
+                f.write(f"target_full\t{target_info['target_full']}\n")
+                f.write(f"entity_phrase\t{source}\n")
+                f.write(f"entity_specific_target\t{args.entity_specific_target}\n")
+                f.write(f"target_suffix\t{target_info['target_suffix']}\n")
+                f.write(f"target_query\t{target_info['target_query']}\n")
+                f.write(f"target_placeholder\t{target_info['target_placeholder']}\n")
+                f.write(f"tgt_pos\t{target_info['tgt_pos']}\n")
+                f.write(f"tgt_token_id\t{target_info['tgt_token_id']}\n")
+                f.write(f"tgt_token\t{target_info['tgt_token']}\n")
+                f.write(f"target_token_count\t{target_info['target_token_count']}\n")
+                f.write("target_with_x_token_count\t"
+                        f"{target_info['target_with_x_token_count']}\n")
             f.write(f"source_set\t{args.source_set}\n")
             f.write(f"inject_mode\t{args.inject_mode}\n")
             f.write(f"normalize\t{args.normalize}\n")
             f.write(f"target\t{args.target}\n")
+            f.write(f"target_before_x\t{target_before_x}\n")
+            f.write(f"target_with_x\t{target_with_x}\n")
             f.write(f"target_layer\t{tgt_tag}\n")
             for src_layer, tl, text in rows:
                 f.write(f"S{src_layer:02d}_T{tl:02d}\t{text}\n")

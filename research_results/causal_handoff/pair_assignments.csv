@@ -1,0 +1,17 @@
+shard_id,pair_index,pair_id,donor,recipient,role
+0,0,scientist_Einstein_into_Newton,Einstein,Newton,scientist
+0,1,scientist_Einstein_into_Darwin,Einstein,Darwin,scientist
+0,2,scientist_Newton_into_Einstein,Newton,Einstein,scientist
+0,3,scientist_Newton_into_Darwin,Newton,Darwin,scientist
+0,4,scientist_Darwin_into_Einstein,Darwin,Einstein,scientist
+0,5,scientist_Darwin_into_Newton,Darwin,Newton,scientist
+1,6,composer_Mozart_into_Bach,Mozart,Bach,composer
+1,7,composer_Bach_into_Mozart,Bach,Mozart,composer
+1,8,writer_Shakespeare_into_Dickens,Shakespeare,Dickens,writer
+1,9,writer_Dickens_into_Shakespeare,Dickens,Shakespeare,writer
+1,10,country_France_into_Japan,France,Japan,country
+2,11,country_Japan_into_France,Japan,France,country
+2,12,city_Paris_into_Tokyo,Paris,Tokyo,city
+2,13,city_Tokyo_into_Paris,Tokyo,Paris,city
+2,14,company_Google_into_Apple,Google,Apple,company
+2,15,company_Apple_into_Google,Apple,Google,company

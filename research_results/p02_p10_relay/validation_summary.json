@@ -1,0 +1,261 @@
+{
+  "all_normalized_recoveries_finite": true,
+  "checks": {
+    "direct_final_min_ge_0.95": true,
+    "exact_relay_row_count": true,
+    "exactly_16_ordered_pairs": true,
+    "finite_values": true,
+    "identity_max_abs_le_1e-5": true
+  },
+  "direct_clean_donor_p10_layer35_mean_recovery": 1.0,
+  "direct_clean_donor_p10_layer35_min_recovery": 1.0,
+  "direct_control_rows": 1184,
+  "expected_relay_rows": 21312,
+  "identity_recipient_p10_max_abs_recovery": 0.0,
+  "interval_note": "Cluster-bootstrap intervals are descriptive because reciprocal ordered directions are dependent; unordered entity pairs are resampled with both directions together.",
+  "merged_shards": 3,
+  "model": "Qwen/Qwen3-8B-Base",
+  "num_ordered_pairs": 16,
+  "num_skipped_pairs": 0,
+  "num_unordered_clusters": 8,
+  "pair_ids": [
+    "scientist_Einstein_into_Newton",
+    "scientist_Einstein_into_Darwin",
+    "scientist_Newton_into_Einstein",
+    "scientist_Newton_into_Darwin",
+    "scientist_Darwin_into_Einstein",
+    "scientist_Darwin_into_Newton",
+    "composer_Mozart_into_Bach",
+    "composer_Bach_into_Mozart",
+    "writer_Shakespeare_into_Dickens",
+    "writer_Dickens_into_Shakespeare",
+    "country_France_into_Japan",
+    "country_Japan_into_France",
+    "city_Paris_into_Tokyo",
+    "city_Tokyo_into_Paris",
+    "company_Google_into_Apple",
+    "company_Apple_into_Google"
+  ],
+  "relay_rows": 21312,
+  "source_patch_end_to_end_reference_comparison": [
+    {
+      "delta": 0.0,
+      "layer": 0,
+      "observed": 0.9956607177065296,
+      "reference": 0.9956607177065296
+    },
+    {
+      "delta": 0.0,
+      "layer": 1,
+      "observed": 0.9992453612053795,
+      "reference": 0.9992453612053795
+    },
+    {
+      "delta": 0.0,
+      "layer": 2,
+      "observed": 0.9960147720947353,
+      "reference": 0.9960147720947353
+    },
+    {
+      "delta": 0.0,
+      "layer": 3,
+      "observed": 0.9979930909603183,
+      "reference": 0.9979930909603183
+    },
+    {
+      "delta": 0.0,
+      "layer": 4,
+      "observed": 0.9968873015599332,
+      "reference": 0.9968873015599332
+    },
+    {
+      "delta": 0.0,
+      "layer": 5,
+      "observed": 1.0024426607461412,
+      "reference": 1.0024426607461412
+    },
+    {
+      "delta": 0.0,
+      "layer": 6,
+      "observed": 0.9958180683061937,
+      "reference": 0.9958180683061937
+    },
+    {
+      "delta": 0.0,
+      "layer": 7,
+      "observed": 0.9929576092187126,
+      "reference": 0.9929576092187126
+    },
+    {
+      "delta": 0.0,
+      "layer": 8,
+      "observed": 0.994896747288286,
+      "reference": 0.994896747288286
+    },
+    {
+      "delta": 0.0,
+      "layer": 9,
+      "observed": 0.9508877926215428,
+      "reference": 0.9508877926215428
+    },
+    {
+      "delta": 0.0,
+      "layer": 10,
+      "observed": 0.928749744690708,
+      "reference": 0.928749744690708
+    },
+    {
+      "delta": 0.0,
+      "layer": 11,
+      "observed": 0.9052168945333452,
+      "reference": 0.9052168945333452
+    },
+    {
+      "delta": 0.0,
+      "layer": 12,
+      "observed": 0.9069765727636117,
+      "reference": 0.9069765727636117
+    },
+    {
+      "delta": 0.0,
+      "layer": 13,
+      "observed": 0.9105990794594299,
+      "reference": 0.9105990794594299
+    },
+    {
+      "delta": 0.0,
+      "layer": 14,
+      "observed": 0.8994877429088013,
+      "reference": 0.8994877429088013
+    },
+    {
+      "delta": 0.0,
+      "layer": 15,
+      "observed": 0.9029054957451845,
+      "reference": 0.9029054957451845
+    },
+    {
+      "delta": 0.0,
+      "layer": 16,
+      "observed": 0.8975260327672783,
+      "reference": 0.8975260327672783
+    },
+    {
+      "delta": 0.0,
+      "layer": 17,
+      "observed": 0.8912312261940252,
+      "reference": 0.8912312261940252
+    },
+    {
+      "delta": 0.0,
+      "layer": 18,
+      "observed": 0.8839025956465193,
+      "reference": 0.8839025956465193
+    },
+    {
+      "delta": 0.0,
+      "layer": 19,
+      "observed": 0.8796438343434964,
+      "reference": 0.8796438343434964
+    },
+    {
+      "delta": 0.0,
+      "layer": 20,
+      "observed": 0.8737229032586744,
+      "reference": 0.8737229032586744
+    },
+    {
+      "delta": 0.0,
+      "layer": 21,
+      "observed": 0.8589184448511956,
+      "reference": 0.8589184448511956
+    },
+    {
+      "delta": 0.0,
+      "layer": 22,
+      "observed": 0.8524375006044824,
+      "reference": 0.8524375006044824
+    },
+    {
+      "delta": 0.0,
+      "layer": 23,
+      "observed": 0.7289377051302622,
+      "reference": 0.7289377051302622
+    },
+    {
+      "delta": 0.0,
+      "layer": 24,
+      "observed": 0.40019374966365323,
+      "reference": 0.40019374966365323
+    },
+    {
+      "delta": 0.0,
+      "layer": 25,
+      "observed": 0.3953699251017772,
+      "reference": 0.3953699251017772
+    },
+    {
+      "delta": 0.0,
+      "layer": 26,
+      "observed": 0.19993827473354958,
+      "reference": 0.19993827473354958
+    },
+    {
+      "delta": 0.0,
+      "layer": 27,
+      "observed": 0.16232665112070443,
+      "reference": 0.16232665112070443
+    },
+    {
+      "delta": 0.0,
+      "layer": 28,
+      "observed": 0.16312333095845666,
+      "reference": 0.16312333095845666
+    },
+    {
+      "delta": 0.0,
+      "layer": 29,
+      "observed": 0.15455087700846853,
+      "reference": 0.15455087700846853
+    },
+    {
+      "delta": 0.0,
+      "layer": 30,
+      "observed": 0.14506748180467524,
+      "reference": 0.14506748180467524
+    },
+    {
+      "delta": 0.0,
+      "layer": 31,
+      "observed": 0.100563235492317,
+      "reference": 0.100563235492317
+    },
+    {
+      "delta": 0.0,
+      "layer": 32,
+      "observed": 0.08721758173724253,
+      "reference": 0.08721758173724253
+    },
+    {
+      "delta": 0.0,
+      "layer": 33,
+      "observed": 0.08032017236732746,
+      "reference": 0.08032017236732746
+    },
+    {
+      "delta": 0.0,
+      "layer": 34,
+      "observed": 0.0011123259633034662,
+      "reference": 0.0011123259633034662
+    },
+    {
+      "delta": 0.0,
+      "layer": 35,
+      "observed": 0.0,
+      "reference": 0.0
+    }
+  ],
+  "source_patch_reference_max_abs_delta": 0.0,
+  "source_rows": 576,
+  "status": "SUCCESS"
+}

@@ -1,0 +1,17 @@
+pair_id,donor,recipient,role,crossover_layer_final_ge_subject
+city_Paris_into_Tokyo,Paris,Tokyo,city,24
+city_Tokyo_into_Paris,Tokyo,Paris,city,24
+company_Apple_into_Google,Apple,Google,company,25
+company_Google_into_Apple,Google,Apple,company,24
+composer_Bach_into_Mozart,Bach,Mozart,composer,26
+composer_Mozart_into_Bach,Mozart,Bach,composer,26
+country_France_into_Japan,France,Japan,country,24
+country_Japan_into_France,Japan,France,country,24
+scientist_Darwin_into_Einstein,Darwin,Einstein,scientist,26
+scientist_Darwin_into_Newton,Darwin,Newton,scientist,26
+scientist_Einstein_into_Darwin,Einstein,Darwin,scientist,26
+scientist_Einstein_into_Newton,Einstein,Newton,scientist,24
+scientist_Newton_into_Darwin,Newton,Darwin,scientist,26
+scientist_Newton_into_Einstein,Newton,Einstein,scientist,24
+writer_Dickens_into_Shakespeare,Dickens,Shakespeare,writer,26
+writer_Shakespeare_into_Dickens,Shakespeare,Dickens,writer,26

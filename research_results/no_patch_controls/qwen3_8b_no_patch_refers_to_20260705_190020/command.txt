@@ -1,0 +1,1 @@
+cd /ssd/mh3897/nanochat && CUDA_VISIBLE_DEVICES=0 /local-ssd/mh3897/envs/pddl/bin/python scripts/inspect/patchscope_no_patch_target_prompt.py --hf-model Qwen/Qwen3-8B --out-dir /ssd/mh3897/patchscope_results/qwen3_8b_no_patch_refers_to_20260705_190020 --max-tokens 20 --target-suffix " refers to" --target-query ""

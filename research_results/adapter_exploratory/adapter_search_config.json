@@ -1,0 +1,95 @@
+{
+  "batch_size": 128,
+  "candidate_soft_limit_seconds": 900,
+  "conditions": [
+    "oracle_readout",
+    "raw_late",
+    "translated_late",
+    "random_norm_control",
+    "wrong_entity_control"
+  ],
+  "device": "cuda",
+  "diagonal_alphas": [
+    0.001,
+    0.01,
+    0.1,
+    1.0,
+    10.0,
+    100.0
+  ],
+  "expanded_pairs": 24000,
+  "held_out_entities": [
+    "Alexander the Great",
+    "Diana, princess of Wales",
+    "Jurassic Park",
+    "Muhammad Ali",
+    "New York City"
+  ],
+  "hf_model": "Qwen/Qwen3-8B",
+  "initial_pairs": 12000,
+  "low_rank_epochs": 80,
+  "low_rank_lr": 0.001,
+  "low_rank_weight_decay": 0.001,
+  "low_ranks": [
+    4,
+    8,
+    16,
+    32,
+    64
+  ],
+  "mappings": [
+    [
+      28,
+      10
+    ],
+    [
+      28,
+      8
+    ],
+    [
+      28,
+      6
+    ],
+    [
+      30,
+      10
+    ],
+    [
+      30,
+      8
+    ],
+    [
+      24,
+      10
+    ]
+  ],
+  "max_tokens": 20,
+  "out_dir": "/ssd/mh3897/patchscope_results/qwen3_8b_adapter_search_strict_20260707_055910",
+  "ridge_alphas": [
+    0.1,
+    1.0,
+    10.0,
+    100.0,
+    1000.0,
+    10000.0
+  ],
+  "seed": 1234,
+  "smoke_test": false,
+  "target": "Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x",
+  "time_limit_seconds": 7200,
+  "train_templates": [
+    "{entity}",
+    "The topic is {entity}.",
+    "A concise encyclopedia entry about {entity}.",
+    "Important facts about {entity} include its history, context, and influence.",
+    "In a classroom lesson, the teacher introduced {entity} and explained why it matters.",
+    "Researchers often mention {entity} when discussing culture, geography, science, or history.",
+    "The article compared {entity} with related people, places, organizations, and events.",
+    "Background: {entity} is a subject that appears in reference books and general knowledge tests.",
+    "A short paragraph says that {entity} has a recognizable name and associated description.",
+    "Students wrote notes about {entity}, then summarized the topic in one sentence.",
+    "For a quiz clue, {entity} would be identified from a brief factual description.",
+    "The phrase {entity} appears in a neutral document with surrounding generic context."
+  ],
+  "val_fraction": 0.2
+}

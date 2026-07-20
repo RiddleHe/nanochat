@@ -277,6 +277,19 @@ def capture_source_block_contributions(adapter, src_ids, src_pos):
             for i in range(adapter["n_layer"])}
 
 
+def build_context_source(entity_phrase, context_mode, source_prefix, source_suffix):
+    """Build a source prompt and keep the entity-span end position explicit."""
+    prefix = source_prefix if context_mode in ("prefix", "both") else ""
+    suffix = source_suffix if context_mode in ("suffix", "both") else ""
+    return {
+        "prefix": prefix,
+        "entity_phrase": entity_phrase,
+        "suffix": suffix,
+        "source_text": f"{prefix}{entity_phrase}{suffix}",
+        "prefix_entity_text": f"{prefix}{entity_phrase}",
+    }
+
+
 def patched_generate(adapter, tgt_ids, target_layer, tgt_pos, src_vec,
                      max_tokens, op="replace", normalize=False):
     """Hook on block `target_layer`: at the prefill step (input length covers
@@ -321,18 +334,26 @@ def patched_generate(adapter, tgt_ids, target_layer, tgt_pos, src_vec,
 
 
 def run_one_source(adapter, source, target, target_layer, max_tokens,
-                   inject_mode="residual", normalize=False):
+                   inject_mode="residual", normalize=False,
+                   prefix_entity_text=None):
     """inject_mode='residual' (existing): extract residual-stream output at
         each src layer and REPLACE target residual at tgt_layer with it.
     inject_mode='block': extract each block's contribution (output - input)
         at the src last token, ADD it on top of target residual at tgt_layer."""
     src_ids = adapter["encode"](source)
+    prefix_entity_ids = adapter["encode"](
+        prefix_entity_text if prefix_entity_text is not None else source)
     tgt_ids = adapter["encode"](target)
     assert len(src_ids) >= 1, f"Source must tokenize to >=1 token: {source!r}"
+    assert len(prefix_entity_ids) >= 1, (
+        f"Prefix+entity must tokenize to >=1 token: {prefix_entity_text!r}")
+    assert len(prefix_entity_ids) <= len(src_ids), (
+        "Prefix+entity tokenization is longer than the full source; check context strings")
     assert len(tgt_ids) >= 2, f"Target needs >=2 tokens; got {len(tgt_ids)}"
     if len(src_ids) < 2:  # nanochat smear-gate needs T>1
         src_ids = [src_ids[0]] + src_ids
-    src_pos = len(src_ids) - 1
+        prefix_entity_ids = [prefix_entity_ids[0]] + prefix_entity_ids
+    src_pos = len(prefix_entity_ids) - 1
     tgt_pos = len(tgt_ids) - 1
 
     if inject_mode == "residual":
@@ -349,7 +370,14 @@ def run_one_source(adapter, source, target, target_layer, max_tokens,
                                 src_vecs[src_layer], max_tokens, op=op,
                                 normalize=normalize)
         results.append((src_layer, text.lstrip().split("\n")[0]))
-    return results
+    src_token = adapter["decode"]([src_ids[src_pos]])
+    return results, {
+        "src_pos": src_pos,
+        "src_token_id": src_ids[src_pos],
+        "src_token": src_token,
+        "source_token_count": len(src_ids),
+        "prefix_entity_token_count": len(prefix_entity_ids),
+    }
 
 
 # ----------------------------------------------------------------------------
@@ -504,6 +532,20 @@ def main():
                          "segment.")
     ap.add_argument("--source-set", choices=list(SOURCE_SETS), default="canonical",
                     help="Which set of source prompts to use.")
+    ap.add_argument("--source-context-mode",
+                    choices=["none", "prefix", "suffix", "both"],
+                    default="none",
+                    help="Add context around each source entity phrase. The "
+                         "patched source position is always the final token of "
+                         "prefix+entity_phrase, not the final token of the "
+                         "full source when suffix context is present.")
+    ap.add_argument("--source-prefix", default="In this biography, ",
+                    help="Prefix text used when --source-context-mode is "
+                         "prefix or both.")
+    ap.add_argument("--source-suffix",
+                    default=" was known for her public life",
+                    help="Suffix text used when --source-context-mode is "
+                         "suffix or both.")
     ap.add_argument("--inject-mode", choices=["residual", "block"],
                     default="residual",
                     help="In both modes we REPLACE the target residual at "
@@ -535,8 +577,11 @@ def main():
     sources = SOURCE_SETS[args.source_set]
     print(f"Model: {adapter['name']}  n_layer={n_layer}  "
           f"target_layer={args.target_layer}  source_set={args.source_set}  "
-          f"inject_mode={args.inject_mode}")
+          f"inject_mode={args.inject_mode}  "
+          f"source_context_mode={args.source_context_mode}")
     print(f"Target prompt: {args.target!r}")
+    print(f"Source prefix: {args.source_prefix!r}")
+    print(f"Source suffix: {args.source_suffix!r}")
     os.makedirs(args.out_dir, exist_ok=True)
 
     # Single target layer, or -1 => sweep ALL target layers (source x target matrix).
@@ -549,15 +594,31 @@ def main():
     # injected vector is norm-matched to the target residual.
     mode_seg = "" if args.inject_mode == "residual" else f"{args.inject_mode}__"
     norm_seg = "norm__" if args.normalize else ""
+    context_seg = ("" if args.source_context_mode == "none"
+                   else f"ctx-{args.source_context_mode}__")
 
     for ent_key in ENTITIES:
-        source = sources[ent_key]
+        source_spec = build_context_source(
+            sources[ent_key], args.source_context_mode,
+            args.source_prefix, args.source_suffix)
+        source = source_spec["source_text"]
         print(f"\n===== Source [{ent_key}]: {source!r} =====")
+        print(f"  entity phrase: {source_spec['entity_phrase']!r}")
+        print(f"  prefix used: {bool(source_spec['prefix'])}  "
+              f"suffix used: {bool(source_spec['suffix'])}")
         rows = []  # (src_layer, tgt_layer, text)
+        src_info = None
         for tl in target_layers:
-            res = run_one_source(adapter, source, args.target, tl,
-                                 args.max_tokens, inject_mode=args.inject_mode,
-                                 normalize=args.normalize)
+            res, src_info = run_one_source(
+                adapter, source, args.target, tl, args.max_tokens,
+                inject_mode=args.inject_mode, normalize=args.normalize,
+                prefix_entity_text=source_spec["prefix_entity_text"])
+            if tl == target_layers[0]:
+                print(f"  chosen src_pos: {src_info['src_pos']}")
+                print(f"  decoded token at src_pos: {src_info['src_token']!r}")
+                print(f"  source tokens: {src_info['source_token_count']}  "
+                      f"prefix+entity tokens: "
+                      f"{src_info['prefix_entity_token_count']}")
             for src_layer, text in res:
                 rows.append((src_layer, tl, text))
             if matrix_mode:
@@ -568,11 +629,22 @@ def main():
         out_path = os.path.join(
             args.out_dir,
             f"{adapter['name']}__tgt{tgt_tag}__"
-            f"{args.source_set}__{norm_seg}{mode_seg}{ent_key}.txt")
+            f"{args.source_set}__{context_seg}{norm_seg}{mode_seg}{ent_key}.txt")
         with open(out_path, "w") as f:
             f.write(f"model\t{adapter['name']}\n")
             f.write(f"entity_key\t{ent_key}\n")
             f.write(f"source\t{source}\n")
+            f.write(f"entity_phrase\t{source_spec['entity_phrase']}\n")
+            f.write(f"source_prefix\t{source_spec['prefix']}\n")
+            f.write(f"source_suffix\t{source_spec['suffix']}\n")
+            f.write(f"source_context_mode\t{args.source_context_mode}\n")
+            if src_info is not None:
+                f.write(f"src_pos\t{src_info['src_pos']}\n")
+                f.write(f"src_token_id\t{src_info['src_token_id']}\n")
+                f.write(f"src_token\t{src_info['src_token']}\n")
+                f.write(f"source_token_count\t{src_info['source_token_count']}\n")
+                f.write("prefix_entity_token_count\t"
+                        f"{src_info['prefix_entity_token_count']}\n")
             f.write(f"source_set\t{args.source_set}\n")
             f.write(f"inject_mode\t{args.inject_mode}\n")
             f.write(f"normalize\t{args.normalize}\n")
@@ -585,7 +657,8 @@ def main():
     # Auto-plot only for the legacy single-target line grid. Matrix mode and
     # normalized runs just produce output files (verification / matrix plotting
     # is done separately).
-    if not args.no_plot and not matrix_mode and not args.normalize:
+    if (not args.no_plot and not matrix_mode and not args.normalize
+            and args.source_context_mode == "none"):
         print()
         regenerate_plot(args.out_dir, args.target_layer, args.source_set,
                         inject_mode=args.inject_mode)

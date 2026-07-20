@@ -1,0 +1,1001 @@
+split,entity,prompt,position,token_id,token_text
+train,Photosynthesis,Photosynthesis,0,31772,Photos
+train,Photosynthesis,Photosynthesis,1,73667,ynthesis
+train,Martin Luther King Jr.,A concise encyclopedia entry about Martin Luther King Jr..,6,35202, Luther
+train,Martin Luther King Jr.,A concise encyclopedia entry about Martin Luther King Jr..,8,15640, Jr
+train,Martin Luther King Jr.,A concise encyclopedia entry about Martin Luther King Jr..,3,4343, entry
+train,Martin Luther King Jr.,A concise encyclopedia entry about Martin Luther King Jr..,2,82608, encyclopedia
+train,Martin Luther King Jr.,A concise encyclopedia entry about Martin Luther King Jr..,9,496,..
+train,Martin Luther King Jr.,A concise encyclopedia entry about Martin Luther King Jr..,0,32,A
+train,Martin Luther King Jr.,A concise encyclopedia entry about Martin Luther King Jr..,5,11565, Martin
+train,Martin Luther King Jr.,A concise encyclopedia entry about Martin Luther King Jr..,7,6210, King
+train,Martin Luther King Jr.,A concise encyclopedia entry about Martin Luther King Jr..,1,63594, concise
+train,Martin Luther King Jr.,A concise encyclopedia entry about Martin Luther King Jr..,4,911, about
+train,Nelson Mandela,The topic is Nelson Mandela.,5,13,.
+train,Nelson Mandela,The topic is Nelson Mandela.,0,785,The
+train,Nelson Mandela,The topic is Nelson Mandela.,2,374, is
+train,Nelson Mandela,The topic is Nelson Mandela.,4,87330, Mandela
+train,Nelson Mandela,The topic is Nelson Mandela.,1,8544, topic
+train,Nelson Mandela,The topic is Nelson Mandela.,3,26464, Nelson
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",2,8388, notes
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",9,279, the
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",14,13,.
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",8,68629, summarized
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",10,8544, topic
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",3,911, about
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",1,6139, wrote
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",7,1221, then
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",4,14927, Charles
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",13,11652, sentence
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",0,30952,Students
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",12,825, one
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",5,44380, Darwin
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",11,304, in
+train,Charles Darwin,"Students wrote notes about Charles Darwin, then summarized the topic in one sentence.",6,11,","
+train,Bill Gates,The phrase Bill Gates appears in a neutral document with surrounding generic context.,7,20628, neutral
+train,Bill Gates,The phrase Bill Gates appears in a neutral document with surrounding generic context.,6,264, a
+train,Bill Gates,The phrase Bill Gates appears in a neutral document with surrounding generic context.,2,8596, Bill
+train,Bill Gates,The phrase Bill Gates appears in a neutral document with surrounding generic context.,0,785,The
+train,Bill Gates,The phrase Bill Gates appears in a neutral document with surrounding generic context.,11,13954, generic
+train,Bill Gates,The phrase Bill Gates appears in a neutral document with surrounding generic context.,13,13,.
+train,Bill Gates,The phrase Bill Gates appears in a neutral document with surrounding generic context.,8,2197, document
+train,Bill Gates,The phrase Bill Gates appears in a neutral document with surrounding generic context.,12,2266, context
+train,Bill Gates,The phrase Bill Gates appears in a neutral document with surrounding generic context.,4,7952, appears
+train,Bill Gates,The phrase Bill Gates appears in a neutral document with surrounding generic context.,3,35493, Gates
+train,Bill Gates,The phrase Bill Gates appears in a neutral document with surrounding generic context.,10,14590, surrounding
+train,Bill Gates,The phrase Bill Gates appears in a neutral document with surrounding generic context.,1,17133, phrase
+train,Bill Gates,The phrase Bill Gates appears in a neutral document with surrounding generic context.,5,304, in
+train,Bill Gates,The phrase Bill Gates appears in a neutral document with surrounding generic context.,9,448, with
+train,Nintendo,A concise encyclopedia entry about Nintendo.,0,32,A
+train,Nintendo,A concise encyclopedia entry about Nintendo.,1,63594, concise
+train,Nintendo,A concise encyclopedia entry about Nintendo.,3,4343, entry
+train,Nintendo,A concise encyclopedia entry about Nintendo.,6,13,.
+train,Nintendo,A concise encyclopedia entry about Nintendo.,2,82608, encyclopedia
+train,Nintendo,A concise encyclopedia entry about Nintendo.,4,911, about
+train,Nintendo,A concise encyclopedia entry about Nintendo.,5,22799, Nintendo
+train,London,"For a quiz clue, London would be identified from a brief factual description.",12,59901, factual
+train,London,"For a quiz clue, London would be identified from a brief factual description.",1,264, a
+train,London,"For a quiz clue, London would be identified from a brief factual description.",11,9814, brief
+train,London,"For a quiz clue, London would be identified from a brief factual description.",4,11,","
+train,London,"For a quiz clue, London would be identified from a brief factual description.",8,10820, identified
+train,London,"For a quiz clue, London would be identified from a brief factual description.",10,264, a
+train,London,"For a quiz clue, London would be identified from a brief factual description.",9,504, from
+train,London,"For a quiz clue, London would be identified from a brief factual description.",0,2461,For
+train,London,"For a quiz clue, London would be identified from a brief factual description.",6,1035, would
+train,London,"For a quiz clue, London would be identified from a brief factual description.",2,27124, quiz
+train,London,"For a quiz clue, London would be identified from a brief factual description.",3,29989, clue
+train,London,"For a quiz clue, London would be identified from a brief factual description.",5,7148, London
+train,London,"For a quiz clue, London would be identified from a brief factual description.",7,387, be
+train,London,"For a quiz clue, London would be identified from a brief factual description.",14,13,.
+train,London,"For a quiz clue, London would be identified from a brief factual description.",13,4008, description
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",3,17755, lesson
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",0,641,In
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",9,323, and
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",7,11523, introduced
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",11,3170, why
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",2,24017, classroom
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",1,264, a
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",6,11079, teacher
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",13,12850, matters
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",5,279, the
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",14,13,.
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",4,11,","
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",10,11247, explained
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",12,432, it
+train,JavaScript,"In a classroom lesson, the teacher introduced JavaScript and explained why it matters.",8,12914, JavaScript
+train,Barcelona,A concise encyclopedia entry about Barcelona.,3,4343, entry
+train,Barcelona,A concise encyclopedia entry about Barcelona.,4,911, about
+train,Barcelona,A concise encyclopedia entry about Barcelona.,6,13,.
+train,Barcelona,A concise encyclopedia entry about Barcelona.,2,82608, encyclopedia
+train,Barcelona,A concise encyclopedia entry about Barcelona.,5,26937, Barcelona
+train,Barcelona,A concise encyclopedia entry about Barcelona.,0,32,A
+train,Barcelona,A concise encyclopedia entry about Barcelona.,1,63594, concise
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",12,323, and
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",2,7707, compared
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",13,4357, events
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",3,12095, Paris
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",10,11104, organizations
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",0,785,The
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",14,13,.
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",6,1251, people
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",11,11,","
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",5,5435, related
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",8,7482, places
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",7,11,","
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",9,11,","
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",4,448, with
+train,Paris,"The article compared Paris with related people, places, organizations, and events.",1,4549, article
+train,Australia,"Students wrote notes about Australia, then summarized the topic in one sentence.",6,1221, then
+train,Australia,"Students wrote notes about Australia, then summarized the topic in one sentence.",12,11652, sentence
+train,Australia,"Students wrote notes about Australia, then summarized the topic in one sentence.",8,279, the
+train,Australia,"Students wrote notes about Australia, then summarized the topic in one sentence.",2,8388, notes
+train,Australia,"Students wrote notes about Australia, then summarized the topic in one sentence.",0,30952,Students
+train,Australia,"Students wrote notes about Australia, then summarized the topic in one sentence.",7,68629, summarized
+train,Australia,"Students wrote notes about Australia, then summarized the topic in one sentence.",3,911, about
+train,Australia,"Students wrote notes about Australia, then summarized the topic in one sentence.",1,6139, wrote
+train,Australia,"Students wrote notes about Australia, then summarized the topic in one sentence.",5,11,","
+train,Australia,"Students wrote notes about Australia, then summarized the topic in one sentence.",9,8544, topic
+train,Australia,"Students wrote notes about Australia, then summarized the topic in one sentence.",10,304, in
+train,Australia,"Students wrote notes about Australia, then summarized the topic in one sentence.",4,8330, Australia
+train,Australia,"Students wrote notes about Australia, then summarized the topic in one sentence.",11,825, one
+train,Australia,"Students wrote notes about Australia, then summarized the topic in one sentence.",13,13,.
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",11,68629, summarized
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",1,6139, wrote
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",9,11,","
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",10,1221, then
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",8,72,i
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",5,84134,ileo
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",3,911, about
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",6,10620, Gal
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",0,30952,Students
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",12,279, the
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",13,8544, topic
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",7,457,ile
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",16,11652, sentence
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",4,10620, Gal
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",14,304, in
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",2,8388, notes
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",15,825, one
+train,Galileo Galilei,"Students wrote notes about Galileo Galilei, then summarized the topic in one sentence.",17,13,.
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",13,11652, sentence
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",9,279, the
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",2,8388, notes
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",8,68629, summarized
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",10,8544, topic
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",7,1221, then
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",12,825, one
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",6,11,","
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",1,6139, wrote
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",3,911, about
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",14,13,.
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",11,304, in
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",4,16462, Pacific
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",0,30952,Students
+train,Pacific Ocean,"Students wrote notes about Pacific Ocean, then summarized the topic in one sentence.",5,21575, Ocean
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",1,264, a
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",8,4882, South
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",11,11247, explained
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",5,279, the
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",14,12850, matters
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",3,17755, lesson
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",10,323, and
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",2,24017, classroom
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",13,432, it
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",12,3170, why
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",0,641,In
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",4,11,","
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",7,11523, introduced
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",9,11862, Korea
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",15,13,.
+train,South Korea,"In a classroom lesson, the teacher introduced South Korea and explained why it matters.",6,11079, teacher
+train,Rio de Janeiro,A concise encyclopedia entry about Rio de Janeiro.,0,32,A
+train,Rio de Janeiro,A concise encyclopedia entry about Rio de Janeiro.,2,82608, encyclopedia
+train,Rio de Janeiro,A concise encyclopedia entry about Rio de Janeiro.,6,409, de
+train,Rio de Janeiro,A concise encyclopedia entry about Rio de Janeiro.,1,63594, concise
+train,Rio de Janeiro,A concise encyclopedia entry about Rio de Janeiro.,8,13,.
+train,Rio de Janeiro,A concise encyclopedia entry about Rio de Janeiro.,7,60323, Janeiro
+train,Rio de Janeiro,A concise encyclopedia entry about Rio de Janeiro.,5,26961, Rio
+train,Rio de Janeiro,A concise encyclopedia entry about Rio de Janeiro.,3,4343, entry
+train,Rio de Janeiro,A concise encyclopedia entry about Rio de Janeiro.,4,911, about
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",16,13,.
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",14,476, or
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",13,11,","
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",15,3840, history
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",7,24392, discussing
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",9,11,","
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",1,3545, often
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",10,53142, geography
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",11,11,","
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",4,4264, God
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",8,7674, culture
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",5,23017,father
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",3,576, The
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",2,6286, mention
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",12,8038, science
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",6,979, when
+train,The Godfather,"Researchers often mention The Godfather when discussing culture, geography, science, or history.",0,59110,Researchers
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",3,17755, lesson
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",13,12850, matters
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",11,3170, why
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",7,11523, introduced
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",8,5085, Google
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",6,11079, teacher
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",14,13,.
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",10,11247, explained
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",2,24017, classroom
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",4,11,","
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",1,264, a
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",5,279, the
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",12,432, it
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",9,323, and
+train,Google,"In a classroom lesson, the teacher introduced Google and explained why it matters.",0,641,In
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",14,13,.
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",4,11,","
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",13,12850, matters
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",8,7148, London
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",3,17755, lesson
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",9,323, and
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",1,264, a
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",11,3170, why
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",2,24017, classroom
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",12,432, it
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",5,279, the
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",7,11523, introduced
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",10,11247, explained
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",6,11079, teacher
+train,London,"In a classroom lesson, the teacher introduced London and explained why it matters.",0,641,In
+train,India,The topic is India.,4,13,.
+train,India,The topic is India.,1,8544, topic
+train,India,The topic is India.,0,785,The
+train,India,The topic is India.,2,374, is
+train,India,The topic is India.,3,6747, India
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",9,1221, then
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",2,8388, notes
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",6,6210, King
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",14,825, one
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",1,6139, wrote
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",11,279, the
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",5,35202, Luther
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",12,8544, topic
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",10,68629, summarized
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",15,11652, sentence
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",4,11565, Martin
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",13,304, in
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",16,13,.
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",7,15640, Jr
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",3,911, about
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",0,30952,Students
+train,Martin Luther King Jr.,"Students wrote notes about Martin Luther King Jr., then summarized the topic in one sentence.",8,2572,".,"
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,3,374, is
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,7,7952, appears
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,5,3832, subject
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,6,429, that
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,4,264, a
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,11,323, and
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,10,6467, books
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,1,25,:
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,12,4586, general
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,2,22642, Netflix
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,13,6540, knowledge
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,15,13,.
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,0,8706,Background
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,14,7032, tests
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,8,304, in
+train,Netflix,Background: Netflix is a subject that appears in reference books and general knowledge tests.,9,5785, reference
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",13,4357, events
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",2,7707, compared
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",1,4549, article
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",0,785,The
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",14,13,.
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",6,1251, people
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",8,7482, places
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",3,24081, Madrid
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",10,11104, organizations
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",7,11,","
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",4,448, with
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",5,5435, related
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",11,11,","
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",12,323, and
+train,Madrid,"The article compared Madrid with related people, places, organizations, and events.",9,11,","
+train,"Washington, D.C.","The topic is Washington, D.C..",6,727,.C
+train,"Washington, D.C.","The topic is Washington, D.C..",4,11,","
+train,"Washington, D.C.","The topic is Washington, D.C..",0,785,The
+train,"Washington, D.C.","The topic is Washington, D.C..",2,374, is
+train,"Washington, D.C.","The topic is Washington, D.C..",3,6515, Washington
+train,"Washington, D.C.","The topic is Washington, D.C..",5,422, D
+train,"Washington, D.C.","The topic is Washington, D.C..",7,496,..
+train,"Washington, D.C.","The topic is Washington, D.C..",1,8544, topic
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",6,11,","
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",5,22126, Revolution
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",0,30952,Students
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",4,8585, French
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",12,825, one
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",3,911, about
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",2,8388, notes
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",7,1221, then
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",14,13,.
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",9,279, the
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",11,304, in
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",1,6139, wrote
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",13,11652, sentence
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",10,8544, topic
+train,French Revolution,"Students wrote notes about French Revolution, then summarized the topic in one sentence.",8,68629, summarized
+train,Intel,A concise encyclopedia entry about Intel.,3,4343, entry
+train,Intel,A concise encyclopedia entry about Intel.,5,15611, Intel
+train,Intel,A concise encyclopedia entry about Intel.,0,32,A
+train,Intel,A concise encyclopedia entry about Intel.,4,911, about
+train,Intel,A concise encyclopedia entry about Intel.,1,63594, concise
+train,Intel,A concise encyclopedia entry about Intel.,2,82608, encyclopedia
+train,Intel,A concise encyclopedia entry about Intel.,6,13,.
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,4,429, that
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,14,13,.
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,5,24545, Industrial
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,9,65252, recognizable
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,2,14311, paragraph
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,12,5815, associated
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,11,323, and
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,3,2727, says
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,6,22126, Revolution
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,7,702, has
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,0,32,A
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,13,4008, description
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,1,2805, short
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,8,264, a
+train,Industrial Revolution,A short paragraph says that Industrial Revolution has a recognizable name and associated description.,10,829, name
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",1,264, a
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",11,3170, why
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",9,323, and
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",6,11079, teacher
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",0,641,In
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",3,17755, lesson
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",7,11523, introduced
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",13,12850, matters
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",4,11,","
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",12,432, it
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",14,13,.
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",10,11247, explained
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",5,279, the
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",2,24017, classroom
+train,Titanic,"In a classroom lesson, the teacher introduced Titanic and explained why it matters.",8,88762, Titanic
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",11,8038, science
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",9,53142, geography
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",5,979, when
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",15,13,.
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",7,7674, culture
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",1,3545, often
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",13,476, or
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",4,65781, Odyssey
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",3,576, The
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",6,24392, discussing
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",14,3840, history
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",2,6286, mention
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",12,11,","
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",8,11,","
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",10,11,","
+train,The Odyssey,"Researchers often mention The Odyssey when discussing culture, geography, science, or history.",0,59110,Researchers
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,0,8706,Background
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,16,13,.
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,8,7952, appears
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,7,429, that
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,5,264, a
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,12,323, and
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,14,6540, knowledge
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,10,5785, reference
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,13,4586, general
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,2,576, The
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,11,6467, books
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,9,304, in
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,4,374, is
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,1,25,:
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,6,3832, subject
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,3,54283, Renaissance
+train,The Renaissance,Background: The Renaissance is a subject that appears in reference books and general knowledge tests.,15,7032, tests
+train,Rosa Parks,"Important facts about Rosa Parks include its history, context, and influence.",13,13,.
+train,Rosa Parks,"Important facts about Rosa Parks include its history, context, and influence.",4,38172, Parks
+train,Rosa Parks,"Important facts about Rosa Parks include its history, context, and influence.",7,3840, history
+train,Rosa Parks,"Important facts about Rosa Parks include its history, context, and influence.",2,911, about
+train,Rosa Parks,"Important facts about Rosa Parks include its history, context, and influence.",5,2924, include
+train,Rosa Parks,"Important facts about Rosa Parks include its history, context, and influence.",11,323, and
+train,Rosa Parks,"Important facts about Rosa Parks include its history, context, and influence.",12,10173, influence
+train,Rosa Parks,"Important facts about Rosa Parks include its history, context, and influence.",9,2266, context
+train,Rosa Parks,"Important facts about Rosa Parks include its history, context, and influence.",10,11,","
+train,Rosa Parks,"Important facts about Rosa Parks include its history, context, and influence.",1,13064, facts
+train,Rosa Parks,"Important facts about Rosa Parks include its history, context, and influence.",0,52280,Important
+train,Rosa Parks,"Important facts about Rosa Parks include its history, context, and influence.",6,1181, its
+train,Rosa Parks,"Important facts about Rosa Parks include its history, context, and influence.",3,46830, Rosa
+train,Rosa Parks,"Important facts about Rosa Parks include its history, context, and influence.",8,11,","
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",5,24392, discussing
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",7,11,","
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",0,59110,Researchers
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",10,8038, science
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",1,3545, often
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",6,7674, culture
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",8,53142, geography
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",3,22415, Moscow
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",13,3840, history
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",14,13,.
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",11,11,","
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",2,6286, mention
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",4,979, when
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",9,11,","
+train,Moscow,"Researchers often mention Moscow when discussing culture, geography, science, or history.",12,476, or
+train,Amsterdam,A short paragraph says that Amsterdam has a recognizable name and associated description.,10,323, and
+train,Amsterdam,A short paragraph says that Amsterdam has a recognizable name and associated description.,1,2805, short
+train,Amsterdam,A short paragraph says that Amsterdam has a recognizable name and associated description.,3,2727, says
+train,Amsterdam,A short paragraph says that Amsterdam has a recognizable name and associated description.,8,65252, recognizable
+train,Amsterdam,A short paragraph says that Amsterdam has a recognizable name and associated description.,2,14311, paragraph
+train,Amsterdam,A short paragraph says that Amsterdam has a recognizable name and associated description.,0,32,A
+train,Amsterdam,A short paragraph says that Amsterdam has a recognizable name and associated description.,11,5815, associated
+train,Amsterdam,A short paragraph says that Amsterdam has a recognizable name and associated description.,13,13,.
+train,Amsterdam,A short paragraph says that Amsterdam has a recognizable name and associated description.,12,4008, description
+train,Amsterdam,A short paragraph says that Amsterdam has a recognizable name and associated description.,6,702, has
+train,Amsterdam,A short paragraph says that Amsterdam has a recognizable name and associated description.,5,37741, Amsterdam
+train,Amsterdam,A short paragraph says that Amsterdam has a recognizable name and associated description.,7,264, a
+train,Amsterdam,A short paragraph says that Amsterdam has a recognizable name and associated description.,4,429, that
+train,Amsterdam,A short paragraph says that Amsterdam has a recognizable name and associated description.,9,829, name
+train,India,A short paragraph says that India has a recognizable name and associated description.,7,264, a
+train,India,A short paragraph says that India has a recognizable name and associated description.,5,6747, India
+train,India,A short paragraph says that India has a recognizable name and associated description.,4,429, that
+train,India,A short paragraph says that India has a recognizable name and associated description.,1,2805, short
+train,India,A short paragraph says that India has a recognizable name and associated description.,3,2727, says
+train,India,A short paragraph says that India has a recognizable name and associated description.,6,702, has
+train,India,A short paragraph says that India has a recognizable name and associated description.,11,5815, associated
+train,India,A short paragraph says that India has a recognizable name and associated description.,8,65252, recognizable
+train,India,A short paragraph says that India has a recognizable name and associated description.,9,829, name
+train,India,A short paragraph says that India has a recognizable name and associated description.,12,4008, description
+train,India,A short paragraph says that India has a recognizable name and associated description.,0,32,A
+train,India,A short paragraph says that India has a recognizable name and associated description.,13,13,.
+train,India,A short paragraph says that India has a recognizable name and associated description.,10,323, and
+train,India,A short paragraph says that India has a recognizable name and associated description.,2,14311, paragraph
+train,Morocco,The topic is Morocco.,1,8544, topic
+train,Morocco,The topic is Morocco.,4,13,.
+train,Morocco,The topic is Morocco.,3,58130, Morocco
+train,Morocco,The topic is Morocco.,0,785,The
+train,Morocco,The topic is Morocco.,2,374, is
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,3,315, of
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,0,785,The
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,2,50106, Joan
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,1,17133, phrase
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,11,14590, surrounding
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,14,13,.
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,8,20628, neutral
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,6,304, in
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,4,19689, Arc
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,5,7952, appears
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,7,264, a
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,10,448, with
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,12,13954, generic
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,13,2266, context
+train,Joan of Arc,The phrase Joan of Arc appears in a neutral document with surrounding generic context.,9,2197, document
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",1,264, a
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",11,9814, brief
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",10,264, a
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",7,387, be
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",13,4008, description
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",5,15948, Brazil
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",9,504, from
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",3,29989, clue
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",12,59901, factual
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",0,2461,For
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",4,11,","
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",6,1035, would
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",8,10820, identified
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",14,13,.
+train,Brazil,"For a quiz clue, Brazil would be identified from a brief factual description.",2,27124, quiz
+train,Albert Einstein,The topic is Albert Einstein.,2,374, is
+train,Albert Einstein,The topic is Albert Einstein.,0,785,The
+train,Albert Einstein,The topic is Albert Einstein.,1,8544, topic
+train,Albert Einstein,The topic is Albert Einstein.,5,13,.
+train,Albert Einstein,The topic is Albert Einstein.,3,17513, Albert
+train,Albert Einstein,The topic is Albert Einstein.,4,54052, Einstein
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",6,7674, culture
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",9,11,","
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",8,53142, geography
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",0,59110,Researchers
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",3,37047, Shanghai
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",2,6286, mention
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",7,11,","
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",4,979, when
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",5,24392, discussing
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",13,3840, history
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",14,13,.
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",12,476, or
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",10,8038, science
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",11,11,","
+train,Shanghai,"Researchers often mention Shanghai when discussing culture, geography, science, or history.",1,3545, often
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,12,323, and
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,9,304, in
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,6,3832, subject
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,14,6540, knowledge
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,4,374, is
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,3,42186, Desert
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,7,429, that
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,10,5785, reference
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,1,25,:
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,13,4586, general
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,0,8706,Background
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,11,6467, books
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,15,7032, tests
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,5,264, a
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,16,13,.
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,8,7952, appears
+train,Sahara Desert,Background: Sahara Desert is a subject that appears in reference books and general knowledge tests.,2,87978, Sahara
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",14,13,.
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",4,979, when
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",13,3840, history
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",8,53142, geography
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",10,8038, science
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",6,7674, culture
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",0,59110,Researchers
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",9,11,","
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",11,11,","
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",2,6286, mention
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",3,81022, Kyoto
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",5,24392, discussing
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",7,11,","
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",12,476, or
+train,Kyoto,"Researchers often mention Kyoto when discussing culture, geography, science, or history.",1,3545, often
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",15,13,.
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",6,29026, mechanics
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",11,264, a
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",10,504, from
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",1,264, a
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",8,387, be
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",5,55313, Quantum
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",7,1035, would
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",9,10820, identified
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",0,2461,For
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",13,59901, factual
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",2,27124, quiz
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",12,9814, brief
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",14,4008, description
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",4,11,","
+train,Quantum mechanics,"For a quiz clue, Quantum mechanics would be identified from a brief factual description.",3,29989, clue
+train,Argentina,A concise encyclopedia entry about Argentina.,5,31064, Argentina
+train,Argentina,A concise encyclopedia entry about Argentina.,2,82608, encyclopedia
+train,Argentina,A concise encyclopedia entry about Argentina.,1,63594, concise
+train,Argentina,A concise encyclopedia entry about Argentina.,4,911, about
+train,Argentina,A concise encyclopedia entry about Argentina.,6,13,.
+train,Argentina,A concise encyclopedia entry about Argentina.,0,32,A
+train,Argentina,A concise encyclopedia entry about Argentina.,3,4343, entry
+train,Sony,A concise encyclopedia entry about Sony.,0,32,A
+train,Sony,A concise encyclopedia entry about Sony.,3,4343, entry
+train,Sony,A concise encyclopedia entry about Sony.,2,82608, encyclopedia
+train,Sony,A concise encyclopedia entry about Sony.,5,20864, Sony
+train,Sony,A concise encyclopedia entry about Sony.,6,13,.
+train,Sony,A concise encyclopedia entry about Sony.,4,911, about
+train,Sony,A concise encyclopedia entry about Sony.,1,63594, concise
+train,Amazon,A concise encyclopedia entry about Amazon.,6,13,.
+train,Amazon,A concise encyclopedia entry about Amazon.,2,82608, encyclopedia
+train,Amazon,A concise encyclopedia entry about Amazon.,3,4343, entry
+train,Amazon,A concise encyclopedia entry about Amazon.,1,63594, concise
+train,Amazon,A concise encyclopedia entry about Amazon.,0,32,A
+train,Amazon,A concise encyclopedia entry about Amazon.,5,8176, Amazon
+train,Amazon,A concise encyclopedia entry about Amazon.,4,911, about
+train,United Nations,The phrase United Nations appears in a neutral document with surrounding generic context.,0,785,The
+train,United Nations,The phrase United Nations appears in a neutral document with surrounding generic context.,11,13954, generic
+train,United Nations,The phrase United Nations appears in a neutral document with surrounding generic context.,3,19140, Nations
+train,United Nations,The phrase United Nations appears in a neutral document with surrounding generic context.,5,304, in
+train,United Nations,The phrase United Nations appears in a neutral document with surrounding generic context.,9,448, with
+train,United Nations,The phrase United Nations appears in a neutral document with surrounding generic context.,2,3639, United
+train,United Nations,The phrase United Nations appears in a neutral document with surrounding generic context.,13,13,.
+train,United Nations,The phrase United Nations appears in a neutral document with surrounding generic context.,1,17133, phrase
+train,United Nations,The phrase United Nations appears in a neutral document with surrounding generic context.,12,2266, context
+train,United Nations,The phrase United Nations appears in a neutral document with surrounding generic context.,10,14590, surrounding
+train,United Nations,The phrase United Nations appears in a neutral document with surrounding generic context.,4,7952, appears
+train,United Nations,The phrase United Nations appears in a neutral document with surrounding generic context.,8,2197, document
+train,United Nations,The phrase United Nations appears in a neutral document with surrounding generic context.,6,264, a
+train,United Nations,The phrase United Nations appears in a neutral document with surrounding generic context.,7,20628, neutral
+train,Mexico,"Important facts about Mexico include its history, context, and influence.",9,11,","
+train,Mexico,"Important facts about Mexico include its history, context, and influence.",8,2266, context
+train,Mexico,"Important facts about Mexico include its history, context, and influence.",0,52280,Important
+train,Mexico,"Important facts about Mexico include its history, context, and influence.",1,13064, facts
+train,Mexico,"Important facts about Mexico include its history, context, and influence.",5,1181, its
+train,Mexico,"Important facts about Mexico include its history, context, and influence.",2,911, about
+train,Mexico,"Important facts about Mexico include its history, context, and influence.",7,11,","
+train,Mexico,"Important facts about Mexico include its history, context, and influence.",4,2924, include
+train,Mexico,"Important facts about Mexico include its history, context, and influence.",11,10173, influence
+train,Mexico,"Important facts about Mexico include its history, context, and influence.",6,3840, history
+train,Mexico,"Important facts about Mexico include its history, context, and influence.",12,13,.
+train,Mexico,"Important facts about Mexico include its history, context, and influence.",10,323, and
+train,Mexico,"Important facts about Mexico include its history, context, and influence.",3,12270, Mexico
+train,BMW,BMW,0,97636,BMW
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,2,576, The
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,12,323, and
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,15,7032, tests
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,13,4586, general
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,10,5785, reference
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,5,264, a
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,14,6540, knowledge
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,0,8706,Background
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,7,429, that
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,11,6467, books
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,1,25,:
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,9,304, in
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,4,374, is
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,3,11631, Matrix
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,16,13,.
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,6,3832, subject
+train,The Matrix,Background: The Matrix is a subject that appears in reference books and general knowledge tests.,8,7952, appears
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,12,323, and
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,3,2727, says
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,5,50106, Joan
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,7,19689, Arc
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,0,32,A
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,14,4008, description
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,13,5815, associated
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,10,65252, recognizable
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,4,429, that
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,1,2805, short
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,9,264, a
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,8,702, has
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,15,13,.
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,6,315, of
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,2,14311, paragraph
+train,Joan of Arc,A short paragraph says that Joan of Arc has a recognizable name and associated description.,11,829, name
+train,Hong Kong,The topic is Hong Kong.,3,19180, Hong
+train,Hong Kong,The topic is Hong Kong.,0,785,The
+train,Hong Kong,The topic is Hong Kong.,5,13,.
+train,Hong Kong,The topic is Hong Kong.,4,18211, Kong
+train,Hong Kong,The topic is Hong Kong.,1,8544, topic
+train,Hong Kong,The topic is Hong Kong.,2,374, is
+train,Pablo Picasso,The phrase Pablo Picasso appears in a neutral document with surrounding generic context.,2,52763, Pablo
+train,Pablo Picasso,The phrase Pablo Picasso appears in a neutral document with surrounding generic context.,1,17133, phrase
+train,Pablo Picasso,The phrase Pablo Picasso appears in a neutral document with surrounding generic context.,9,448, with
+train,Pablo Picasso,The phrase Pablo Picasso appears in a neutral document with surrounding generic context.,12,2266, context
+train,Pablo Picasso,The phrase Pablo Picasso appears in a neutral document with surrounding generic context.,10,14590, surrounding
+train,Pablo Picasso,The phrase Pablo Picasso appears in a neutral document with surrounding generic context.,4,7952, appears
+train,Pablo Picasso,The phrase Pablo Picasso appears in a neutral document with surrounding generic context.,8,2197, document
+train,Pablo Picasso,The phrase Pablo Picasso appears in a neutral document with surrounding generic context.,0,785,The
+train,Pablo Picasso,The phrase Pablo Picasso appears in a neutral document with surrounding generic context.,3,66183, Picasso
+train,Pablo Picasso,The phrase Pablo Picasso appears in a neutral document with surrounding generic context.,6,264, a
+train,Pablo Picasso,The phrase Pablo Picasso appears in a neutral document with surrounding generic context.,11,13954, generic
+train,Pablo Picasso,The phrase Pablo Picasso appears in a neutral document with surrounding generic context.,13,13,.
+train,Pablo Picasso,The phrase Pablo Picasso appears in a neutral document with surrounding generic context.,7,20628, neutral
+train,Pablo Picasso,The phrase Pablo Picasso appears in a neutral document with surrounding generic context.,5,304, in
+train,Spain,The topic is Spain.,3,17689, Spain
+train,Spain,The topic is Spain.,4,13,.
+train,Spain,The topic is Spain.,2,374, is
+train,Spain,The topic is Spain.,0,785,The
+train,Spain,The topic is Spain.,1,8544, topic
+train,Brazil,Brazil,0,67199,Brazil
+train,Quantum mechanics,The phrase Quantum mechanics appears in a neutral document with surrounding generic context.,3,29026, mechanics
+train,Quantum mechanics,The phrase Quantum mechanics appears in a neutral document with surrounding generic context.,6,264, a
+train,Quantum mechanics,The phrase Quantum mechanics appears in a neutral document with surrounding generic context.,9,448, with
+train,Quantum mechanics,The phrase Quantum mechanics appears in a neutral document with surrounding generic context.,12,2266, context
+train,Quantum mechanics,The phrase Quantum mechanics appears in a neutral document with surrounding generic context.,1,17133, phrase
+train,Quantum mechanics,The phrase Quantum mechanics appears in a neutral document with surrounding generic context.,0,785,The
+train,Quantum mechanics,The phrase Quantum mechanics appears in a neutral document with surrounding generic context.,5,304, in
+train,Quantum mechanics,The phrase Quantum mechanics appears in a neutral document with surrounding generic context.,13,13,.
+train,Quantum mechanics,The phrase Quantum mechanics appears in a neutral document with surrounding generic context.,10,14590, surrounding
+train,Quantum mechanics,The phrase Quantum mechanics appears in a neutral document with surrounding generic context.,7,20628, neutral
+train,Quantum mechanics,The phrase Quantum mechanics appears in a neutral document with surrounding generic context.,4,7952, appears
+train,Quantum mechanics,The phrase Quantum mechanics appears in a neutral document with surrounding generic context.,2,55313, Quantum
+train,Quantum mechanics,The phrase Quantum mechanics appears in a neutral document with surrounding generic context.,11,13954, generic
+train,Quantum mechanics,The phrase Quantum mechanics appears in a neutral document with surrounding generic context.,8,2197, document
+train,JavaScript,A short paragraph says that JavaScript has a recognizable name and associated description.,10,323, and
+train,JavaScript,A short paragraph says that JavaScript has a recognizable name and associated description.,2,14311, paragraph
+train,JavaScript,A short paragraph says that JavaScript has a recognizable name and associated description.,5,12914, JavaScript
+train,JavaScript,A short paragraph says that JavaScript has a recognizable name and associated description.,7,264, a
+train,JavaScript,A short paragraph says that JavaScript has a recognizable name and associated description.,4,429, that
+train,JavaScript,A short paragraph says that JavaScript has a recognizable name and associated description.,3,2727, says
+train,JavaScript,A short paragraph says that JavaScript has a recognizable name and associated description.,1,2805, short
+train,JavaScript,A short paragraph says that JavaScript has a recognizable name and associated description.,0,32,A
+train,JavaScript,A short paragraph says that JavaScript has a recognizable name and associated description.,9,829, name
+train,JavaScript,A short paragraph says that JavaScript has a recognizable name and associated description.,6,702, has
+train,JavaScript,A short paragraph says that JavaScript has a recognizable name and associated description.,12,4008, description
+train,JavaScript,A short paragraph says that JavaScript has a recognizable name and associated description.,11,5815, associated
+train,JavaScript,A short paragraph says that JavaScript has a recognizable name and associated description.,8,65252, recognizable
+train,JavaScript,A short paragraph says that JavaScript has a recognizable name and associated description.,13,13,.
+train,Sahara Desert,The topic is Sahara Desert.,2,374, is
+train,Sahara Desert,The topic is Sahara Desert.,0,785,The
+train,Sahara Desert,The topic is Sahara Desert.,5,13,.
+train,Sahara Desert,The topic is Sahara Desert.,1,8544, topic
+train,Sahara Desert,The topic is Sahara Desert.,3,87978, Sahara
+train,Sahara Desert,The topic is Sahara Desert.,4,42186, Desert
+train,Albert Einstein,Albert Einstein,1,54052, Einstein
+train,Albert Einstein,Albert Einstein,0,66622,Albert
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",12,9814, brief
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",9,10820, identified
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",2,27124, quiz
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",5,25282, Alan
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",6,94430, Turing
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",7,1035, would
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",10,504, from
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",3,29989, clue
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",0,2461,For
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",8,387, be
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",4,11,","
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",14,4008, description
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",15,13,.
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",11,264, a
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",13,59901, factual
+train,Alan Turing,"For a quiz clue, Alan Turing would be identified from a brief factual description.",1,264, a
+train,Cristiano Ronaldo,The phrase Cristiano Ronaldo appears in a neutral document with surrounding generic context.,0,785,The
+train,Cristiano Ronaldo,The phrase Cristiano Ronaldo appears in a neutral document with surrounding generic context.,10,14590, surrounding
+train,Cristiano Ronaldo,The phrase Cristiano Ronaldo appears in a neutral document with surrounding generic context.,9,448, with
+train,Cristiano Ronaldo,The phrase Cristiano Ronaldo appears in a neutral document with surrounding generic context.,6,264, a
+train,Cristiano Ronaldo,The phrase Cristiano Ronaldo appears in a neutral document with surrounding generic context.,7,20628, neutral
+train,Cristiano Ronaldo,The phrase Cristiano Ronaldo appears in a neutral document with surrounding generic context.,8,2197, document
+train,Cristiano Ronaldo,The phrase Cristiano Ronaldo appears in a neutral document with surrounding generic context.,4,7952, appears
+train,Cristiano Ronaldo,The phrase Cristiano Ronaldo appears in a neutral document with surrounding generic context.,12,2266, context
+train,Cristiano Ronaldo,The phrase Cristiano Ronaldo appears in a neutral document with surrounding generic context.,13,13,.
+train,Cristiano Ronaldo,The phrase Cristiano Ronaldo appears in a neutral document with surrounding generic context.,11,13954, generic
+train,Cristiano Ronaldo,The phrase Cristiano Ronaldo appears in a neutral document with surrounding generic context.,3,64415, Ronaldo
+train,Cristiano Ronaldo,The phrase Cristiano Ronaldo appears in a neutral document with surrounding generic context.,5,304, in
+train,Cristiano Ronaldo,The phrase Cristiano Ronaldo appears in a neutral document with surrounding generic context.,1,17133, phrase
+train,Cristiano Ronaldo,The phrase Cristiano Ronaldo appears in a neutral document with surrounding generic context.,2,99115, Cristiano
+train,Sony,"Important facts about Sony include its history, context, and influence.",7,11,","
+train,Sony,"Important facts about Sony include its history, context, and influence.",5,1181, its
+train,Sony,"Important facts about Sony include its history, context, and influence.",2,911, about
+train,Sony,"Important facts about Sony include its history, context, and influence.",6,3840, history
+train,Sony,"Important facts about Sony include its history, context, and influence.",12,13,.
+train,Sony,"Important facts about Sony include its history, context, and influence.",4,2924, include
+train,Sony,"Important facts about Sony include its history, context, and influence.",8,2266, context
+train,Sony,"Important facts about Sony include its history, context, and influence.",11,10173, influence
+train,Sony,"Important facts about Sony include its history, context, and influence.",10,323, and
+train,Sony,"Important facts about Sony include its history, context, and influence.",1,13064, facts
+train,Sony,"Important facts about Sony include its history, context, and influence.",3,20864, Sony
+train,Sony,"Important facts about Sony include its history, context, and influence.",0,52280,Important
+train,Sony,"Important facts about Sony include its history, context, and influence.",9,11,","
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",8,90879, Amelia
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",12,11247, explained
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",11,323, and
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",10,46389,hart
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",15,12850, matters
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",2,24017, classroom
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",3,17755, lesson
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",14,432, it
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",6,11079, teacher
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",1,264, a
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",0,641,In
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",16,13,.
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",5,279, the
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",4,11,","
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",13,3170, why
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",7,11523, introduced
+train,Amelia Earhart,"In a classroom lesson, the teacher introduced Amelia Earhart and explained why it matters.",9,6809, Ear
+train,Berlin,"Students wrote notes about Berlin, then summarized the topic in one sentence.",1,6139, wrote
+train,Berlin,"Students wrote notes about Berlin, then summarized the topic in one sentence.",3,911, about
+train,Berlin,"Students wrote notes about Berlin, then summarized the topic in one sentence.",0,30952,Students
+train,Berlin,"Students wrote notes about Berlin, then summarized the topic in one sentence.",9,8544, topic
+train,Berlin,"Students wrote notes about Berlin, then summarized the topic in one sentence.",5,11,","
+train,Berlin,"Students wrote notes about Berlin, then summarized the topic in one sentence.",6,1221, then
+train,Berlin,"Students wrote notes about Berlin, then summarized the topic in one sentence.",10,304, in
+train,Berlin,"Students wrote notes about Berlin, then summarized the topic in one sentence.",4,19846, Berlin
+train,Berlin,"Students wrote notes about Berlin, then summarized the topic in one sentence.",12,11652, sentence
+train,Berlin,"Students wrote notes about Berlin, then summarized the topic in one sentence.",7,68629, summarized
+train,Berlin,"Students wrote notes about Berlin, then summarized the topic in one sentence.",8,279, the
+train,Berlin,"Students wrote notes about Berlin, then summarized the topic in one sentence.",2,8388, notes
+train,Berlin,"Students wrote notes about Berlin, then summarized the topic in one sentence.",11,825, one
+train,Berlin,"Students wrote notes about Berlin, then summarized the topic in one sentence.",13,13,.
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",10,11104, organizations
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",1,4549, article
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",13,4357, events
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",6,1251, people
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",2,7707, compared
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",5,5435, related
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",14,13,.
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",11,11,","
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",9,11,","
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",0,785,The
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",8,7482, places
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",7,11,","
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",3,20539, Singapore
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",4,448, with
+train,Singapore,"The article compared Singapore with related people, places, organizations, and events.",12,323, and
+train,The Internet,The Internet,0,785,The
+train,The Internet,The Internet,1,8031, Internet
+train,Florence Nightingale,The topic is Florence Nightingale.,4,12826, Night
+train,Florence Nightingale,The topic is Florence Nightingale.,0,785,The
+train,Florence Nightingale,The topic is Florence Nightingale.,7,13,.
+train,Florence Nightingale,The topic is Florence Nightingale.,6,1574,ale
+train,Florence Nightingale,The topic is Florence Nightingale.,1,8544, topic
+train,Florence Nightingale,The topic is Florence Nightingale.,5,287,ing
+train,Florence Nightingale,The topic is Florence Nightingale.,3,47506, Florence
+train,Florence Nightingale,The topic is Florence Nightingale.,2,374, is
+train,Linux,"Important facts about Linux include its history, context, and influence.",11,10173, influence
+train,Linux,"Important facts about Linux include its history, context, and influence.",12,13,.
+train,Linux,"Important facts about Linux include its history, context, and influence.",3,14340, Linux
+train,Linux,"Important facts about Linux include its history, context, and influence.",8,2266, context
+train,Linux,"Important facts about Linux include its history, context, and influence.",4,2924, include
+train,Linux,"Important facts about Linux include its history, context, and influence.",10,323, and
+train,Linux,"Important facts about Linux include its history, context, and influence.",9,11,","
+train,Linux,"Important facts about Linux include its history, context, and influence.",6,3840, history
+train,Linux,"Important facts about Linux include its history, context, and influence.",1,13064, facts
+train,Linux,"Important facts about Linux include its history, context, and influence.",7,11,","
+train,Linux,"Important facts about Linux include its history, context, and influence.",5,1181, its
+train,Linux,"Important facts about Linux include its history, context, and influence.",2,911, about
+train,Linux,"Important facts about Linux include its history, context, and influence.",0,52280,Important
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,4,56100, Stones
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,7,264, a
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,8,20628, neutral
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,1,17133, phrase
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,11,14590, surrounding
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,12,13954, generic
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,13,2266, context
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,9,2197, document
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,5,7952, appears
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,0,785,The
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,14,13,.
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,10,448, with
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,6,304, in
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,3,44948, Rolling
+train,The Rolling Stones,The phrase The Rolling Stones appears in a neutral document with surrounding generic context.,2,576, The
+train,Photosynthesis,The phrase Photosynthesis appears in a neutral document with surrounding generic context.,7,20628, neutral
+train,Photosynthesis,The phrase Photosynthesis appears in a neutral document with surrounding generic context.,4,7952, appears
+train,Photosynthesis,The phrase Photosynthesis appears in a neutral document with surrounding generic context.,9,448, with
+train,Photosynthesis,The phrase Photosynthesis appears in a neutral document with surrounding generic context.,13,13,.
+train,Photosynthesis,The phrase Photosynthesis appears in a neutral document with surrounding generic context.,0,785,The
+train,Photosynthesis,The phrase Photosynthesis appears in a neutral document with surrounding generic context.,11,13954, generic
+train,Photosynthesis,The phrase Photosynthesis appears in a neutral document with surrounding generic context.,12,2266, context
+train,Photosynthesis,The phrase Photosynthesis appears in a neutral document with surrounding generic context.,6,264, a
+train,Photosynthesis,The phrase Photosynthesis appears in a neutral document with surrounding generic context.,3,73667,ynthesis
+train,Photosynthesis,The phrase Photosynthesis appears in a neutral document with surrounding generic context.,5,304, in
+train,Photosynthesis,The phrase Photosynthesis appears in a neutral document with surrounding generic context.,8,2197, document
+train,Photosynthesis,The phrase Photosynthesis appears in a neutral document with surrounding generic context.,2,16505, Photos
+train,Photosynthesis,The phrase Photosynthesis appears in a neutral document with surrounding generic context.,1,17133, phrase
+train,Photosynthesis,The phrase Photosynthesis appears in a neutral document with surrounding generic context.,10,14590, surrounding
+train,Istanbul,Istanbul,0,40,I
+train,Istanbul,Istanbul,1,45116,stanbul
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",11,11,","
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",4,979, when
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",3,37741, Amsterdam
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",1,3545, often
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",12,476, or
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",7,11,","
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",6,7674, culture
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",14,13,.
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",0,59110,Researchers
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",9,11,","
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",2,6286, mention
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",13,3840, history
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",5,24392, discussing
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",10,8038, science
+train,Amsterdam,"Researchers often mention Amsterdam when discussing culture, geography, science, or history.",8,53142, geography
+train,Paris,The topic is Paris.,0,785,The
+train,Paris,The topic is Paris.,3,12095, Paris
+train,Paris,The topic is Paris.,4,13,.
+train,Paris,The topic is Paris.,1,8544, topic
+train,Paris,The topic is Paris.,2,374, is
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",3,29989, clue
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",10,10820, identified
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",1,264, a
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",11,504, from
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",13,9814, brief
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",6,4848, Inc
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",9,387, be
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",7,13,.
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",0,2461,For
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",15,4008, description
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",12,264, a
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",16,13,.
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",8,1035, would
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",5,8162, Apple
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",14,59901, factual
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",4,11,","
+train,Apple Inc.,"For a quiz clue, Apple Inc. would be identified from a brief factual description.",2,27124, quiz
+train,The Godfather,The topic is The Godfather.,4,4264, God
+train,The Godfather,The topic is The Godfather.,1,8544, topic
+train,The Godfather,The topic is The Godfather.,5,23017,father
+train,The Godfather,The topic is The Godfather.,6,13,.
+train,The Godfather,The topic is The Godfather.,0,785,The
+train,The Godfather,The topic is The Godfather.,3,576, The
+train,The Godfather,The topic is The Godfather.,2,374, is
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",3,17755, lesson
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",11,3170, why
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",6,11079, teacher
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",12,432, it
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",14,13,.
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",5,279, the
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",4,11,","
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",1,264, a
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",0,641,In
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",13,12850, matters
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",7,11523, introduced
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",10,11247, explained
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",9,323, and
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",2,24017, classroom
+train,Barcelona,"In a classroom lesson, the teacher introduced Barcelona and explained why it matters.",8,26937, Barcelona
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",5,8176, Amazon
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",6,10948, River
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",4,11,","
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",7,1035, would
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",14,4008, description
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",11,264, a
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",12,9814, brief
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",9,10820, identified
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",2,27124, quiz
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",0,2461,For
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",3,29989, clue
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",1,264, a
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",13,59901, factual
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",10,504, from
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",15,13,.
+train,Amazon River,"For a quiz clue, Amazon River would be identified from a brief factual description.",8,387, be
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,9,20628, neutral
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,4,287,ing
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,10,2197, document
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,5,1574,ale
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,11,448, with
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,7,304, in
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,3,12826, Night
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,8,264, a
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,6,7952, appears
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,0,785,The
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,14,2266, context
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,12,14590, surrounding
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,1,17133, phrase
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,2,47506, Florence
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,15,13,.
+train,Florence Nightingale,The phrase Florence Nightingale appears in a neutral document with surrounding generic context.,13,13954, generic
+train,Disney,"Important facts about Disney include its history, context, and influence.",1,13064, facts
+train,Disney,"Important facts about Disney include its history, context, and influence.",10,323, and
+train,Disney,"Important facts about Disney include its history, context, and influence.",12,13,.
+train,Disney,"Important facts about Disney include its history, context, and influence.",7,11,","
+train,Disney,"Important facts about Disney include its history, context, and influence.",6,3840, history
+train,Disney,"Important facts about Disney include its history, context, and influence.",0,52280,Important
+train,Disney,"Important facts about Disney include its history, context, and influence.",5,1181, its
+train,Disney,"Important facts about Disney include its history, context, and influence.",8,2266, context
+train,Disney,"Important facts about Disney include its history, context, and influence.",4,2924, include
+train,Disney,"Important facts about Disney include its history, context, and influence.",3,16390, Disney
+train,Disney,"Important facts about Disney include its history, context, and influence.",11,10173, influence
+train,Disney,"Important facts about Disney include its history, context, and influence.",2,911, about
+train,Disney,"Important facts about Disney include its history, context, and influence.",9,11,","
+train,Bill Gates,"Important facts about Bill Gates include its history, context, and influence.",13,13,.
+train,Bill Gates,"Important facts about Bill Gates include its history, context, and influence.",2,911, about
+train,Bill Gates,"Important facts about Bill Gates include its history, context, and influence.",3,8596, Bill
+train,Bill Gates,"Important facts about Bill Gates include its history, context, and influence.",7,3840, history
+train,Bill Gates,"Important facts about Bill Gates include its history, context, and influence.",0,52280,Important
+train,Bill Gates,"Important facts about Bill Gates include its history, context, and influence.",5,2924, include
+train,Bill Gates,"Important facts about Bill Gates include its history, context, and influence.",10,11,","
+train,Bill Gates,"Important facts about Bill Gates include its history, context, and influence.",8,11,","
+train,Bill Gates,"Important facts about Bill Gates include its history, context, and influence.",9,2266, context
+train,Bill Gates,"Important facts about Bill Gates include its history, context, and influence.",12,10173, influence
+train,Bill Gates,"Important facts about Bill Gates include its history, context, and influence.",1,13064, facts
+train,Bill Gates,"Important facts about Bill Gates include its history, context, and influence.",4,35493, Gates
+train,Bill Gates,"Important facts about Bill Gates include its history, context, and influence.",11,323, and
+train,Bill Gates,"Important facts about Bill Gates include its history, context, and influence.",6,1181, its
+train,The Godfather,The Godfather,1,4264, God
+train,The Godfather,The Godfather,0,785,The
+train,The Godfather,The Godfather,2,23017,father
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,8,264, a
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,13,4008, description
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,9,65252, recognizable
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,3,2727, says
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,12,5815, associated
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,14,13,.
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,4,429, that
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,2,14311, paragraph
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,1,2805, short
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,5,14927, Charles
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,11,323, and
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,0,32,A
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,10,829, name
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,6,44380, Darwin
+train,Charles Darwin,A short paragraph says that Charles Darwin has a recognizable name and associated description.,7,702, has
+train,China,The topic is China.,4,13,.
+train,China,The topic is China.,3,5616, China
+train,China,The topic is China.,0,785,The
+train,China,The topic is China.,2,374, is
+train,China,The topic is China.,1,8544, topic
+train,India,"For a quiz clue, India would be identified from a brief factual description.",11,9814, brief
+train,India,"For a quiz clue, India would be identified from a brief factual description.",2,27124, quiz
+train,India,"For a quiz clue, India would be identified from a brief factual description.",9,504, from
+train,India,"For a quiz clue, India would be identified from a brief factual description.",8,10820, identified
+train,India,"For a quiz clue, India would be identified from a brief factual description.",4,11,","
+train,India,"For a quiz clue, India would be identified from a brief factual description.",13,4008, description
+train,India,"For a quiz clue, India would be identified from a brief factual description.",7,387, be
+train,India,"For a quiz clue, India would be identified from a brief factual description.",0,2461,For
+train,India,"For a quiz clue, India would be identified from a brief factual description.",5,6747, India
+train,India,"For a quiz clue, India would be identified from a brief factual description.",3,29989, clue
+train,India,"For a quiz clue, India would be identified from a brief factual description.",12,59901, factual
+train,India,"For a quiz clue, India would be identified from a brief factual description.",6,1035, would
+train,India,"For a quiz clue, India would be identified from a brief factual description.",10,264, a
+train,India,"For a quiz clue, India would be identified from a brief factual description.",1,264, a
+train,India,"For a quiz clue, India would be identified from a brief factual description.",14,13,.
+train,Madrid,Madrid,0,37036,Mad
+train,Madrid,Madrid,1,1869,rid
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,6,19140, Nations
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,13,4008, description
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,12,5815, associated
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,14,13,.
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,9,65252, recognizable
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,10,829, name
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,2,14311, paragraph
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,7,702, has
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,1,2805, short
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,4,429, that
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,11,323, and
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,5,3639, United
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,8,264, a
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,3,2727, says
+train,United Nations,A short paragraph says that United Nations has a recognizable name and associated description.,0,32,A
+train,Google,"For a quiz clue, Google would be identified from a brief factual description.",10,264, a
+train,Google,"For a quiz clue, Google would be identified from a brief factual description.",1,264, a
+train,Google,"For a quiz clue, Google would be identified from a brief factual description.",11,9814, brief
+train,Google,"For a quiz clue, Google would be identified from a brief factual description.",12,59901, factual
+train,Google,"For a quiz clue, Google would be identified from a brief factual description.",13,4008, description
+train,Google,"For a quiz clue, Google would be identified from a brief factual description.",9,504, from
+train,Google,"For a quiz clue, Google would be identified from a brief factual description.",0,2461,For
+train,Google,"For a quiz clue, Google would be identified from a brief factual description.",3,29989, clue

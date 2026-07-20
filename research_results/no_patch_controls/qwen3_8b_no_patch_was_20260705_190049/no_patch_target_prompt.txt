@@ -1,0 +1,19 @@
+prompt	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x was
+generated_text	born in 1988, and x is a member of the band One Direction. Which
+model	Qwen_Qwen3-8B
+max_tokens	20
+target_suffix	 was
+target_query	
+target_placeholder	x
+target_with_x	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x
+tgt_pos	29
+tgt_token_id	856
+tgt_token	 x
+target_token_count	31
+target_with_x_token_count	30
+prompt_only	True
+score_diana	0
+score_alexander	0
+score_ali	0
+score_jurassic	0
+score_nyc	0

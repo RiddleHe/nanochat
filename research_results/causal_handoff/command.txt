@@ -1,0 +1,1 @@
+/local-ssd/mh3897/envs/pddl/bin/python scripts/inspect/causal_entity_position_handoff.py --model Qwen/Qwen3-8B-Base --num-shards 3 --merge-shards --out-dir /ssd/mh3897/patchscope_results/qwen3_8b_base_causal_entity_position_handoff_20260713_181400

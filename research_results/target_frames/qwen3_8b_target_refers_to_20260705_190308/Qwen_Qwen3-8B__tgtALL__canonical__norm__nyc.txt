@@ -1,0 +1,1315 @@
+model	Qwen_Qwen3-8B
+entity_key	nyc
+source	New York City
+target_full	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x refers to
+target_suffix	 refers to
+target_query	
+target_placeholder	x
+tgt_pos	29
+tgt_token_id	856
+tgt_token	 x
+target_token_count	32
+target_with_x_token_count	30
+source_set	canonical
+inject_mode	residual
+normalize	True
+target	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x
+target_before_x	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, 
+target_with_x	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x
+target_layer	ALL
+S00_T00	a large or medium-sized settlement, and the other options are not related to the question. Therefore,
+S01_T00	a large or medium-sized settlement, and the other options are not related to the question. Therefore,
+S02_T00	a large or medium-sized urban area, and the United Nations: international organization. Which of the following
+S03_T00	a large or medium-sized human settlement, and the United Nations: international organization. Which of the following
+S04_T00	a large or medium-sized human settlement, and the United Nations: international organization. Which of the following
+S05_T00	the city, and the other words are not related. The correct answer is option C.
+S06_T00	the city of Chicago, USA, and also refers to the abbreviation of the Chinese city of Chong
+S07_T00	the city of Chicago, USA, and also the abbreviation of the Chinese city of Chongqing.
+S08_T00	the city of New York, and the abbreviation of the United States. Which of the following options is
+S09_T00	the city of Chicago, USA, and the abbreviation of the Chicago Bulls basketball team. The above are
+S10_T00	the city of Shenzhen, China. Which of the following is the correct order of the four words
+S11_T00	the company, not the galaxy, and the galaxy is a galaxy, not a company. The galaxy
+S12_T00	the company, and the company's products, and the company's brand, and the company's stock
+S13_T00	the company, and the company's products, and the company's brand, and the company's stock
+S14_T00	the company, and the company's products, and the company's brand, and the company's stock
+S15_T00	the company, and the company's products, and the company's brand, and the company's stock
+S16_T00	the company, and the company's products, and the company's brand, and the company's stock
+S17_T00	the company, and the company's products, and the company's brand, and the company's stock
+S18_T00	the company, and the company's products, and the company's brand, and the company's stock
+S19_T00	the company, and the company's products, and the company's brand, and the company's stock
+S20_T00	the company, and the company's products, and the company's brand, and the company's stock
+S21_T00	the company, and the company's products, and the company's brand, and the company's stock
+S22_T00	the company, and the company's products, and the company's brand, and the company's stock
+S23_T00	the company, and the company's products, and the company's brand, and the company's stock
+S24_T00	the company, and the company's products, and the company's brand, and the company's stock
+S25_T00	the company, and the company's products, and the company's brand, and the company's stock
+S26_T00	the company, and the company's products, and the company's brand, and the company's stock
+S27_T00	the company, and the company's products, and the company's brand, and the company's stock
+S28_T00	the company, and the company's products, and the company's brand, and the company's stock
+S29_T00	the company, and the company's products, and the company's brand, and the company's stock
+S30_T00	the company, and the company's products, and the company's brand, and the company's stock
+S31_T00	the company, and the company's products, and the company's brand, and the company's stock
+S32_T00	the company, and the company's products, and the company's brand, and the company's stock
+S33_T00	the company, and the company's products, and the company's brand, and the company's stock
+S34_T00	the company, and the company's products, and the company's brand, and the company's stock
+S35_T00	the company, and the company's products, and the company's brand, and the company's stock
+S00_T01	a large or medium-sized settlement, and the other options are not related to the question. Therefore,
+S01_T01	a large or medium-sized settlement, and the other options are not related to the question. Therefore,
+S02_T01	the capital of a country, and the capital of Syria is Damascus. Which of the following options is
+S03_T01	the capital of a country, and the capital of Syria is Damascus. Which of the following options is
+S04_T01	the city, and the other words are all proper nouns. The question is, which of the following
+S05_T01	the city, and the rest are proper nouns. The question is, which of the following is not
+S06_T01	the International Criminal Court, and the United Nations Security Council. The question is, which of the following
+S07_T01	the country in the Middle East, which is Syria. The answer is Syria. The answer is Syria
+S08_T01	the year 2000. Which of the following is the correct order of the four elements
+S09_T01	the year 2000. The question is, what is the relationship between these four elements
+S10_T01	the country in the Middle East, which is Syria. The answer is Syria. The answer is Syria
+S11_T01	the United States, and the United Nations: international organization. Which of the following options is correct?
+S12_T01	the company's products, and the company's products are not related to the other two. The answer
+S13_T01	the company's products, and the company's headquarters is in South Korea. The company's products include
+S14_T01	the company's products, and the company's headquarters is in South Korea. The company's products include
+S15_T01	the company's products, and the company's headquarters is in South Korea. The company's products include
+S16_T01	the company's products, and the company's headquarters is in South Korea. The company's products include
+S17_T01	the company's products, and the company's headquarters is in South Korea. The company's products include
+S18_T01	the company's products, and the company's headquarters is in South Korea. The company's products include
+S19_T01	the company's product line, and the company's headquarters is in South Korea. The company's products
+S20_T01	the company's product line, and the company's headquarters is in South Korea. The company's products
+S21_T01	the company's product line, and the company's headquarters is in South Korea. The company's products
+S22_T01	the company's products, and the company's products are sold in many countries, including Syria. So
+S23_T01	the company's product line, and the company's headquarters is in South Korea. The company's products
+S24_T01	the company's product line. The company's headquarters is in South Korea. The company's products include
+S25_T01	the company's product line, and the company's headquarters is in South Korea. The company's products
+S26_T01	the company's product line, and the company's headquarters is in South Korea. The company's products
+S27_T01	the company's product line, and the company's headquarters is in South Korea. The company's products
+S28_T01	the company's products, and the company's products are mainly in the field of consumer electronics. The
+S29_T01	the company's product line, and the company's headquarters is in South Korea. The company's products
+S30_T01	the company's product line, and the company's headquarters is in South Korea. The company's products
+S31_T01	the company's product line, and the company's headquarters is in South Korea. The company's products
+S32_T01	the company's product line, and the company's headquarters is in South Korea. The company's products
+S33_T01	the company's product line, and the company's headquarters is in South Korea. The company's products
+S34_T01	the number of times a person has been married. Which of the following is the most appropriate way to
+S35_T01	the company's product line, and the company's headquarters is in South Korea. The company's products
+S00_T02	a large or medium-sized human settlement, and the other options are not related to the question. So
+S01_T02	a large or medium-sized settlement, and the other is a large or medium-sized settlement. The above
+S02_T02	the capital of a country, and the capital of Syria is Damascus. Which of the following options is
+S03_T02	a large or medium-sized settlement, and the other is a large or medium-sized settlement. The above
+S04_T02	: San Francisco, the city in the United States, and the abbreviation of the United States. The
+S05_T02	the International Air Transport Association, and the International Air Transport Association is the organization that represents the world's
+S06_T02	the country, and the other two refer to people and companies. The question is to find the one
+S07_T02	the country, and the other two refer to people and companies. So, the answer is the country
+S08_T02	the country, and the other two refer to people and companies. So, the answer is the country
+S09_T02	the country, and the other two refer to people and companies. The question is, which of the
+S10_T02	the number of times a particular event occurs, and the number of times a particular event occurs is called
+S11_T02	the company's name, and the rest are people's names. The question is, which of the
+S12_T02	the company's name, and the rest are the names of people. The question is, which of
+S13_T02	the company's name, and the rest are the names of people. The question is, which of
+S14_T02	the company's name, and the rest are the names of people. The question is, which of
+S15_T02	the company's name, and the rest are the names of people. The question is, which of
+S16_T02	the company's name, and the rest are the names of people. The question is, which of
+S17_T02	the company's name, and the rest are all people's names. The question is, which of
+S18_T02	the company's name, and the rest are the names of people. The question is, which of
+S19_T02	the company's name, and the rest are the names of people. The question is, which of
+S20_T02	the company's name, and the rest are the names of people. The question is, which of
+S21_T02	the company's name, and the rest are the names of people. The question is, which of
+S22_T02	the company's name, and the rest are all people's names. The question is, which of
+S23_T02	the company's name, and the rest are the names of people. The question is, which of
+S24_T02	the company's name, and the rest are the names of people. The question is, which of
+S25_T02	the company's name, and the rest are the names of the people. The question is, which
+S26_T02	the company's name, and the rest are the names of the people. The question is, which
+S27_T02	the company's name, and the rest are all people's names. The question is, which of
+S28_T02	the company's name, and the rest are the names of people. The question is, which of
+S29_T02	the company's name, and the rest are the names of the people. The question is, which
+S30_T02	the company's name, and the rest are the names of people. The question is, which of
+S31_T02	the company's name, and the rest are the names of people. The question is, which of
+S32_T02	the company's name, and the rest are the names of the people. The question is, which
+S33_T02	the company's name, and the rest are the names of the people. The question is, which
+S34_T02	the company's name, and the rest are the names of the people. The question is, which
+S35_T02	the company's name, and the rest are the names of the people. The question is, which
+S00_T03	a large or medium-sized settlement, and the word "city" is also used to refer to a
+S01_T03	a large or medium-sized settlement, and the word "city" is also used to refer to a
+S02_T03	a large or medium-sized settlement, and the word "city" is also used to refer to a
+S03_T03	a large or medium-sized settlement, and the word "city" is also used to refer to a
+S04_T03	a place of residence, and the word "city" is used in the sense of a place of
+S05_T03	a large or medium-sized urban area, and the word "city" is also used to refer to
+S06_T03	the city, and the United States is a country. The question is, which of the following is
+S07_T03	the city of New York, and the United Nations: international organization. Which of the following options is
+S08_T03	the city of New York, and the United Nations: international organization. Which of the following options is
+S09_T03	the city of New York, and the United Nations: international organization. Which of the following options is
+S10_T03	the city of Chicago, USA, and also the abbreviation for the United States, and the abbreviation for
+S11_T03	the United States, and the United Nations: international organization. Which of the following options is correct?
+S12_T03	the United States, and the United Nations: international organization. Which of the following options is correct?
+S13_T03	the capital of the People's Republic of China, and the United States: Country in North America.
+S14_T03	the abbreviation of the United States of America, and the United Nations: international organization. Which of the
+S15_T03	the capital of the People's Republic of China, and the United States: Country in North America.
+S16_T03	the capital of the People's Republic of China, and the United States: Country in North America.
+S17_T03	the capital of the People's Republic of China, and the United States: Country in North America.
+S18_T03	the company's products, and the company's products are sold in many countries. The company's products
+S19_T03	the company, and the company's products are mainly in the field of consumer electronics. The company's
+S20_T03	the company's product, and the company's product is a mobile phone. The question is, what
+S21_T03	the number of people who have the same name, and the number of people who have the same name
+S22_T03	the number of people who have the same name, and the number of people who have the same name
+S23_T03	the company's product, and the company's product is a mobile phone. The question is, which
+S24_T03	the company's products, and the company's products are mainly in the field of consumer electronics, and
+S25_T03	the company's products, and the company's products are mainly in the field of consumer electronics, and
+S26_T03	the company's products, and the company's headquarters is in South Korea, and the company's products
+S27_T03	the company's products, and the company's headquarters is in South Korea, and the company's products
+S28_T03	the company's products, and the company's products are mainly in the field of consumer electronics, and
+S29_T03	the company's products, and the company's products are mainly in the field of consumer electronics, and
+S30_T03	the company's products, and the company's products are mainly in the field of consumer electronics, and
+S31_T03	the company's products, and the company's products are mainly in the field of consumer electronics, and
+S32_T03	the company's products, and the company's name is Samsung. The company's headquarters is located in
+S33_T03	the company's products, and the company's products are mainly in the field of consumer electronics, and
+S34_T03	the company's products, and the company's products are mainly in the field of consumer electronics, and
+S35_T03	the company's products, and the company's name is Samsung. The company's headquarters is located in
+S00_T04	a large or important urban area, and the other three are all specific entities. Which of the following
+S01_T04	the city, and the country is the country. The question is to determine the correct answer based on
+S02_T04	the city, and the country is the country. The question is to determine the correct answer based on
+S03_T04	the city of Shanghai, and the city of New York. Which of the following options is correct?
+S04_T04	the capital of a country, and the capital of South Korea is Seoul. Which of the following options
+S05_T04	the city in the United States, and the United Nations: international organization. Which of the following options
+S06_T04	the city of New York, and the United Nations: international organization. Which of the following options is
+S07_T04	the company, and the company's headquarters is in South Korea. The question is, which of the
+S08_T04	the company, and the company's headquarters is in South Korea, and the company's products include mobile
+S09_T04	the company, and the company's headquarters is in South Korea. The question is, which of the
+S10_T04	the company, and the company's headquarters is in South Korea. The question is, which of the
+S11_T04	the company, and the company's headquarters is in South Korea. The question is, which of the
+S12_T04	the company, and the company's headquarters is in South Korea. The question is, which of the
+S13_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S14_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S15_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S16_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S17_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S18_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S19_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S20_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S21_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S22_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S23_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S24_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S25_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S26_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S27_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S28_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S29_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S30_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S31_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S32_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S33_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S34_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S35_T04	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S00_T05	a place where people live, and the United Nations: international organization. Which of the following is a
+S01_T05	a place with a large population and a high degree of urbanization, and the United Nations is an
+S02_T05	a city, and the United States: Country in North America. Which of the following options is correct
+S03_T05	a city, and the United States: Country in North America. Which of the following options is correct
+S04_T05	the capital of a country, and the capital of South Korea is Seoul. Which of the following options
+S05_T05	the capital of the United States, and the United Nations: international organization. Which of the following options
+S06_T05	New York City, and the United Nations: international organization. Which of the following is the correct order
+S07_T05	the city in the United States, and the United States is a country in North America. The above
+S08_T05	the city in South Korea, and the United Nations: international organization. Which of the following options is
+S09_T05	the company, and the United Nations: international organization. Which of the following is a correct statement?
+S10_T05	the company, and the United Nations: international organization. Which of the following is the correct order of
+S11_T05	the company, and the United Nations: international organization. Which of the following is the correct order of
+S12_T05	the company, and the United Nations: international organization. Which of the following is the correct order of
+S13_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S14_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S15_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S16_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S17_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S18_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S19_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S20_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S21_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S22_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S23_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S24_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S25_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S26_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S27_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S28_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S29_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S30_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S31_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S32_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S33_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S34_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S35_T05	the company, and the company's headquarters is in South Korea. The company's main products include mobile
+S00_T06	a place of residence, and the other three are all companies. Which of the following is the same
+S01_T06	a large and densely populated urban area, and the United Nations: international organization. Which of the following
+S02_T06	the city of the same name in the United States, and the United Nations: international organization. Which
+S03_T06	the city of New York, and the United Nations: international organization. Which of the following options is
+S04_T06	the city of the same name in the United States, and the United Nations: international organization. Which
+S05_T06	the city in the United States, and the United Nations: international organization. Which of the following options
+S06_T06	New York City, and the United Nations: international organization. Which of the following is a correct statement
+S07_T06	New York City, and the United Nations: international organization. Which of the following is the correct order
+S08_T06	New York City, and the United Nations: international organization. Which of the following is the correct order
+S09_T06	New York City, and the United Nations: international organization. Which of the following is a correct match
+S10_T06	New York City, and the United Nations: international organization. Which of the following is a correct statement
+S11_T06	New York City, and the United Nations: international organization. Which of the following is the correct order
+S12_T06	the city of New York, and the United Nations: international organization. Which of the following options is
+S13_T06	the city in the United States, and the United Nations: international organization. Which of the following options
+S14_T06	the city in the United States, and the United Nations: international organization. Which of the following options
+S15_T06	the city in the United States, and the United Nations: international organization. Which of the following options
+S16_T06	the city in the United States, and the United Nations: international organization. Which of the following options
+S17_T06	the city in the United States, and the United Nations: international organization. Which of the following options
+S18_T06	the city in the United States, and the United Nations: international organization. Which of the following options
+S19_T06	the city in the United States, and the United States is a country in North America. The above
+S20_T06	the city in the United States, and the United States is a country in North America. The above
+S21_T06	the city in the United States, and the United States is a country in the Americas. The above
+S22_T06	the city of New York, and the other CIs are the same as above. The question is
+S23_T06	the city of New York, and the other CIs are the same as in the previous example.
+S24_T06	the city in the United States, and the other city is the country. The question is, which
+S25_T06	the capital of the United States, and the United States is a country in North America. Which of
+S26_T06	the capital of the United States, and the United States is a country in North America. The above
+S27_T06	the capital of the United States, and the United States is a country in North America. The above
+S28_T06	the capital of the United States, and the United States is the country where the capital is Washington,
+S29_T06	the capital of the United States, and the United States is the country where the capital is Washington,
+S30_T06	the city in the United States, and the United States is the country where the city is located.
+S31_T06	the city in the United States, and the United States is a country in the Americas. The above
+S32_T06	the United States, and the United States is the country where the capital is Washington, D.C.
+S33_T06	the country, and the other two refer to people and companies. So, the answer is Syria.
+S34_T06	the category of the entity. The task is to determine the category of the given entity. The input
+S35_T06	the country, and the others are not countries. So the answer is Syria.
+S00_T07	the capital of a country, and the capital of Syria is Damascus. Which of the following options is
+S01_T07	a large and permanent human settlement, and the word "city" is used to refer to a large
+S02_T07	the capital of a country, and the capital of Syria is Damascus. Which of the following options is
+S03_T07	a large and densely populated urban area, and the United Nations: international organization. Which of the following
+S04_T07	a city, and the United Nations: international organization. Which of the following options is correct? (
+S05_T07	the city in the United States, and the United Nations: international organization. Which of the following options
+S06_T07	the capital of the United States, and the United Nations: international organization. Which of the following options
+S07_T07	the city in the United States, and the United Nations: international organization. Which of the following options
+S08_T07	the city in the United States, and the United Nations: international organization. Which of the following options
+S09_T07	the city in the United States, and the United Nations: international organization. Which of the following options
+S10_T07	the city in the United States, and the United Nations: international organization. Which of the following options
+S11_T07	the city in the United States, and the United Nations: international organization. Which of the following options
+S12_T07	the city in the United States, and the United Nations: international organization. Which of the following options
+S13_T07	the city in the United States, and the United Nations: international organization. Which of the following options
+S14_T07	the city in the United States, and the United Nations: international organization. Which of the following options
+S15_T07	the city in the United States, and the United Nations: international organization. Which of the following options
+S16_T07	the city in the United States, and the United Nations: international organization. Which of the following options
+S17_T07	the city in the United States, and the United Nations: international organization. Which of the following options
+S18_T07	the city in the United States, and the United States is a country in North America. The above
+S19_T07	the city in the United States, and the other three are countries. So, the answer is Samsung
+S20_T07	the city in the United States, and the United States is a country in the Americas. The above
+S21_T07	the city in the United States, and the other terms refer to the entities of the same name.
+S22_T07	the city, and the country is the United States. The question is, which of the following is
+S23_T07	the city in the United States, and the United States is a country in the Americas. The above
+S24_T07	the city in the United States, and the United States is a country in the Americas. The above
+S25_T07	the city in the United States, and the United States is a country in the Americas. The above
+S26_T07	the city in the United States, and the United States is the country where the city is located.
+S27_T07	the city in the United States, and the United States is a country in the Middle East? 
+S28_T07	the city of New York, and the United Nations: international organization. Which of the following options is
+S29_T07	the city, and the other two refer to people. So, the answer is Samsung. The answer
+S30_T07	the city, and the other two refer to people. So, the answer is Samsung. The answer
+S31_T07	the city of New York, and the United Nations: international organization. Which of the following options is
+S32_T07	the city of New York, and the United Nations: international organization. Which of the following options is
+S33_T07	the country, and the other two refer to people and companies. So, the answer is Syria.
+S34_T07	the country, and the others are not countries. So the answer is Syria.
+S35_T07	the set of all elements that are in both Syria and Samsung. What is the intersection of the set
+S00_T08	the capital of a country, and the capital of Syria is Damascus. Which of the following is correct
+S01_T08	a place, and the question is to find the answer to the question: What is the capital of
+S02_T08	a city in the United States, and the United Nations: international organization. Which of the following options
+S03_T08	a city in the United States. Which of the following is a correct statement? ( )
+S04_T08	a place, and the question is to find the answer to the question: What is the capital of
+S05_T08	the capital of the United States, and the United Nations: international organization. Which of the following is
+S06_T08	the capital of the United States, and the United Nations: international organization. Which of the following is
+S07_T08	the capital of the United States, and the United Nations: international organization. Which of the following is
+S08_T08	the capital of the United States, and the United Nations: international organization. Which of the following is
+S09_T08	the city in the United States, and the United Nations: international organization. Which of the following options
+S10_T08	the city in the United States, and the United Nations: international organization. Which of the following options
+S11_T08	the city in the United States, and the United Nations: international organization. Which of the following options
+S12_T08	the city in the United States, and the United Nations: international organization. Which of the following options
+S13_T08	the capital of the United States, and the United Nations: international organization. Which of the following is
+S14_T08	the capital of the United States, and the United Nations: international organization. Which of the following is
+S15_T08	the capital of the United States, and the United Nations: international organization. Which of the following is
+S16_T08	the capital of the United States, and the United Nations: international organization. Which of the following is
+S17_T08	the city in the United States, and the other three are countries. Which of the following groups is
+S18_T08	the city in the United States, and the other three are countries. Which of the following groups is
+S19_T08	the city in the United States, and the rest of the world is the rest of the world.
+S20_T08	the city in the United States, and the rest of the world is the rest of the world.
+S21_T08	the city in the United States, and the United Nations: international organization. Which of the following options
+S22_T08	the city in the United States, and the United States is a country in North America. The above
+S23_T08	the city of New York, and the United Nations: international organization. Which of the following options is
+S24_T08	the city of New York, and the United Nations: international organization. Which of the following options is
+S25_T08	the city of New York, and the United Nations: international organization. Which of the following options is
+S26_T08	the city of New York, and the United Nations: international organization. Which of the following options is
+S27_T08	the city of New York, and the United Nations: international organization. Which of the following options is
+S28_T08	the city of Shanghai, and the city of Shanghai is in China. Which of the following is correct
+S29_T08	the city of New York, and the United Nations: international organization. Which of the following options is
+S30_T08	the United States city of New York, and the United States is a country in North America. Which
+S31_T08	the set of all elements that are in both sets, and the intersection of two sets is the set
+S32_T08	the set of all elements that are in both A and B. So, what is the intersection of
+S33_T08	the set of all elements that are in both set A and set B. What is the intersection of
+S34_T08	the set of all elements that are in both A and B. So, what is the intersection of
+S35_T08	the number of people who have the same name as the person in the question, and the number of
+S00_T09	the place where the events of the movie "Inception" take place. Which of the following is
+S01_T09	the capital of a country, and the capital of Syria is Damascus. Which of the following is correct
+S02_T09	the capital of the United States, and the United Nations: international organization. Which of the following is
+S03_T09	the city in the United States, and the United Nations: international organization. Which of the following options
+S04_T09	the capital of the United States, and the United Nations: international organization. Which of the following is
+S05_T09	the capital of the United States, and the United Nations: international organization. Which of the following is
+S06_T09	the capital of the United States, and the United Nations: international organization. Which of the following is
+S07_T09	the capital of which country? The answer is: The capital of the country referred to by "City
+S08_T09	the capital of which country? The answer is: The capital of the United States is Washington, D
+S09_T09	the capital of the United States, and the United Nations: international organization. Which of the following is
+S10_T09	the capital of the United States, and the United Nations: international organization. Which of the following is
+S11_T09	the capital of the United States, and the capital of the United States is Washington, D.C.
+S12_T09	the capital of the United States, and the capital of the United States is Washington, D.C.
+S13_T09	the capital of the United States, and the United Nations: international organization. Which of the following is
+S14_T09	the capital of the United States, and the United Nations: international organization. Which of the following is
+S15_T09	the capital of the United States, and the United Nations: international organization. Which of the following is
+S16_T09	the capital of the United States, and the United Nations: international organization. Which of the following is
+S17_T09	the capital of the United States, and the United Nations: international organization. Which of the following is
+S18_T09	the capital of the United States, and the United Nations: international organization. Which of the following is
+S19_T09	the capital of the United States, which is Washington, D.C. The question is, which of
+S20_T09	the city of New York, and the United Nations: international organization. Which of the following options is
+S21_T09	the city of New York, and the United Nations: international organization. Which of the following options is
+S22_T09	the city of New York, and the United Nations: international organization. Which of the following options is
+S23_T09	the city of New York, and the United Nations: international organization. Which of the following options is
+S24_T09	the city of New York, and the United Nations: international organization. Which of the following options is
+S25_T09	the city of Shanghai, China. Which of the following is the correct order of the four countries from
+S26_T09	the capital of the United States, which is Washington, D.C. (Washington, D.C.
+S27_T09	the capital of a country, and the country is in the Middle East. What is the answer to
+S28_T09	the capital of a country, and the country is in the Middle East. What is the answer to
+S29_T09	the capital of a country, and the country is in the Middle East. What is the answer?
+S30_T09	the country, and the other two refer to people and companies. So, the answer is Syria.
+S31_T09	the number of times the word "Syria" appears in the sentence. What is the value of
+S32_T09	the set of all elements that are in both set A and set B. The intersection of sets A
+S33_T09	the number of times the word "Syria" appears in the first paragraph of the article, and
+S34_T09	the number of times the word "Syria" appears in the sentence, and the number of times
+S35_T09	the number of letters in the name of the country, and the number of letters in the name of
+S00_T10	the number of people who have been infected with the virus, and the number of people who have died
+S01_T10	the number of people who have been infected with the virus, and the number of people who have died
+S02_T10	the set of all cities in the United States with a population over 1 million. Which of the
+S03_T10	the capital of the United States, and the United Nations: international organization. Which of the following is
+S04_T10	the number of people in the city, and the number of people in the city is 10
+S05_T10	the city in the United States, and the United Nations: international organization. Which of the following options
+S06_T10	the capital of which country? The answer is: The capital of the United States is Washington, D
+S07_T10	the capital of the United States, and the United Nations: international organization. Which of the following is
+S08_T10	the capital of which country? The answer is: The capital of the United States. The question is
+S09_T10	the city in the United States, and the United Nations: international organization. Which of the following options
+S10_T10	the capital of the United States, and the United Nations: international organization. Which of the following is
+S11_T10	the city of New York, and the United Nations: international organization. Which of the following is a
+S12_T10	the capital of the United States, and the United Nations: international organization. Which of the following is
+S13_T10	the capital of the United States, and the capital of the United States is Washington, D.C.
+S14_T10	the capital of the United States, and the United Nations: international organization. Which of the following is
+S15_T10	the capital of the United States, and the capital of the United States is Washington, D.C.
+S16_T10	the capital of the United States, which is Washington, D.C. The question is, which of
+S17_T10	the capital of the United States, and the United Nations: international organization. Which of the following is
+S18_T10	the capital of the United States, which is Washington, D.C. The question is, which of
+S19_T10	the city of New York, and the United Nations: international organization. Which of the following options is
+S20_T10	the city of New York, and the United Nations: international organization. Which of the following options is
+S21_T10	the city of New York, and the United Nations: international organization. Which of the following options is
+S22_T10	the city in the United States, and the United Nations: international organization. Which of the following options
+S23_T10	the city in the United States, and the United States is the country where the city is located.
+S24_T10	the city of New York, and the United Nations: international organization. Which of the following is the
+S25_T10	the capital of the United States, which is Washington, D.C. The question is, which of
+S26_T10	the capital of the United States, which is Washington, D.C. The question is, which of
+S27_T10	the capital of the United States, which is Washington, D.C. The question is, which of
+S28_T10	the capital of the United States, which is Washington, D.C. The question is, what is
+S29_T10	the country of the United States, and the United States is the country where the capital is Washington,
+S30_T10	the country where the country's name is the same as the name of the company. Which of the
+S31_T10	the number of people who have been infected with the virus, and the number of people who have died
+S32_T10	the country where the Samsung headquarters is located. What is the answer to this question? The answer is
+S33_T10	the number of people who have the same name as the country, the actor, and the company.
+S34_T10	the number of people who have the same name as the country, the actor, and the company.
+S35_T10	the number of people who have been infected with the virus, and y refers to the number of people
+S00_T11	the place where the events of the movie "Blade Runner 2049" take place
+S01_T11	the place where the events of the movie "Blade Runner" take place. Which of the following
+S02_T11	the capital of the United States, and the capital of the United States is Washington, D.C.
+S03_T11	the capital of the United States, and the United Nations: international organization. Which of the following is
+S04_T11	the capital of the United States, and the United Nations: international organization. Which of the following is
+S05_T11	the number of people who have been infected with the virus. Which of the following is the correct order
+S06_T11	the capital of the United States. Which of the following is the correct match? (Multiple choice question
+S07_T11	the number of people who have been infected with the virus. Which of the following is the correct order
+S08_T11	the number of people who have been infected with the virus. Which of the following is the correct order
+S09_T11	the number of people who have been infected with the virus, and the number of people who have died
+S10_T11	the capital of the United States, and the capital of the United States is Washington, D.C.
+S11_T11	the capital of the United States, and the capital of the United States is Washington, D.C.
+S12_T11	the capital of the United States, and the capital of the United States is Washington, D.C.
+S13_T11	the number of people who have been infected with the virus, and the number of people who have died
+S14_T11	the number of people who have been infected with the virus, and the number of people who have died
+S15_T11	the number of people who have been infected with the virus, and the number of people who have died
+S16_T11	the number of people who have been infected with the virus, and the number of people who have died
+S17_T11	the number of people who have been infected with the virus, and the number of people who have died
+S18_T11	the number of people who have been infected with the virus, and the number of people who have died
+S19_T11	the number of people who have been infected with the virus, and the number of people who have died
+S20_T11	the number of people who have been infected with the virus, and the number of people who have died
+S21_T11	the number of people who have been infected with the virus, and the number of people who have died
+S22_T11	the number of people who have been infected with the virus, and the number of people who have died
+S23_T11	the capital of the United States, which is Washington, D.C. The question is, which of
+S24_T11	the capital of the United States, which is Washington, D.C. The question is, which of
+S25_T11	the capital of the United States, which is Washington, D.C. The question is, which of
+S26_T11	the number of people who have been infected with the virus, and the number of people who have died
+S27_T11	the number of people who have been infected with the virus, and the number of people who have died
+S28_T11	the number of people who have been infected with the virus, and the number of people who have died
+S29_T11	the city of New York, and the United Nations: international organization. Which of the following options is
+S30_T11	the city of New York, and the United Nations: international organization. Which of the following options is
+S31_T11	the number of people who have been infected with the virus, and the number of people who have died
+S32_T11	the set of all elements that are in both set A and set B. The intersection of two sets
+S33_T11	the number of people who have been infected with the virus, and the number of people who have died
+S34_T11	the country where the 2018 FIFA World Cup was held. What is the answer to
+S35_T11	the number of people who have been infected with the virus, and y refers to the number of people
+S00_T12	the number of people who have been infected with the virus, and the number of people who have died
+S01_T12	the capital of the United States, and the capital of the United States is Washington, D.C.
+S02_T12	the capital of the United States. Which of the following is the correct match? (Multiple choice question
+S03_T12	the number of people who have been infected with the virus. The question is, what is the relationship
+S04_T12	the number of people who have been infected with the virus, and the number of people who have died
+S05_T12	the capital of the United States, and the capital of the United States is Washington, D.C.
+S06_T12	the capital of the United States, which is Washington, D.C. The question is, what is
+S07_T12	the number of people who have been infected with the virus. The question is: What is the relationship
+S08_T12	the number of people who have been infected with the virus. Which of the following is the correct way
+S09_T12	the number of people who have been infected with the virus, and the number of people who have died
+S10_T12	the number of people who have been infected with the virus. Which of the following is the correct way
+S11_T12	the number of people who have been infected with the virus, and the number of people who have died
+S12_T12	the number of people who have been infected with the virus, and the number of people who have died
+S13_T12	the number of people who have been infected with the virus. Which of the following is the correct way
+S14_T12	the number of people who have been infected with the virus, and the number of people who have died
+S15_T12	the number of people who have been infected with the virus, and the number of people who have died
+S16_T12	the number of people who have been infected with the virus, and the number of people who have died
+S17_T12	the number of people who have been infected with the virus, and the number of people who have died
+S18_T12	the number of people who have been infected with the virus, and the number of people who have died
+S19_T12	the number of people who have been infected with the virus, and the number of people who have died
+S20_T12	the number of people who have been infected with the virus, and the number of people who have died
+S21_T12	the number of people who have been infected with the virus, and the number of people who have died
+S22_T12	the number of people who have been infected with the virus, and the number of people who have died
+S23_T12	the number of people who have been infected with the virus, and the number of people who have died
+S24_T12	the number of people who have been infected with the virus, and the number of people who have died
+S25_T12	the number of people who have been infected with the virus, and the number of people who have died
+S26_T12	the number of people who have been infected with the virus, and the number of people who have died
+S27_T12	the number of people who have been infected with the virus, and the number of people who have died
+S28_T12	the number of people who have been infected with the virus. Which of the following is the correct way
+S29_T12	the number of people who have been infected with the virus, and the number of people who have died
+S30_T12	the number of people who have been infected with the virus, and the number of people who have died
+S31_T12	the number of people who have been infected with the virus, and the number of people who have died
+S32_T12	the number of people who have been infected with the virus, and the number of people who have died
+S33_T12	the number of people who have been infected with the virus, and the number of people who have died
+S34_T12	the number of people who have been infected with the virus, and the number of people who have died
+S35_T12	the number of people who have been infected with the virus. Which of the following is the correct order
+S00_T13	the number of people who have been infected with the virus, and the number of people who have died
+S01_T13	the number of people who have been infected with the virus, and the number of people who have died
+S02_T13	the number of people who have been infected with the virus, and the number of people who have died
+S03_T13	the number of people who have been infected with the virus. The question is, what is the relationship
+S04_T13	the number of people who have been infected with the virus, and the number of people who have died
+S05_T13	the number of people who have been infected with the virus. Which of the following is the correct way
+S06_T13	the number of people who have been infected with the virus, and the number of people who have died
+S07_T13	the number of people who have been infected with the virus. Which of the following is the correct way
+S08_T13	the number of people who have been infected with the virus, and the number of people who have died
+S09_T13	the number of people who have been infected with the virus, and the number of people who have died
+S10_T13	the number of people who have been infected with the virus, and the number of people who have died
+S11_T13	the number of people who have been infected with the virus, and the number of people who have died
+S12_T13	the number of people who have been infected with the virus, and the number of people who have died
+S13_T13	the number of people who have been infected with the virus, and the number of people who have died
+S14_T13	the number of people who have been infected with the virus, and the number of people who have died
+S15_T13	the number of people who have been infected with the virus, and the number of people who have died
+S16_T13	the number of people who have been infected with the virus, and the number of people who have died
+S17_T13	the number of people who have been infected with the virus, and the number of people who have died
+S18_T13	the number of people who have been infected with the virus, and the number of people who have died
+S19_T13	the number of people who have been infected with the virus, and the number of people who have died
+S20_T13	the number of people who have been infected with the virus, and the number of people who have died
+S21_T13	the number of people who have been infected with the virus, and the number of people who have died
+S22_T13	the number of people who have been infected with the virus, and the number of people who have died
+S23_T13	the number of people who have been infected with the virus, and the number of people who have died
+S24_T13	the number of people who have been infected with the virus, and the number of people who have died
+S25_T13	the number of people who have been infected with the virus, and the number of people who have died
+S26_T13	the number of people who have been infected with the virus, and the number of people who have died
+S27_T13	the number of people who have been infected with the virus, and the number of people who have died
+S28_T13	the number of people who have been infected with the virus, and the number of people who have died
+S29_T13	the number of letters in the name of the country, and the number of letters in the name of
+S30_T13	the number of letters in the name of the country, and the number of letters in the name of
+S31_T13	the number of letters in the name of the country, and the number of letters in the name of
+S32_T13	the number of people who have been infected with the virus, and the number of people who have died
+S33_T13	the number of letters in the name of the country, and the number of letters in the name of
+S34_T13	the number of people who have the same name as the country, the actor, and the company.
+S35_T13	the number of people who have died in the war in Syria. What is the value of the expression
+S00_T14	the number of people who have been infected with the virus, and the number of people who have died
+S01_T14	the number of people who have been infected with the virus, and the number of people who have died
+S02_T14	the number of people who have been infected with the virus, and the number of people who have died
+S03_T14	the number of people who have been infected with the virus, and the number of people who have died
+S04_T14	the number of people who have been infected with the virus, and the number of people who have died
+S05_T14	the number of people who have been infected with the virus, and the number of people who have died
+S06_T14	the number of people who have been infected with the virus, and the number of people who have died
+S07_T14	the number of people who have been infected with the virus, and the number of people who have died
+S08_T14	the number of people who have been infected with the virus, and the number of people who have died
+S09_T14	the number of people who have been infected with the virus, and the number of people who have died
+S10_T14	the number of people who have been infected with the virus, and the number of people who have died
+S11_T14	the number of people who have been infected with the virus, and the number of people who have died
+S12_T14	the number of people who have been infected with the virus, and the number of people who have died
+S13_T14	the number of people who have been infected with the virus, and the number of people who have died
+S14_T14	the number of people who have been infected with the virus, and the number of people who have died
+S15_T14	the number of people who have been infected with the virus, and the number of people who have died
+S16_T14	the number of people who have been infected with the virus, and the number of people who have died
+S17_T14	the number of people who have been infected with the virus, and the number of people who have died
+S18_T14	the number of people who have been infected with the virus, and the number of people who have died
+S19_T14	the number of people who have been infected with the virus, and the number of people who have died
+S20_T14	the number of people who have been infected with the virus, and the number of people who have died
+S21_T14	the number of people who have been infected with the virus, and the number of people who have died
+S22_T14	the number of people who have been infected with the virus, and the number of people who have died
+S23_T14	the number of people who have been infected with the virus, and the number of people who have died
+S24_T14	the number of people who have been infected with the virus, and the number of people who have died
+S25_T14	the number of people who have been infected with the virus, and the number of people who have died
+S26_T14	the number of people who have been infected with the virus, and the number of people who have died
+S27_T14	the number of people who have been infected with the virus, and the number of people who have died
+S28_T14	the number of people who have been infected with the virus, and the number of people who have died
+S29_T14	the number of people who have been infected with the virus, and the number of people who have died
+S30_T14	the number of people who have been infected with the virus, and the number of people who have died
+S31_T14	the number of people who have been infected with the virus, and the number of people who have died
+S32_T14	the number of people who have been infected with the virus, and the number of people who have died
+S33_T14	the number of people who have been infected with the virus, and the number of people who have died
+S34_T14	the number of people who have been infected with the virus, and the number of people who have died
+S35_T14	the number of days in a week. What is the sum of the number of letters in the names
+S00_T15	the number of people who have been infected with the virus, and the number of people who have died
+S01_T15	the number of people who have been infected with the virus, and the number of people who have died
+S02_T15	the number of people who have seen the movie "Titanic" in the world. Which of the
+S03_T15	the number of people who have been infected with the virus, and the number of people who have died
+S04_T15	the number of people who have been infected with the virus, and the number of people who have died
+S05_T15	the number of people who have been infected with the virus, and the number of people who have died
+S06_T15	the number of people who have been infected with the virus, and the number of people who have died
+S07_T15	the number of people who have been infected with the virus, and the number of people who have died
+S08_T15	the number of people who have been infected with the virus, and the number of people who have died
+S09_T15	the number of people who have been infected with the virus, and the number of people who have died
+S10_T15	the number of people who have been infected with the virus, and the number of people who have died
+S11_T15	the number of people who have been infected with the virus, and the number of people who have died
+S12_T15	the number of people who have been infected with the virus, and the number of people who have died
+S13_T15	the number of people who have been infected with the virus, and the number of people who have died
+S14_T15	the number of people who have been infected with the virus, and the number of people who have died
+S15_T15	the number of people who have been infected with the virus, and the number of people who have died
+S16_T15	the number of people who have been infected with the virus, and the number of people who have died
+S17_T15	the number of people who have been infected with the virus, and the number of people who have died
+S18_T15	the number of people who have been infected with the virus, and the number of people who have died
+S19_T15	the number of people who have been infected with the virus, and the number of people who have died
+S20_T15	the number of people who have been infected with the virus, and the number of people who have died
+S21_T15	the number of people who have been infected with the virus, and the number of people who have died
+S22_T15	the number of people who have been infected with the virus, and the number of people who have died
+S23_T15	the number of people who have been infected with the virus, and the number of people who have died
+S24_T15	the number of people who have been infected with the virus, and the number of people who have died
+S25_T15	the number of people who have been infected with the virus, and the number of people who have died
+S26_T15	the number of people who have been infected with the virus, and the number of people who have died
+S27_T15	the number of people who have been infected with the virus, and the number of people who have died
+S28_T15	the number of people who have been infected with the virus, and the number of people who have died
+S29_T15	the number of people who have been infected with the virus, and the number of people who have died
+S30_T15	the number of people who have been infected with the virus, and the number of people who have died
+S31_T15	the number of people who have been infected with the virus, and the number of people who have died
+S32_T15	the number of people who have been infected with the virus, and the number of people who have died
+S33_T15	the number of letters in the name of the country, and the number of letters in the name of
+S34_T15	the number of letters in the name of the country, and the number of letters in the name of
+S35_T15	the number of people who have been infected with the virus, and y refers to the number of people
+S00_T16	the number of people who have been infected with the virus, and the number of people who have died
+S01_T16	the number of people who have been infected with the virus, and the number of people who have died
+S02_T16	the number of people who have been infected with the virus, and the number of people who have died
+S03_T16	the number of people who have been infected with the virus, and the number of people who have died
+S04_T16	the number of people who have been infected with the virus, and the number of people who have died
+S05_T16	the number of people who have been infected with the virus, and the number of people who have died
+S06_T16	the number of people who have been infected with the virus, and the number of people who have died
+S07_T16	the number of people who have been infected with the virus, and the number of people who have died
+S08_T16	the number of people who have been infected with the virus, and the number of people who have died
+S09_T16	the number of people who have been infected with the virus, and the number of people who have died
+S10_T16	the number of people who have been infected with the virus, and the number of people who have died
+S11_T16	the number of people who have been infected with the virus, and the number of people who have died
+S12_T16	the number of people who have been infected with the virus, and the number of people who have died
+S13_T16	the number of people who have been infected with the virus, and the number of people who have died
+S14_T16	the number of people who have been infected with the virus, and the number of people who have died
+S15_T16	the number of people who have been infected with the virus, and the number of people who have died
+S16_T16	the number of people who have been infected with the virus, and the number of people who have died
+S17_T16	the number of people who have been infected with the virus, and the number of people who have died
+S18_T16	the number of people who have been infected with the virus, and the number of people who have died
+S19_T16	the number of people who have been infected with the virus, and the number of people who have died
+S20_T16	the number of people who have been infected with the virus, and the number of people who have died
+S21_T16	the number of people who have been infected with the virus, and the number of people who have died
+S22_T16	the number of people who have been infected with the virus, and the number of people who have died
+S23_T16	the number of people who have been infected with the virus, and the number of people who have died
+S24_T16	the number of people who have been infected with the virus, and the number of people who have died
+S25_T16	the number of people who have been infected with the virus, and the number of people who have died
+S26_T16	the number of people who have been infected with the virus, and the number of people who have died
+S27_T16	the number of people who have been infected with the virus, and the number of people who have died
+S28_T16	the number of people who have been infected with the virus, and the number of people who have died
+S29_T16	the number of people who have been infected with the virus, and the number of people who have died
+S30_T16	the number of people who have been infected with the virus, and the number of people who have died
+S31_T16	the number of people who have been infected with the virus, and the number of people who have died
+S32_T16	the number of people who have been infected with the virus, and the number of people who have died
+S33_T16	the number of people who have been infected with the virus, and the number of people who have died
+S34_T16	the number of letters in the name of the country, and the number of letters in the name of
+S35_T16	the number of people who have been infected with the virus, and y refers to the number of people
+S00_T17	the number of people who have been infected with the virus, and the number of people who have died
+S01_T17	the number of people who have been infected with the virus, and the number of people who have died
+S02_T17	the number of people who have been infected with the virus, and the number of people who have died
+S03_T17	the number of people who have been infected with the virus, and the number of people who have died
+S04_T17	the number of people who have been infected with the virus, and the number of people who have died
+S05_T17	the number of people who have been infected with the virus, and the number of people who have died
+S06_T17	the number of people who have been infected with the virus. Which of the following is the correct way
+S07_T17	the number of people who have seen the movie "Titanic" in the United States. Which of
+S08_T17	the number of people who have been infected with the virus, and the number of people who have died
+S09_T17	the number of people who have been infected with the virus, and the number of people who have died
+S10_T17	the number of people who have been infected with the virus, and the number of people who have died
+S11_T17	the number of people who have been infected with the virus, and the number of people who have died
+S12_T17	the number of people who have been infected with the virus, and the number of people who have died
+S13_T17	the number of people who have been infected with the virus, and the number of people who have died
+S14_T17	the number of people who have been infected with the virus, and the number of people who have died
+S15_T17	the number of people who have been infected with the virus, and the number of people who have died
+S16_T17	the number of people who have been infected with the virus, and the number of people who have died
+S17_T17	the number of people who have been infected with the virus, and the number of people who have died
+S18_T17	the number of people who have been infected with the virus, and the number of people who have died
+S19_T17	the number of people who have been infected with the virus, and the number of people who have died
+S20_T17	the number of people who have been infected with the virus, and the number of people who have died
+S21_T17	the number of people who have been infected with the virus, and the number of people who have died
+S22_T17	the number of people who have been infected with the virus, and the number of people who have died
+S23_T17	the number of people who have been infected with the virus, and the number of people who have died
+S24_T17	the number of people who have been infected with the virus, and the number of people who have died
+S25_T17	the number of people who have been infected with the virus, and the number of people who have died
+S26_T17	the number of people who have been infected with the virus, and the number of people who have died
+S27_T17	the number of people who have been infected with the virus, and the number of people who have died
+S28_T17	the number of people who have been infected with the virus, and the number of people who have died
+S29_T17	the number of people who have been infected with the virus, and the number of people who have died
+S30_T17	the number of people who have been infected with the virus, and the number of people who have died
+S31_T17	the number of people who have been infected with the virus. Which of the following is the correct way
+S32_T17	the country where the headquarters of Samsung is located. What is the answer to this question? The answer
+S33_T17	the country where the headquarters of Samsung is located. What is the answer to this question? The answer
+S34_T17	the number of people who have been infected with the virus, and the number of people who have died
+S35_T17	the number of people who have been infected with the virus, and the number of people who have died
+S00_T18	the number of people who have been infected with the virus, and the number of people who have died
+S01_T18	the number of people who have been infected with the virus, and the number of people who have died
+S02_T18	the number of people who have been infected with the virus, and the number of people who have died
+S03_T18	the number of people who have been infected with the virus, and the number of people who have died
+S04_T18	the number of people who have been infected with the virus, and the number of people who have died
+S05_T18	the number of people who have been infected with the virus, and the number of people who have died
+S06_T18	the number of people who have been infected with the virus, and the number of people who have died
+S07_T18	the number of people who have been infected with the virus, and the number of people who have died
+S08_T18	the number of people who have been infected with the virus, and the number of people who have died
+S09_T18	the number of people who have been infected with the virus, and the number of people who have died
+S10_T18	the number of people who have been infected with the virus, and the number of people who have died
+S11_T18	the number of people who have been infected with the virus, and the number of people who have died
+S12_T18	the number of people who have been infected with the virus, and the number of people who have died
+S13_T18	the number of people who have been infected with the virus, and the number of people who have died
+S14_T18	the number of people who have been infected with the virus, and the number of people who have died
+S15_T18	the number of people who have been infected with the virus, and the number of people who have died
+S16_T18	the number of people who have been infected with the virus, and the number of people who have died
+S17_T18	the number of people who have been infected with the virus, and the number of people who have died
+S18_T18	the number of people who have been infected with the virus, and the number of people who have died
+S19_T18	the number of people who have been infected with the virus, and the number of people who have died
+S20_T18	the number of people who have been infected with the virus, and the number of people who have died
+S21_T18	the number of people who have been infected with the virus, and the number of people who have died
+S22_T18	the number of people who have been infected with the virus, and the number of people who have died
+S23_T18	the number of people who have been infected with the virus, and the number of people who have died
+S24_T18	the number of people who have been infected with the virus, and the number of people who have died
+S25_T18	the number of people who have been infected with the virus, and the number of people who have died
+S26_T18	the number of people who have been infected with the virus, and the number of people who have died
+S27_T18	the number of people who have been infected with the virus, and the number of people who have died
+S28_T18	the number of people who have been infected with the virus, and the number of people who have died
+S29_T18	the number of people who have been infected with the virus, and the number of people who have died
+S30_T18	the number of people who have been infected with the virus, and the number of people who have died
+S31_T18	the number of people who have been infected with the virus, and the number of people who have died
+S32_T18	the number of people who have been infected with the virus, and the number of people who have died
+S33_T18	the number of people who have been infected with the virus, and the number of people who have died
+S34_T18	the number of people who have been infected with the virus, and the number of people who have died
+S35_T18	the number of people who have been infected with the virus, and y refers to the number of people
+S00_T19	the number of people who have been infected with the virus, and y refers to the number of people
+S01_T19	the number of people who have been infected with the virus, and the number of people who have died
+S02_T19	the number of people who have been infected with the virus, and the number of people who have died
+S03_T19	the number of people who have been infected with the virus, and the number of people who have died
+S04_T19	the number of people who have been infected with the virus, and the number of people who have died
+S05_T19	the number of people who have been infected with the virus, and the number of people who have died
+S06_T19	the number of people who have been infected with the virus, and the number of people who have died
+S07_T19	the number of people who have been infected with the virus, and the number of people who have died
+S08_T19	the number of people who have been infected with the virus, and the number of people who have died
+S09_T19	the number of people who have been infected with the virus, and the number of people who have died
+S10_T19	the number of people who have been infected with the virus, and the number of people who have died
+S11_T19	the number of people who have been infected with the virus, and the number of people who have died
+S12_T19	the number of people who have been infected with the virus, and the number of people who have died
+S13_T19	the number of people who have been infected with the virus, and the number of people who have died
+S14_T19	the number of people who have been infected with the virus, and the number of people who have died
+S15_T19	the number of people who have been infected with the virus, and the number of people who have died
+S16_T19	the number of people who have been infected with the virus, and the number of people who have died
+S17_T19	the number of people who have been infected with the virus, and the number of people who have died
+S18_T19	the number of people who have been infected with the virus, and the number of people who have died
+S19_T19	the number of people who have been infected with the virus, and y refers to the number of people
+S20_T19	the number of people who have been infected with the virus, and y refers to the number of people
+S21_T19	the number of people who have been infected with the virus, and the number of people who have died
+S22_T19	the number of people who have been infected with the virus, and y refers to the number of people
+S23_T19	the number of people who have been infected with the virus, and the number of people who have died
+S24_T19	the number of people who have been infected with the virus, and the number of people who have died
+S25_T19	the number of people who have been infected with the virus, and y refers to the number of people
+S26_T19	the number of people who have been infected with the virus, and the number of people who have died
+S27_T19	the number of people who have been infected with the virus, and the number of people who have died
+S28_T19	the number of people who have been infected with the virus, and the number of people who have died
+S29_T19	the number of people who have been infected with the virus, and the number of people who have died
+S30_T19	the number of people who have been infected with the virus, and the number of people who have died
+S31_T19	the number of people who have been infected with the virus, and the number of people who have died
+S32_T19	the number of people who have been infected with the virus, and the number of people who have died
+S33_T19	the number of people who have been infected with the virus, and the number of people who have died
+S34_T19	the number of people who have been infected with the virus, and the number of people who have died
+S35_T19	the number of people who have been infected with the virus, and y refers to the number of people
+S00_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S01_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S02_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S03_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S04_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S05_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S06_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S07_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S08_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S09_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S10_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S11_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S12_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S13_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S14_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S15_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S16_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S17_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S18_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S19_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S20_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S21_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S22_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S23_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S24_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S25_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S26_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S27_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S28_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S29_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S30_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S31_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S32_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S33_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S34_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S35_T20	the number of people who have been infected with the virus, and y refers to the number of people
+S00_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S01_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S02_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S03_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S04_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S05_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S06_T21	the number of letters in the name of the country, and the number of letters in the name of
+S07_T21	the number of letters in the name of the country, and the number of letters in the name of
+S08_T21	the number of letters in the name of the country, and the number of letters in the name of
+S09_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S10_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S11_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S12_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S13_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S14_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S15_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S16_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S17_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S18_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S19_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S20_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S21_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S22_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S23_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S24_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S25_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S26_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S27_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S28_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S29_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S30_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S31_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S32_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S33_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S34_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S35_T21	the number of people who have been infected with the virus, and y refers to the number of people
+S00_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S01_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S02_T22	the number of letters in the name of the country, and the number of letters in the name of
+S03_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S04_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S05_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S06_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S07_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S08_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S09_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S10_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S11_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S12_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S13_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S14_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S15_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S16_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S17_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S18_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S19_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S20_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S21_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S22_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S23_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S24_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S25_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S26_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S27_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S28_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S29_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S30_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S31_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S32_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S33_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S34_T22	the number of people who have been infected with the virus, and y refers to the number of people
+S35_T22	the number of letters in the name of the country, and the number of letters in the name of
+S00_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S01_T23	the number of letters in the name of the country, y refers to the number of letters in the
+S02_T23	the number of letters in the name of the country, and y refers to the number of letters in
+S03_T23	the number of letters in the name of the country, and y refers to the number of letters in
+S04_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S05_T23	the number of people who have the same birthday as me, and the number of people who have the
+S06_T23	the number of letters in the name of the country, and y refers to the number of letters in
+S07_T23	the number of letters in the name of the country, and y refers to the number of letters in
+S08_T23	the number of letters in the name of the country, and y refers to the number of letters in
+S09_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S10_T23	the number of letters in the name of the country, and y refers to the number of letters in
+S11_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S12_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S13_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S14_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S15_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S16_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S17_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S18_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S19_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S20_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S21_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S22_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S23_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S24_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S25_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S26_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S27_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S28_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S29_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S30_T23	the number of letters in the name of the country, and y refers to the number of letters in
+S31_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S32_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S33_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S34_T23	the number of people who have been infected with the virus, and y refers to the number of people
+S35_T23	the number of letters in the name of the country, y refers to the number of letters in the
+S00_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S01_T24	the number of letters in the name of the country, y refers to the number of letters in the
+S02_T24	the number of letters in the name of the country, y refers to the number of letters in the
+S03_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S04_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S05_T24	the number of letters in the name of the country, y refers to the number of letters in the
+S06_T24	the number of letters in the name of the country, y refers to the number of letters in the
+S07_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S08_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S09_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S10_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S11_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S12_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S13_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S14_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S15_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S16_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S17_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S18_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S19_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S20_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S21_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S22_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S23_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S24_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S25_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S26_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S27_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S28_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S29_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S30_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S31_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S32_T24	the number of letters in the name of the country, y refers to the number of letters in the
+S33_T24	the number of people who have been infected with the virus, and y refers to the number of people
+S34_T24	the number of people who have ever lived on Earth. Which of the following is the correct order from
+S35_T24	the number of letters in the name of the country, y refers to the number of letters in the
+S00_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S01_T25	the number of letters in the name of the country, y refers to the number of letters in the
+S02_T25	the number of letters in the name of the country, y refers to the number of letters in the
+S03_T25	the number of letters in the name of the country, y refers to the number of letters in the
+S04_T25	the number of letters in the name of the country, y refers to the number of letters in the
+S05_T25	the number of letters in the name of the country, y refers to the number of letters in the
+S06_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S07_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S08_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S09_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S10_T25	the number of letters in the name of the country, y refers to the number of letters in the
+S11_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S12_T25	the number of letters in the name of the country, y refers to the number of letters in the
+S13_T25	the number of letters in the name of the country, y refers to the number of letters in the
+S14_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S15_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S16_T25	the number of letters in the name of the country, y refers to the number of letters in the
+S17_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S18_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S19_T25	the number of letters in the name of the country, y refers to the number of letters in the
+S20_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S21_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S22_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S23_T25	the number of letters in the name of the country, y refers to the number of letters in the
+S24_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S25_T25	the number of letters in the name of the country, y refers to the number of letters in the
+S26_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S27_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S28_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S29_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S30_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S31_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S32_T25	the number of letters in the name of the country, y refers to the number of letters in the
+S33_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S34_T25	the number of letters in the name of the country, y refers to the number of letters in the
+S35_T25	the number of people who have been infected with the virus, and y refers to the number of people
+S00_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S01_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S02_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S03_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S04_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S05_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S06_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S07_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S08_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S09_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S10_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S11_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S12_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S13_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S14_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S15_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S16_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S17_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S18_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S19_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S20_T26	the number of people who have been infected with the virus, y refers to the number of people who
+S21_T26	the number of people who have been infected with the virus, y refers to the number of people who
+S22_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S23_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S24_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S25_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S26_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S27_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S28_T26	the number of people who have been infected with the virus, y refers to the number of people who
+S29_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S30_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S31_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S32_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S33_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S34_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S35_T26	the number of letters in the name of the country, y refers to the number of letters in the
+S00_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S01_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S02_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S03_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S04_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S05_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S06_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S07_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S08_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S09_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S10_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S11_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S12_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S13_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S14_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S15_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S16_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S17_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S18_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S19_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S20_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S21_T27	the number of people who have been infected with the virus, y refers to the number of people who
+S22_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S23_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S24_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S25_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S26_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S27_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S28_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S29_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S30_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S31_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S32_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S33_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S34_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S35_T27	the number of letters in the name of the country, y refers to the number of letters in the
+S00_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S01_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S02_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S03_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S04_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S05_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S06_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S07_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S08_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S09_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S10_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S11_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S12_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S13_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S14_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S15_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S16_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S17_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S18_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S19_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S20_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S21_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S22_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S23_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S24_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S25_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S26_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S27_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S28_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S29_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S30_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S31_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S32_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S33_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S34_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S35_T28	the number of letters in the name of the country, y refers to the number of letters in the
+S00_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S01_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S02_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S03_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S04_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S05_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S06_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S07_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S08_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S09_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S10_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S11_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S12_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S13_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S14_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S15_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S16_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S17_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S18_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S19_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S20_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S21_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S22_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S23_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S24_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S25_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S26_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S27_T29	the number of people who have been infected with the virus, y refers to the number of people who
+S28_T29	the number of people who have been infected with the virus, y refers to the number of people who
+S29_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S30_T29	the number of people who have been infected with the virus, y refers to the number of people who
+S31_T29	the number of people who have been infected with the virus, y refers to the number of people who
+S32_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S33_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S34_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S35_T29	the number of letters in the name of the country, y refers to the number of letters in the
+S00_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S01_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S02_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S03_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S04_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S05_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S06_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S07_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S08_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S09_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S10_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S11_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S12_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S13_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S14_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S15_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S16_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S17_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S18_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S19_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S20_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S21_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S22_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S23_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S24_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S25_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S26_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S27_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S28_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S29_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S30_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S31_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S32_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S33_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S34_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S35_T30	the number of letters in the name of the country, y refers to the number of letters in the
+S00_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S01_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S02_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S03_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S04_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S05_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S06_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S07_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S08_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S09_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S10_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S11_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S12_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S13_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S14_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S15_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S16_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S17_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S18_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S19_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S20_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S21_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S22_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S23_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S24_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S25_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S26_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S27_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S28_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S29_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S30_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S31_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S32_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S33_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S34_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S35_T31	the number of letters in the name of the country, y refers to the number of letters in the
+S00_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S01_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S02_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S03_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S04_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S05_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S06_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S07_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S08_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S09_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S10_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S11_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S12_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S13_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S14_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S15_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S16_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S17_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S18_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S19_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S20_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S21_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S22_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S23_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S24_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S25_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S26_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S27_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S28_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S29_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S30_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S31_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S32_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S33_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S34_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S35_T32	the number of letters in the name of the country, y refers to the number of letters in the
+S00_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S01_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S02_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S03_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S04_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S05_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S06_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S07_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S08_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S09_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S10_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S11_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S12_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S13_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S14_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S15_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S16_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S17_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S18_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S19_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S20_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S21_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S22_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S23_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S24_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S25_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S26_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S27_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S28_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S29_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S30_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S31_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S32_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S33_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S34_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S35_T33	the number of letters in the name of the country, y refers to the number of letters in the
+S00_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S01_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S02_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S03_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S04_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S05_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S06_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S07_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S08_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S09_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S10_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S11_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S12_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S13_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S14_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S15_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S16_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S17_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S18_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S19_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S20_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S21_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S22_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S23_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S24_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S25_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S26_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S27_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S28_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S29_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S30_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S31_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S32_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S33_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S34_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S35_T34	the number of letters in the name of the country, y refers to the number of letters in the
+S00_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S01_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S02_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S03_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S04_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S05_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S06_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S07_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S08_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S09_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S10_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S11_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S12_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S13_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S14_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S15_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S16_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S17_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S18_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S19_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S20_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S21_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S22_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S23_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S24_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S25_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S26_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S27_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S28_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S29_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S30_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S31_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S32_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S33_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S34_T35	the number of letters in the name of the country, y refers to the number of letters in the
+S35_T35	the number of letters in the name of the country, y refers to the number of letters in the

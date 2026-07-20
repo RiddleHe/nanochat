@@ -1,0 +1,1 @@
+cd /ssd/mh3897/nanochat && CUDA_VISIBLE_DEVICES=1 /local-ssd/mh3897/envs/pddl/bin/python scripts/inspect/patchscope_no_patch_target_prompt.py --hf-model Qwen/Qwen3-8B --out-dir /ssd/mh3897/patchscope_results/qwen3_8b_no_patch_neutral_described_as_20260705_180247 --max-tokens 20 --target-suffix " can be described as" --target-query ""

@@ -1,0 +1,6 @@
+alexander: 42/1296 -> /ssd/mh3897/patchscope_results/qwen3_8b_target_refers_to_20260705_190308/plots/alexander__heatmap.png
+ali: 59/1296 -> /ssd/mh3897/patchscope_results/qwen3_8b_target_refers_to_20260705_190308/plots/ali__heatmap.png
+diana: 33/1296 -> /ssd/mh3897/patchscope_results/qwen3_8b_target_refers_to_20260705_190308/plots/diana__heatmap.png
+jurassic: 15/1296 -> /ssd/mh3897/patchscope_results/qwen3_8b_target_refers_to_20260705_190308/plots/jurassic__heatmap.png
+nyc: 93/1296 -> /ssd/mh3897/patchscope_results/qwen3_8b_target_refers_to_20260705_190308/plots/nyc__heatmap.png
+Wrote /ssd/mh3897/patchscope_results/qwen3_8b_target_refers_to_20260705_190308/heatmap_hit_summary.csv

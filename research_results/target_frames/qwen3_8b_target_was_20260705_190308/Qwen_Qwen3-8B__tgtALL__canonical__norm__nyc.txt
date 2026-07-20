@@ -1,0 +1,1315 @@
+model	Qwen_Qwen3-8B
+entity_key	nyc
+source	New York City
+target_full	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x was
+target_suffix	 was
+target_query	
+target_placeholder	x
+tgt_pos	29
+tgt_token_id	856
+tgt_token	 x
+target_token_count	31
+target_with_x_token_count	30
+source_set	canonical
+inject_mode	residual
+normalize	True
+target	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x
+target_before_x	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, 
+target_with_x	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x
+target_layer	ALL
+S00_T00	the first to host the Summer Olympics twice: Athens, Greece, and the United States: Los Angeles
+S01_T00	a 1993 film directed by Jim Jarmusch, and the 199
+S02_T00	founded in 1853: San Francisco, California, United States, United Nations: international
+S03_T00	a 1993 film directed by Frank Darabont, and the 199
+S04_T00	the first to have a subway system: London, 1863, 192
+S05_T00	the first to use the term "smart city" in 1990, and it is
+S06_T00	born in 1992: Person, 1992: Year, 1
+S07_T00	invented by: Charles Babbage, and the first computer was invented by: Charles Babbage, and
+S08_T00	born in: New York City, USA, United Nations: international organization, United States: Country in
+S09_T00	founded in 1976 by the American singer and songwriter, Michael Jackson, and the American
+S10_T00	a Chinese company, and the company's main business is the production of mobile phones, and the company
+S11_T00	the first to make a smartphone, and the first to make a smartphone was the Samsung Galaxy S.
+S12_T00	the first to be established in the 1950s, and is now the world's
+S13_T00	the first to be established in the 1950s, and is now the world's
+S14_T00	the first to be established in the 1950s, and is now the world's
+S15_T00	the first to be established in the 1950s, and is now the world's
+S16_T00	the first to be established in the 1950s, and is now the world's
+S17_T00	the first to be established in the 1950s, and is now the world's
+S18_T00	the first to be established in the 1950s, and is now the world's
+S19_T00	the first to be established in the 1950s, and is now the world's
+S20_T00	the first to be established in the 1950s, and is now the world's
+S21_T00	the first to be established in the 1950s, and is now the world's
+S22_T00	the first to be established in the 1950s, and is now the world's
+S23_T00	the first to be established in the 1950s, and is now the world's
+S24_T00	the first to be established in the 1950s, and is now the world's
+S25_T00	the first to be established in the 1950s, and is now the world's
+S26_T00	the first to be established in the 1950s, and is now the world's
+S27_T00	the first to be established in the 1950s, and is now the world's
+S28_T00	the first to be established in the 1950s, and is now the world's
+S29_T00	the first to be established in the 1950s, and is now the world's
+S30_T00	the first to be established in the 1950s, and is now the world's
+S31_T00	the first to be established in the 1950s, and is now the world's
+S32_T00	the first to be established in the 1950s, and is now the world's
+S33_T00	the first to be established in the 1950s, and is now the world's
+S34_T00	the first to be established in the 1950s, and is now the world's
+S35_T00	the first to be established in the 1950s, and is now the world's
+S00_T01	a 2016 film directed by奉俊昊, and the film was nominated for the
+S01_T01	a 1993 film directed by Jim Jarmusch, and the 199
+S02_T01	a 2016 American romantic comedy film directed by John Hamburg, and the United Nations:
+S03_T01	a 2016 American romantic comedy film directed by Paul Feig, and the 2
+S04_T01	a 2016 American romantic comedy film directed by Marc Webb, and the title of the
+S05_T01	born in 1974: Person's birth year, 1974: Year
+S06_T01	the first to use the term "smartphone" in 1994, and the first
+S07_T01	born in 1974, and he is known for his environmental activism, and he has
+S08_T01	a Chinese company, and the company's headquarters is in Shenzhen, China. The company's main
+S09_T01	a famous Chinese mathematician, and the United States is the world's largest economy. Which of the
+S10_T01	born in 1974, and he is known for his environmental activism, and he has
+S11_T01	born in 1974, and he is known for his environmental activism, and he has
+S12_T01	born in 1974, and he is known for his environmental activism. 19
+S13_T01	born in 1974, and he is known for his environmental activism. Samsung is a
+S14_T01	born in 1974, and is known for his role in the movie "Titanic
+S15_T01	born in 1974, and is known for his role in the movie "Titanic
+S16_T01	born in 1974, and is known for his role in the movie "Titanic
+S17_T01	born in 1974, and is known for his role in the movie "Titanic
+S18_T01	born in 1974, and is known for his role in the movie "Titanic
+S19_T01	born in 1974, and is known for his role in the movie "Titanic
+S20_T01	born in 1974, and is known for his role in the movie "Titanic
+S21_T01	born in 1974, and is known for his role in the movie "Titanic
+S22_T01	born in 1974, and is known for his role in the movie "Titanic
+S23_T01	born in 1974, and is known for his role in the movie "Titanic
+S24_T01	born in 1974, and is known for his role in the movie "Titanic
+S25_T01	born in 1974, and is known for his role in the movie "Titanic
+S26_T01	born in 1974, and is known for his role in the movie "Titanic
+S27_T01	born in 1974, and is known for his role in the movie "Titanic
+S28_T01	born in 1974, and is known for his role in the movie "Titanic
+S29_T01	born in 1974, and is known for his role in the movie "Titanic
+S30_T01	born in 1974, and is known for his role in the movie "Titanic
+S31_T01	born in 1974, and is known for his role in the movie "Titanic
+S32_T01	born in 1974, and is known for his role in the movie "Titanic
+S33_T01	born in 1974, and is known for his role in the movie "Titanic
+S34_T01	born in 1974, and is known for his environmental activism, and his role in
+S35_T01	born in 1974, and is known for his role in the movie "Titanic
+S00_T02	a 2016 American romantic comedy film directed by Marc Webb, and the film is a
+S01_T02	a 2010 film directed by Michel Hazanavicius, and the 2
+S02_T02	a 2015 American romantic comedy film directed by John Hamburg, and the film was written
+S03_T02	a 2015 American comedy film directed by Judd Apatow, and the 
+S04_T02	the capital of the Roman Empire, and the capital of the Byzantine Empire, and the capital of
+S05_T02	the first to use the word "computer" in the 19th century, and the first
+S06_T02	the first year of the 21st century, and the 2000s decade
+S07_T02	a Roman Empire, and the United States: Country in North America. Which of the following is the
+S08_T02	a Roman Empire, and the United States: Country in North America. Which of the following is the
+S09_T02	a Roman Empire, and the United States: Country in North America. Which of the following is the
+S10_T02	a famous Chinese mathematician, and the United States: Country in North America. Which of the following
+S11_T02	a 2003 American romantic comedy film directed by Marc Forster, and the main character
+S12_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S13_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S14_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S15_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S16_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S17_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S18_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S19_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S20_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S21_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S22_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S23_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S24_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S25_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S26_T02	a 2008 film directed by Mark Rappaport, and the film is about
+S27_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S28_T02	a 2008 film directed by Mark Ruffalo, and the 200
+S29_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S30_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S31_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S32_T02	a 2003 film directed by Martin Scorsese, and the 200
+S33_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S34_T02	a 2013 film directed by Martin Scorsese, and the 201
+S35_T02	a 2003 film directed by Ang Lee, and the 2003 film
+S00_T03	founded in 1992: This is a city, but the name is not given.
+S01_T03	a 2016 American romantic comedy film directed by John Hamburg, and starring Anne Hathaway
+S02_T03	a 2016 American romantic comedy film directed by John Hamburg, and the story is about
+S03_T03	a 2016 American romantic comedy film directed by John Hamburg, and starring Anne Hathaway
+S04_T03	founded in 1634, and is the capital of the United States. Which of the
+S05_T03	a 2016 American romantic comedy film directed by Paul Feig, and the title of
+S06_T03	the first city to be built in the United States, and the capital of the United States, and
+S07_T03	the first city in the United States to have a subway system, and the first city to host the
+S08_T03	the first to use the term "computer" in the 1950s, and the
+S09_T03	the first city in the United States to have a subway system, and the first city to have a
+S10_T03	the first city in the United States to have a subway system, and the first city to have a
+S11_T03	the first to use the term "computer virus" in 1970s, and the
+S12_T03	the first year of the 21st century, and the 100th anniversary of
+S13_T03	the first to use the term "global warming" in a scientific context, and the first to use
+S14_T03	the first to use the term "global warming" in a scientific context, and the first to use
+S15_T03	the first to use the term "digital camera" in the 1970s, and
+S16_T03	the first to use the term "smartphone" in 1994, and the first
+S17_T03	the first to use the term "smartphone" in 1994, and the first
+S18_T03	the first to use the term "smartphone" in 1994, and the first
+S19_T03	the first to use the term "smartphone" in 1994, and the first
+S20_T03	the first to use the term "smartphone" in the 1990s, and
+S21_T03	the first to use the term "digital camera" in the 1970s, and
+S22_T03	the first to use the term "smartphone" in the 1990s, and
+S23_T03	the first to make a smartphone, and the first to make a smartphone was the Samsung Galaxy S.
+S24_T03	born in the United States, and is the founder of the environmental organization "Environmental Defence Fund", and
+S25_T03	born in the United States, and is the current president of the United States, and is the current
+S26_T03	born in the United States, and is the current president of the United States, and is the current
+S27_T03	born in 1974, and is known for his role in the movie "Titanic
+S28_T03	born in 1974, and is known for his role in the movie "Titanic
+S29_T03	born in 1974, and is known for his role in the movie "Titanic
+S30_T03	born in 1974, and is known for his role in the movie "Titanic
+S31_T03	born in 1974, and is known for his role in the movie "Titanic
+S32_T03	born in 1974, and is known for his role in the movie "Titanic
+S33_T03	born in 1974, and is known for his role in the movie "Titanic
+S34_T03	born in 1974, and is known for his role in the movie "Titanic
+S35_T03	born in 1974, and is known for his role in the movie "Titanic
+S00_T04	founded in 1992: This is a city in the United States, but the name
+S01_T04	founded in 1857: This is a clue about the city of San Francisco, which
+S02_T04	founded in 1857: This is a statement about the founding year of a city,
+S03_T04	founded in 1624: This is a statement about the history of New Amsterdam, which
+S04_T04	founded in 1837: New York City, 1970: Year,
+S05_T04	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S06_T04	the first city to host the Summer Olympics twice: 1932 and 198
+S07_T04	founded in 1938, and is the world's largest electronics company, and is the
+S08_T04	born in the United States, and is known for his environmental activism, and his role as a leading
+S09_T04	born in the United States, and is known for his environmental activism, and his role as a leading
+S10_T04	born in the United States, and is known for his environmental activism, and his role as a leading
+S11_T04	born in the United States, and is known for his role in the movie "Titanic" and
+S12_T04	born in the United States, and is known for his environmental activism, and his role as a leading
+S13_T04	born in the United States, and is the current president of the United States, and is the current
+S14_T04	born in the United States, and is the founder of the Leonardo DiCaprio Foundation, which is
+S15_T04	born in the United States, and is the founder of the Leonardo DiCaprio Foundation, which is
+S16_T04	born in the United States, and is the founder of the Leonardo DiCaprio Foundation, which is
+S17_T04	born in the United States, and is the founder of the Leonardo DiCaprio Foundation, which is
+S18_T04	born in 1974, and is known for his role in the movie "Titanic
+S19_T04	born in 1974, and is known for his role in the movie "Titanic
+S20_T04	born in 1974, and is known for his role in the movie "Titanic
+S21_T04	born in 1974, and is known for his role in the movie "Titanic
+S22_T04	born in 1974, and is known for his role in the movie "Titanic
+S23_T04	born in 1974, and is known for his role in the movie "Titanic
+S24_T04	born in 1974, and is known for his role in the movie "Titanic
+S25_T04	born in 1974, and is known for his role in the movie "Titanic
+S26_T04	born in 1974, and is known for his role in the movie "Titanic
+S27_T04	born in 1974, and is known for his role in the movie "Titanic
+S28_T04	born in 1974, and is known for his role in the movie "Titanic
+S29_T04	born in 1974, and is known for his role in the movie "Titanic
+S30_T04	born in 1974, and is known for his role in the movie "Titanic
+S31_T04	born in the United States, and is the founder of the Leonardo DiCaprio Foundation, which is
+S32_T04	born in the United States, and is a citizen of the United States, and is a citizen of
+S33_T04	born in the United States, and is a citizen of the United States, and is a citizen of
+S34_T04	born in the United States, and is the current president of the United States, and is the current
+S35_T04	born in the United States, and is a citizen of the United States, and is a citizen of
+S00_T05	a 2016 American romantic comedy film directed by Paul Feig, and the main character
+S01_T05	the first to have a subway system: London, 1908, 190
+S02_T05	the first to use the term "city-state" to describe its form of government, and the city
+S03_T05	the first to use the term "city-state" to describe its form of government, and the United
+S04_T05	the first to use the term "city" in the English language, and the first to use the
+S05_T05	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S06_T05	the first city to host the Summer Olympics twice: 1932 and 198
+S07_T05	the first to be established in the 19th century, and the United States: Country in
+S08_T05	born in New York City, USA, and is known for his role in the movie "Titanic
+S09_T05	born in the United States, and is known for his role in the movie "Titanic", and
+S10_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S11_T05	born in the United States, and is known for his role in the movie "Titanic", and
+S12_T05	born in the United States, and is known for his role in the movie "Titanic", and
+S13_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S14_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S15_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S16_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S17_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S18_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S19_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S20_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S21_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S22_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S23_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S24_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S25_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S26_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S27_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S28_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S29_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S30_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S31_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S32_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S33_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S34_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S35_T05	born in the United States, and is known for his role in the movie "Titanic" and
+S00_T06	the first to use the term "city" in the dictionary, and the first to use the term
+S01_T06	the first to use the term "city" in the 19th century, and the first
+S02_T06	the first to use the term "city" in the 19th century, and the first
+S03_T06	a 1970s American rock band, and the rest of the options are not relevant
+S04_T06	born in: City in the United States, City was born in: City in the United States,
+S05_T06	a Roman foundation: City in the United States, and the United Nations: International organization. Which of
+S06_T06	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S07_T06	the first city to host the Summer Olympics in 1932, and the 20
+S08_T06	the first city to host the Summer Olympics in 1932, and the 20
+S09_T06	the first city to host the Summer Olympics in 1932, and the 20
+S10_T06	the first city to host the Summer Olympics in 1932, and the 20
+S11_T06	the first city to host the Summer Olympics in 1932, and the 20
+S12_T06	the first city to host the Summer Olympics in 1932, and the 20
+S13_T06	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S14_T06	the first city to host the Summer Olympics in 1932, and the first city to
+S15_T06	the first city in the United States to have a subway system, and the first city to have a
+S16_T06	the first city in the United States to have a subway system, and the first city to have a
+S17_T06	the first city in the United States to have a subway system, and the first city to have a
+S18_T06	the first city in the United States to have a subway system, and the first city to have a
+S19_T06	the first city in the United States to have a subway system, and the first city to have a
+S20_T06	the first city in the United States to have a subway system, and the first city to have a
+S21_T06	the first to be established. The first to be established is the one that was founded first in history
+S22_T06	the first to be established. The first to be established is the one that was founded first in history
+S23_T06	the first city in the United States to have a subway system, and the first city to have a
+S24_T06	the first city in the United States to have a subway system, and the first city to have a
+S25_T06	the capital of the United States, and the United States is a country in North America. Which of
+S26_T06	the capital of the United States, and the United States is a country in North America. Which of
+S27_T06	born in 1974, Samsung was founded in 1938, and the
+S28_T06	born in 1974, Samsung was founded in 1938, and the
+S29_T06	born in 1974, Samsung was founded in 1938, Syria was
+S30_T06	the first city to host the Summer Olympics in 1968, and the 19
+S31_T06	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S32_T06	born in 1974, Samsung was founded in 1938, and the
+S33_T06	the first to be established. The answer is: Syria. 
+S34_T06	the first to use the term "smartphone" in 1994, and the first
+S35_T06	the first to use the word "sustainability" in a corporate context, and the first to use
+S00_T07	born in 1974: This is a statement about the birth year of a person,
+S01_T07	a 2016 American romantic comedy film directed by Paul Feig, and the film stars
+S02_T07	a Roman Empire city, and the United States: Country in North America. Which of the following is
+S03_T07	born in: City in the United States, United States: Country in North America, United Kingdom:
+S04_T07	born in 1995: Person born in 1995, 19
+S05_T07	a Roman Empire city, and the United States: Country in North America. Which of the following is
+S06_T07	a Roman Empire city, and the United States: Country in North America. Which of the following is
+S07_T07	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S08_T07	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S09_T07	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S10_T07	the first city to host the Summer Olympics in 1932, and the 20
+S11_T07	the first city to host the Summer Olympics in 1932, and the 20
+S12_T07	the first city to host the Summer Olympics in 1932, and the 20
+S13_T07	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S14_T07	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S15_T07	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S16_T07	born in 1974, Samsung was founded in 1938, Leonardo Di
+S17_T07	born in 1974, Samsung was founded in 1938, Leonardo Di
+S18_T07	the first city in the United States to have a subway system, and the first city to have a
+S19_T07	the first city in the United States to have a subway system, and the first city to have a
+S20_T07	founded in 1624, Samsung was founded in 1938, Leonardo Di
+S21_T07	founded in 1624, Samsung was founded in 1938, Leonardo Di
+S22_T07	founded in 1624, Samsung was founded in 1938, Leonardo Di
+S23_T07	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S24_T07	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S25_T07	the first city in the United States to have a subway system, and the first city to have a
+S26_T07	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S27_T07	the first to be established, then Samsung, then Syria. The order is: 1. Syria
+S28_T07	the first to be established, and the last to be established is Samsung. The order of establishment is
+S29_T07	the first to be established. The answer is: Samsung. Wait, no, that's not right
+S30_T07	the first to use the term "Samsung" as a brand name, and the first to use the
+S31_T07	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S32_T07	born in 1974, and is known for his role in the movie "Titanic
+S33_T07	born in 1974: This is a statement about the birth year of someone, but
+S34_T07	born in 1974, and is known for his role in the movie "Titanic
+S35_T07	born in 1974, and is known for his role in the movie "Titanic
+S00_T08	a 1995 film directed by James Cameron, and the 1995 film
+S01_T08	a 1970s American rock band, and the 1970s:
+S02_T08	a 1979 American drama film directed by Francis Ford Coppola, and the main character
+S03_T08	a 1970s American rock band, and the 1970s:
+S04_T08	a 1989 American romantic drama film directed by James Ivory, and starring Sean Penn and
+S05_T08	a Roman Empire city, and the capital of the Roman province of Syria, and the capital of the
+S06_T08	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S07_T08	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S08_T08	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S09_T08	a city in the United States, and the United Nations: international organization. Which of the following is
+S10_T08	a city in the United States, and the United Nations: international organization. Which of the following is
+S11_T08	a city in the United States, and the United Nations: international organization. Which of the following is
+S12_T08	a city in the United States, and the United Nations: international organization. Which of the following is
+S13_T08	a 2016 American romantic comedy film directed by Paul Feig, and starring Amy Schumer
+S14_T08	a 2016 American romantic comedy film directed by Paul Feig, and starring Amy Schumer
+S15_T08	born in 1974, Samsung was founded in 1938, Leonardo Di
+S16_T08	born in 1974, Samsung was founded in 1938, Leonardo Di
+S17_T08	born in 1974, Samsung was founded in 1938, Leonardo Di
+S18_T08	born in 1974, Samsung was founded in 1938, Leonardo Di
+S19_T08	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S20_T08	the first city in the United States to be incorporated as a city, and is the largest city in
+S21_T08	a city in the United States, and the United States is a country in North America. The United
+S22_T08	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S23_T08	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S24_T08	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S25_T08	born in 1974, and is known for his role in the movie "Titanic
+S26_T08	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S27_T08	the first city to host the Summer Olympics in 1932, and the first city to
+S28_T08	born in 1974, and is known for his role in the movie "Titanic
+S29_T08	the first city in the United States to have a subway system, and the first city to have a
+S30_T08	born in 1974, and is known for his role in the movie "Titanic
+S31_T08	born in 1974, and is known for his role in the movie "Titanic
+S32_T08	born in 1974, and is known for his role in the movie "Titanic
+S33_T08	the first to use the term "sustainability" in a corporate context. Which of the following is
+S34_T08	the first to use the term "sustainability" in a corporate context, and the company is known
+S35_T08	the first to be used in the 19th century, and the first to be used in
+S00_T09	the first to be built in the 19th century, and the second to be built in
+S01_T09	a 1970s American rock band, and the 1970s was
+S02_T09	a 1979 American drama film directed by Francis Ford Coppola, and the main character
+S03_T09	born in 1974: This is a statement about the birth year of a person,
+S04_T09	a 1976 American drama film directed by Francis Ford Coppola, and the main character
+S05_T09	born in 1974, and is known for his role in the movie "Titanic
+S06_T09	the capital of the United States until 1800, when the capital was moved to Washington
+S07_T09	the capital of the United States, and the United States is the country where the capital is Washington,
+S08_T09	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S09_T09	born in 1974, and the company was founded in 1938.
+S10_T09	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S11_T09	born in 1974, and is known for his role in the movie "Titanic
+S12_T09	born in 1974, and is known for his role in the movie "Titanic
+S13_T09	born in 1974, and is known for his role in the movie "Titanic
+S14_T09	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S15_T09	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S16_T09	a 2015 American romantic comedy film directed by Garry Marshall, and the film was
+S17_T09	a 2015 American romantic comedy film directed by Garry Marshall, and the film was
+S18_T09	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S19_T09	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S20_T09	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S21_T09	a 2013 American romantic comedy film directed by Garry Marshall, and the film was
+S22_T09	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S23_T09	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S24_T09	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S25_T09	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S26_T09	the first city to be named a city in the world, and the first city to be named a
+S27_T09	the first city to have a subway system. Which of the following is the odd one out? -
+S28_T09	born in 1974, and is known for his role in the movie "Titanic
+S29_T09	born in 1974, and is known for his role in the movie "Titanic
+S30_T09	the first to use the term "cyberpunk" in a science fiction novel, and the novel
+S31_T09	the first to use the term "cyberpunk" in a science fiction novel, and the novel
+S32_T09	the first to be discovered, and the last to be discovered. Which of the following is the correct
+S33_T09	the first to be used in the world, and the first to be used in the world. The
+S34_T09	the first to be discovered, and the last to be discovered. Which of the following is the correct
+S35_T09	born in 1974, and the company was founded in 1938.
+S00_T10	the first to use the term "city" in the dictionary, and the first to use the term
+S01_T10	born in 1974, and the company was founded in 1938.
+S02_T10	born in 1974, and the company was founded in 1938.
+S03_T10	born in 1974, and is known for his role in the movie "Titanic
+S04_T10	born in 1974, and the company was founded in 1938.
+S05_T10	the first to use the term "city" in the 19th century, and the first
+S06_T10	the capital of the Roman Empire, and the capital of the United States is Washington, D.C.
+S07_T10	the first city to have a subway system. Which of the following is the correct order of the above
+S08_T10	the capital of the United States, and the United States is the country where the capital is Washington,
+S09_T10	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S10_T10	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S11_T10	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S12_T10	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S13_T10	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S14_T10	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S15_T10	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S16_T10	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S17_T10	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S18_T10	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S19_T10	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S20_T10	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S21_T10	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S22_T10	the first city to host the Summer Olympics in 1932, and the 20
+S23_T10	the first city to host the Summer Olympics in 1932, and the 20
+S24_T10	the first city to host the Summer Olympics in 1932, and the 19
+S25_T10	the first city to host the Summer Olympics in 1932, and the 19
+S26_T10	the first city to host the Summer Olympics in 1932, and the Winter Olympics in
+S27_T10	the first to be established. Which of the following is the correct order of the establishment of these entities
+S28_T10	the name of the first computer, and the name of the first computer is the same as the name
+S29_T10	the first to use the term "city" in the name of a city, and the city is
+S30_T10	the first to use the term "cyberpunk" in a science fiction novel. Which of the
+S31_T10	born in 1974, and is known for his role in the movie "Titanic
+S32_T10	born in 1974, and is known for his role in the movie "Titanic
+S33_T10	born in 1974, and is known for his role in the movie "Titanic
+S34_T10	the first to use the term "cyberpunk" in a science fiction novel. Which of the
+S35_T10	the first to be born. The answer is: Leonardo DiCaprio. The answer is: Leonardo
+S00_T11	the first to use the term "city" in the English language, and the first to use the
+S01_T11	a 1995 film directed by James Cameron, and the 1995 film
+S02_T11	a 1931 American pre-Code drama film directed by William Wellman, and the
+S03_T11	born in 1974, and the company was founded in 1938.
+S04_T11	born in 1974, and the company was founded in 1938.
+S05_T11	the first to use the term "city" in the 19th century, and the first
+S06_T11	born in 1974, and the company was founded in 1938.
+S07_T11	the first to use the term "city" in the English language, and the first to use the
+S08_T11	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S09_T11	the first to be established. The correct order is: 
+S10_T11	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S11_T11	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S12_T11	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S13_T11	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S14_T11	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S15_T11	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S16_T11	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S17_T11	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S18_T11	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S19_T11	the first to be established. Which of the following is the correct order of establishment? (A)
+S20_T11	the first city to host the Summer Olympics twice, and the first city to host the Winter Olympics,
+S21_T11	a 2015 American superhero film. Which of the following is the odd one out?
+S22_T11	the first to be established. Which of the following is the correct order of establishment? (A)
+S23_T11	the first city to host the Summer Olympics in 1932, and the 20
+S24_T11	the first city to host the Summer Olympics in 1932, and the 20
+S25_T11	the first city to host the Summer Olympics in 1932, and the 19
+S26_T11	the first city to host the Summer Olympics in 1932, and the 19
+S27_T11	the first to use the term "city" in the name of a city, and the city is
+S28_T11	the first to be established. Which of the following is the correct order of the establishment of these entities
+S29_T11	the first to use the term "city" in the name of a city in the United States.
+S30_T11	a 2000 film directed by Spike Jonze, and the 2000
+S31_T11	a 2002 American romantic comedy film directed by James L. Brooks, written by Larry
+S32_T11	born in the United States, and now lives in the United Kingdom. Which of the following is the
+S33_T11	the first to be discovered in the 19th century, and the first to be discovered in
+S34_T11	the first to be used in the 19th century, and the first to be used in
+S35_T11	the first to be born. Which one is the oldest? The answer is: Samsung. The answer
+S00_T12	the first to use the term "city" in the English language, and the first to use the
+S01_T12	a city in the United States, and the city was destroyed in the 19th century.
+S02_T12	a city in the United States, and the city was destroyed in the 19th century.
+S03_T12	a 1995 American drama film directed by James Cameron, and the film was a box
+S04_T12	a 2015 American romantic comedy film directed by Paul Feig, and starring Amy Schumer
+S05_T12	a 2016 American romantic comedy film directed by Paul Feig, and starring Amy Schumer
+S06_T12	born in 1974, and is known for his role in the movie "Titanic
+S07_T12	the first to have a subway system, and the first to have a subway system in the world,
+S08_T12	the first to have a subway system in the world. Which of the following is the correct order of
+S09_T12	the first to have a subway system in the world, and the first to have a subway system in
+S10_T12	born in 1974, and is known for his role in the movie "Titanic
+S11_T12	born in 1974, and is known for his role in the movie "Titanic
+S12_T12	born in 1974, and is known for his role in the movie "Titanic
+S13_T12	born in 1974, and is known for his role in the movie "Titanic
+S14_T12	born in 1974, and is known for his role in the movie "Titanic
+S15_T12	born in 1974, and is known for his role in the movie "Titanic
+S16_T12	born in 1974, and is known for his role in the movie "Titanic
+S17_T12	born in 1974, and is known for his role in the movie "Titanic
+S18_T12	born in 1974, and is known for his role in the movie "Titanic
+S19_T12	born in 1974, and is known for his role in the movie "Titanic
+S20_T12	born in 1974, and is known for his role in the movie "Titanic
+S21_T12	born in 1974, and is known for his role in the movie "Titanic
+S22_T12	the first to be established. Which of the following is the correct order? A. Syria, Samsung
+S23_T12	the first to be established. Which of the following is the correct order? A. Syria, Samsung
+S24_T12	the first to be established. Which of the following is the correct order of establishment? (A)
+S25_T12	the first to be established. Which of the following is the correct order of establishment? (A)
+S26_T12	born in 1974, and is known for his role in the movie "Titanic
+S27_T12	born in 1974, and is known for his role in the movie "Titanic
+S28_T12	born in 1974, and is known for his role in the movie "Titanic
+S29_T12	born in 1974, and is known for his role as Jack Dawson in the film
+S30_T12	born in 1974, and is known for his role in the movie "Titanic
+S31_T12	the first to use the term "computer virus" in 1970s, and the
+S32_T12	born in 1974, and the birthplace of the person is Syria. Which of
+S33_T12	a 2015 American superhero film. Which of the following is the odd one out?
+S34_T12	the first to be used in the 19th century, and the second to be used in
+S35_T12	a 2012 film directed by Christopher Nolan, and the 2012 film
+S00_T13	born in 1974, and is known for his role in the movie "Titanic
+S01_T13	a 1999 American romantic comedy film directed by James L. Brooks, written by Charlie
+S02_T13	a 1997 American romantic comedy film directed by James L. Brooks, written by Charlie
+S03_T13	born in 1974, and is known for his role in the movie "Titanic
+S04_T13	born in 1974, and is known for his role in the movie "Titanic
+S05_T13	a 1995 American drama film directed by James Cameron, and the film was the first
+S06_T13	the first to use the term "cyberpunk" in a science fiction novel. Which of the
+S07_T13	the first to use the term "meme" in 1970s, and the
+S08_T13	a 2015 American superhero film. Which of the following is the odd one out?
+S09_T13	a 1998 American romantic comedy film directed by James L. Brooks, and starring Meg
+S10_T13	born in 1992, and is a member of the boy group EXO. Which
+S11_T13	born in 1992, and is a member of the boy group EXO. Who
+S12_T13	born in 1992, and is a member of the boy group EXO. Which
+S13_T13	born in 1994, and the city is in the north of China. Which of
+S14_T13	born in 1994, and the current year is 2023. What
+S15_T13	born in 1974, and is the son of a famous actor. Which of the
+S16_T13	born in 1974, and is the son of a famous actor. Which of the
+S17_T13	born in 1974, and is the son of a famous actor. Which of the
+S18_T13	born in 1994, and the current year is 2023. What
+S19_T13	born in 1994, and the current year is 2023. What
+S20_T13	born in 1992, and is the son of a famous American actor. Which of
+S21_T13	born in 1992, and is the son of a famous American actor. Which of
+S22_T13	born in 1992, and is the son of a famous American actor. Which of
+S23_T13	born in 1992, and is a member of the boy group EXO. Who
+S24_T13	born in 1974, and is the son of a famous American actor. Which of
+S25_T13	born in 1974, and is the son of a famous American actor. Which of
+S26_T13	born in 1974, and is known for his role in the movie "Titanic
+S27_T13	born in 1974, and is known for his role as Jack Dawson in the film
+S28_T13	born in 1974, and is the son of a famous American actor. Which of
+S29_T13	born in 1974, and is the son of a famous actor. Which of the
+S30_T13	born in 1974, and is known for his role as Jack Dawson in the film
+S31_T13	born in 1974, and is known for his role in the movie "Titanic
+S32_T13	the first to be used in the 19th century, and the second to be used in
+S33_T13	born in 1974, and is the son of a famous actor. Which of the
+S34_T13	the first to be used in the 19th century, and the first to be used in
+S35_T13	the largest producer of oil in the world in 2012. What is the connection between
+S00_T14	born in 1988, and is the son of a famous American actor. Which of
+S01_T14	born in 1988, and is the son of a famous American actor. Which of
+S02_T14	born in 1988, and is the son of a famous American actor. Which of
+S03_T14	born in 1988, and is the son of a famous American actor. Which of
+S04_T14	born in 1988, and is the son of a famous American actor. Which of
+S05_T14	born in 1992, and is a member of the band One Direction. Which of
+S06_T14	born in 1994, and is the son of the former president of the United States
+S07_T14	born in 1992, and is the son of a famous American actor. Which of
+S08_T14	born in 1992, and is a member of the boy group EXO. Who
+S09_T14	born in 1992, and is the son of a famous American actor. Which of
+S10_T14	born in 1992, and is the son of a famous American actor. Which of
+S11_T14	born in 1988, and is the son of a famous American actor. Which of
+S12_T14	born in 1992, and is a member of the boy group EXO. Who
+S13_T14	born in 1992, and is a member of the boy group EXO. Who
+S14_T14	born in 1994, and is the son of a famous American actor. Which of
+S15_T14	born in 1994, and is the son of a famous American actor. Which of
+S16_T14	born in 1994, and is the son of a famous American actor. Which of
+S17_T14	born in 1994, and is the son of a famous American actor. Which of
+S18_T14	born in 1994, and is the son of a famous American actor. Which of
+S19_T14	born in 1994, and is the son of a famous American actor. Which of
+S20_T14	born in 1994, and is the son of a famous American actor. Which of
+S21_T14	born in 1994, and is the son of a famous American actor. Which of
+S22_T14	born in 1992, and is the son of a famous American actor. Which of
+S23_T14	born in 1994, and is the son of a famous American actor. Which of
+S24_T14	born in 1994, and is the son of a famous American actor. Which of
+S25_T14	born in 1994, and is the son of a famous American actor. Which of
+S26_T14	born in 1994, and is the son of a famous American actor. Which of
+S27_T14	born in 1994, and is the son of a famous American actor. Which of
+S28_T14	born in 1994, and is the son of a famous American actor. Which of
+S29_T14	born in 1982, and is the son of a famous American actor. Which of
+S30_T14	born in 1992, and is the son of a famous American actor. Which of
+S31_T14	born in 1994, and is a member of the band One Direction. Which of
+S32_T14	born in 1994, and is a member of the band One Direction. Which of
+S33_T14	a 2012 film directed by Christopher Nolan, and the film was a box office success
+S34_T14	the first to be used in the world. Which of the following is the correct order of the above
+S35_T14	the first to be discovered in the 19th century. Which of the following is the odd
+S00_T15	born in 1988, and is a member of the band One Direction. Which of
+S01_T15	born in 1992, and is the son of a famous American actor. Which of
+S02_T15	born in 1994, and the year is 2020. What is
+S03_T15	born in 1988, and is the son of a famous American actor. Which of
+S04_T15	born in 1982, and he is the son of a famous director. Which of
+S05_T15	born in 1988, and is the son of a famous American actor. Which of
+S06_T15	born in 1992, and is a member of the band One Direction. Which of
+S07_T15	born in 1992, and is a member of the boy group EXO. Who
+S08_T15	born in 1988, and is the son of a famous American actor. Which of
+S09_T15	born in 1992, and is the son of a famous American actor. Which of
+S10_T15	born in 1994, and is the son of a famous American actor. Which of
+S11_T15	born in 1992, and is the son of a famous American actor. Which of
+S12_T15	born in 1992, and is the son of a famous American actor. Which of
+S13_T15	born in 1992, and is the son of a famous American actor. Which of
+S14_T15	born in 1992, and is the son of a famous American actor. Which of
+S15_T15	born in 1988, and is the son of a famous American actor. Which of
+S16_T15	born in 1994, and is the son of a famous American actor. Which of
+S17_T15	born in 1994, and is the son of a famous American actor. Which of
+S18_T15	born in 1994, and is the son of a famous American actor. Which of
+S19_T15	born in 1994, and is the son of a famous American actor. Which of
+S20_T15	born in 1994, and is the son of a famous American actor. Which of
+S21_T15	born in 1994, and is the son of a famous American actor. Which of
+S22_T15	born in 1988, and is the son of a famous American actor. Which of
+S23_T15	born in 1994, and is the son of a famous American actor. Which of
+S24_T15	born in 1988, and is the son of a famous American actor. Which of
+S25_T15	born in 1994, and is the son of a famous American actor. Which of
+S26_T15	born in 1988, and is the son of a famous American actor. Which of
+S27_T15	born in 1988, and is the son of a famous American actor. Which of
+S28_T15	born in 1994, and is the son of a famous American actor. Which of
+S29_T15	born in 1992, and is a member of the boy group EXO. Who
+S30_T15	born in 1994, and is the son of a famous American actor. Which of
+S31_T15	born in 1988, and is the son of a famous American actor. Which of
+S32_T15	born in 1992, and is a member of the boy group EXO. Who
+S33_T15	born in 1994, and is the son of a famous American actor. Which of
+S34_T15	the first to be discovered in the 19th century, and the first to be discovered in
+S35_T15	the first to use the term "meme" in 1978. Which of the
+S00_T16	born in 1988, and is a member of the band One Direction. Which of
+S01_T16	born in 1994, and is the son of a famous American actor. Which of
+S02_T16	born in 1994, and is the son of a famous American actor. Which of
+S03_T16	born in 1988, and is the son of a famous American actor. Which of
+S04_T16	born in 1988, and is the son of a famous American actor. Which of
+S05_T16	born in 1988, and is the son of a famous American actor. Which of
+S06_T16	born in 1994, and is the son of a famous American actor. Which of
+S07_T16	born in 1994, and is the son of a famous American actor. Which of
+S08_T16	born in 1994, and is the son of a famous American actor. Which of
+S09_T16	born in 1994, and is the son of a famous American actor. Which of
+S10_T16	born in 1994, and is the son of a famous American actor. Which of
+S11_T16	born in 1994, and is the son of a famous American actor. Which of
+S12_T16	born in 1992, and is the son of a famous American actor. Which of
+S13_T16	born in 1992, and is the son of a famous American actor. Which of
+S14_T16	born in 1994, and is the son of a famous American actor. Which of
+S15_T16	born in 1994, and is the son of a famous American actor. Which of
+S16_T16	born in 1994, and is the son of a famous American actor. Which of
+S17_T16	born in 1994, and is the son of a famous American actor. Which of
+S18_T16	born in 1994, and is the son of a famous American actor. Which of
+S19_T16	born in 1994, and is the son of a famous American actor. Which of
+S20_T16	born in 1994, and is the son of a famous American actor. Which of
+S21_T16	born in 1994, and is the son of a famous American actor. Which of
+S22_T16	born in 1994, and is the son of a famous American actor. Which of
+S23_T16	born in 1994, and is the son of a famous American actor. Which of
+S24_T16	born in 1994, and is the son of a famous American actor. Which of
+S25_T16	born in 1994, and is the son of a famous American actor. Which of
+S26_T16	born in 1994, and is the son of a famous American actor. Which of
+S27_T16	born in 1994, and is the son of a famous American actor. Which of
+S28_T16	born in 1994, and is the son of a famous American actor. Which of
+S29_T16	born in 1994, and is the son of a famous American actor. Which of
+S30_T16	born in 1994, and is the son of a famous American actor. Which of
+S31_T16	born in 1994, and is a member of the band One Direction. Which of
+S32_T16	born in 1994, and is a member of the band One Direction. Who is
+S33_T16	born in 1992, and is a member of the boy group EXO. Who
+S34_T16	born in 1994, and is the son of a famous American actor. Which of
+S35_T16	born in 1994, and is the son of a famous American actor. Which of
+S00_T17	born in 1994, and is the son of a famous American actor. Which of
+S01_T17	born in 1994, and is the son of a famous American actor. Which of
+S02_T17	born in 1988, and is the son of a famous American actor. Which of
+S03_T17	born in 1988, and is the son of a famous American actor. Which of
+S04_T17	born in 1988, and is the son of a famous American actor. Which of
+S05_T17	born in 1988, and is the son of a famous American actor. Which of
+S06_T17	born in 1992, and is the son of a famous American actor. Which of
+S07_T17	born in 1994, and is the son of a famous American actor. Which of
+S08_T17	born in 1988, and is the son of a famous American actor. Which of
+S09_T17	born in 1994, and is the son of a famous American actor. Which of
+S10_T17	born in 1994, and is the son of a famous American actor. Which of
+S11_T17	born in 1994, and is the son of a famous American actor. Which of
+S12_T17	born in 1988, and is the son of a famous American actor. Which of
+S13_T17	born in 1994, and is the son of a famous American actor. Which of
+S14_T17	born in 1994, and is the son of a famous American actor. Which of
+S15_T17	born in 1994, and is the son of a famous American actor. Which of
+S16_T17	born in 1994, and is the son of a famous American actor. Which of
+S17_T17	born in 1994, and is the son of a famous American actor. Which of
+S18_T17	born in 1994, and is the son of a famous American actor. Which of
+S19_T17	born in 1994, and is the son of a famous American actor. Which of
+S20_T17	born in 1994, and is the son of a famous American actor. Which of
+S21_T17	born in 1994, and is the son of a famous American actor. Which of
+S22_T17	born in 1994, and is the son of a famous American actor. Which of
+S23_T17	born in 1994, and is the son of a famous American actor. Which of
+S24_T17	born in 1992, and is the son of a famous American actor. Which of
+S25_T17	born in 1994, and is the son of a famous American actor. Which of
+S26_T17	born in 1994, and is the son of a famous American actor. Which of
+S27_T17	born in 1994, and is the son of a famous American actor. Which of
+S28_T17	born in 1992, and is the son of a famous American actor. Which of
+S29_T17	born in 1994, and is the son of a famous American actor. Which of
+S30_T17	born in 1994, and is the son of a famous American actor. Which of
+S31_T17	born in 1994, and is the son of a famous American actor. Which of
+S32_T17	born in 1994, and is the son of a famous American actor. Which of
+S33_T17	born in 1994, and is the son of a famous American actor. Which of
+S34_T17	born in 1994, and is the son of a famous American actor. Which of
+S35_T17	born in 1988, and is the son of a famous American actor. Which of
+S00_T18	born in 1988, and is the son of a famous American actor. Which of
+S01_T18	born in 1994, and is the son of a famous American actor. Which of
+S02_T18	born in 1994, and the city where he was born is the capital of the
+S03_T18	born in 1988, and is the son of a famous American actor. Which of
+S04_T18	born in 1994, and is the son of a famous American actor. Which of
+S05_T18	born in 1988, and is the son of a famous American actor. Which of
+S06_T18	born in 1988, and is a member of the boy group EXO. Who
+S07_T18	born in 1994, and is the son of a famous American actor. Which of
+S08_T18	born in 1994, and is the son of a famous American actor. Which of
+S09_T18	born in 1994, and is the son of a famous American actor. Which of
+S10_T18	born in 1994, and is the son of a famous American actor. Which of
+S11_T18	born in 1992, and is the son of a famous American actor. Which of
+S12_T18	born in 1994, and is the son of a famous American actor. Which of
+S13_T18	born in 1988, and is the son of a famous American actor. Which of
+S14_T18	born in 1994, and is the son of a famous American actor. Which of
+S15_T18	born in 1994, and is the son of a famous American actor. Which of
+S16_T18	born in 1994, and is the son of a famous American actor. Which of
+S17_T18	born in 1994, and is the son of a famous American actor. Which of
+S18_T18	born in 1994, and is the son of a famous American actor. Which of
+S19_T18	born in 1994, and is the son of a famous American actor. Which of
+S20_T18	born in 1994, and is the son of a famous American actor. Which of
+S21_T18	born in 1994, and is the son of a famous American actor. Which of
+S22_T18	born in 1994, and is the son of a famous American actor. Which of
+S23_T18	born in 1994, and is the son of a famous American actor. Which of
+S24_T18	born in 1994, and is the son of a famous American actor. Which of
+S25_T18	born in 1994, and is the son of a famous American actor. Which of
+S26_T18	born in 1988, and is the son of a famous American actor. Which of
+S27_T18	born in 1994, and is the son of a famous American actor. Which of
+S28_T18	born in 1994, and is the son of a famous American actor. Which of
+S29_T18	born in 1992, and is the son of a famous American actor. Which of
+S30_T18	born in 1992, and is the son of a famous American actor. Which of
+S31_T18	born in 1994, and is the son of a famous American actor. Which of
+S32_T18	born in 1994, and the birthplace is in the United States. Which of
+S33_T18	born in 1994, and is the son of a famous American actor. Which of
+S34_T18	born in 1994, and is the son of a famous American actor. Which of
+S35_T18	born in 1994, and the year is 2020. What is
+S00_T19	born in 1988, and is the son of a famous American actor. Which of
+S01_T19	born in 1988, and is a member of the band One Direction. Who is
+S02_T19	born in 1988, and is the son of a famous American actor. Which of
+S03_T19	born in 1988, and is the son of a famous American actor. Which of
+S04_T19	born in 1988, and is the son of a famous American actor. Which of
+S05_T19	born in 1988, and is the son of a famous American actor. Which of
+S06_T19	born in 1994, and is the son of a famous American actor. Which of
+S07_T19	born in 1988, and is the son of a famous American actor. Which of
+S08_T19	born in 1994, and is the son of a famous American actor. Which of
+S09_T19	born in 1994, and the birthplace of x is the same as the birth
+S10_T19	the first to be discovered in the 19th century, and the first to be discovered in
+S11_T19	born in 1994, and is the son of a famous American actor. Which of
+S12_T19	born in 1988, and is the son of a famous American actor. Which of
+S13_T19	born in 1994, and is the son of a famous American actor. Which of
+S14_T19	born in 1994, and is the son of a famous American actor. Which of
+S15_T19	born in 1994, and is the son of a famous American actor. Which of
+S16_T19	born in 1994, and is the son of a famous American actor. Which of
+S17_T19	born in 1994, and is the son of a famous American actor. Which of
+S18_T19	born in 1994, and is the son of a famous American actor. Which of
+S19_T19	born in 1994, and is the son of a famous American actor. Which of
+S20_T19	born in 1994, and is the son of a famous American actor. Which of
+S21_T19	born in 1988, and is the son of a famous American actor. Which of
+S22_T19	born in 1994, and the birthplace of x is the same as the birth
+S23_T19	born in 1994, and the year is 2020. What is
+S24_T19	born in 1994, and is the son of a famous American actor. Which of
+S25_T19	born in 1994, and is the son of a famous American actor. Which of
+S26_T19	born in 1994, and is the son of a famous American actor. Which of
+S27_T19	born in 1988, and is the son of a famous American actor. Which of
+S28_T19	born in 1994, and the city where he was born is the capital of the
+S29_T19	born in 1994, and the birthplace of the person is the same as the
+S30_T19	born in 1994, and the birthplace of the person is the same as the
+S31_T19	born in 1988, and is the son of a famous American actor. Which of
+S32_T19	born in 1994, and the birthplace of the person is the same as the
+S33_T19	born in 1994, and the birthplace of the person is Syria. What is
+S34_T19	born in 1988, and is the son of a famous American actor. Which of
+S35_T19	the first to use the term "meme" in an academic context. Which of the following is
+S00_T20	born in 1988, and is the son of a famous American actor. Which of
+S01_T20	born in 1988, and is the son of a famous American actor. Which of
+S02_T20	born in 1988, and is the son of a famous American actor. Which of
+S03_T20	born in 1988, and is the son of a famous American actor. Which of
+S04_T20	born in 1988, and is the son of a famous American actor. Which of
+S05_T20	born in 1988, and is the son of a famous American actor. Which of
+S06_T20	born in 1994, and is the son of a famous American actor. Which of
+S07_T20	born in 1994, and the birthplace of x is the same as the birth
+S08_T20	born in 1994, and is the son of a famous American actor. Which of
+S09_T20	born in 1994, and the birthplace of x is the same as the birth
+S10_T20	born in 1994, and the city where he was born is the capital of the
+S11_T20	born in 1994, and the birthplace of x is the same as the birth
+S12_T20	born in 1994, and the city where he was born is the capital of the
+S13_T20	born in 1994, and the city where he was born is the capital of the
+S14_T20	born in 1988, and is the son of a famous American actor. Which of
+S15_T20	born in 1994, and the birthplace of x is the same as the birth
+S16_T20	born in 1994, and the birthplace of x is the same as the birth
+S17_T20	born in 1994, and the birthplace of x is the same as the birth
+S18_T20	born in 1994, and the birthplace of x is the same as the birth
+S19_T20	born in 1994, and is the son of a famous American actor. Which of
+S20_T20	born in 1994, and is the son of a famous American actor. Which of
+S21_T20	born in 1994, and is the son of a famous American actor. Which of
+S22_T20	born in 1994, and is the son of a famous American actor. Which of
+S23_T20	born in 1994, and is the son of a famous American actor. Which of
+S24_T20	born in 1994, and the birthplace of x is the same as the birth
+S25_T20	born in 1994, and the birthplace of x is the same as the birth
+S26_T20	born in 1994, and the birthplace of x is the same as the birth
+S27_T20	born in 1994, and the birthplace of x is the same as the birth
+S28_T20	born in 1994, and the birthplace of x is the same as the birth
+S29_T20	born in 1994, and the birthplace of x is the same as the birth
+S30_T20	born in 1994, and the birthplace of x is the same as the birth
+S31_T20	born in 1994, and the birthplace of x is the same as the birth
+S32_T20	born in 1994, and the birthplace of x is the same as the birth
+S33_T20	born in 1994, and the birthplace of x is the same as the birth
+S34_T20	born in 1994, and the birthplace of x is the same as the birth
+S35_T20	born in 1994, and the year is 2020. What is
+S00_T21	born in 1994, and is the son of the former president of the United States
+S01_T21	born in 1994, and the birthplace of x is the same as the birth
+S02_T21	born in 1994, and the birthplace of x is the same as the birth
+S03_T21	born in 1994, and is the son of a famous American actor. Which of
+S04_T21	born in 1994, and is the son of a famous American actor. Which of
+S05_T21	born in 1988, and is the son of a famous American actor. Which of
+S06_T21	born in 1988, and is the son of a famous American actor. Which of
+S07_T21	born in 1994, and is the son of a famous American actor. Which of
+S08_T21	born in 1994, and is the son of a famous American actor. Which of
+S09_T21	born in 1994, and is the son of a famous American actor. Which of
+S10_T21	born in 1994, and is the son of a famous American actor. Which of
+S11_T21	born in 1988, and is the son of a famous American actor. Which of
+S12_T21	born in 1994, and is the son of a famous American actor. Which of
+S13_T21	born in 1994, and is the son of a famous American actor. Which of
+S14_T21	born in 1994, and is the son of a famous American actor. Which of
+S15_T21	born in 1994, and is the son of a famous American actor. Which of
+S16_T21	born in 1994, and is the son of a famous American actor. Which of
+S17_T21	born in 1988, and is the son of a famous American actor. Which of
+S18_T21	born in 1994, and is the son of a famous American actor. Which of
+S19_T21	born in 1994, and is the son of a famous American actor. Which of
+S20_T21	born in 1988, and is the son of a famous American actor. Which of
+S21_T21	born in 1994, and is the son of a famous American actor. Which of
+S22_T21	born in 1994, and is the son of a famous American actor. Which of
+S23_T21	born in 1994, and is the son of a famous American actor. Which of
+S24_T21	born in 1994, and is the son of a famous American actor. Which of
+S25_T21	born in 1994, and is the son of a famous American actor. Which of
+S26_T21	born in 1994, and is the son of a famous American actor. Which of
+S27_T21	born in 1994, and the birthplace of x is the same as the birth
+S28_T21	born in 1994, and the birthplace of x is the same as the birth
+S29_T21	born in 1994, and the birthplace of x is the same as the birth
+S30_T21	born in 1994, and the birthplace of the person is the same as the
+S31_T21	born in 1994, and the birthplace of the person is the same as the
+S32_T21	born in 1988, and is the son of a famous American actor. Which of
+S33_T21	born in 1994, and the birthplace of the person is Syria. What is
+S34_T21	born in 1994, and the birthplace of x is the same as the birth
+S35_T21	born in 1994, and the birthplace of x is the same as the birth
+S00_T22	born in 1994, and is the son of the former president of the United States
+S01_T22	born in 1994, and is the son of a famous American actor. Which of
+S02_T22	born in 1994, and is the son of the former president of the United States
+S03_T22	born in 1994, and is the son of the former president of the United States
+S04_T22	born in 1994, and is the son of the former president of the United States
+S05_T22	born in 1994, and is the son of the former president of the United States
+S06_T22	born in 1988, and is the son of a famous American actor. Which of
+S07_T22	born in 1992, and is the son of a famous American actor. Which of
+S08_T22	born in 1994, and is the son of a famous American actor. Which of
+S09_T22	born in 1994, and is the son of a famous American actor. Which of
+S10_T22	born in 1994, and the birthplace of X is the same as the birth
+S11_T22	born in 1994, and is the son of a famous American actor. Which of
+S12_T22	born in 1994, and is the son of a famous American actor. Which of
+S13_T22	born in 1994, and is the son of a famous American actor. Which of
+S14_T22	born in 1994, and is the son of a famous American actor. Which of
+S15_T22	born in 1988, and is the son of a famous American actor. Which of
+S16_T22	born in 1994, and is the son of a famous American actor. Which of
+S17_T22	born in 1988, and is the son of a famous American actor. Which of
+S18_T22	born in 1994, and is the son of a famous American actor. Which of
+S19_T22	born in 1994, and is the son of a famous American actor. Which of
+S20_T22	born in 1994, and is the son of a famous American actor. Which of
+S21_T22	born in 1988, and is the son of a famous American actor. Which of
+S22_T22	born in 1994, and is the son of a famous American actor. Which of
+S23_T22	born in 1994, and is the son of a famous American actor. Which of
+S24_T22	born in 1994, and is the son of a famous American actor. Which of
+S25_T22	born in 1994, and is the son of a famous American actor. Which of
+S26_T22	born in 1994, and is the son of a famous American actor. Which of
+S27_T22	born in 1994, and is the son of a famous American actor. Which of
+S28_T22	born in 1988, and is the son of a famous American actor. Which of
+S29_T22	born in 1994, and the birthplace of x is the same as the birth
+S30_T22	born in 1994, and the year is 2020. What is
+S31_T22	born in 1988, and is the son of a famous American actor. Which of
+S32_T22	born in 1994, and the country where the company is located is the same as
+S33_T22	born in 1994, and the birthplace of the person is Syria. What is
+S34_T22	born in 1994, and the city where he was born is the capital of the
+S35_T22	born in 1994, and the birthplace of x is the same as the birth
+S00_T23	born in 1988, and is the son of a famous American actor. Which of
+S01_T23	born in 1994, and the year is 2020. What is
+S02_T23	born in 1994, and the birthplace of x is Syria. What is x
+S03_T23	born in 1994, and the birthplace of x is Syria. What is x
+S04_T23	born in 1988, and is the son of a famous American actor. Which of
+S05_T23	born in 1994, and the birthplace of x is the same as the birth
+S06_T23	born in 1994, and is the son of the former president of the United States
+S07_T23	born in 1994, and the year is 2020. What is
+S08_T23	born in 1994, and the birthplace of x is Syria. What is x
+S09_T23	born in 1994, and the birthplace of x is Syria. What is x
+S10_T23	born in 1994, and is the son of the former president of the United States
+S11_T23	born in 1994, and the birthplace of x is Syria. What is x
+S12_T23	born in 1988, and is the son of a famous American actor. Which of
+S13_T23	born in 1994, and the birthplace of x is the same as the birth
+S14_T23	born in 1994, and is the son of the former president of the United States
+S15_T23	born in 1994, and is the son of the former president of the United States
+S16_T23	born in 1994, and is the son of a famous American actor. Which of
+S17_T23	born in 1994, and is the son of a famous American actor. Which of
+S18_T23	born in 1994, and is the son of the former president of the United States
+S19_T23	born in 1994, and the birthplace of x is the same as the birth
+S20_T23	born in 1994, and is the son of the former president of the United States
+S21_T23	born in 1994, and is the son of a famous American actor. Which of
+S22_T23	born in 1994, and the birthplace of x is the same as the birth
+S23_T23	born in 1994, and the birthplace of x is the same as the birth
+S24_T23	born in 1994, and is the son of the former president of the United States
+S25_T23	born in 1994, and the birthplace of x is the same as the birth
+S26_T23	born in 1994, and the birthplace of x is the same as the birth
+S27_T23	born in 1988, and is the son of a famous American actor. Which of
+S28_T23	born in 1992, and is the son of a famous American actor. Which of
+S29_T23	born in 1994, and is the son of a famous American actor. Which of
+S30_T23	born in 1992, and is the son of a famous American actor. Which of
+S31_T23	born in 1994, and the birthplace of x is the same as the birth
+S32_T23	born in 1994, and the birthplace of x is the same as the birth
+S33_T23	born in 1994, and the birthplace of x is the same as the birth
+S34_T23	born in 1988, and is the son of a famous American actor. Which of
+S35_T23	born in 1994, and the birthplace of x is Syria. What is x
+S00_T24	the first to use the term "meme" in an academic context. Which of the following is
+S01_T24	born in 1994, and the birthplace of x is Syria. What is x
+S02_T24	born in 1994, and the year is 2020. What is
+S03_T24	born in 1994, and the birthplace of x is Syria. What is x
+S04_T24	born in 1988, and is the son of a famous American actor. Which of
+S05_T24	born in 1988, and is the son of a famous American actor. Which of
+S06_T24	born in 1988, and is the son of a famous American actor. Which of
+S07_T24	born in 1994, and the birthplace of x is Syria. What is x
+S08_T24	born in 1988, and is the son of a famous American actor. Which of
+S09_T24	born in 1994, and the birthplace of x is Syria. What is x
+S10_T24	born in 1988, and is the son of a famous American actor. Which of
+S11_T24	born in 1994, and is the son of the former president of the United States
+S12_T24	born in 1994, and the birthplace of x is Syria. What is x
+S13_T24	born in 1994, and the birthplace of x is Syria. What is x
+S14_T24	born in 1994, and the birthplace of x is the same as the birth
+S15_T24	born in 1994, and the birthplace of x is the same as the birth
+S16_T24	born in 1994, and is the son of the former president of the United States
+S17_T24	born in 1994, and the birthplace of x is the same as the birth
+S18_T24	born in 1994, and the birthplace of x is the same as the birth
+S19_T24	born in 1994, and is the son of a famous American actor. Which of
+S20_T24	born in 1994, and the birthplace of x is the same as the birth
+S21_T24	born in 1994, and is the son of a famous American actor. Which of
+S22_T24	born in 1994, and the birthplace of x is the same as the birth
+S23_T24	born in 1988, and is the son of a famous American actor. Which of
+S24_T24	born in 1994, and the birthplace of x is the same as the birth
+S25_T24	born in 1994, and the birthplace of x is the same as the birth
+S26_T24	born in 1994, and is the son of a famous American actor. Which of
+S27_T24	born in 1994, and the birthplace of x is the same as the birth
+S28_T24	born in 1994, and the birthplace of x is the same as the birth
+S29_T24	born in 1994, and the birthplace of x is the same as the birth
+S30_T24	born in 1988, and is the son of a famous American actor. Which of
+S31_T24	born in 1994, and the birthplace of x is the same as the birth
+S32_T24	born in 1994, and the birthplace of x is the same as the birth
+S33_T24	born in 1994, and is the son of the former president of the United States
+S34_T24	born in 1994, and the birthplace of x is the same as the birth
+S35_T24	born in 1988, and is the son of a famous American actor. Which of
+S00_T25	born in 1994, and the birthplace of x is Syria. What is x
+S01_T25	born in 1988, and is the son of a famous American actor. Which of
+S02_T25	born in 1994, and the birthplace of x is Syria. What is x
+S03_T25	born in 1988, and is the son of a famous American actor. Which of
+S04_T25	born in 1994, and the birthplace of x is Syria. What is x
+S05_T25	the first to be born. Which of the following is the correct order?  A. Samsung,
+S06_T25	born in 1994, and x is a member of the band One Direction. Which
+S07_T25	born in 1994, and x is a member of the band One Direction. Which
+S08_T25	born in 1994, and the year is 2020. What is
+S09_T25	born in 1988, and is the son of a famous American actor. Which of
+S10_T25	born in 1988, and is the son of a famous American actor. Which of
+S11_T25	born in 1994, and the birthplace of x is Syria. What is x
+S12_T25	born in 1994, and the birthplace of x is the same as the birth
+S13_T25	born in 1988, and is the son of a famous American actor. Which of
+S14_T25	born in 1994, and is the son of the former president of the United States
+S15_T25	born in 1994, and x is a member of the band One Direction. Which
+S16_T25	born in 1994, and the birthplace of x is the same as the birth
+S17_T25	born in 1994, and the birthplace of x is the same as the birth
+S18_T25	born in 1994, and is the son of a famous American actor. Which of
+S19_T25	born in 1988, and is the son of a famous American actor. Which of
+S20_T25	born in 1994, and the birthplace of x is the same as the birth
+S21_T25	born in 1994, and the birthplace of x is the same as the birth
+S22_T25	born in 1994, and the birthplace of x is the same as the birth
+S23_T25	born in 1994, and the birthplace of x is the same as the birth
+S24_T25	born in 1994, and the birthplace of x is the same as the birth
+S25_T25	born in 1994, and the birthplace of x is the same as the birth
+S26_T25	born in 1994, and the birthplace of x is the same as the birth
+S27_T25	born in 1994, and the birthplace of x is the same as the birth
+S28_T25	born in 1994, and the birthplace of x is the same as the birth
+S29_T25	born in 1994, and the birthplace of x is the same as the birth
+S30_T25	born in 1994, and the birthplace of x is the same as the birth
+S31_T25	born in 1988, and is the son of a famous American actor. Which of
+S32_T25	born in 1994, and the birthplace of x is the same as the birth
+S33_T25	born in 1988, and is the son of a famous American actor. Which of
+S34_T25	born in 1994, and the birthplace of x is the same as the birth
+S35_T25	born in 1994, and x is a member of the band One Direction. Which
+S00_T26	born in 1994, and the birthplace of x is Syria. What is x
+S01_T26	born in 1988, and is the son of a famous American actor. Which of
+S02_T26	born in 1988, and is the son of a famous American actor. Which of
+S03_T26	born in 1994, and x is a member of the band One Direction. Which
+S04_T26	the first to be born. Which of the following is the correct order?  A. Samsung,
+S05_T26	the first to use the term "meme" in an academic context. Which of the following is
+S06_T26	born in 1994, and x is a member of the band One Direction. Which
+S07_T26	born in 1994, and x is a member of the band One Direction. Which
+S08_T26	born in 1994, and x is a member of the band One Direction. Which
+S09_T26	born in 1994, and x is a member of the band One Direction. Which
+S10_T26	born in 1994, and x is a member of the band One Direction. Which
+S11_T26	born in 1994, and the birthplace of x is Syria. What is x
+S12_T26	born in 1994, and x is a member of the band One Direction. Which
+S13_T26	born in 1994, and x is a member of the band One Direction. Which
+S14_T26	born in 1994, and x is a member of the band One Direction. Which
+S15_T26	born in 1988, and is the son of a famous American actor. Which of
+S16_T26	born in 1994, and x is a member of the band One Direction. Which
+S17_T26	born in 1994, and x is a member of the band One Direction. Which
+S18_T26	born in 1988, and is the son of a famous American actor. Which of
+S19_T26	born in 1994, and x is a member of the band One Direction. Which
+S20_T26	born in 1994, and x is a member of the band One Direction. Which
+S21_T26	born in 1988, and is the son of a famous American actor. Which of
+S22_T26	born in 1994, and x is a member of the band One Direction. Which
+S23_T26	born in 1994, and x is a member of the band One Direction. Which
+S24_T26	born in 1994, and x is a member of the band One Direction. Which
+S25_T26	born in 1994, and the birthplace of x is the same as the birth
+S26_T26	born in 1994, and x is a member of the band One Direction. Which
+S27_T26	born in 1988, and is the son of a famous American actor. Which of
+S28_T26	born in 1994, and the birthplace of x is the same as the birth
+S29_T26	born in 1988, and is the son of a famous American actor. Which of
+S30_T26	born in 1988, and is the son of a famous American actor. Which of
+S31_T26	born in 1994, and the birthplace of x is Syria. What is x
+S32_T26	born in 1988, and is the son of a famous American actor. Which of
+S33_T26	born in 1994, and the birthplace of x is the same as the birth
+S34_T26	born in 1994, and x is a member of the band One Direction. Which
+S35_T26	born in 1994, and x is a member of the band One Direction. Which
+S00_T27	the first to be born. Which of the following is the correct order? A. Syria, Leonardo
+S01_T27	the first to use the term "meme" in an academic context. Which of the following is
+S02_T27	born in 1994, and x is a member of the band One Direction. Which
+S03_T27	born in 1988, and is the son of a famous American actor. Which of
+S04_T27	born in 1988, and is the son of a famous American actor. Which of
+S05_T27	the first to use the term "meme" in an academic context. Which of the following is
+S06_T27	born in 1988, and is the son of a famous American actor. Which of
+S07_T27	the first to be born. Who is x? The answer is Leonardo DiCaprio. The question
+S08_T27	born in 1994, and x is a member of the band One Direction. Which
+S09_T27	born in 1988, and is the son of a famous American actor. Which of
+S10_T27	born in 1994, and the birthplace of x is Syria. What is x
+S11_T27	born in 1994, and the birthplace of x is Syria. What is x
+S12_T27	born in 1994, and x is a member of the band One Direction. Which
+S13_T27	born in 1994, and x is a member of the band One Direction. Which
+S14_T27	born in 1994, and the birthplace of x is Syria. What is x
+S15_T27	born in 1994, and x is a member of the band One Direction. Which
+S16_T27	born in 1994, and x is a member of the band One Direction. Which
+S17_T27	born in 1994, and is the son of a famous American actor. Which of
+S18_T27	born in 1994, and is the son of the former president of the United States
+S19_T27	born in 1994, and x is a member of the band One Direction. Which
+S20_T27	born in 1994, and x is a member of the band One Direction. Which
+S21_T27	born in 1994, and x is a member of the band One Direction. Which
+S22_T27	born in 1994, and x is a member of the band One Direction. Which
+S23_T27	born in 1994, and the birthplace of x is the same as the birth
+S24_T27	born in 1988, and is the son of a famous American actor. Which of
+S25_T27	born in 1994, and the birthplace of x is the same as the birth
+S26_T27	born in 1988, and is the son of a famous American actor. Which of
+S27_T27	born in 1988, and is the son of a famous American actor. Which of
+S28_T27	born in 1988, and is the son of a famous American actor. Which of
+S29_T27	born in 1994, and the birthplace of x is Syria. What is x
+S30_T27	born in 1994, and the birthplace of x is Syria. What is x
+S31_T27	born in 1994, and the birthplace of x is Syria. What is x
+S32_T27	born in 1994, and the year is 2020. What is
+S33_T27	born in 1994, and x is a member of the band One Direction. Which
+S34_T27	born in 1988, and is the son of a famous American actor. Which of
+S35_T27	born in 1994, and x is a member of the band One Direction. Which
+S00_T28	born in 1994, and the birthplace of x is Syria. What is x
+S01_T28	born in 1994, and the birthplace of x is Syria. What is x
+S02_T28	born in 1994, and the birthplace of x is Syria. What is x
+S03_T28	born in 1994, and the birthplace of x is Syria. What is x
+S04_T28	born in 1994, and is the son of a famous American actor. Which of
+S05_T28	born in 1994, and is the son of the former president of the United States
+S06_T28	born in 1988, and is the son of a famous American actor. Which of
+S07_T28	born in 1994, and the birthplace of x is Syria. What is x
+S08_T28	born in 1988, and is the son of a famous American actor. Which of
+S09_T28	born in 1994, and is the son of the former president of the United States
+S10_T28	born in 1994, and is the son of the former president of the United States
+S11_T28	born in 1988, and is the son of a famous American actor. Which of
+S12_T28	born in 1988, and is the son of a famous American actor. Which of
+S13_T28	born in 1994, and is the son of a famous American actor. Which of
+S14_T28	born in 1994, and is the son of a famous American actor. Which of
+S15_T28	born in 1994, and is the son of the former president of the United States
+S16_T28	born in 1994, and the birthplace of x is the same as the birth
+S17_T28	born in 1988, and is the son of a famous American actor. Which of
+S18_T28	born in 1994, and the birthplace of x is the same as the birth
+S19_T28	born in 1994, and the birthplace of x is the same as the birth
+S20_T28	born in 1994, and the birthplace of x is the same as the birth
+S21_T28	born in 1988, and is the son of a famous American actor. Which of
+S22_T28	born in 1994, and the birthplace of x is the same as the birth
+S23_T28	born in 1988, and is the son of a famous American actor. Which of
+S24_T28	born in 1994, and the birthplace of x is the same as the birth
+S25_T28	born in 1988, and is the son of a famous American actor. Which of
+S26_T28	born in 1994, and is the son of a famous American actor. Which of
+S27_T28	born in 1994, and the birthplace of x is the same as the birth
+S28_T28	born in 1994, and the birthplace of x is the same as the birth
+S29_T28	born in 1994, and the birthplace of x is the same as the birth
+S30_T28	born in 1988, and is the son of a famous American actor. Which of
+S31_T28	born in 1994, and is the son of a famous American actor. Which of
+S32_T28	born in 1994, and the birthplace of x is Syria. What is x
+S33_T28	born in 1994, and is the son of a famous American actor. Which of
+S34_T28	born in 1994, and the birthplace of x is the same as the birth
+S35_T28	born in 1994, and the year is 2020. What is
+S00_T29	born in 1994, and the year is 2020. What is
+S01_T29	born in 1988, and is the son of a famous American actor. Which of
+S02_T29	born in 1994, and the year is 2020. What is
+S03_T29	born in 1994, and the year is 2020. What is
+S04_T29	born in 1988, and is the son of a famous American actor. Which of
+S05_T29	born in 1988, and is the son of a famous American actor. Which of
+S06_T29	born in 1988, and is the son of a famous American actor. Which of
+S07_T29	born in 1994, and the year is 2020. What is
+S08_T29	born in 1994, and the year is 2020. What is
+S09_T29	born in 1988, and is the son of a famous American actor. Which of
+S10_T29	born in 1994, and the year is 2020. What is
+S11_T29	born in 1994, and the year is 2020. What is
+S12_T29	born in 1988, and is the son of a famous American actor. Which of
+S13_T29	born in 1994, and the year is 2020. What is
+S14_T29	born in 1988, and is the son of a famous American actor. Which of
+S15_T29	born in 1994, and the year is 2020. What is
+S16_T29	born in 1994, and the year is 2020. What is
+S17_T29	born in 1988, and is the son of a famous American actor. Which of
+S18_T29	born in 1988, and is the son of a famous American actor. Which of
+S19_T29	born in 1994, and the year is 2020. What is
+S20_T29	born in 1988, and is the son of a famous American actor. Which of
+S21_T29	born in 1994, and the year is 2020. What is
+S22_T29	born in 1994, and the year is 2020. What is
+S23_T29	born in 1994, and the year is 2020. What is
+S24_T29	born in 1994, and the year is 2020. What is
+S25_T29	born in 1988, and is the son of a famous American actor. Which of
+S26_T29	born in 1994, and the year is 2020. What is
+S27_T29	born in 1988, and is the son of a famous American actor. Which of
+S28_T29	born in 1988, and is the son of a famous American actor. Which of
+S29_T29	born in 1994, and the year is 2020. What is
+S30_T29	born in 1994, and the year is 2020. What is
+S31_T29	born in 1988, and is the son of a famous American actor. Which of
+S32_T29	born in 1994, and the year is 2020. What is
+S33_T29	born in 1994, and the year is 2020. What is
+S34_T29	born in 1994, and the year is 2020. What is
+S35_T29	born in 1994, and the year is 2020. What is
+S00_T30	born in 1994, and the year is 2020. What is
+S01_T30	born in 1988, and is the son of a famous American actor. Which of
+S02_T30	born in 1994, and the year is 2020. What is
+S03_T30	born in 1994, and the year is 2020. What is
+S04_T30	born in 1994, and the year is 2020. What is
+S05_T30	born in 1994, and the year is 2020. What is
+S06_T30	born in 1994, and the year is 2020. What is
+S07_T30	born in 1994, and the year is 2020. What is
+S08_T30	born in 1994, and the year is 2020. What is
+S09_T30	born in 1994, and the year is 2020. What is
+S10_T30	born in 1994, and the year is 2020. What is
+S11_T30	born in 1988, and is the son of a famous American actor. Which of
+S12_T30	born in 1994, and the year is 2020. What is
+S13_T30	born in 1994, and the year is 2020. What is
+S14_T30	born in 1994, and the year is 2020. What is
+S15_T30	born in 1988, and is the son of a famous American actor. Which of
+S16_T30	born in 1988, and is the son of a famous American actor. Which of
+S17_T30	born in 1988, and is the son of a famous American actor. Which of
+S18_T30	born in 1994, and the year is 2020. What is
+S19_T30	born in 1994, and the year is 2020. What is
+S20_T30	born in 1988, and is the son of a famous American actor. Which of
+S21_T30	born in 1994, and the year is 2020. What is
+S22_T30	born in 1994, and the year is 2020. What is
+S23_T30	born in 1994, and the year is 2020. What is
+S24_T30	born in 1994, and the year is 2020. What is
+S25_T30	born in 1994, and the year is 2020. What is
+S26_T30	born in 1988, and is the son of a famous American actor. Which of
+S27_T30	born in 1994, and the year is 2020. What is
+S28_T30	born in 1994, and the year is 2020. What is
+S29_T30	born in 1994, and the year is 2020. What is
+S30_T30	born in 1994, and the year is 2020. What is
+S31_T30	born in 1994, and the year is 2020. What is
+S32_T30	born in 1994, and the year is 2020. What is
+S33_T30	born in 1994, and the year is 2020. What is
+S34_T30	born in 1994, and the birthplace of x is Syria. What is x
+S35_T30	born in 1994, and the year is 2020. What is
+S00_T31	born in 1994, and the year is 2020. What is
+S01_T31	born in 1994, and the year is 2020. What is
+S02_T31	born in 1988, and is the son of a famous American actor. Which of
+S03_T31	born in 1988, and is the son of a famous American actor. Which of
+S04_T31	born in 1994, and the year is 2020. What is
+S05_T31	born in 1994, and the year is 2020. What is
+S06_T31	born in 1994, and the year is 2020. What is
+S07_T31	born in 1988, and is the son of a famous American actor. Which of
+S08_T31	born in 1994, and is the son of the former president of the United States
+S09_T31	born in 1988, and is the son of a famous American actor. Which of
+S10_T31	born in 1994, and the year is 2020. What is
+S11_T31	born in 1994, and the year is 2020. What is
+S12_T31	born in 1988, and is the son of a famous American actor. Which of
+S13_T31	born in 1994, and the year is 2020. What is
+S14_T31	born in 1994, and is the son of a famous American actor. Which of
+S15_T31	born in 1988, and is the son of a famous American actor. Which of
+S16_T31	born in 1994, and the year is 2020. What is
+S17_T31	born in 1994, and the year is 2020. What is
+S18_T31	born in 1994, and the year is 2020. What is
+S19_T31	born in 1994, and is the son of a famous American actor. Which of
+S20_T31	born in 1994, and is the son of a famous American actor. Which of
+S21_T31	born in 1994, and the year is 2020. What is
+S22_T31	born in 1994, and the year is 2020. What is
+S23_T31	born in 1994, and the year is 2020. What is
+S24_T31	born in 1994, and the year is 2020. What is
+S25_T31	born in 1994, and the year is 2020. What is
+S26_T31	born in 1994, and the year is 2020. What is
+S27_T31	born in 1994, and the year is 2020. What is
+S28_T31	born in 1988, and is the son of a famous American actor. Which of
+S29_T31	born in 1994, and the year is 2020. What is
+S30_T31	born in 1994, and the year is 2020. What is
+S31_T31	born in 1994, and the year is 2020. What is
+S32_T31	born in 1994, and the year is 2020. What is
+S33_T31	born in 1994, and the year is 2020. What is
+S34_T31	born in 1988, and is the son of a famous American actor. Which of
+S35_T31	born in 1994, and the year is 2020. What is
+S00_T32	born in 1994, and the year is 2020. What is
+S01_T32	born in 1988, and is the son of a famous American actor. Which of
+S02_T32	born in 1994, and the year is 2020. What is
+S03_T32	born in 1994, and the year is 2020. What is
+S04_T32	born in 1988, and is the son of a famous American actor. Which of
+S05_T32	born in 1994, and the year is 2020. What is
+S06_T32	born in 1994, and the year is 2020. What is
+S07_T32	born in 1994, and the year is 2020. What is
+S08_T32	born in 1988, and is the son of a famous American actor. Which of
+S09_T32	born in 1994, and the year is 2020. What is
+S10_T32	born in 1994, and is the son of a famous American actor. Which of
+S11_T32	born in 1988, and is the son of a famous American actor. Which of
+S12_T32	born in 1994, and the year is 2020. What is
+S13_T32	born in 1994, and the year is 2020. What is
+S14_T32	born in 1994, and the year is 2020. What is
+S15_T32	born in 1994, and the year is 2020. What is
+S16_T32	born in 1994, and the year is 2020. What is
+S17_T32	born in 1994, and the year is 2020. What is
+S18_T32	born in 1994, and the year is 2020. What is
+S19_T32	born in 1988, and is the son of a famous American actor. Which of
+S20_T32	born in 1994, and the year is 2020. What is
+S21_T32	born in 1994, and the year is 2020. What is
+S22_T32	born in 1994, and the year is 2020. What is
+S23_T32	born in 1994, and the year is 2020. What is
+S24_T32	born in 1988, and is the son of a famous American actor. Which of
+S25_T32	born in 1994, and the year is 2020. What is
+S26_T32	born in 1994, and the year is 2020. What is
+S27_T32	born in 1994, and the year is 2020. What is
+S28_T32	born in 1988, and is the son of a famous American actor. Which of
+S29_T32	born in 1994, and the year is 2020. What is
+S30_T32	born in 1994, and the year is 2020. What is
+S31_T32	born in 1988, and is the son of a famous American actor. Which of
+S32_T32	born in 1994, and the year is 2020. What is
+S33_T32	born in 1994, and the year is 2020. What is
+S34_T32	born in 1994, and the year is 2020. What is
+S35_T32	born in 1994, and the year is 2020. What is
+S00_T33	born in 1988, and is the son of a famous American actor. Which of
+S01_T33	born in 1988, and is the son of a famous American actor. Which of
+S02_T33	born in 1994, and the year is 2020. What is
+S03_T33	born in 1994, and the year is 2020. What is
+S04_T33	born in 1988, and is the son of a famous American actor. Which of
+S05_T33	born in 1994, and the year is 2020. What is
+S06_T33	born in 1994, and the year is 2020. What is
+S07_T33	born in 1988, and is the son of a famous American actor. Which of
+S08_T33	born in 1988, and is the son of a famous American actor. Which of
+S09_T33	born in 1994, and the year is 2020. What is
+S10_T33	born in 1994, and the year is 2020. What is
+S11_T33	born in 1994, and the year is 2020. What is
+S12_T33	born in 1988, and is the son of a famous American actor. Which of
+S13_T33	born in 1994, and the year is 2020. What is
+S14_T33	born in 1994, and the year is 2020. What is
+S15_T33	born in 1994, and the year is 2020. What is
+S16_T33	born in 1994, and the year is 2020. What is
+S17_T33	born in 1994, and the year is 2020. What is
+S18_T33	born in 1994, and the year is 2020. What is
+S19_T33	born in 1994, and the year is 2020. What is
+S20_T33	born in 1994, and the year is 2020. What is
+S21_T33	born in 1994, and the year is 2020. What is
+S22_T33	born in 1994, and the year is 2020. What is
+S23_T33	born in 1994, and the year is 2020. What is
+S24_T33	born in 1994, and the year is 2020. What is
+S25_T33	born in 1994, and the year is 2020. What is
+S26_T33	born in 1988, and is the son of a famous American actor. Which of
+S27_T33	born in 1994, and the year is 2020. What is
+S28_T33	born in 1988, and is the son of a famous American actor. Which of
+S29_T33	born in 1994, and the year is 2020. What is
+S30_T33	born in 1988, and is the son of a famous American actor. Which of
+S31_T33	born in 1994, and the year is 2020. What is
+S32_T33	born in 1994, and the year is 2020. What is
+S33_T33	born in 1988, and is the son of a famous American actor. Which of
+S34_T33	born in 1994, and the year is 2020. What is
+S35_T33	born in 1994, and the year is 2020. What is
+S00_T34	born in 1994, and x is a member of the band One Direction. Which
+S01_T34	born in 1994, and x is a member of the band One Direction. Which
+S02_T34	born in 1994, and x is a member of the band One Direction. Which
+S03_T34	born in 1994, and x is a member of the band One Direction. Which
+S04_T34	born in 1994, and x is a member of the band One Direction. Which
+S05_T34	born in 1994, and x is a member of the band One Direction. Which
+S06_T34	born in 1994, and x is a member of the band One Direction. Which
+S07_T34	born in 1988, and is the son of a famous American actor. Which of
+S08_T34	born in 1994, and x is a member of the band One Direction. Which
+S09_T34	born in 1994, and x is a member of the band One Direction. Which
+S10_T34	born in 1994, and x is a member of the band One Direction. Which
+S11_T34	born in 1994, and x is a member of the band One Direction. Which
+S12_T34	born in 1994, and x is a member of the band One Direction. Which
+S13_T34	born in 1994, and x is a member of the band One Direction. Which
+S14_T34	born in 1994, and x is a member of the band One Direction. Which
+S15_T34	born in 1994, and x is a member of the band One Direction. Which
+S16_T34	born in 1994, and x is a member of the band One Direction. Which
+S17_T34	born in 1994, and x is a member of the band One Direction. Which
+S18_T34	born in 1994, and x is a member of the band One Direction. Which
+S19_T34	born in 1988, and is the son of a famous American actor. Which of
+S20_T34	born in 1994, and x is a member of the band One Direction. Which
+S21_T34	born in 1988, and is the son of a famous American actor. Which of
+S22_T34	born in 1988, and is the son of a famous American actor. Which of
+S23_T34	born in 1988, and is the son of a famous American actor. Which of
+S24_T34	born in 1988, and is the son of a famous American actor. Which of
+S25_T34	born in 1988, and x is a member of the band "The Beatles".
+S26_T34	born in 1994, and x is a member of the band One Direction. Which
+S27_T34	born in 1994, and x is a member of the band One Direction. Which
+S28_T34	born in 1988, and is the son of a famous American actor. Which of
+S29_T34	born in 1988, and is the son of a famous American actor. Which of
+S30_T34	born in 1988, and is the son of a famous American actor. Which of
+S31_T34	born in 1994, and x is a member of the band One Direction. Which
+S32_T34	born in 1988, and is the son of a famous American actor. Which of
+S33_T34	born in 1994, and x is a member of the band One Direction. Which
+S34_T34	born in 1994, and x is a member of the band One Direction. Which
+S35_T34	born in 1994, and x is a member of the band One Direction. Which
+S00_T35	born in 1988, and x is a member of the band One Direction. Which
+S01_T35	born in 1988, and x is a member of the band One Direction. Which
+S02_T35	born in 1988, and x is a member of the band One Direction. Which
+S03_T35	born in 1988, and x is a member of the band One Direction. Which
+S04_T35	born in 1988, and x is a member of the band One Direction. Which
+S05_T35	born in 1988, and x is a member of the band One Direction. Which
+S06_T35	born in 1988, and x is a member of the band One Direction. Which
+S07_T35	born in 1988, and x is a member of the band One Direction. Which
+S08_T35	born in 1988, and x is a member of the band One Direction. Which
+S09_T35	born in 1988, and x is a member of the band One Direction. Which
+S10_T35	born in 1988, and x is a member of the band One Direction. Which
+S11_T35	born in 1988, and x is a member of the band One Direction. Which
+S12_T35	born in 1988, and x is a member of the band One Direction. Which
+S13_T35	born in 1988, and x is a member of the band One Direction. Which
+S14_T35	born in 1988, and x is a member of the band One Direction. Which
+S15_T35	born in 1988, and x is a member of the band One Direction. Which
+S16_T35	born in 1988, and x is a member of the band One Direction. Which
+S17_T35	born in 1988, and x is a member of the band One Direction. Which
+S18_T35	born in 1988, and x is a member of the band One Direction. Which
+S19_T35	born in 1988, and x is a member of the band One Direction. Which
+S20_T35	born in 1988, and x is a member of the band One Direction. Which
+S21_T35	born in 1988, and x is a member of the band One Direction. Which
+S22_T35	born in 1988, and x is a member of the band One Direction. Which
+S23_T35	born in 1988, and x is a member of the band One Direction. Which
+S24_T35	born in 1988, and x is a member of the band One Direction. Which
+S25_T35	born in 1988, and x is a member of the band One Direction. Which
+S26_T35	born in 1988, and x is a member of the band One Direction. Which
+S27_T35	born in 1988, and x is a member of the band One Direction. Which
+S28_T35	born in 1988, and x is a member of the band One Direction. Which
+S29_T35	born in 1988, and x is a member of the band One Direction. Which
+S30_T35	born in 1988, and x is a member of the band One Direction. Which
+S31_T35	born in 1988, and x is a member of the band One Direction. Which
+S32_T35	born in 1988, and x is a member of the band One Direction. Which
+S33_T35	born in 1988, and x is a member of the band One Direction. Which
+S34_T35	born in 1988, and x is a member of the band One Direction. Which
+S35_T35	born in 1988, and x is a member of the band One Direction. Which

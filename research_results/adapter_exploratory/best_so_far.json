@@ -1,0 +1,17 @@
+{
+  "candidate": "low_rank_residual_rank_32_h28_to_h10",
+  "good": 1,
+  "oracle_original_hits": 3,
+  "promising": 1,
+  "random_original_hits": 0,
+  "raw_original_hits": 1,
+  "readout_layer": 10,
+  "source_layer": 28,
+  "strong": 1,
+  "translated_category_hits": 4,
+  "translated_original_hits": 3,
+  "translated_strict_hits": 1,
+  "val_cosine": 0.8078963160514832,
+  "val_mse": 0.39516371488571167,
+  "wrong_original_hits": 0
+}

@@ -1,0 +1,1315 @@
+model	Qwen_Qwen3-8B
+entity_key	nyc
+source	New York City
+target_full	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x can be described as
+target_suffix	 can be described as
+target_query	
+target_placeholder	x
+tgt_pos	29
+tgt_token_id	856
+tgt_token	 x
+target_token_count	34
+target_with_x_token_count	30
+source_set	canonical
+inject_mode	residual
+normalize	True
+target	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x
+target_before_x	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, 
+target_with_x	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x
+target_layer	ALL
+S00_T00	a large and densely populated urban area. Which of the following is a correct statement? (Multiple choice
+S01_T00	a large and densely populated urban area, and the United Nations: international organization. Which of the following
+S02_T00	a place where people live, and the city of Paris is a city. Which of the following is
+S03_T00	a place where people live, and the city of Paris is a city. Which of the following is
+S04_T00	a place where people live, and the city of Paris is a city. Which of the following is
+S05_T00	a place where people live, work, and play. The city is a place where people live,
+S06_T00	a(n) _______.
+S07_T00	a city in the United States, and the United Nations: international organization. Which of the following is
+S08_T00	a city in the US, but it's also a city in the state of New York. So
+S09_T00	a place where people live, and the other three are companies. Which of the following is a company
+S10_T00	a(n) _______.
+S11_T00	a(n) _______.
+S12_T00	a(n) _______.
+S13_T00	a(n) _______.
+S14_T00	a(n) _______.
+S15_T00	a(n) _______.
+S16_T00	a(n) _______.
+S17_T00	a(n) _______.
+S18_T00	a(n) _______.
+S19_T00	a(n) _______.
+S20_T00	a(n) _______.
+S21_T00	a(n) _______.
+S22_T00	a(n) _______.
+S23_T00	a(n) _______.
+S24_T00	a(n) _______.
+S25_T00	a(n) _______.
+S26_T00	a(n) _______.
+S27_T00	a(n) _______.
+S28_T00	a(n) _______.
+S29_T00	a(n) _______.
+S30_T00	a(n) _______.
+S31_T00	a(n) _______.
+S32_T00	a(n) _______.
+S33_T00	a(n) _______.
+S34_T00	a(n) _______.
+S35_T00	a(n) _______.
+S00_T01	a large human settlement, and the word "city" is also used for the principal settlement of a
+S01_T01	a large and densely populated urban area, and the United Nations: international organization. Which of the following
+S02_T01	a place where people live, work, and play. Which of the following is a set of three
+S03_T01	a place where people live, and the country is a larger area. So, the country is a
+S04_T01	a place where people live, and the other three are companies. The question is to find the odd
+S05_T01	a place where people live, and the other three are companies. The question is to find the odd
+S06_T01	a(n) _______.
+S07_T01	a person, place, or thing.  The question is, what is the commonality between these
+S08_T01	a(n) _______.
+S09_T01	a(n) _______.
+S10_T01	a person, and Samsung is an organization. So, the question is, what is the relationship between
+S11_T01	a person, and Samsung can be described as an organization. The question is, what is the relationship
+S12_T01	a person, and Samsung can be described as an organization. The question is, how can you describe
+S13_T01	a person, and Samsung can be described as an organization. The question is, what is the relationship
+S14_T01	a person, and Samsung can be described as an organization. The question is, what is the relationship
+S15_T01	a person, and Samsung can be described as an organization. The question is, what is the relationship
+S16_T01	a person, and Samsung can be described as an organization. So, the question is, what is
+S17_T01	a person, and Samsung can be described as an organization. The question is, how can you describe
+S18_T01	a person, and Samsung can be described as a company. So, the question is, what is
+S19_T01	a person, and Samsung can be described as a company. So, the question is, what is
+S20_T01	a(n) _______.
+S21_T01	a(n) _______.
+S22_T01	a(n) _______.
+S23_T01	a(n) _______.
+S24_T01	a(n) _______.
+S25_T01	a(n) _______.
+S26_T01	a(n) _______.
+S27_T01	a(n) _______.
+S28_T01	a(n) _______.
+S29_T01	a(n) _______.
+S30_T01	a(n) _______.
+S31_T01	a(n) _______.
+S32_T01	a(n) _______.
+S33_T01	a(n) _______.
+S34_T01	a(n) _______.
+S35_T01	a(n) _______.
+S00_T02	a place where people live, work, and play. The question is, which of these is a
+S01_T02	a large and densely populated urban area, and the United Nations: international organization. Which of the following
+S02_T02	a place where people live, and the city of Paris is a city. Which of the following is
+S03_T02	a place where people live, and the other three are companies. The question is to find the odd
+S04_T02	a city in the United States, and the United States is a country in North America. Which of
+S05_T02	a country, and Samsung is a company. So, the question is, what is the relationship between
+S06_T02	a country, and the others are not. The question is to find the one that is different from
+S07_T02	a country, a language, or a programming language, and also a type of plant. The question
+S08_T02	a country, a company, or a programming language. So, what is the correct answer for the
+S09_T02	a(n) _______.
+S10_T02	a(n) _______.
+S11_T02	a(n) ______.
+S12_T02	a(n) _______.
+S13_T02	a(n) _______.
+S14_T02	a(n) _______.
+S15_T02	a(n) _______.
+S16_T02	a(n) _______.
+S17_T02	a(n) _______.
+S18_T02	a(n) _______.
+S19_T02	a(n) _______.
+S20_T02	a(n) _______.
+S21_T02	a(n) _______.
+S22_T02	a(n) ______.
+S23_T02	a(n) ______.
+S24_T02	a(n) ______.
+S25_T02	a(n) ______.
+S26_T02	a(n) ______.
+S27_T02	a(n) ______.
+S28_T02	a(n) ______.
+S29_T02	a(n) ______.
+S30_T02	a(n) ______.
+S31_T02	a(n) ______.
+S32_T02	a(n) ______.
+S33_T02	a(n) ______.
+S34_T02	a(n) ______.
+S35_T02	a(n) ______.
+S00_T03	a place where people live, and the city of Paris is a city in France. The city of
+S01_T03	a place where people live, and the other three are companies. Which of the following is the correct
+S02_T03	a place where people live, and the city is a place where people live. The city is a
+S03_T03	a place where people live, and the other three are companies. Which of the following is the correct
+S04_T03	a place where people live, and the word "city" is a noun. The word "city
+S05_T03	a place where people live, and the word "city" is a noun. The word "city
+S06_T03	a country, but it is a city in the United States. So, the question is, what
+S07_T03	a place where people live, and the other three are companies. Which of the following is a company
+S08_T03	a(n) _______.
+S09_T03	a city in the United States. Which of the following is a correct statement? (Multiple choice question
+S10_T03	a city in the United States. Which of the following is a correct statement? (Multiple choice question
+S11_T03	a country, a person, and a company respectively. The question is, what is the term for
+S12_T03	a country, and the other two as companies. The question is, which of the following is a
+S13_T03	a country, and the other two as companies. The question is, which of the following is a
+S14_T03	a country, and the other two as companies. The question is, which of the following is a
+S15_T03	a country, and the other two are not. So the answer is Syria. The question is to
+S16_T03	a(n) _______.
+S17_T03	a(n) _______.
+S18_T03	a(n) _______.
+S19_T03	a(n) _______.
+S20_T03	a company, and the United States: Country in North America. So, the question is, what
+S21_T03	a company, and the United States: Country in North America. Which of the following is the correct
+S22_T03	a company, and the United Nations: international organization. These are all examples of what type of noun
+S23_T03	a(n) _______.
+S24_T03	a(n) _______.
+S25_T03	a(n) _______.
+S26_T03	a(n) _______.
+S27_T03	a(n) _______.
+S28_T03	a(n) _______.
+S29_T03	a(n) _______.
+S30_T03	a(n) _______.
+S31_T03	a(n) _______.
+S32_T03	a(n) _______.
+S33_T03	a(n) _______.
+S34_T03	a(n) _______.
+S35_T03	a(n) _______.
+S00_T04	a place where people live, and the other three are all companies. Which of the following is the
+S01_T04	a place where people live, and the city is a place where people live. The city is a
+S02_T04	a place with a large population and a lot of buildings. The question is, which of the following
+S03_T04	a place with a large population and many buildings. The question is, which of the following is not
+S04_T04	a place where people live, and the United Nations: international organization. Which of the following is a
+S05_T04	a place where people live, and the United Nations: international organization. Which of the following is a
+S06_T04	a place where people from all over the world live, work, and play. The city is known
+S07_T04	a(n) _______.
+S08_T04	a(n) _______.
+S09_T04	a(n) _______.
+S10_T04	a(n) _______.
+S11_T04	a(n) _______.
+S12_T04	a(n) _______.
+S13_T04	a(n) _______.
+S14_T04	a(n) _______.
+S15_T04	a(n) _______.
+S16_T04	a(n) _______.
+S17_T04	a(n) _______.
+S18_T04	a(n) _______.
+S19_T04	a(n) _______.
+S20_T04	a(n) _______.
+S21_T04	a(n) _______.
+S22_T04	a(n) _______.
+S23_T04	a(n) _______.
+S24_T04	a(n) _______.
+S25_T04	a(n) _______.
+S26_T04	a(n) _______.
+S27_T04	a(n) _______.
+S28_T04	a(n) _______.
+S29_T04	a(n) _______.
+S30_T04	a(n) _______.
+S31_T04	a(n) _______.
+S32_T04	a(n) _______.
+S33_T04	a(n) _______.
+S34_T04	a(n) _______.
+S35_T04	a(n) _______.
+S00_T05	a place where people live, and the other three are companies. The question is to find the odd
+S01_T05	a place where people live, and the United Nations: international organization. Which of the following is a
+S02_T05	a place with a large population and a lot of buildings. Which of the following is a correct statement
+S03_T05	a place with a large population and a lot of buildings. The question is, which of the following
+S04_T05	a place where people live, and the United Nations: international organization. Which of the following is a
+S05_T05	a place where people from all over the world live, and the United Nations: international organization. Which
+S06_T05	a place where people from all over the world live and work.  The sentence above is an example
+S07_T05	a place, and the United Nations: international organization. Which of the following is a correct classification of
+S08_T05	a(n) _______.
+S09_T05	a(n) _______.
+S10_T05	a(n) _______.
+S11_T05	a(n) _______.
+S12_T05	a(n) _______.
+S13_T05	a(n) _______.
+S14_T05	a(n) _______.
+S15_T05	a(n) _______.
+S16_T05	a(n) _______.
+S17_T05	a(n) _______.
+S18_T05	a(n) _______.
+S19_T05	a(n) _______.
+S20_T05	a(n) _______.
+S21_T05	a(n) _______.
+S22_T05	a(n) _______.
+S23_T05	a(n) _______.
+S24_T05	a(n) _______.
+S25_T05	a(n) _______.
+S26_T05	a(n) _______.
+S27_T05	a(n) _______.
+S28_T05	a(n) _______.
+S29_T05	a(n) _______.
+S30_T05	a(n) _______.
+S31_T05	a(n) _______.
+S32_T05	a(n) _______.
+S33_T05	a(n) _______.
+S34_T05	a(n) _______.
+S35_T05	a(n) _______.
+S00_T06	a place where people live, and the city of Paris is a city in France. The city of
+S01_T06	a place where people live, and the city is a type of place. The city is a place
+S02_T06	a place where people live, and the city is a place where people live. So, the city
+S03_T06	a place where people live, and the city is a place where people live. So, the city
+S04_T06	a place where people live, and the city of Paris is a city in France. The city of
+S05_T06	a place where people live, and the city is a place where people live. So, the city
+S06_T06	a place where you can find all of these. Which of the following is the best example of a
+S07_T06	a city in the United States, and the United Nations: international organization. Which of the following is
+S08_T06	a city in the United States, and the United Nations: international organization. Which of the following is
+S09_T06	a city in the United States, and the United Nations: international organization. Which of the following is
+S10_T06	a city in the United States, and the United Nations: international organization. Which of the following is
+S11_T06	a city in the United States, and the United Nations: international organization. Which of the following is
+S12_T06	a city in the United States, and the United Nations: international organization. Which of the following is
+S13_T06	a place, a city, a metropolis, a big city, a metropolitan area, etc.
+S14_T06	a city in the United States, and the United Nations: international organization. Which of the following is
+S15_T06	a place, a city, a state, or a country. The question is, which of the
+S16_T06	a place, a city, a state, or a country. The question is, which of the
+S17_T06	a place where you can find all of the above. Which of the following is the best example of
+S18_T06	a place where you can find all of the above. Which of the following is the best example of
+S19_T06	a place, but also as a company, and the same for the others. So, the question
+S20_T06	a place, but also as a company, and the same for the others. So, the question
+S21_T06	a place where people live, and Samsung is a company. So, the relationship between the first and
+S22_T06	a place where you can find all of the above. Which of the following is the best example of
+S23_T06	a place where you can find all of the above. Which of the following is the best example of
+S24_T06	a place where you can find all of the above. Which of the following is the best example of
+S25_T06	a city in the United States, and the United States is a country in North America.  So
+S26_T06	a city, but also as a country. The question is, which of the following is not a
+S27_T06	a place where people live, and Samsung is a company. So, the question is, what is
+S28_T06	a place, but also as a city. The question is, which of the following is not a
+S29_T06	a city in the United States, but also as a city in the United Kingdom, and also as
+S30_T06	a city in the United States, but it is also a city in the United States. The United
+S31_T06	a city in the United States, but it is also a common abbreviation for the United States. Which
+S32_T06	a country, and Samsung is a company. So, the question is, what is the relationship between
+S33_T06	a country, and Samsung is a company. So, the question is, what is the relationship between
+S34_T06	a conjunction of three different entities. The question is, what is the commonality between these three entities
+S35_T06	a(n) _______ of the other two.
+S00_T07	a place where people live, and the city is a type of place. So, the answer is
+S01_T07	a place where people live, and the city is a place where people live. So, the city
+S02_T07	a place where people live, and the city is a place where people live. So, the city
+S03_T07	a place where people live, and it is also a place where people work. The city is also
+S04_T07	a place where people live, and the city is a place where people live. So, the city
+S05_T07	a place where people live, and the city is a place where people live. So, the city
+S06_T07	a place where people live, and the United Nations: international organization. Which of the following is a
+S07_T07	a place where you can find all of these. Which of the following is the best example of a
+S08_T07	a city in the United States, and the United Nations: international organization. Which of the following is
+S09_T07	a city in the United States, and the United Nations: international organization. Which of the following is
+S10_T07	a city in the United States. Which of the following is a correct statement? (A) All
+S11_T07	a city in the United States. Which of the following is a correct statement? (A) All
+S12_T07	a city in the United States, and the United Nations: international organization. Which of the following is
+S13_T07	a place where you can find all of the above. Which of the following is the best example of
+S14_T07	a place where you can find all of the above. Which of the following is the best example of
+S15_T07	a place where you can find all of the above. Which of the following is the best example of
+S16_T07	a place where you can find all of the above. Which of the following is the best example of
+S17_T07	a place where you can find all of the above. Which of the following is the best example of
+S18_T07	a place where you can find all of the above. Which of the following is the best example of
+S19_T07	a place where you can find a lot of different things, including a lot of different people, and
+S20_T07	a place where people live, and Samsung can be described as a company that makes electronics. The question
+S21_T07	a place where people live, and Samsung can be described as a company that makes electronics. The question
+S22_T07	a place where you can find a lot of restaurants, and Samsung can be described as a company that
+S23_T07	a city in the United States, and the United States is a country in North America. So,
+S24_T07	a city in the United States, and the United States is a country in North America. So,
+S25_T07	a city in the United States, and the United States is a country in North America. So,
+S26_T07	a city in the United States, and the United States is a country in North America. So,
+S27_T07	a place where people live, and the other two are companies. So, the answer is the first
+S28_T07	a place where people live, and Samsung is a company. So, the question is, what is
+S29_T07	a place where people live, and Samsung is a company. So, the relationship between the first and
+S30_T07	a place, but also as a concept. The term "city" is used in many contexts,
+S31_T07	a city in the United States, but it is also a common abbreviation for New York City. The
+S32_T07	a place, a person, or an organization. The question is, which of the following is not
+S33_T07	a set of elements, which are all different from each other. So, the set {Syria
+S34_T07	a set of elements, and the elements are connected by the relation of "being in the same category
+S35_T07	a person, place, or thing. So, what is the answer to the question: What is
+S00_T08	a place where people live, and it is a place where people live. The city is a place
+S01_T08	a place where people live, and the city is a type of place. The city is a place
+S02_T08	a place where people live, and the city is a place where people live. So, the city
+S03_T08	a place where people live, and the city is a place where people live. So, the city
+S04_T08	a place where people live, and the city is a type of place. The city is a place
+S05_T08	a place where people live, and the city is a place where people live. So, the city
+S06_T08	a place where people live, and the city is located in the United States. The city is known
+S07_T08	a place where people live, and the city is located in the United States. The city is also
+S08_T08	a place where people live, work, and play. The question is, what is the common feature
+S09_T08	a place where people live, and the city is located in the United States. The city is known
+S10_T08	a place where you can find all of the above. Which of the following is the best example of
+S11_T08	a place where you can find all of the above. Which of the following is the best example of
+S12_T08	a place where people live, and the city is located in the United States. The city is known
+S13_T08	a place where people live, and the city is located in the United States. The city is known
+S14_T08	a place where people live, and the other three are companies. The question is to find the odd
+S15_T08	a place where people live, and the other three are companies. The question is to find the odd
+S16_T08	a place where people live, and the other three are companies. The question is to find the odd
+S17_T08	a place where people live, and Samsung can be described as a company that makes electronics. The question
+S18_T08	a city in the United States, and the United States is a country in North America. So,
+S19_T08	a place where people live, and the other three are companies. The question is to find the odd
+S20_T08	a city in the United States, and the United Nations: international organization. Which of the following is
+S21_T08	a place where people live, and the other three are companies. The question is, which one is
+S22_T08	a city in the United States, and the United States is a country in North America. So,
+S23_T08	a city in the United States, and also as a city in the United Arab Emirates. The city
+S24_T08	a city in the United States, and also as a city in the United Kingdom. The city of
+S25_T08	a city in the United States, and also as a city in the United Kingdom. The city of
+S26_T08	a place, a city, or a state. The question is, what is the relationship between these
+S27_T08	a city, but also as a type of government. What is the common feature of these four items
+S28_T08	a place, a city, or a state. The question is, what is the relationship between these
+S29_T08	a city, but also as a state in the United States. The term "city" is used
+S30_T08	a city, but also as a state in the United States. The term "city" is used
+S31_T08	a country, a city, or a state. The term "city" is a common noun,
+S32_T08	a set of elements with a common property. Which of the following is not a set? A.
+S33_T08	a set of elements that are all of the same type. Which of the following is not a set
+S34_T08	a set of elements that are not related to each other. Which of the following is not a set
+S35_T08	a country, a person, or a company. The question is, what is the relationship between these
+S00_T09	a place where people live, and the other two are companies. So, the odd one out is
+S01_T09	a place where people live, and the other three are companies. The question is to find the one
+S02_T09	a place where people live, and the city is located in the United States. The city is known
+S03_T09	a place where people live, and the city is located in the United States. The city is known
+S04_T09	a place where people live, and the other three are companies. The question is, which one is
+S05_T09	a place where people live, and the city is located in the United States. The city is known
+S06_T09	a place, a city, a town, a village, or a neighborhood. The question is,
+S07_T09	a place where people can go to eat, sleep, and work. Which of the following is the
+S08_T09	a place where you can find all of the above. Which of the following is the best example of
+S09_T09	a place where you can find all of the above. Which of the following is the best example of
+S10_T09	a place where these three entities are located. What is the name of the city? The answer is
+S11_T09	a place where you can find all of the above. Which of the following is the best example of
+S12_T09	a place where you can find all of the above. Which of the following is the best example of
+S13_T09	a place where you can find all of the above. Which of the following is the best example of
+S14_T09	a place where people can go to enjoy the nightlife, and the place is known for its iconic skyline
+S15_T09	a place where people live, and the other three are companies. The question is to find the one
+S16_T09	a place where people live, and the other three are companies. The question is to find the one
+S17_T09	a place where people live, and the other three are companies. The question is to find the odd
+S18_T09	a place where people live, and the other three are companies. The question is to find the one
+S19_T09	a place where people live, and the other three are companies. The question is to find the odd
+S20_T09	a place where people live, and the other three are companies. The question is, which one is
+S21_T09	a place where people live, and the city is located in the United States. Which of the following
+S22_T09	a place where people live, and the city is located in the United States. The city is known
+S23_T09	a city in the United States, and the United Nations: international organization. Which of the following is
+S24_T09	a city, but it can also be a term used in mathematics. Which of the following is the
+S25_T09	a city in the United States, and the United Nations: international organization. Which of the following is
+S26_T09	a place where people live, and also as a place where people work. The city of New York
+S27_T09	a place where people live, and also as a place where people work. The city of New York
+S28_T09	a place, a city, or a country. The question is, what is the common feature between
+S29_T09	a place, a person, or an organization. The question is, what is the relationship between these
+S30_T09	a place, person, or thing. The question is, what is the common feature between these three
+S31_T09	a country, a person, or a company. The question is, what is the value of the
+S32_T09	a country, a person, or a company. The question is, what is the value of the
+S33_T09	a country, a person, or a company. The question is, what is the value of the
+S34_T09	a country, person, or company. The question is, what is the value of the expression:
+S35_T09	a country, person, or company. The question is, what is the common feature of these three
+S00_T10	a place where people live, and the other two are companies. Which of the following is a company
+S01_T10	a place, a person, or an organization. The question is, what is the relationship between the
+S02_T10	a place where people live, and the other two are companies. Which of the following is the correct
+S03_T10	a place where people live, and the other three are entities that can be described as organizations. Which
+S04_T10	a place where people live, and the other two are entities that provide goods and services. The question
+S05_T10	a place where people can find a variety of things. Which of the following is the most appropriate to
+S06_T10	a place, a person, or an object. The question is, what is the common feature of
+S07_T10	a place, a city, a place where people live, a place where people live in a city
+S08_T10	a place, a city, a metropolis, a big city, a place of culture, a
+S09_T10	a place where you can find all of the above. Which of the following is the best example of
+S10_T10	a place where these three entities are located. The question is, what is the common characteristic of these
+S11_T10	a place where these three entities intersect. What is the connection between these three entities? What is the
+S12_T10	a place where these three entities are located. What is the name of the city? The answer is
+S13_T10	a place where these three entities are located. What is the name of the city? The answer is
+S14_T10	a place, a city, a place where people live, a place where people work, a place
+S15_T10	a place where these three entities are located. What is the name of the city? The answer is
+S16_T10	a place where these three entities are located. What is the answer to this riddle? The answer
+S17_T10	a place where people live, and the other three are companies. The question is, which one is
+S18_T10	a city in the United States, and also as a financial center. Which of the following is a
+S19_T10	a city in the United States, and the United Nations: international organization. Which of the following is
+S20_T10	a city, a state, or a country. The question is, which of the following is not
+S21_T10	a city in the United States, and also as a type of government. What is the common feature
+S22_T10	a city in the United States, and the United Nations: international organization. Which of the following is
+S23_T10	a city in the United States, and also as a city in the United States. The question is
+S24_T10	a city, but it is also a state in the United States. The question is, what is
+S25_T10	a city, but it's also a state in the United States. The same is true for the
+S26_T10	a city, but it's also a state in the United States. Which of the following is the
+S27_T10	a city, a state, or a country. The question is, what is the common feature between
+S28_T10	a place, a city, or a state. The question is, what is the common feature between
+S29_T10	a place, a city, or a region. The question is, which of the following is not
+S30_T10	a city, but it is also a state in the United States. Which of the following is the
+S31_T10	a place, a person, or an object. The question is, what is the relationship between the
+S32_T10	a place, person, or thing. The question is, what is the relationship between these three?
+S33_T10	a country, a person, or a company. The question is, what is the relationship between the
+S34_T10	a country, a person, or a company. The question is, what is the relationship between the
+S35_T10	a country, a person, or a company. The question is, what is the relationship between these
+S00_T11	a place where people live, and the other three are companies. The question is to find the one
+S01_T11	a place where people live, and the other three are companies. The question is, which one is
+S02_T11	a place where people live, and the other three are companies. The question is to find the one
+S03_T11	a place, a city, or a state. The question is, what is the common link between
+S04_T11	a place, a person, or an object. The question is to find the most appropriate category for
+S05_T11	a place, a person, or an object. The question is, what is the relationship between these
+S06_T11	a place where people live, and the other two are entities that provide goods and services. The question
+S07_T11	a place where people live, and the other three are companies. The question is, which one is
+S08_T11	a place where people live, and the other three are companies. The question is, which one is
+S09_T11	a place, a person, or an object. The question is, what is the common feature between
+S10_T11	a place where you can find all of the above. Which of the following is the best example of
+S11_T11	a place where you can find all of the above. Which of the following is the best example of
+S12_T11	a place where people live, and the other three are companies. The question is, which one is
+S13_T11	a place where people live, and the other three are companies. The question is, which one is
+S14_T11	a place, a person, or an object. The question is, what is the common feature between
+S15_T11	a place where these three entities are located. What is the answer to this riddle? The answer
+S16_T11	a place where these three entities are located. What is the answer to this riddle? The answer
+S17_T11	a place, a person, or an object. The question is, what is the relationship between these
+S18_T11	a place, a person, or an object. The question is, what is the common feature between
+S19_T11	a place, a person, or an object. The question is, what is the common feature between
+S20_T11	a place, a person, or an object. The question is, what is the common feature between
+S21_T11	a place, a person, or an object. The question is, what is the common feature between
+S22_T11	a city, but it is also a state in the United States. Which of the following is the
+S23_T11	a city in the United States, and the United Nations: international organization. Which of the following is
+S24_T11	a city in the United States, and the United Nations: international organization. Which of the following is
+S25_T11	a city in the United States, and the United Nations: international organization. Which of the following is
+S26_T11	a city, a state, or a country. The question is, which of the following is not
+S27_T11	a place, a person, or an object. The question is, what is the common feature between
+S28_T11	a place, a person, or an object. The question is, what is the common feature between
+S29_T11	a city, but it's also a state, and it's also a country. Which of the
+S30_T11	a city in the United States, and the United States is a country in North America. Which of
+S31_T11	a city in the United States, and the United States is a country in North America. Which of
+S32_T11	a city in the United States, and the United States is a country in North America. Which of
+S33_T11	a place where people live, and the other two are companies. Which of the following is the correct
+S34_T11	a country, a person, or a company. The question is, what is the answer to the
+S35_T11	a person, place, thing, or idea.  The question is, what is the answer to
+S00_T12	a place where people live, and the other three are people who work in the entertainment industry. The
+S01_T12	a place where people live, and the other three are companies. Which of the following is the correct
+S02_T12	a place where people live, and the other three are companies. Which of the following is the correct
+S03_T12	a place, person, or thing. The question is, what is the common feature between these three
+S04_T12	a place where people live, and the other three are companies. Which of the following is the correct
+S05_T12	a place where people live, and the other three are companies. Which of the following is the correct
+S06_T12	a place where people live, and the other three are companies. Which of the following is the correct
+S07_T12	a place where people live, and the other three are entities that are not places. The question is
+S08_T12	a place, a person, or an object. The question is, what is the relationship between the
+S09_T12	a place, a person, or an object. The question is, what is the common feature between
+S10_T12	a place where people live, and the other three are companies. The question is, which one is
+S11_T12	a place where people live, and the other three are people who work in the entertainment industry. The
+S12_T12	a place, person, or thing. The question is, what is the common feature between these three
+S13_T12	a place, person, or thing. The question is, what is the common feature between these three
+S14_T12	a place, person, or thing. The question is, what is the common feature between these three
+S15_T12	a place, person, or thing. The question is, what is the common feature between these three
+S16_T12	a place, person, or thing. The question is, what is the common feature between these three
+S17_T12	a place, person, or thing. The question is, what is the common feature between these three
+S18_T12	a place, person, or thing. The question is, what is the common feature between these three
+S19_T12	a place, person, or thing. The question is, what is the common feature between these three
+S20_T12	a place, person, or thing. The question is, what is the common feature between these three
+S21_T12	a place, person, or thing. The question is, what is the common feature between these three
+S22_T12	a place, person, or thing. The question is, what is the common feature between these four
+S23_T12	a place, person, or thing. The question is, what is the common feature of these four
+S24_T12	a place, person, or thing. The question is, what is the common feature of these four
+S25_T12	a place, person, or thing. The question is, what is the common feature between these four
+S26_T12	a place, person, or thing. The question is, what is the common feature between these four
+S27_T12	a place, person, or thing. The question is, what is the common feature between these three
+S28_T12	a place, person, or thing. The question is, what is the common feature between these four
+S29_T12	a city in the United States. Which of the following is the most similar in logical structure to the
+S30_T12	a city in the United States. Which of the following is the most similar in logical structure to the
+S31_T12	a place, a person, or an object. The question is, what is the common feature of
+S32_T12	a city in the United States. Which of the following is the most similar in logical structure to the
+S33_T12	a country, a person, or a company. The question is, what is the common feature of
+S34_T12	a country, a person, or a company. The question is, what is the common feature of
+S35_T12	a country in the Middle East, a famous American actor, and a South Korean multinational electronics corporation.
+S00_T13	a place, person, or thing. The question is, what is the common feature between these three
+S01_T13	a place, person, or thing. The question is, what is the commonality between these three
+S02_T13	a place, person, or thing. The question is, what is the common feature between these three
+S03_T13	a place, person, or thing. The question is, what is the common feature between these three
+S04_T13	a place, person, or thing. The question is to find the most appropriate answer for the given
+S05_T13	a place, person, or thing. The question is, what is the common feature between these four
+S06_T13	a place where people live, and the other two are entities that provide goods and services. The question
+S07_T13	a place, person, or thing. The question is, what is the common feature between these three
+S08_T13	a place, person, or thing. The question is, what is the common feature between these four
+S09_T13	a city in the United States. Which of the following is the most similar in logical structure to the
+S10_T13	a place, person, or thing. The question is, what is the common feature between these four
+S11_T13	a place, person, or thing. The question is, what is the common feature between these three
+S12_T13	a place, person, or thing. The question is, what is the common feature between these three
+S13_T13	a place, person, or thing. The question is, what is the common feature between these three
+S14_T13	a place, person, or thing. The question is, what is the common feature between these three
+S15_T13	a place, person, or thing. The question is, what is the common feature between these three
+S16_T13	a place, person, or thing. The question is, what is the common feature between these three
+S17_T13	a place, person, or thing. The question is, what is the common feature between these three
+S18_T13	a place, person, or thing. The question is, what is the common feature between these three
+S19_T13	a place, person, or thing. The question is, what is the common feature between these three
+S20_T13	a place, person, or thing. The question is, what is the common feature between these three
+S21_T13	a place, person, or thing. The question is, what is the common feature between these three
+S22_T13	a place, person, or thing. The question is, what is the common feature between these three
+S23_T13	a place, person, or thing. The question is, what is the common feature between these three
+S24_T13	a place, person, or thing. The question is, what is the common feature between these three
+S25_T13	a place, person, or thing. The question is, what is the common feature between these four
+S26_T13	a place, person, or thing. The question is, what is the common feature between these three
+S27_T13	a country in the Middle East, and the other two can be described as companies. So, the
+S28_T13	a(n) _______.
+S29_T13	a place, person, or thing. The question is to find the most appropriate answer for the given
+S30_T13	a place, person, or thing. The question is, what is the common feature between these three
+S31_T13	a city in the United States. Which of the following is the most similar in relation to the above
+S32_T13	a city in the United States, and the United Nations: international organization. Which of the following is
+S33_T13	a country, a person, or a company. The question is, what is the value of the
+S34_T13	a country, a person, or a company. The question is, what is the common feature of
+S35_T13	a country in the Middle East, and the other three can be described as entities that are not countries
+S00_T14	a place, person, or thing. The question is, what is the relationship between the three?
+S01_T14	a place, person, or thing. The question is, what is the answer to the riddle
+S02_T14	a place, person, or thing. The question is, what is the relationship between the three?
+S03_T14	a place, person, or thing. The question is, what is the relationship between the three?
+S04_T14	a place, person, or thing. The question is, what is the answer to the riddle
+S05_T14	a city in the United States. Which of the following is the most similar in relation to the above
+S06_T14	a place, person, or thing. The question is, what is the answer to the riddle
+S07_T14	a place, person, or thing. The question is, what is the relationship between the three?
+S08_T14	a place, person, or thing. The question is, what is the relationship between the three?
+S09_T14	a place, person, or thing. The question is, what is the relationship between the three?
+S10_T14	a place, person, or thing. The question is, what is the relationship between the three?
+S11_T14	a place, person, or thing. The question is, what is the answer to the riddle
+S12_T14	a place, person, or thing. The question is, what is the answer to the riddle
+S13_T14	a place, person, or thing. The question is, what is the answer to the riddle
+S14_T14	a place, person, or thing. The question is, what is the answer to the riddle
+S15_T14	a place, person, or thing. The question is, what is the answer to the riddle
+S16_T14	a place, person, or thing. The question is, what is the common feature between these three
+S17_T14	a place, person, or thing. The question is, what is the answer to the riddle
+S18_T14	a place, person, or thing. The question is, what is the common feature between these three
+S19_T14	a place, person, or thing. The question is, what is the answer to the riddle
+S20_T14	a place, person, or thing. The question is, what is the common feature between these four
+S21_T14	a place, person, or thing. The question is, what is the answer to the riddle
+S22_T14	a place, person, or thing. The question is, what is the answer to the riddle
+S23_T14	a place, person, or thing. The question is, what is the common feature between these three
+S24_T14	a place, person, or thing. The question is, what is the relationship between the three?
+S25_T14	a place, person, or thing. The question is, what is the relationship between the three?
+S26_T14	a place, person, or thing. What is the relationship between the three? The question is asking
+S27_T14	a place, person, or thing. What is the relationship between the three? The question is asking
+S28_T14	a place, person, or thing. What is the relationship between the four elements? The four elements
+S29_T14	a place, person, or thing. What is the relationship between the four elements? The question is
+S30_T14	a place, person, or thing. What is the relationship between the three? The question is asking
+S31_T14	a place, person, or thing. What is the relationship between the three? The question is asking
+S32_T14	a place, person, or thing. The question is, what is the answer to the riddle
+S33_T14	a place, person, or thing. What is the answer to the riddle? The answer is
+S34_T14	a place, a person, or an object. The question is, what is the answer to the
+S35_T14	a person, place, thing, or idea. The question is, what is the answer to the
+S00_T15	a place, person, or thing. The question is, what is the relationship between the three?
+S01_T15	a person, place, thing, or idea. The question is, what is the answer to the
+S02_T15	a place, person, or thing. The question is, what is the relationship between the three?
+S03_T15	a place, person, or thing. The question is, what is the relationship between the three?
+S04_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S05_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S06_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S07_T15	a place, person, or thing. The question is, what is the relationship between the three?
+S08_T15	a person, place, or thing. What is the relationship between the four elements? The four elements
+S09_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S10_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S11_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S12_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S13_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S14_T15	a place, person, or thing. The question is, what is the common feature between these three
+S15_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S16_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S17_T15	a place, person, or thing. The question is, what is the common feature between these three
+S18_T15	a place, person, or thing. The question is, what is the common feature between these three
+S19_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S20_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S21_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S22_T15	a place, person, or thing. The question is, what is the relationship between the three?
+S23_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S24_T15	a place, person, or thing. The question is, what is the relationship between the three?
+S25_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S26_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S27_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S28_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S29_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S30_T15	a place, person, or thing. The question is, what is the answer to the riddle
+S31_T15	a city in the United States, and the United Nations: international organization. Which of the following is
+S32_T15	a place, person, or thing. What is the relationship between the four elements? The four elements
+S33_T15	a place, person, or thing. What is the answer to the riddle? The answer is
+S34_T15	a place, person, or thing. The question is to find the most appropriate answer for the blank
+S35_T15	a person, place, or thing. What is the answer to the riddle? The answer is
+S00_T16	a person, place, thing, or idea. The question is, what is the answer to the
+S01_T16	a country in the Middle East, and the other three are people or companies. So, the answer
+S02_T16	a place, person, or thing. The question is, what is the relationship between the three?
+S03_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S04_T16	a city in the United States, and the United Nations: international organization. Which of the following is
+S05_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S06_T16	a place, person, or thing. The question is to find the most appropriate answer for the given
+S07_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S08_T16	a place, person, or thing. The question is, what is the relationship between the three?
+S09_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S10_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S11_T16	a place, person, or thing. The question is, what is the relationship between the three?
+S12_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S13_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S14_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S15_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S16_T16	a place, person, or thing. The question is, what is the relationship between the three?
+S17_T16	a place, person, or thing. The question is, what is the relationship between the three?
+S18_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S19_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S20_T16	a place, person, or thing. The question is, what is the relationship between the three?
+S21_T16	a place, person, or thing. The question is, what is the relationship between the three?
+S22_T16	a place, person, or thing. The question is, what is the relationship between the three?
+S23_T16	a place, person, or thing. The question is, what is the relationship between the three?
+S24_T16	a place, person, or thing. The question is, what is the relationship between the three?
+S25_T16	a place, person, or thing. The question is, what is the relationship between the three?
+S26_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S27_T16	a country, a person, or a company. The question is, what is the relationship between the
+S28_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S29_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S30_T16	a country, a person, or a company. The question is, what is the relationship between the
+S31_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S32_T16	a place, person, or thing. The question is, what is the answer to the riddle
+S33_T16	a country, a person, or a company. The question is, what is the value of x
+S34_T16	a country, a person, or a company. The question is, what is the value of x
+S35_T16	a person, place, or thing. What is the answer to the riddle? The answer is
+S00_T17	a place, person, or thing. The question is, what is the relationship between the three?
+S01_T17	a place, person, or thing. The question is, what is the answer to the riddle
+S02_T17	a place, person, or thing. The question is, what is the answer to the riddle
+S03_T17	a place, person, or thing. The question is, what is the answer to the riddle
+S04_T17	a place, person, or thing. The question is, what is the answer to the riddle
+S05_T17	a place, person, or thing. The question is, what is the answer to the riddle
+S06_T17	a city in the United States. Which of the following is the most similar to the relationship between the
+S07_T17	a person, place, or thing. What is the common feature of these four items? The answer
+S08_T17	a place, person, or thing. The question is, what is the relationship between the three?
+S09_T17	a place, person, or thing. The question is, what is the relationship between the three?
+S10_T17	a place, person, or thing. The question is, what is the relationship between the three?
+S11_T17	a place, person, or thing. The question is, what is the relationship between the three?
+S12_T17	a place, person, or thing. The question is, what is the answer to the riddle
+S13_T17	a place, person, or thing. The question is, what is the relationship between the three?
+S14_T17	a place, person, or thing. The question is, what is the answer to the riddle
+S15_T17	a place, person, or thing. The question is, what is the relationship between the three?
+S16_T17	a place, person, or thing. The question is, what is the answer to the riddle
+S17_T17	a place, person, or thing. The question is, what is the answer to the riddle
+S18_T17	a place, person, or thing. The question is, what is the answer to the riddle
+S19_T17	a place, person, or thing. The question is, what is the answer to the riddle
+S20_T17	a place, person, or thing. The question is, what is the answer to the riddle
+S21_T17	a place, person, or thing. The question is, what is the relationship between the three?
+S22_T17	a place, person, or thing. The question is, what is the answer to the riddle
+S23_T17	a place, person, or thing. The question is, what is the relationship between the three?
+S24_T17	a place, person, or thing. The question is, what is the relationship between the three?
+S25_T17	a place, person, or thing. The question is, what is the relationship between the three?
+S26_T17	a place, person, or thing. The question is, what is the answer to the riddle
+S27_T17	a country in the Middle East, and the other three are not. The question is, which one
+S28_T17	a country in the Middle East, and the other three are people or companies. So, the answer
+S29_T17	a country, a person, or a company. The question is, what is the relationship between the
+S30_T17	a country, a person, or a company. The question is, what is the relationship between the
+S31_T17	a country, a person, or a company. The question is, what is the relationship between the
+S32_T17	a country, a person, or a company. The question is, what is the value of x
+S33_T17	a country in the Middle East, and the country is not Syria. Which of the following is the
+S34_T17	a city in the United States, and the United Nations: international organization. Which of the following is
+S35_T17	a person, place, or thing. What is the answer to the riddle? The answer is
+S00_T18	a country in the Middle East, and the other three are not. So, the answer is Syria
+S01_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S02_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S03_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S04_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S05_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S06_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S07_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S08_T18	a place, person, or thing. The question is, what is the relationship between the three?
+S09_T18	a place, person, or thing. The question is, what is the relationship between the three?
+S10_T18	a place, person, or thing. The question is, what is the relationship between the three?
+S11_T18	a place, person, or thing. The question is, what is the relationship between the three?
+S12_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S13_T18	a place, person, or thing. The question is, what is the relationship between the three?
+S14_T18	a place, person, or thing. The question is, what is the relationship between the three?
+S15_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S16_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S17_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S18_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S19_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S20_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S21_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S22_T18	a country in the Middle East, and the other three are people or companies. So, the answer
+S23_T18	a country in the Middle East, and the other three are people or companies. So, the answer
+S24_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S25_T18	a country in the Middle East, and the other three are not. The question is, which one
+S26_T18	a country in the Middle East, and the other three are not. The question is, which one
+S27_T18	a country in the Middle East, and the other three are not. The question is, which one
+S28_T18	a country in the Middle East, and the other three are not. The question is, which one
+S29_T18	a country in the Middle East, and the other three are not. So, the answer is Syria
+S30_T18	a country in the Middle East, and the other three are people or companies. So, the answer
+S31_T18	a country in the Middle East, and the other three are not. The question is, which one
+S32_T18	a place, person, or thing. The question is, what is the answer to the riddle
+S33_T18	a city in the United States. Which of the following is the most similar to the relationship between the
+S34_T18	a city in the United States, and the United Nations: international organization. Which of the following is
+S35_T18	a person, place, or thing. What is the relationship between the first and the second? What
+S00_T19	a person, place, or thing. What is the answer to the riddle? The answer is
+S01_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S02_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S03_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S04_T19	a person, place, or thing. What is the answer to the riddle? The answer is
+S05_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S06_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S07_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S08_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S09_T19	a person, place, or thing. What is the answer to the riddle? The answer is
+S10_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S11_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S12_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S13_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S14_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S15_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S16_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S17_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S18_T19	a place, person, or thing. The question is, what is the relationship between the three?
+S19_T19	a place, person, or thing. The question is, what is the answer to the riddle
+S20_T19	a place, person, or thing. The question is, what is the relationship between the three?
+S21_T19	a person, place, thing, or idea. What is the common feature of these four items?
+S22_T19	a country in the Middle East, and the other three are people or companies. So, the answer
+S23_T19	a person, place, thing, or idea. What is the answer to the question: What is
+S24_T19	a country in the Middle East, and the other three are people or companies. So, the answer
+S25_T19	a country in the Middle East, and the other three are people or companies. So, the answer
+S26_T19	a country in the Middle East, and the other three are people or companies. So, the answer
+S27_T19	a person, place, or thing. What is the answer to the riddle? The answer is
+S28_T19	a person, place, thing, or idea. What is the answer to the riddle? The
+S29_T19	a country in the Middle East, and the other three are people or companies. So, the answer
+S30_T19	a country in the Middle East, and the other three are people or companies. So, the answer
+S31_T19	a country in the Middle East, and the other three are not. So, the answer is Syria
+S32_T19	a place, person, or thing. What is the relationship between the four elements? The four elements
+S33_T19	a place, person, or thing. What is the relationship between the four elements? The four elements
+S34_T19	a set of numbers, and the set of numbers is a set of numbers. The set of numbers
+S35_T19	a person, place, thing, or idea. What is the answer to the question: What is
+S00_T20	a person, place, or thing. What is the relationship between the four elements? The four elements
+S01_T20	a person, place, or thing. What is the answer to the riddle? The answer is
+S02_T20	a person, place, or thing. What is the relationship between the four elements? The four elements
+S03_T20	a person, place, or thing. What is the answer to the question: What is the answer
+S04_T20	a person, place, or thing. What is the answer to the riddle? The answer is
+S05_T20	a person, place, or thing. What is the answer to the riddle? The answer is
+S06_T20	a person, place, or thing. What is the answer to the riddle? The answer is
+S07_T20	a person, place, or thing. What is the relationship between the four elements? The four elements
+S08_T20	a person, place, or thing. What is the relationship between the four elements? The four elements
+S09_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S10_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S11_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S12_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S13_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S14_T20	a place, person, or thing. The question is, what is the relationship between the three?
+S15_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S16_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S17_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S18_T20	a person, place, or thing. What is the relationship between the four elements? The four elements
+S19_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S20_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S21_T20	a person, place, thing, or idea. What is the answer to the question: What is
+S22_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S23_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S24_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S25_T20	a person, place, thing, or idea. What is the answer to the question: What is
+S26_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S27_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S28_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S29_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S30_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S31_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S32_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S33_T20	a country in the Middle East, and the other three are people or companies. So, the answer
+S34_T20	a place, person, or thing. What is the relationship between the four elements? The four elements
+S35_T20	a person, place, thing, or idea. The question is, what is the answer to the
+S00_T21	a person, place, or thing. What is the answer to the riddle? The answer is
+S01_T21	a person, place, or thing. What is the relationship between the four elements? The four elements
+S02_T21	a person, place, or thing. What is the answer to the question: What is the answer
+S03_T21	a person, place, or thing. What is the answer to the question: What is the answer
+S04_T21	a person, place, thing, or idea. What is the answer to the question: What is
+S05_T21	a person, place, thing, or idea. What is the answer to the question: What is
+S06_T21	a person, place, or thing. What is the relationship between the four elements? The four elements
+S07_T21	a place, person, or thing. The question is, what is the answer to the riddle
+S08_T21	a person, place, thing, or idea. What is the value of x? The question is
+S09_T21	a person, place, thing, or idea. What is the answer to the question: What is
+S10_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S11_T21	a person, place, thing, or idea. What is the answer to the question: What is
+S12_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S13_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S14_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S15_T21	a person, place, thing, or idea. What is the answer to the question: What is
+S16_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S17_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S18_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S19_T21	a person, place, thing, or idea. What is the answer to the question: What is
+S20_T21	a person, place, thing, or idea. What is the answer to the question: What is
+S21_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S22_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S23_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S24_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S25_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S26_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S27_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S28_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S29_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S30_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S31_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S32_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S33_T21	a country in the Middle East, and the other three are people or companies. So, the answer
+S34_T21	a place, person, or thing. The question is, what is the relationship between the three?
+S35_T21	a person, place, thing, or idea. What is the answer to the question: What is
+S00_T22	a person, place, thing, or idea. What is the answer to the question: What is
+S01_T22	a person, place, thing, or idea. What is the answer to the question: What is
+S02_T22	a person, place, or thing. What is the relationship between the four elements? The four elements
+S03_T22	a person, place, or thing. What is the relationship between the four elements? The four elements
+S04_T22	a person, place, thing, or idea. The question is, what is the answer to the
+S05_T22	a person, place, thing, or idea. What is the answer to the question: What is
+S06_T22	a person, place, thing, or idea. The question is, what is the answer to the
+S07_T22	a person, place, thing, or idea. What is the value of x? The question is
+S08_T22	a person, place, thing, or idea. What is the value of x? The question is
+S09_T22	a person, place, thing, or idea. What is the value of x? The question is
+S10_T22	a country in the Middle East, and the other three are people or companies. So, the answer
+S11_T22	a person, place, thing, or idea. What is the value of x? The question is
+S12_T22	a person, place, thing, or idea. What is the value of x? The question is
+S13_T22	a country in the Middle East, and the other three are people or companies. So, the answer
+S14_T22	a person, place, thing, or idea. What is the value of x? The question is
+S15_T22	a person, place, thing, or idea. What is the value of x? The question is
+S16_T22	a person, place, thing, or idea. What is the value of x? The question is
+S17_T22	a person, place, thing, or idea. What is the answer to the question: What is
+S18_T22	a person, place, thing, or idea. What is the answer to the question: What is
+S19_T22	a person, place, thing, or idea. What is the answer to the question: What is
+S20_T22	a person, place, thing, or idea. What is the answer to the question: What is
+S21_T22	a person, place, thing, or idea. What is the answer to the question: What is
+S22_T22	a person, place, thing, or idea. What is the answer to the question: What is
+S23_T22	a country in the Middle East, and the other three are people or companies. So, the answer
+S24_T22	a country in the Middle East, and the other three are people or companies. So, the answer
+S25_T22	a country in the Middle East, and the other three are people or companies. So, the answer
+S26_T22	a country in the Middle East, and the other three are people or companies. So, the answer
+S27_T22	a country in the Middle East, and the other three are people or companies. So, the answer
+S28_T22	a country in the Middle East, and the other three are people or companies. So, the answer
+S29_T22	a country in the Middle East, and the other three are people or companies. So, the answer
+S30_T22	a country in the Middle East, and the other three are people or companies. So, the answer
+S31_T22	a country in the Middle East, and the other three are people or companies. So, the answer
+S32_T22	a country in the Middle East, and the other three are people or companies. So, the answer
+S33_T22	a country in the Middle East, and the other three are people or companies. So, the answer
+S34_T22	a city in the United States. Which of the following is the most similar to the relationship between the
+S35_T22	a person, place, thing, or idea. What is the answer to the question: What is
+S00_T23	a person, place, or thing. What is the value of x? The question is a bit
+S01_T23	a person, place, or thing. What is the value of x? The question is a bit
+S02_T23	a person, place, or thing. What is the value of x? The question is a bit
+S03_T23	a person, place, or thing. What is the value of x? The question is a bit
+S04_T23	a person, place, or thing. What is the relationship between the four elements? The question is
+S05_T23	a person, place, or thing. What is the value of x? The question is a bit
+S06_T23	a person, place, thing, or idea. What is the value of x? The question is
+S07_T23	a person, place, thing, or idea. What is the value of x? The question is
+S08_T23	a person, place, thing, or idea. What is the value of x? The question is
+S09_T23	a person, place, thing, or idea. What is the value of x? The question is
+S10_T23	a person, place, thing, or idea. What is the value of x? The question is
+S11_T23	a person, place, thing, or idea. What is the value of x? The question is
+S12_T23	a person, place, thing, or idea. What is the value of x? The question is
+S13_T23	a person, place, thing, or idea. What is the value of x? The question is
+S14_T23	a person, place, thing, or idea. What is the value of x? The question is
+S15_T23	a person, place, thing, or idea. What is the value of x? The question is
+S16_T23	a person, place, thing, or idea. What is the value of x? The question is
+S17_T23	a person, place, thing, or idea. What is the value of x? The question is
+S18_T23	a person, place, thing, or idea. What is the value of x? The question is
+S19_T23	a person, place, thing, or idea. What is the value of x? The question is
+S20_T23	a person, place, thing, or idea. What is the value of x? The question is
+S21_T23	a person, place, thing, or idea. What is the value of x? The question is
+S22_T23	a person, place, thing, or idea. What is the value of x? The question is
+S23_T23	a person, place, thing, or idea. What is the value of x? The question is
+S24_T23	a person, place, thing, or idea. What is the value of x? The question is
+S25_T23	a person, place, thing, or idea. What is the value of x? The question is
+S26_T23	a person, place, thing, or idea. What is the value of x? The question is
+S27_T23	a person, place, thing, or idea. What is the value of x? The question is
+S28_T23	a person, place, thing, or idea. What is the value of x? The question is
+S29_T23	a person, place, thing, or idea. What is the value of x? The question is
+S30_T23	a country in the Middle East, and the other three are people or companies. So, the answer
+S31_T23	a country in the Middle East, and the other three are people or companies. So, the answer
+S32_T23	a country in the Middle East, and the other three are people or companies. So, the answer
+S33_T23	a person, place, thing, or idea. What is the value of x? The question is
+S34_T23	a city in the United States. Which of the following is the most similar to the relationship between the
+S35_T23	a person, place, thing, or idea. What is the value of x? The question is
+S00_T24	a person, place, or thing. What is the value of x? The question is a bit
+S01_T24	a person, place, or thing. What is the relationship between the four elements? The question is
+S02_T24	a person, place, thing, or idea. What is the value of x? The question is
+S03_T24	a person, place, thing, or idea. The question is, what is the answer to the
+S04_T24	a person, place, thing, or idea. What is the value of x? The question is
+S05_T24	a person, place, thing, or idea. What is the value of x? The question is
+S06_T24	a person, place, thing, or idea. What is the value of x? The question is
+S07_T24	a person, place, thing, or idea. What is the value of x? The question is
+S08_T24	a person, place, thing, or idea. What is the value of x? The question is
+S09_T24	a person, place, thing, or idea. What is the value of x? The question is
+S10_T24	a person, place, thing, or idea. What is the value of x? The question is
+S11_T24	a person, place, thing, or idea. What is the value of x? The question is
+S12_T24	a person, place, thing, or idea. What is the value of x? The question is
+S13_T24	a person, place, thing, or idea. What is the value of x? The question is
+S14_T24	a person, place, thing, or idea. What is the value of x? The question is
+S15_T24	a person, place, thing, or idea. What is the value of x? The question is
+S16_T24	a person, place, thing, or idea. What is the value of x? The question is
+S17_T24	a person, place, thing, or idea. What is the value of x? The question is
+S18_T24	a person, place, thing, or idea. What is the value of x? The question is
+S19_T24	a person, place, thing, or idea. What is the value of x? The question is
+S20_T24	a person, place, thing, or idea. What is the value of x? The question is
+S21_T24	a person, place, thing, or idea. What is the value of x? The question is
+S22_T24	a person, place, thing, or idea. What is the value of x? The question is
+S23_T24	a person, place, thing, or idea. What is the value of x? The question is
+S24_T24	a person, place, thing, or idea. What is the value of x? The question is
+S25_T24	a person, place, thing, or idea. What is the value of x? The question is
+S26_T24	a person, place, thing, or idea. What is the value of x? The question is
+S27_T24	a person, place, thing, or idea. What is the value of x? The question is
+S28_T24	a person, place, thing, or idea. What is the value of x? The question is
+S29_T24	a person, place, thing, or idea. What is the value of x? The question is
+S30_T24	a person, place, thing, or idea. What is the value of x? The question is
+S31_T24	a country in the Middle East, and the other three are people or companies. So, the answer
+S32_T24	a person, place, thing, or idea. What is the value of x? The question is
+S33_T24	a person, place, thing, or idea. What is the value of x? The question is
+S34_T24	a city in the United States. Which of the following is the most similar to the relationship between the
+S35_T24	a person, place, thing, or idea. The question is, what is the value of x
+S00_T25	a person, place, thing, or idea. What is the value of x? The question is
+S01_T25	a person, place, or thing. What is the value of x? The question is a bit
+S02_T25	a person, place, thing, or idea. What is the value of x? The question is
+S03_T25	a person, place, thing, or idea. The question is, what is the answer to the
+S04_T25	a person, place, thing, or idea. What is the value of x? The question is
+S05_T25	a person, place, thing, or idea. What is the value of x? The question is
+S06_T25	a person, place, thing, or idea. What is the value of x? The question is
+S07_T25	a person, place, thing, or idea. What is the value of x? The question is
+S08_T25	a person, place, thing, or idea. What is the value of x? The question is
+S09_T25	a person, place, thing, or idea. What is the value of x? The question is
+S10_T25	a person, place, thing, or idea. What is the value of x? The question is
+S11_T25	a person, place, thing, or idea. What is the value of x? The question is
+S12_T25	a person, place, thing, or idea. What is the value of x? The question is
+S13_T25	a person, place, thing, or idea. What is the value of x? The question is
+S14_T25	a person, place, thing, or idea. What is the value of x? The question is
+S15_T25	a person, place, thing, or idea. What is the value of x? The question is
+S16_T25	a person, place, thing, or idea. What is the value of x? The question is
+S17_T25	a person, place, thing, or idea. What is the value of x? The question is
+S18_T25	a person, place, thing, or idea. What is the value of x? The question is
+S19_T25	a person, place, thing, or idea. What is the value of x? The question is
+S20_T25	a person, place, thing, or idea. What is the value of x? The question is
+S21_T25	a person, place, thing, or idea. What is the value of x? The question is
+S22_T25	a person, place, thing, or idea. What is the value of x? The question is
+S23_T25	a person, place, thing, or idea. What is the value of x? The question is
+S24_T25	a person, place, thing, or idea. What is the value of x? The question is
+S25_T25	a person, place, thing, or idea. What is the value of x? The question is
+S26_T25	a person, place, thing, or idea. What is the value of x? The question is
+S27_T25	a person, place, thing, or idea. What is the value of x? The question is
+S28_T25	a person, place, thing, or idea. What is the value of x? The question is
+S29_T25	a person, place, thing, or idea. What is the value of x? The question is
+S30_T25	a person, place, thing, or idea. What is the value of x? The question is
+S31_T25	a person, place, thing, or idea. What is the value of x? The question is
+S32_T25	a person, place, thing, or idea. What is the value of x? The question is
+S33_T25	a person, place, thing, or idea. What is the value of x? The question is
+S34_T25	a person, place, thing, or idea. What is the value of x? The question is
+S35_T25	a person, place, thing, or idea. What is the value of x? The question is
+S00_T26	a person, place, thing, or idea. What is the value of x? The question is
+S01_T26	a person, place, thing, or idea. What is the value of x? The question is
+S02_T26	a person, place, thing, or idea. The question is, what is the answer to the
+S03_T26	a person, place, thing, or idea. The question is, what is the answer to the
+S04_T26	a person, place, thing, or idea. The question is, what is the value of x
+S05_T26	a person, place, thing, or idea. The question is, what is the answer to the
+S06_T26	a person, place, thing, or idea. What is the value of x? The question is
+S07_T26	a person, place, thing, or idea. What is the value of x? The question is
+S08_T26	a person, place, thing, or idea. What is the value of x? The question is
+S09_T26	a person, place, thing, or idea. What is the value of x? The question is
+S10_T26	a person, place, thing, or idea. What is the value of x? The question is
+S11_T26	a person, place, thing, or idea. What is the value of x? The question is
+S12_T26	a person, place, thing, or idea. What is the value of x? The question is
+S13_T26	a person, place, thing, or idea. What is the value of x? The question is
+S14_T26	a person, place, thing, or idea. What is the value of x? The question is
+S15_T26	a person, place, thing, or idea. What is the value of x? The question is
+S16_T26	a person, place, thing, or idea. What is the value of x? The question is
+S17_T26	a person, place, thing, or idea. What is the value of x? The question is
+S18_T26	a person, place, thing, or idea. What is the value of x? The question is
+S19_T26	a person, place, thing, or idea. What is the value of x? The question is
+S20_T26	a person, place, thing, or idea. What is the value of x? The question is
+S21_T26	a person, place, thing, or idea. What is the value of x? The question is
+S22_T26	a person, place, thing, or idea. What is the value of x? The question is
+S23_T26	a person, place, thing, or idea. What is the value of x? The question is
+S24_T26	a person, place, thing, or idea. What is the value of x? The question is
+S25_T26	a person, place, thing, or idea. What is the value of x? The question is
+S26_T26	a person, place, thing, or idea. What is the value of x? The question is
+S27_T26	a person, place, thing, or idea. What is the value of x? The question is
+S28_T26	a person, place, thing, or idea. What is the value of x? The question is
+S29_T26	a person, place, thing, or idea. What is the value of x? The question is
+S30_T26	a person, place, thing, or idea. What is the value of x? The question is
+S31_T26	a person, place, thing, or idea. What is the value of x? The question is
+S32_T26	a person, place, thing, or idea. What is the value of x? The question is
+S33_T26	a person, place, thing, or idea. What is the value of x? The question is
+S34_T26	a person, place, thing, or idea. What is the value of x? The question is
+S35_T26	a person, place, thing, or idea. What is the value of x? The question is
+S00_T27	a person, place, thing, or idea. What is the value of x? The question is
+S01_T27	a person, place, thing, or idea. What is the value of x? The question is
+S02_T27	a person, place, thing, or idea. What is the value of x? The question is
+S03_T27	a person, place, thing, or idea. The question is, what is the answer to the
+S04_T27	a person, place, thing, or idea. What is the value of x? The question is
+S05_T27	a person, place, thing, or idea. What is the value of x? The question is
+S06_T27	a person, place, thing, or idea. What is the value of x? The question is
+S07_T27	a person, place, thing, or idea. What is the value of x? The question is
+S08_T27	a person, place, thing, or idea. What is the value of x? The question is
+S09_T27	a person, place, thing, or idea. What is the value of x? The question is
+S10_T27	a person, place, thing, or idea. What is the value of x? The question is
+S11_T27	a person, place, thing, or idea. What is the value of x? The question is
+S12_T27	a person, place, thing, or idea. What is the value of x? The question is
+S13_T27	a person, place, thing, or idea. What is the value of x? The question is
+S14_T27	a person, place, thing, or idea. What is the value of x? The question is
+S15_T27	a person, place, thing, or idea. What is the value of x? The question is
+S16_T27	a person, place, thing, or idea. What is the value of x? The question is
+S17_T27	a person, place, thing, or idea. What is the value of x? The question is
+S18_T27	a person, place, thing, or idea. What is the value of x? The question is
+S19_T27	a person, place, thing, or idea. What is the value of x? The question is
+S20_T27	a person, place, thing, or idea. What is the value of x? The question is
+S21_T27	a person, place, thing, or idea. What is the value of x? The question is
+S22_T27	a person, place, thing, or idea. What is the value of x? The question is
+S23_T27	a person, place, thing, or idea. What is the value of x? The question is
+S24_T27	a person, place, thing, or idea. What is the value of x? The question is
+S25_T27	a person, place, thing, or idea. What is the value of x? The question is
+S26_T27	a person, place, thing, or idea. What is the value of x? The question is
+S27_T27	a person, place, thing, or idea. What is the value of x? The question is
+S28_T27	a person, place, thing, or idea. What is the value of x? The question is
+S29_T27	a person, place, thing, or idea. What is the value of x? The question is
+S30_T27	a person, place, thing, or idea. What is the value of x? The question is
+S31_T27	a person, place, thing, or idea. What is the value of x? The question is
+S32_T27	a person, place, thing, or idea. What is the value of x? The question is
+S33_T27	a person, place, thing, or idea. What is the value of x? The question is
+S34_T27	a person, place, thing, or idea. What is the value of x? The question is
+S35_T27	a person, place, thing, or idea. What is the value of x? The question is
+S00_T28	a person, place, thing, or idea. What is the value of x? The question is
+S01_T28	a person, place, thing, or idea. What is the value of x? The question is
+S02_T28	a person, place, thing, or idea. What is the value of x? The question is
+S03_T28	a person, place, thing, or idea. What is the value of x? The question is
+S04_T28	a person, place, thing, or idea. What is the value of x? The question is
+S05_T28	a person, place, thing, or idea. What is the value of x? The question is
+S06_T28	a person, place, thing, or idea. What is the value of x? The question is
+S07_T28	a person, place, thing, or idea. What is the value of x? The question is
+S08_T28	a person, place, thing, or idea. What is the value of x? The question is
+S09_T28	a person, place, thing, or idea. What is the value of x? The question is
+S10_T28	a person, place, thing, or idea. What is the value of x? The question is
+S11_T28	a person, place, thing, or idea. What is the value of x? The question is
+S12_T28	a person, place, thing, or idea. What is the value of x? The question is
+S13_T28	a person, place, thing, or idea. What is the value of x? The question is
+S14_T28	a person, place, thing, or idea. What is the value of x? The question is
+S15_T28	a person, place, thing, or idea. What is the value of x? The question is
+S16_T28	a person, place, thing, or idea. What is the value of x? The question is
+S17_T28	a person, place, thing, or idea. What is the value of x? The question is
+S18_T28	a person, place, thing, or idea. What is the value of x? The question is
+S19_T28	a person, place, thing, or idea. What is the value of x? The question is
+S20_T28	a person, place, thing, or idea. What is the value of x? The question is
+S21_T28	a person, place, thing, or idea. What is the value of x? The question is
+S22_T28	a person, place, thing, or idea. What is the value of x? The question is
+S23_T28	a person, place, thing, or idea. What is the value of x? The question is
+S24_T28	a person, place, thing, or idea. What is the value of x? The question is
+S25_T28	a person, place, thing, or idea. What is the value of x? The question is
+S26_T28	a person, place, thing, or idea. What is the value of x? The question is
+S27_T28	a person, place, thing, or idea. What is the value of x? The question is
+S28_T28	a person, place, thing, or idea. What is the value of x? The question is
+S29_T28	a person, place, thing, or idea. What is the value of x? The question is
+S30_T28	a person, place, thing, or idea. What is the value of x? The question is
+S31_T28	a person, place, thing, or idea. What is the value of x? The question is
+S32_T28	a person, place, thing, or idea. What is the value of x? The question is
+S33_T28	a person, place, thing, or idea. What is the value of x? The question is
+S34_T28	a person, place, thing, or idea. What is the value of x? The question is
+S35_T28	a person, place, thing, or idea. What is the value of x? The question is
+S00_T29	a person, place, thing, or idea. What is the value of x? The question is
+S01_T29	a person, place, thing, or idea. What is the value of x? The question is
+S02_T29	a person, place, thing, or idea. What is the value of x? The question is
+S03_T29	a person, place, thing, or idea. What is the value of x? The question is
+S04_T29	a person, place, thing, or idea. What is the value of x? The question is
+S05_T29	a person, place, thing, or idea. What is the value of x? The question is
+S06_T29	a person, place, thing, or idea. What is the value of x? The question is
+S07_T29	a person, place, thing, or idea. What is the value of x? The question is
+S08_T29	a person, place, thing, or idea. What is the value of x? The question is
+S09_T29	a person, place, thing, or idea. What is the value of x? The question is
+S10_T29	a person, place, thing, or idea. What is the value of x? The question is
+S11_T29	a person, place, thing, or idea. What is the value of x? The question is
+S12_T29	a person, place, thing, or idea. What is the value of x? The question is
+S13_T29	a person, place, thing, or idea. What is the value of x? The question is
+S14_T29	a person, place, thing, or idea. What is the value of x? The question is
+S15_T29	a person, place, thing, or idea. What is the value of x? The question is
+S16_T29	a person, place, thing, or idea. What is the value of x? The question is
+S17_T29	a person, place, thing, or idea. What is the value of x? The question is
+S18_T29	a person, place, thing, or idea. What is the value of x? The question is
+S19_T29	a person, place, thing, or idea. What is the value of x? The question is
+S20_T29	a person, place, thing, or idea. What is the value of x? The question is
+S21_T29	a person, place, thing, or idea. What is the value of x? The question is
+S22_T29	a person, place, thing, or idea. What is the value of x? The question is
+S23_T29	a person, place, thing, or idea. What is the value of x? The question is
+S24_T29	a person, place, thing, or idea. What is the value of x? The question is
+S25_T29	a person, place, thing, or idea. What is the value of x? The question is
+S26_T29	a person, place, thing, or idea. What is the value of x? The question is
+S27_T29	a person, place, thing, or idea. What is the value of x? The question is
+S28_T29	a person, place, thing, or idea. What is the value of x? The question is
+S29_T29	a person, place, thing, or idea. What is the value of x? The question is
+S30_T29	a person, place, thing, or idea. What is the value of x? The question is
+S31_T29	a person, place, thing, or idea. What is the value of x? The question is
+S32_T29	a person, place, thing, or idea. What is the value of x? The question is
+S33_T29	a person, place, thing, or idea. What is the value of x? The question is
+S34_T29	a person, place, thing, or idea. What is the value of x? The question is
+S35_T29	a person, place, thing, or idea. What is the value of x? The question is
+S00_T30	a person, place, thing, or idea. What is the value of x? The question is
+S01_T30	a person, place, thing, or idea. What is the value of x? The question is
+S02_T30	a person, place, thing, or idea. What is the value of x? The question is
+S03_T30	a person, place, thing, or idea. What is the value of x? The question is
+S04_T30	a person, place, thing, or idea. What is the value of x? The question is
+S05_T30	a person, place, thing, or idea. What is the value of x? The question is
+S06_T30	a person, place, thing, or idea. What is the value of x? The question is
+S07_T30	a person, place, thing, or idea. What is the value of x? The question is
+S08_T30	a person, place, thing, or idea. What is the value of x? The question is
+S09_T30	a person, place, thing, or idea. What is the value of x? The question is
+S10_T30	a person, place, thing, or idea. What is the value of x? The question is
+S11_T30	a person, place, thing, or idea. What is the value of x? The question is
+S12_T30	a person, place, thing, or idea. What is the value of x? The question is
+S13_T30	a person, place, thing, or idea. What is the value of x? The question is
+S14_T30	a person, place, thing, or idea. What is the value of x? The question is
+S15_T30	a person, place, thing, or idea. What is the value of x? The question is
+S16_T30	a person, place, thing, or idea. What is the value of x? The question is
+S17_T30	a person, place, thing, or idea. What is the value of x? The question is
+S18_T30	a person, place, thing, or idea. What is the value of x? The question is
+S19_T30	a person, place, thing, or idea. What is the value of x? The question is
+S20_T30	a person, place, thing, or idea. What is the value of x? The question is
+S21_T30	a person, place, thing, or idea. What is the value of x? The question is
+S22_T30	a person, place, thing, or idea. What is the value of x? The question is
+S23_T30	a person, place, thing, or idea. What is the value of x? The question is
+S24_T30	a person, place, thing, or idea. What is the value of x? The question is
+S25_T30	a person, place, thing, or idea. What is the value of x? The question is
+S26_T30	a person, place, thing, or idea. What is the value of x? The question is
+S27_T30	a person, place, thing, or idea. What is the value of x? The question is
+S28_T30	a person, place, thing, or idea. What is the value of x? The question is
+S29_T30	a person, place, thing, or idea. What is the value of x? The question is
+S30_T30	a person, place, thing, or idea. What is the value of x? The question is
+S31_T30	a person, place, thing, or idea. What is the value of x? The question is
+S32_T30	a person, place, thing, or idea. What is the value of x? The question is
+S33_T30	a person, place, thing, or idea. What is the value of x? The question is
+S34_T30	a person, place, thing, or idea. What is the value of x? The question is
+S35_T30	a person, place, thing, or idea. What is the value of x? The question is
+S00_T31	a person, place, thing, or idea. What is the value of x? The question is
+S01_T31	a person, place, thing, or idea. What is the value of x? The question is
+S02_T31	a person, place, thing, or idea. What is the value of x? The question is
+S03_T31	a person, place, thing, or idea. What is the value of x? The question is
+S04_T31	a person, place, thing, or idea. What is the value of x? The question is
+S05_T31	a person, place, thing, or idea. What is the value of x? The question is
+S06_T31	a person, place, thing, or idea. What is the value of x? The question is
+S07_T31	a person, place, thing, or idea. What is the value of x? The question is
+S08_T31	a person, place, thing, or idea. What is the value of x? The question is
+S09_T31	a person, place, thing, or idea. What is the value of x? The question is
+S10_T31	a person, place, thing, or idea. What is the value of x? The question is
+S11_T31	a person, place, thing, or idea. What is the value of x? The question is
+S12_T31	a person, place, thing, or idea. What is the value of x? The question is
+S13_T31	a person, place, thing, or idea. What is the value of x? The question is
+S14_T31	a person, place, thing, or idea. What is the value of x? The question is
+S15_T31	a person, place, thing, or idea. What is the value of x? The question is
+S16_T31	a person, place, thing, or idea. What is the value of x? The question is
+S17_T31	a person, place, thing, or idea. What is the value of x? The question is
+S18_T31	a person, place, thing, or idea. What is the value of x? The question is
+S19_T31	a person, place, thing, or idea. What is the value of x? The question is
+S20_T31	a person, place, thing, or idea. What is the value of x? The question is
+S21_T31	a person, place, thing, or idea. What is the value of x? The question is
+S22_T31	a person, place, thing, or idea. What is the value of x? The question is
+S23_T31	a person, place, thing, or idea. What is the value of x? The question is
+S24_T31	a person, place, thing, or idea. What is the value of x? The question is
+S25_T31	a person, place, thing, or idea. What is the value of x? The question is
+S26_T31	a person, place, thing, or idea. What is the value of x? The question is
+S27_T31	a person, place, thing, or idea. What is the value of x? The question is
+S28_T31	a person, place, thing, or idea. What is the value of x? The question is
+S29_T31	a person, place, thing, or idea. What is the value of x? The question is
+S30_T31	a person, place, thing, or idea. What is the value of x? The question is
+S31_T31	a person, place, thing, or idea. What is the value of x? The question is
+S32_T31	a person, place, thing, or idea. What is the value of x? The question is
+S33_T31	a person, place, thing, or idea. What is the value of x? The question is
+S34_T31	a person, place, thing, or idea. What is the value of x? The question is
+S35_T31	a person, place, thing, or idea. What is the value of x? The question is
+S00_T32	a person, place, thing, or idea. What is the value of x? The question is
+S01_T32	a person, place, thing, or idea. What is the value of x? The question is
+S02_T32	a person, place, thing, or idea. What is the value of x? The question is
+S03_T32	a person, place, thing, or idea. What is the value of x? The question is
+S04_T32	a person, place, thing, or idea. What is the value of x? The question is
+S05_T32	a person, place, thing, or idea. What is the value of x? The question is
+S06_T32	a person, place, thing, or idea. What is the value of x? The question is
+S07_T32	a person, place, thing, or idea. What is the value of x? The question is
+S08_T32	a person, place, thing, or idea. What is the value of x? The question is
+S09_T32	a person, place, thing, or idea. What is the value of x? The question is
+S10_T32	a person, place, thing, or idea. What is the value of x? The question is
+S11_T32	a person, place, thing, or idea. What is the value of x? The question is
+S12_T32	a person, place, thing, or idea. What is the value of x? The question is
+S13_T32	a person, place, thing, or idea. What is the value of x? The question is
+S14_T32	a person, place, thing, or idea. What is the value of x? The question is
+S15_T32	a person, place, thing, or idea. What is the value of x? The question is
+S16_T32	a person, place, thing, or idea. What is the value of x? The question is
+S17_T32	a person, place, thing, or idea. What is the value of x? The question is
+S18_T32	a person, place, thing, or idea. What is the value of x? The question is
+S19_T32	a person, place, thing, or idea. What is the value of x? The question is
+S20_T32	a person, place, thing, or idea. What is the value of x? The question is
+S21_T32	a person, place, thing, or idea. What is the value of x? The question is
+S22_T32	a person, place, thing, or idea. What is the value of x? The question is
+S23_T32	a person, place, thing, or idea. What is the value of x? The question is
+S24_T32	a person, place, thing, or idea. What is the value of x? The question is
+S25_T32	a person, place, thing, or idea. What is the value of x? The question is
+S26_T32	a person, place, thing, or idea. What is the value of x? The question is
+S27_T32	a person, place, thing, or idea. What is the value of x? The question is
+S28_T32	a person, place, thing, or idea. What is the value of x? The question is
+S29_T32	a person, place, thing, or idea. What is the value of x? The question is
+S30_T32	a person, place, thing, or idea. What is the value of x? The question is
+S31_T32	a person, place, thing, or idea. What is the value of x? The question is
+S32_T32	a person, place, thing, or idea. What is the value of x? The question is
+S33_T32	a person, place, thing, or idea. What is the value of x? The question is
+S34_T32	a person, place, thing, or idea. What is the value of x? The question is
+S35_T32	a person, place, thing, or idea. What is the value of x? The question is
+S00_T33	a person, place, thing, or idea. What is the value of x? The question is
+S01_T33	a person, place, thing, or idea. What is the value of x? The question is
+S02_T33	a person, place, thing, or idea. What is the value of x? The question is
+S03_T33	a person, place, thing, or idea. What is the value of x? The question is
+S04_T33	a person, place, thing, or idea. What is the value of x? The question is
+S05_T33	a person, place, thing, or idea. What is the value of x? The question is
+S06_T33	a person, place, thing, or idea. What is the value of x? The question is
+S07_T33	a person, place, thing, or idea. What is the value of x? The question is
+S08_T33	a person, place, thing, or idea. What is the value of x? The question is
+S09_T33	a person, place, thing, or idea. What is the value of x? The question is
+S10_T33	a person, place, thing, or idea. What is the value of x? The question is
+S11_T33	a person, place, thing, or idea. What is the value of x? The question is
+S12_T33	a person, place, thing, or idea. What is the value of x? The question is
+S13_T33	a person, place, thing, or idea. What is the value of x? The question is
+S14_T33	a person, place, thing, or idea. What is the value of x? The question is
+S15_T33	a person, place, thing, or idea. What is the value of x? The question is
+S16_T33	a person, place, thing, or idea. What is the value of x? The question is
+S17_T33	a person, place, thing, or idea. What is the value of x? The question is
+S18_T33	a person, place, thing, or idea. What is the value of x? The question is
+S19_T33	a person, place, thing, or idea. What is the value of x? The question is
+S20_T33	a person, place, thing, or idea. What is the value of x? The question is
+S21_T33	a person, place, thing, or idea. What is the value of x? The question is
+S22_T33	a person, place, thing, or idea. What is the value of x? The question is
+S23_T33	a person, place, thing, or idea. What is the value of x? The question is
+S24_T33	a person, place, thing, or idea. What is the value of x? The question is
+S25_T33	a person, place, thing, or idea. What is the value of x? The question is
+S26_T33	a person, place, thing, or idea. What is the value of x? The question is
+S27_T33	a person, place, thing, or idea. What is the value of x? The question is
+S28_T33	a person, place, thing, or idea. What is the value of x? The question is
+S29_T33	a person, place, thing, or idea. What is the value of x? The question is
+S30_T33	a person, place, thing, or idea. What is the value of x? The question is
+S31_T33	a person, place, thing, or idea. What is the value of x? The question is
+S32_T33	a person, place, thing, or idea. What is the value of x? The question is
+S33_T33	a person, place, thing, or idea. What is the value of x? The question is
+S34_T33	a person, place, thing, or idea. What is the value of x? The question is
+S35_T33	a person, place, thing, or idea. What is the value of x? The question is
+S00_T34	a person, place, thing, or idea. What is the value of x? The question is
+S01_T34	a person, place, thing, or idea. What is the value of x? The question is
+S02_T34	a person, place, thing, or idea. What is the value of x? The question is
+S03_T34	a person, place, thing, or idea. What is the value of x? The question is
+S04_T34	a person, place, thing, or idea. What is the value of x? The question is
+S05_T34	a person, place, thing, or idea. What is the value of x? The question is
+S06_T34	a person, place, thing, or idea. What is the value of x? The question is
+S07_T34	a person, place, thing, or idea. What is the value of x? The question is
+S08_T34	a person, place, thing, or idea. What is the value of x? The question is
+S09_T34	a person, place, thing, or idea. What is the value of x? The question is
+S10_T34	a person, place, thing, or idea. What is the value of x? The question is
+S11_T34	a person, place, thing, or idea. What is the value of x? The question is
+S12_T34	a person, place, thing, or idea. What is the value of x? The question is
+S13_T34	a person, place, thing, or idea. What is the value of x? The question is
+S14_T34	a person, place, thing, or idea. What is the value of x? The question is
+S15_T34	a person, place, thing, or idea. What is the value of x? The question is
+S16_T34	a person, place, thing, or idea. What is the value of x? The question is
+S17_T34	a person, place, thing, or idea. What is the value of x? The question is
+S18_T34	a person, place, thing, or idea. What is the value of x? The question is
+S19_T34	a person, place, thing, or idea. What is the value of x? The question is
+S20_T34	a person, place, thing, or idea. What is the value of x? The question is
+S21_T34	a person, place, thing, or idea. What is the value of x? The question is
+S22_T34	a person, place, thing, or idea. What is the value of x? The question is
+S23_T34	a person, place, thing, or idea. What is the value of x? The question is
+S24_T34	a person, place, thing, or idea. What is the value of x? The question is
+S25_T34	a person, place, thing, or idea. What is the value of x? The question is
+S26_T34	a person, place, thing, or idea. What is the value of x? The question is
+S27_T34	a person, place, thing, or idea. What is the value of x? The question is
+S28_T34	a person, place, thing, or idea. What is the value of x? The question is
+S29_T34	a person, place, thing, or idea. What is the value of x? The question is
+S30_T34	a person, place, thing, or idea. What is the value of x? The question is
+S31_T34	a person, place, thing, or idea. What is the value of x? The question is
+S32_T34	a person, place, thing, or idea. What is the value of x? The question is
+S33_T34	a person, place, thing, or idea. What is the value of x? The question is
+S34_T34	a person, place, thing, or idea. What is the value of x? The question is
+S35_T34	a person, place, thing, or idea. What is the value of x? The question is
+S00_T35	a person, place, thing, or idea. What is the value of x? The question is
+S01_T35	a person, place, thing, or idea. What is the value of x? The question is
+S02_T35	a person, place, thing, or idea. What is the value of x? The question is
+S03_T35	a person, place, thing, or idea. What is the value of x? The question is
+S04_T35	a person, place, thing, or idea. What is the value of x? The question is
+S05_T35	a person, place, thing, or idea. What is the value of x? The question is
+S06_T35	a person, place, thing, or idea. What is the value of x? The question is
+S07_T35	a person, place, thing, or idea. What is the value of x? The question is
+S08_T35	a person, place, thing, or idea. What is the value of x? The question is
+S09_T35	a person, place, thing, or idea. What is the value of x? The question is
+S10_T35	a person, place, thing, or idea. What is the value of x? The question is
+S11_T35	a person, place, thing, or idea. What is the value of x? The question is
+S12_T35	a person, place, thing, or idea. What is the value of x? The question is
+S13_T35	a person, place, thing, or idea. What is the value of x? The question is
+S14_T35	a person, place, thing, or idea. What is the value of x? The question is
+S15_T35	a person, place, thing, or idea. What is the value of x? The question is
+S16_T35	a person, place, thing, or idea. What is the value of x? The question is
+S17_T35	a person, place, thing, or idea. What is the value of x? The question is
+S18_T35	a person, place, thing, or idea. What is the value of x? The question is
+S19_T35	a person, place, thing, or idea. What is the value of x? The question is
+S20_T35	a person, place, thing, or idea. What is the value of x? The question is
+S21_T35	a person, place, thing, or idea. What is the value of x? The question is
+S22_T35	a person, place, thing, or idea. What is the value of x? The question is
+S23_T35	a person, place, thing, or idea. What is the value of x? The question is
+S24_T35	a person, place, thing, or idea. What is the value of x? The question is
+S25_T35	a person, place, thing, or idea. What is the value of x? The question is
+S26_T35	a person, place, thing, or idea. What is the value of x? The question is
+S27_T35	a person, place, thing, or idea. What is the value of x? The question is
+S28_T35	a person, place, thing, or idea. What is the value of x? The question is
+S29_T35	a person, place, thing, or idea. What is the value of x? The question is
+S30_T35	a person, place, thing, or idea. What is the value of x? The question is
+S31_T35	a person, place, thing, or idea. What is the value of x? The question is
+S32_T35	a person, place, thing, or idea. What is the value of x? The question is
+S33_T35	a person, place, thing, or idea. What is the value of x? The question is
+S34_T35	a person, place, thing, or idea. What is the value of x? The question is
+S35_T35	a person, place, thing, or idea. What is the value of x? The question is

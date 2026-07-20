@@ -1,0 +1,25 @@
+condition,target_frame,target_bucket,cells,strict,category,strict_or_category,strict_or_category_rate
+baseline_original,original few-shot target,early target 0-11,720,5,74,79,0.10972222222222222
+baseline_original,original few-shot target,mid target 12-23,720,0,9,9,0.0125
+baseline_original,original few-shot target,late target 24-35,720,6,16,16,0.022222222222222223
+target_described_as,x can be described as,early target 0-11,720,4,47,48,0.06666666666666667
+target_described_as,x can be described as,mid target 12-23,720,0,11,11,0.015277777777777777
+target_described_as,x can be described as,late target 24-35,720,0,1,1,0.001388888888888889
+target_refers_to,x refers to,early target 0-11,720,17,51,54,0.075
+target_refers_to,x refers to,mid target 12-23,720,0,21,21,0.029166666666666667
+target_refers_to,x refers to,late target 24-35,720,0,0,0,0.0
+target_name_of,x is the name of,early target 0-11,720,1,113,113,0.15694444444444444
+target_name_of,x is the name of,mid target 12-23,720,0,34,34,0.04722222222222222
+target_name_of,x is the name of,late target 24-35,720,0,1,1,0.001388888888888889
+target_best_known_as,x is best known as,early target 0-11,720,5,60,62,0.08611111111111111
+target_best_known_as,x is best known as,mid target 12-23,720,0,13,13,0.018055555555555554
+target_best_known_as,x is best known as,late target 24-35,720,0,0,0,0.0
+target_was,x was,early target 0-11,720,1,159,159,0.22083333333333333
+target_was,x was,mid target 12-23,720,0,128,128,0.17777777777777778
+target_was,x was,late target 24-35,720,0,0,0,0.0
+target_global_suffix,x was known for her public life. This person was,early target 0-11,720,0,30,30,0.041666666666666664
+target_global_suffix,x was known for her public life. This person was,mid target 12-23,720,0,14,14,0.019444444444444445
+target_global_suffix,x was known for her public life. This person was,late target 24-35,720,0,2,2,0.002777777777777778
+target_entity_specific_suffix,entity-specific target suffix,early target 0-11,720,47,241,241,0.3347222222222222
+target_entity_specific_suffix,entity-specific target suffix,mid target 12-23,720,1,238,238,0.33055555555555555
+target_entity_specific_suffix,entity-specific target suffix,late target 24-35,720,0,276,276,0.38333333333333336

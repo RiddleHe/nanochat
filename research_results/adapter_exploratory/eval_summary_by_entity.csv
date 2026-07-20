@@ -1,0 +1,526 @@
+candidate,entity_key,entity,condition,n,score_original_substring_hits,score_original_substring_hit_rate,score_strict_entity_name_hits,score_strict_entity_name_hit_rate,score_category_description_hits,score_category_description_hit_rate
+diagonal_affine_alpha_0.001_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+diagonal_affine_alpha_0.001_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.001_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.001_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.001_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.001_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.001_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.001_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+diagonal_affine_alpha_0.01_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.01_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.01_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.01_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.01_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.01_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.01_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+diagonal_affine_alpha_0.1_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.1_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.1_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.1_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_0.1_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.1_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_0.1_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+diagonal_affine_alpha_100_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_100_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_100_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_100_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_100_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_100_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_100_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+diagonal_affine_alpha_10_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_10_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_10_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_10_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_10_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_10_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_10_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+diagonal_affine_alpha_1_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_1_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_1_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_1_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_alpha_1_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_1_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_alpha_1_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+diagonal_affine_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+diagonal_affine_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+diagonal_affine_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+diagonal_affine_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,alexander,Alexander the Great,translated_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_16_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+low_rank_residual_rank_16_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_16_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_16_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_16_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_16_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_16_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_16_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+low_rank_residual_rank_32_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,ali,Muhammad Ali,translated_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_32_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_32_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_32_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,1,1.0,1,1.0
+low_rank_residual_rank_32_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_32_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_32_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_32_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,diana,"Diana, princess of Wales",translated_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,nyc,New York City,translated_late,1,0,0.0,0,0.0,1,1.0
+low_rank_residual_rank_32_h28_to_h10_confirm_seed,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+low_rank_residual_rank_4_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_4_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_4_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_4_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_4_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_4_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_4_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,alexander,Alexander the Great,translated_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_8_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+low_rank_residual_rank_8_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_8_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_8_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_8_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+low_rank_residual_rank_8_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_8_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+low_rank_residual_rank_8_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+mean_shift_norm_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+mean_shift_norm_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+mean_shift_norm_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+mean_shift_norm_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+mean_shift_norm_h28_to_h10,nyc,New York City,translated_late,1,0,0.0,0,0.0,0,0.0
+mean_shift_norm_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+orthogonal_procrustes_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+orthogonal_procrustes_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+orthogonal_procrustes_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+orthogonal_procrustes_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+orthogonal_procrustes_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+orthogonal_procrustes_h28_to_h10,nyc,New York City,translated_late,1,0,0.0,0,0.0,1,1.0
+orthogonal_procrustes_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+ridge_linear_alpha_0.1_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_0.1_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_0.1_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_0.1_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_0.1_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_0.1_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,1,1.0
+ridge_linear_alpha_10000_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+ridge_linear_alpha_10000_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_10000_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,jurassic,Jurassic Park,translated_late,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_10000_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_10000_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10000_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_10000_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_10000_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+ridge_linear_alpha_1000_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_1000_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_1000_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1000_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_1000_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_1000_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+ridge_linear_alpha_100_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_100_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,1,1.0,1,1.0
+ridge_linear_alpha_100_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_100_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_100_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_100_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_100_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,1,1.0
+ridge_linear_alpha_10_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+ridge_linear_alpha_10_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_10_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_10_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_10_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_10_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_10_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,1,1.0
+ridge_linear_alpha_1_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+ridge_linear_alpha_1_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_1_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_1_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+ridge_linear_alpha_1_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_1_h28_to_h10,nyc,New York City,translated_late,1,1,1.0,0,0.0,1,1.0
+ridge_linear_alpha_1_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,1,1.0
+scalar_affine_h28_to_h10,alexander,Alexander the Great,oracle_readout,1,0,0.0,1,1.0,0,0.0
+scalar_affine_h28_to_h10,alexander,Alexander the Great,random_norm_control,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,alexander,Alexander the Great,raw_late,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,alexander,Alexander the Great,translated_late,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,alexander,Alexander the Great,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,ali,Muhammad Ali,oracle_readout,1,1,1.0,1,1.0,1,1.0
+scalar_affine_h28_to_h10,ali,Muhammad Ali,random_norm_control,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,ali,Muhammad Ali,raw_late,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,ali,Muhammad Ali,translated_late,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,ali,Muhammad Ali,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,diana,"Diana, princess of Wales",oracle_readout,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,diana,"Diana, princess of Wales",random_norm_control,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,diana,"Diana, princess of Wales",raw_late,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,diana,"Diana, princess of Wales",translated_late,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,diana,"Diana, princess of Wales",wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,jurassic,Jurassic Park,oracle_readout,1,1,1.0,0,0.0,1,1.0
+scalar_affine_h28_to_h10,jurassic,Jurassic Park,random_norm_control,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,jurassic,Jurassic Park,raw_late,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,jurassic,Jurassic Park,translated_late,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,jurassic,Jurassic Park,wrong_entity_control,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,nyc,New York City,oracle_readout,1,1,1.0,0,0.0,1,1.0
+scalar_affine_h28_to_h10,nyc,New York City,random_norm_control,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,nyc,New York City,raw_late,1,1,1.0,0,0.0,1,1.0
+scalar_affine_h28_to_h10,nyc,New York City,translated_late,1,0,0.0,0,0.0,0,0.0
+scalar_affine_h28_to_h10,nyc,New York City,wrong_entity_control,1,0,0.0,0,0.0,0,0.0

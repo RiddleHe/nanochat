@@ -1,0 +1,664 @@
+Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 260.83it/s]
+[setup] model=Qwen/Qwen3-8B n_layer=36 train_entities=128 val_entities=32
+[pairs] train prompts=50/1536 pairs=620/12000
+[pairs] train prompts=100/1536 pairs=1229/12000
+[pairs] train prompts=150/1536 pairs=1836/12000
+[pairs] train prompts=200/1536 pairs=2484/12000
+[pairs] train prompts=250/1536 pairs=3169/12000
+[pairs] train prompts=300/1536 pairs=3788/12000
+[pairs] train prompts=350/1536 pairs=4443/12000
+[pairs] train prompts=400/1536 pairs=5068/12000
+[pairs] train prompts=450/1536 pairs=5697/12000
+[pairs] train prompts=500/1536 pairs=6346/12000
+[pairs] train prompts=550/1536 pairs=7007/12000
+[pairs] train prompts=600/1536 pairs=7586/12000
+[pairs] train prompts=650/1536 pairs=8221/12000
+[pairs] train prompts=700/1536 pairs=8834/12000
+[pairs] train prompts=750/1536 pairs=9492/12000
+[pairs] train prompts=800/1536 pairs=10158/12000
+[pairs] train prompts=850/1536 pairs=10789/12000
+[pairs] train prompts=900/1536 pairs=11451/12000
+[pairs] train prompts=944/1536 pairs=12000/12000
+[pairs] val prompts=50/384 pairs=672/2400
+[pairs] val prompts=100/384 pairs=1317/2400
+[pairs] val prompts=150/384 pairs=1904/2400
+[pairs] val prompts=189/384 pairs=2400/2400
+[mapping] h28->h10 train_pairs=12000 val_pairs=2400
+[candidate] fitting mean_shift_norm_h28_to_h10
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+The attention mask is not set and cannot be inferred from input because pad token is same as eos token. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
+[eval] mean_shift_norm_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] mean_shift_norm_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] mean_shift_norm_h28_to_h10 diana translated_late: orig=0 strict=0 cat=0 text=', and the United Nations: international organization. Which of the following is the most appropriate way to represent'
+[eval] mean_shift_norm_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] mean_shift_norm_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text=', and the United Nations: international organization. Which of the following is the most appropriate way to represent'
+[eval] mean_shift_norm_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] mean_shift_norm_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] mean_shift_norm_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text=', and the United Nations: international organization. Which of the following is the most appropriate way to represent'
+[eval] mean_shift_norm_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] mean_shift_norm_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': ?'
+[eval] mean_shift_norm_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] mean_shift_norm_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] mean_shift_norm_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': ?'
+[eval] mean_shift_norm_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] mean_shift_norm_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': Unknown, 100: Unknown, 1000: Unknown, 1'
+[eval] mean_shift_norm_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] mean_shift_norm_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] mean_shift_norm_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': Unknown, 100: Unknown, 1000: Unknown, 1'
+[eval] mean_shift_norm_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] mean_shift_norm_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 100: A number. These are'
+[eval] mean_shift_norm_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] mean_shift_norm_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] mean_shift_norm_h28_to_h10 nyc translated_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 100: A number. These are'
+[eval] mean_shift_norm_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] mean_shift_norm_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=', and the United Nations: international organization. Which of the following is the most appropriate way to represent'
+[leader] best={'candidate': 'mean_shift_norm_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 0, 'translated_strict_hits': 0, 'translated_category_hits': 0, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.46219348907470703, 'val_mse': 21.319814682006836, 'promising': 0, 'good': 0, 'strong': 0}
+[candidate] fitting scalar_affine_h28_to_h10
+[eval] scalar_affine_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] scalar_affine_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] scalar_affine_h28_to_h10 diana translated_late: orig=0 strict=0 cat=0 text=': 1, 3, 5, 7, 9, 11,'
+[eval] scalar_affine_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] scalar_affine_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text='and 100000000000000000'
+[eval] scalar_affine_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] scalar_affine_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] scalar_affine_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text='and 100000000000000000'
+[eval] scalar_affine_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] scalar_affine_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': ?'
+[eval] scalar_affine_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] scalar_affine_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] scalar_affine_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': ?'
+[eval] scalar_affine_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] scalar_affine_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A variable in mathematics, and the number 100. How are these five items related'
+[eval] scalar_affine_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] scalar_affine_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] scalar_affine_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A variable in mathematics, and the number 100. How are these five items related'
+[eval] scalar_affine_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] scalar_affine_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 100: A number. These are'
+[eval] scalar_affine_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] scalar_affine_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] scalar_affine_h28_to_h10 nyc translated_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 100: A number. These are'
+[eval] scalar_affine_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] scalar_affine_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': 1, 3, 5, 7, 9, 11,'
+[leader] best={'candidate': 'mean_shift_norm_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 0, 'translated_strict_hits': 0, 'translated_category_hits': 0, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.46219348907470703, 'val_mse': 21.319814682006836, 'promising': 0, 'good': 0, 'strong': 0}
+[candidate] fitting diagonal_affine_h28_to_h10
+[eval] diagonal_affine_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] diagonal_affine_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] diagonal_affine_h28_to_h10 diana translated_late: orig=1 strict=0 cat=1 text=': British royal family, and the United Nations: international organization. Which of the following is the most'
+[eval] diagonal_affine_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] diagonal_affine_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] diagonal_affine_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] diagonal_affine_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] diagonal_affine_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] diagonal_affine_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] diagonal_affine_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': Unknown, B: Unknown, C: Unknown, D: Unknown. The question is: Which'
+[eval] diagonal_affine_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] diagonal_affine_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] diagonal_affine_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': Unknown, B: Unknown, C: Unknown, D: Unknown. The question is: Which'
+[eval] diagonal_affine_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] diagonal_affine_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A park in the city, and the rest of the world. The question is, which of'
+[eval] diagonal_affine_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] diagonal_affine_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] diagonal_affine_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A park in the city, and the rest of the world. The question is, which of'
+[eval] diagonal_affine_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] diagonal_affine_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': The city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] diagonal_affine_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': The city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] diagonal_affine_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': British royal family, and the United Nations: international organization. Which of the following is the most'
+[leader] best={'candidate': 'diagonal_affine_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.5684148073196411, 'val_mse': 1.9319708347320557, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting diagonal_affine_alpha_0.001_h28_to_h10
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 diana translated_late: orig=1 strict=0 cat=1 text=': British royal family, and the United Nations: international organization. Which of the following is the most'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': Unknown, B: Unknown, C: Unknown, D: Unknown. The question is: Which'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': Unknown, B: Unknown, C: Unknown, D: Unknown. The question is: Which'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A park in the city, and the rest of the world. The question is, which of'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A park in the city, and the rest of the world. The question is, which of'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': The city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': The city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] diagonal_affine_alpha_0.001_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': British royal family, and the United Nations: international organization. Which of the following is the most'
+[leader] best={'candidate': 'diagonal_affine_alpha_0.001_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.5684148073196411, 'val_mse': 1.9319708347320557, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting diagonal_affine_alpha_0.01_h28_to_h10
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 diana translated_late: orig=1 strict=0 cat=1 text=': British royal family, and the United Nations: international organization. Which of the following is the most'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': Unknown, B: Unknown, C: Unknown, D: Unknown. The question is: Which'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': Unknown, B: Unknown, C: Unknown, D: Unknown. The question is: Which'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A park in the city, and the rest of the world. The question is, which of'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A park in the city, and the rest of the world. The question is, which of'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': The city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': The city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] diagonal_affine_alpha_0.01_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': British royal family, and the United Nations: international organization. Which of the following is the most'
+[leader] best={'candidate': 'diagonal_affine_alpha_0.001_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.5684148073196411, 'val_mse': 1.9319708347320557, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting diagonal_affine_alpha_0.1_h28_to_h10
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 diana translated_late: orig=1 strict=0 cat=1 text=': British royal family, and the United Nations: international organization. Which of the following is the most'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': Unknown, B: Unknown, C: Unknown, D: Unknown. The question is: Which'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': Unknown, B: Unknown, C: Unknown, D: Unknown. The question is: Which'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A park in the city, and the rest of the world. The question is, which of'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A park in the city, and the rest of the world. The question is, which of'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': The city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': The city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] diagonal_affine_alpha_0.1_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': British royal family, and the United Nations: international organization. Which of the following is the most'
+[leader] best={'candidate': 'diagonal_affine_alpha_0.001_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.5684148073196411, 'val_mse': 1.9319708347320557, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting diagonal_affine_alpha_1_h28_to_h10
+[eval] diagonal_affine_alpha_1_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] diagonal_affine_alpha_1_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] diagonal_affine_alpha_1_h28_to_h10 diana translated_late: orig=1 strict=0 cat=1 text=': British royal family, and the United Nations: international organization. Which of the following is the most'
+[eval] diagonal_affine_alpha_1_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] diagonal_affine_alpha_1_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] diagonal_affine_alpha_1_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] diagonal_affine_alpha_1_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] diagonal_affine_alpha_1_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] diagonal_affine_alpha_1_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] diagonal_affine_alpha_1_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] diagonal_affine_alpha_1_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] diagonal_affine_alpha_1_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] diagonal_affine_alpha_1_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] diagonal_affine_alpha_1_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] diagonal_affine_alpha_1_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A park in the city, and the number 12. How can these elements be connected'
+[eval] diagonal_affine_alpha_1_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] diagonal_affine_alpha_1_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] diagonal_affine_alpha_1_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A park in the city, and the number 12. How can these elements be connected'
+[eval] diagonal_affine_alpha_1_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] diagonal_affine_alpha_1_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': The city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_1_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] diagonal_affine_alpha_1_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_1_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': The city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_1_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] diagonal_affine_alpha_1_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': British royal family, and the United Nations: international organization. Which of the following is the most'
+[leader] best={'candidate': 'diagonal_affine_alpha_1_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.5684149265289307, 'val_mse': 1.9319708347320557, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting diagonal_affine_alpha_10_h28_to_h10
+[eval] diagonal_affine_alpha_10_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] diagonal_affine_alpha_10_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] diagonal_affine_alpha_10_h28_to_h10 diana translated_late: orig=1 strict=0 cat=1 text=': British royal family, and the United Nations: international organization. Which of the following is the most'
+[eval] diagonal_affine_alpha_10_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] diagonal_affine_alpha_10_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] diagonal_affine_alpha_10_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] diagonal_affine_alpha_10_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] diagonal_affine_alpha_10_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] diagonal_affine_alpha_10_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] diagonal_affine_alpha_10_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': Unknown, B: Unknown, C: Unknown, D: Unknown, E: Unknown, F'
+[eval] diagonal_affine_alpha_10_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] diagonal_affine_alpha_10_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] diagonal_affine_alpha_10_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': Unknown, B: Unknown, C: Unknown, D: Unknown, E: Unknown, F'
+[eval] diagonal_affine_alpha_10_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] diagonal_affine_alpha_10_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A park in the city, and the rest of the world. The question is, which of'
+[eval] diagonal_affine_alpha_10_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] diagonal_affine_alpha_10_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] diagonal_affine_alpha_10_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A park in the city, and the rest of the world. The question is, which of'
+[eval] diagonal_affine_alpha_10_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] diagonal_affine_alpha_10_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': The city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_10_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] diagonal_affine_alpha_10_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_10_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': The city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_10_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] diagonal_affine_alpha_10_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': British royal family, and the United Nations: international organization. Which of the following is the most'
+[leader] best={'candidate': 'diagonal_affine_alpha_1_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.5684149265289307, 'val_mse': 1.9319708347320557, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting diagonal_affine_alpha_100_h28_to_h10
+[eval] diagonal_affine_alpha_100_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] diagonal_affine_alpha_100_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] diagonal_affine_alpha_100_h28_to_h10 diana translated_late: orig=1 strict=0 cat=1 text=': British royal family, and the United Nations: international organization. Which of the following is the most'
+[eval] diagonal_affine_alpha_100_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] diagonal_affine_alpha_100_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] diagonal_affine_alpha_100_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] diagonal_affine_alpha_100_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] diagonal_affine_alpha_100_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] diagonal_affine_alpha_100_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] diagonal_affine_alpha_100_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': Unknown, B: Unknown, C: Unknown, D: Unknown. The question is: Which'
+[eval] diagonal_affine_alpha_100_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] diagonal_affine_alpha_100_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] diagonal_affine_alpha_100_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': Unknown, B: Unknown, C: Unknown, D: Unknown. The question is: Which'
+[eval] diagonal_affine_alpha_100_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] diagonal_affine_alpha_100_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A park in the city, and the rest of the world: Everything else. Which of the'
+[eval] diagonal_affine_alpha_100_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] diagonal_affine_alpha_100_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] diagonal_affine_alpha_100_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A park in the city, and the rest of the world: Everything else. Which of the'
+[eval] diagonal_affine_alpha_100_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] diagonal_affine_alpha_100_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': The city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_100_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] diagonal_affine_alpha_100_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_100_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': The city in the United States, and the United Nations: International organization. Which of the following'
+[eval] diagonal_affine_alpha_100_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] diagonal_affine_alpha_100_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': British royal family, and the United Nations: international organization. Which of the following is the most'
+[leader] best={'candidate': 'diagonal_affine_alpha_1_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.5684149265289307, 'val_mse': 1.9319708347320557, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting orthogonal_procrustes_h28_to_h10
+[eval] orthogonal_procrustes_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] orthogonal_procrustes_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] orthogonal_procrustes_h28_to_h10 diana translated_late: orig=0 strict=0 cat=0 text=': 1947, 1948, 1949, '
+[eval] orthogonal_procrustes_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] orthogonal_procrustes_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text=': Unknown, 100: Unknown, 10: Unknown, 1: Unknown'
+[eval] orthogonal_procrustes_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] orthogonal_procrustes_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] orthogonal_procrustes_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text=': Unknown, 100: Unknown, 10: Unknown, 1: Unknown'
+[eval] orthogonal_procrustes_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] orthogonal_procrustes_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': A type of Muslim, and the United Nations: International organization. Which of the following is the'
+[eval] orthogonal_procrustes_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] orthogonal_procrustes_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] orthogonal_procrustes_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': A type of Muslim, and the United Nations: International organization. Which of the following is the'
+[eval] orthogonal_procrustes_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] orthogonal_procrustes_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A mathematical concept, and the number 10. How are these five items related? What'
+[eval] orthogonal_procrustes_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] orthogonal_procrustes_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] orthogonal_procrustes_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A mathematical concept, and the number 10. How are these five items related? What'
+[eval] orthogonal_procrustes_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] orthogonal_procrustes_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': The United States, and the United Kingdom, and the United States, and the United Kingdom,'
+[eval] orthogonal_procrustes_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] orthogonal_procrustes_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] orthogonal_procrustes_h28_to_h10 nyc translated_late: orig=0 strict=0 cat=1 text=': The United States, and the United Kingdom, and the United States, and the United Kingdom,'
+[eval] orthogonal_procrustes_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] orthogonal_procrustes_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': 1947, 1948, 1949, '
+[leader] best={'candidate': 'diagonal_affine_alpha_1_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.5684149265289307, 'val_mse': 1.9319708347320557, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting ridge_linear_alpha_0.1_h28_to_h10
+[eval] ridge_linear_alpha_0.1_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] ridge_linear_alpha_0.1_h28_to_h10 diana translated_late: orig=0 strict=0 cat=0 text=': Former First Lady of the United States, and the United Nations: International organization. Which of the'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text=': English mathematician, physicist, and astronomer, and the 19th-century French mathematic'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text=': English mathematician, physicist, and astronomer, and the 19th-century French mathematic'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': American rapper, and so on. The above are all examples of what type of concept? The'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': American rapper, and so on. The above are all examples of what type of concept? The'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A place in the United States, and the United Nations: An international organization. Which of the'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A place in the United States, and the United Nations: An international organization. Which of the'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': A city in the United States, and the United Nations: An international organization. Which of the'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: An international organization. Which of the'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] ridge_linear_alpha_0.1_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=1 text=': Former First Lady of the United States, and the United Nations: International organization. Which of the'
+[leader] best={'candidate': 'diagonal_affine_alpha_1_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.5684149265289307, 'val_mse': 1.9319708347320557, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting ridge_linear_alpha_1_h28_to_h10
+[eval] ridge_linear_alpha_1_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] ridge_linear_alpha_1_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] ridge_linear_alpha_1_h28_to_h10 diana translated_late: orig=0 strict=0 cat=0 text=': Former First Lady of the United States, and the United Nations: International organization. Which of the'
+[eval] ridge_linear_alpha_1_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] ridge_linear_alpha_1_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text=': English mathematician, physicist, and astronomer, and the 19th-century French mathematic'
+[eval] ridge_linear_alpha_1_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] ridge_linear_alpha_1_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] ridge_linear_alpha_1_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text=': English mathematician, physicist, and astronomer, and the 19th-century French mathematic'
+[eval] ridge_linear_alpha_1_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] ridge_linear_alpha_1_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': American rapper, and so on. These are all examples of what type of terms? What is'
+[eval] ridge_linear_alpha_1_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] ridge_linear_alpha_1_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] ridge_linear_alpha_1_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': American rapper, and so on. These are all examples of what type of terms? What is'
+[eval] ridge_linear_alpha_1_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] ridge_linear_alpha_1_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A place in the United States, and the United Nations: An international organization. Which of the'
+[eval] ridge_linear_alpha_1_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] ridge_linear_alpha_1_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] ridge_linear_alpha_1_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A place in the United States, and the United Nations: An international organization. Which of the'
+[eval] ridge_linear_alpha_1_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] ridge_linear_alpha_1_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': City in the United States, United Nations: International organization, United States: Country in North America'
+[eval] ridge_linear_alpha_1_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] ridge_linear_alpha_1_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] ridge_linear_alpha_1_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': City in the United States, United Nations: International organization, United States: Country in North America'
+[eval] ridge_linear_alpha_1_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] ridge_linear_alpha_1_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=1 text=': Former First Lady of the United States, and the United Nations: International organization. Which of the'
+[leader] best={'candidate': 'diagonal_affine_alpha_1_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.5684149265289307, 'val_mse': 1.9319708347320557, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting ridge_linear_alpha_10_h28_to_h10
+[eval] ridge_linear_alpha_10_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] ridge_linear_alpha_10_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] ridge_linear_alpha_10_h28_to_h10 diana translated_late: orig=0 strict=0 cat=0 text=': Former First Lady of the United States, and the United Nations: International organization. Which of the'
+[eval] ridge_linear_alpha_10_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] ridge_linear_alpha_10_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text=': English mathematician, physicist, and astronomer, and the 19th-century French mathematic'
+[eval] ridge_linear_alpha_10_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] ridge_linear_alpha_10_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] ridge_linear_alpha_10_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text=': English mathematician, physicist, and astronomer, and the 19th-century French mathematic'
+[eval] ridge_linear_alpha_10_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] ridge_linear_alpha_10_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': American rapper, and so on. The above are all examples of what type of concept? The'
+[eval] ridge_linear_alpha_10_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] ridge_linear_alpha_10_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] ridge_linear_alpha_10_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': American rapper, and so on. The above are all examples of what type of concept? The'
+[eval] ridge_linear_alpha_10_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] ridge_linear_alpha_10_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A place in the United States, and the United Nations: An international organization. Which of the'
+[eval] ridge_linear_alpha_10_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] ridge_linear_alpha_10_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] ridge_linear_alpha_10_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A place in the United States, and the United Nations: An international organization. Which of the'
+[eval] ridge_linear_alpha_10_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] ridge_linear_alpha_10_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': A city in the United States, and the United Nations: An international organization. Which of the'
+[eval] ridge_linear_alpha_10_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] ridge_linear_alpha_10_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] ridge_linear_alpha_10_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: An international organization. Which of the'
+[eval] ridge_linear_alpha_10_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] ridge_linear_alpha_10_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=1 text=': Former First Lady of the United States, and the United Nations: International organization. Which of the'
+[leader] best={'candidate': 'diagonal_affine_alpha_1_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.5684149265289307, 'val_mse': 1.9319708347320557, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting ridge_linear_alpha_100_h28_to_h10
+[eval] ridge_linear_alpha_100_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] ridge_linear_alpha_100_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] ridge_linear_alpha_100_h28_to_h10 diana translated_late: orig=0 strict=0 cat=0 text=': Former First Lady of the United States, and the United Nations: International organization. Which of the'
+[eval] ridge_linear_alpha_100_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] ridge_linear_alpha_100_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text=': English mathematician, physicist, and astronomer, and the United Nations: international organization. Which'
+[eval] ridge_linear_alpha_100_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] ridge_linear_alpha_100_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] ridge_linear_alpha_100_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text=': English mathematician, physicist, and astronomer, and the United Nations: international organization. Which'
+[eval] ridge_linear_alpha_100_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] ridge_linear_alpha_100_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': American rapper, and so on. These are all examples of what type of terms? What is'
+[eval] ridge_linear_alpha_100_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] ridge_linear_alpha_100_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] ridge_linear_alpha_100_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': American rapper, and so on. These are all examples of what type of terms? What is'
+[eval] ridge_linear_alpha_100_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] ridge_linear_alpha_100_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A place in the movie "Jurassic Park", and the number 100. What'
+[eval] ridge_linear_alpha_100_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] ridge_linear_alpha_100_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] ridge_linear_alpha_100_h28_to_h10 jurassic translated_late: orig=0 strict=1 cat=1 text=': A place in the movie "Jurassic Park", and the number 100. What'
+[eval] ridge_linear_alpha_100_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] ridge_linear_alpha_100_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': A city in the United States, and the United Nations: An international organization. Which of the'
+[eval] ridge_linear_alpha_100_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] ridge_linear_alpha_100_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] ridge_linear_alpha_100_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: An international organization. Which of the'
+[eval] ridge_linear_alpha_100_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] ridge_linear_alpha_100_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=1 text=': Former First Lady of the United States, and the United Nations: International organization. Which of the'
+[leader] best={'candidate': 'diagonal_affine_alpha_1_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.5684149265289307, 'val_mse': 1.9319708347320557, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting ridge_linear_alpha_1000_h28_to_h10
+[eval] ridge_linear_alpha_1000_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] ridge_linear_alpha_1000_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] ridge_linear_alpha_1000_h28_to_h10 diana translated_late: orig=0 strict=0 cat=0 text=': Former British Prime Minister, and the United Nations: International organization. Which of the following is a'
+[eval] ridge_linear_alpha_1000_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] ridge_linear_alpha_1000_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text=': A famous Swiss physicist, and so on. These are all examples of what type of terms?'
+[eval] ridge_linear_alpha_1000_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] ridge_linear_alpha_1000_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] ridge_linear_alpha_1000_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text=': A famous Swiss physicist, and so on. These are all examples of what type of terms?'
+[eval] ridge_linear_alpha_1000_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] ridge_linear_alpha_1000_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': American rapper, Bill Gates: American business magnate, software developer, and philanthropist,'
+[eval] ridge_linear_alpha_1000_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] ridge_linear_alpha_1000_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] ridge_linear_alpha_1000_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': American rapper, Bill Gates: American business magnate, software developer, and philanthropist,'
+[eval] ridge_linear_alpha_1000_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] ridge_linear_alpha_1000_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A national park in the United States, and the United Nations: An international organization. Which of'
+[eval] ridge_linear_alpha_1000_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] ridge_linear_alpha_1000_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] ridge_linear_alpha_1000_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A national park in the United States, and the United Nations: An international organization. Which of'
+[eval] ridge_linear_alpha_1000_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] ridge_linear_alpha_1000_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': A city in the United States, and the United Nations: An international organization. Which of the'
+[eval] ridge_linear_alpha_1000_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] ridge_linear_alpha_1000_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] ridge_linear_alpha_1000_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: An international organization. Which of the'
+[eval] ridge_linear_alpha_1000_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] ridge_linear_alpha_1000_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': Former British Prime Minister, and the United Nations: International organization. Which of the following is a'
+[leader] best={'candidate': 'diagonal_affine_alpha_1_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.5684149265289307, 'val_mse': 1.9319708347320557, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting ridge_linear_alpha_10000_h28_to_h10
+[eval] ridge_linear_alpha_10000_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] ridge_linear_alpha_10000_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] ridge_linear_alpha_10000_h28_to_h10 diana translated_late: orig=0 strict=0 cat=0 text=': British monarch, and so on. These are all examples of what type of terms? What is'
+[eval] ridge_linear_alpha_10000_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] ridge_linear_alpha_10000_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text=': Swiss physicist, and so on. These are all examples of what type of terms? What is'
+[eval] ridge_linear_alpha_10000_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] ridge_linear_alpha_10000_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] ridge_linear_alpha_10000_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text=': Swiss physicist, and so on. These are all examples of what type of terms? What is'
+[eval] ridge_linear_alpha_10000_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] ridge_linear_alpha_10000_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': American rapper, Billie Eilish: American singer, Taylor Swift: American singer, Bey'
+[eval] ridge_linear_alpha_10000_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] ridge_linear_alpha_10000_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] ridge_linear_alpha_10000_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': American rapper, Billie Eilish: American singer, Taylor Swift: American singer, Bey'
+[eval] ridge_linear_alpha_10000_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] ridge_linear_alpha_10000_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A film directed by Steven Spielberg, and so on. These are all examples of what type of'
+[eval] ridge_linear_alpha_10000_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] ridge_linear_alpha_10000_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] ridge_linear_alpha_10000_h28_to_h10 jurassic translated_late: orig=1 strict=0 cat=1 text=': A film directed by Steven Spielberg, and so on. These are all examples of what type of'
+[eval] ridge_linear_alpha_10000_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] ridge_linear_alpha_10000_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': City in the United States, and the United Nations: International organization. Which of the following is'
+[eval] ridge_linear_alpha_10000_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] ridge_linear_alpha_10000_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] ridge_linear_alpha_10000_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. Which of the following is'
+[eval] ridge_linear_alpha_10000_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] ridge_linear_alpha_10000_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': British monarch, and so on. These are all examples of what type of terms? What is'
+[leader] best={'candidate': 'ridge_linear_alpha_10000_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.9426063895225525, 'val_mse': 0.1425158828496933, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting low_rank_residual_rank_4_h28_to_h10
+[low_rank] rank=4 epoch=1 loss=0.995912
+[low_rank] rank=4 epoch=10 loss=0.695609
+[low_rank] rank=4 epoch=20 loss=0.660503
+[low_rank] rank=4 epoch=30 loss=0.658854
+[low_rank] rank=4 epoch=40 loss=0.628173
+[low_rank] rank=4 epoch=50 loss=0.64745
+[low_rank] rank=4 epoch=60 loss=0.637296
+[low_rank] rank=4 epoch=70 loss=0.688888
+[low_rank] rank=4 epoch=80 loss=0.653914
+[eval] low_rank_residual_rank_4_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] low_rank_residual_rank_4_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] low_rank_residual_rank_4_h28_to_h10 diana translated_late: orig=1 strict=0 cat=1 text=': British royal family, and so on. These are all examples of what type of concept? The'
+[eval] low_rank_residual_rank_4_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] low_rank_residual_rank_4_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] low_rank_residual_rank_4_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] low_rank_residual_rank_4_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] low_rank_residual_rank_4_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text='Wall Street: Financial district in New York City, United States, United Nations: International organization, United'
+[eval] low_rank_residual_rank_4_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] low_rank_residual_rank_4_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=": A person's name, and the number 12. How can these elements be connected to"
+[eval] low_rank_residual_rank_4_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] low_rank_residual_rank_4_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] low_rank_residual_rank_4_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 12. How can these elements be connected to"
+[eval] low_rank_residual_rank_4_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] low_rank_residual_rank_4_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A place where people go to have fun, and so on. These are all examples of what'
+[eval] low_rank_residual_rank_4_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] low_rank_residual_rank_4_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] low_rank_residual_rank_4_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A place where people go to have fun, and so on. These are all examples of what'
+[eval] low_rank_residual_rank_4_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] low_rank_residual_rank_4_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': City in the United States, and so on. These are all examples of what type of terms'
+[eval] low_rank_residual_rank_4_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] low_rank_residual_rank_4_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] low_rank_residual_rank_4_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': City in the United States, and so on. These are all examples of what type of terms'
+[eval] low_rank_residual_rank_4_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] low_rank_residual_rank_4_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': British royal family, and so on. These are all examples of what type of concept? The'
+[leader] best={'candidate': 'ridge_linear_alpha_10000_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 2, 'translated_strict_hits': 0, 'translated_category_hits': 2, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.9426063895225525, 'val_mse': 0.1425158828496933, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting low_rank_residual_rank_8_h28_to_h10
+[low_rank] rank=8 epoch=1 loss=0.833736
+[low_rank] rank=8 epoch=10 loss=0.601803
+[low_rank] rank=8 epoch=20 loss=0.573476
+[low_rank] rank=8 epoch=30 loss=0.571037
+[low_rank] rank=8 epoch=40 loss=0.546506
+[low_rank] rank=8 epoch=50 loss=0.552921
+[low_rank] rank=8 epoch=60 loss=0.558007
+[low_rank] rank=8 epoch=70 loss=0.597527
+[low_rank] rank=8 epoch=80 loss=0.556493
+[eval] low_rank_residual_rank_8_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] low_rank_residual_rank_8_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] low_rank_residual_rank_8_h28_to_h10 diana translated_late: orig=1 strict=0 cat=1 text=': British royal family, and so on. These are all examples of what type of concept? The'
+[eval] low_rank_residual_rank_8_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] low_rank_residual_rank_8_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text=': A famous ancient Greek philosopher, and the United Nations: An international organization. Which of the following'
+[eval] low_rank_residual_rank_8_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] low_rank_residual_rank_8_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] low_rank_residual_rank_8_h28_to_h10 alexander translated_late: orig=1 strict=0 cat=1 text=': A famous ancient Greek philosopher, and the United Nations: An international organization. Which of the following'
+[eval] low_rank_residual_rank_8_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] low_rank_residual_rank_8_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': American rapper, and so on. These are all examples of what type of terms? What is'
+[eval] low_rank_residual_rank_8_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] low_rank_residual_rank_8_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] low_rank_residual_rank_8_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': American rapper, and so on. These are all examples of what type of terms? What is'
+[eval] low_rank_residual_rank_8_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] low_rank_residual_rank_8_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A place where people go to have fun, and so on. These are all examples of what'
+[eval] low_rank_residual_rank_8_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] low_rank_residual_rank_8_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] low_rank_residual_rank_8_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A place where people go to have fun, and so on. These are all examples of what'
+[eval] low_rank_residual_rank_8_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] low_rank_residual_rank_8_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': City in the United States, and the United Nations: International organization. Which of the following is'
+[eval] low_rank_residual_rank_8_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] low_rank_residual_rank_8_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] low_rank_residual_rank_8_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. Which of the following is'
+[eval] low_rank_residual_rank_8_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] low_rank_residual_rank_8_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': British royal family, and so on. These are all examples of what type of concept? The'
+[leader] best={'candidate': 'low_rank_residual_rank_8_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 3, 'translated_strict_hits': 0, 'translated_category_hits': 3, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.7209075689315796, 'val_mse': 0.5896096229553223, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting low_rank_residual_rank_16_h28_to_h10
+[low_rank] rank=16 epoch=1 loss=0.69692
+[low_rank] rank=16 epoch=10 loss=0.486117
+[low_rank] rank=16 epoch=20 loss=0.483351
+[low_rank] rank=16 epoch=30 loss=0.465532
+[low_rank] rank=16 epoch=40 loss=0.445701
+[low_rank] rank=16 epoch=50 loss=0.457104
+[low_rank] rank=16 epoch=60 loss=0.455044
+[low_rank] rank=16 epoch=70 loss=0.489559
+[low_rank] rank=16 epoch=80 loss=0.456976
+[eval] low_rank_residual_rank_16_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] low_rank_residual_rank_16_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] low_rank_residual_rank_16_h28_to_h10 diana translated_late: orig=1 strict=0 cat=1 text=': British royal family, and so on. These are all examples of what type of concept? The'
+[eval] low_rank_residual_rank_16_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] low_rank_residual_rank_16_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text=': Ancient Greek philosopher, and the United Nations: International organization. Which of the following is a correct'
+[eval] low_rank_residual_rank_16_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] low_rank_residual_rank_16_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] low_rank_residual_rank_16_h28_to_h10 alexander translated_late: orig=1 strict=0 cat=1 text=': Ancient Greek philosopher, and the United Nations: International organization. Which of the following is a correct'
+[eval] low_rank_residual_rank_16_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] low_rank_residual_rank_16_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': American rapper, and so on. These are all examples of what type of concepts? Additionally,'
+[eval] low_rank_residual_rank_16_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] low_rank_residual_rank_16_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] low_rank_residual_rank_16_h28_to_h10 ali translated_late: orig=0 strict=0 cat=0 text=': American rapper, and so on. These are all examples of what type of concepts? Additionally,'
+[eval] low_rank_residual_rank_16_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] low_rank_residual_rank_16_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A fictional place, and the number 12. How are these connected? The answer is'
+[eval] low_rank_residual_rank_16_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] low_rank_residual_rank_16_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] low_rank_residual_rank_16_h28_to_h10 jurassic translated_late: orig=0 strict=0 cat=0 text=': A fictional place, and the number 12. How are these connected? The answer is'
+[eval] low_rank_residual_rank_16_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] low_rank_residual_rank_16_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': City in the United States, and the United Nations: International organization. Which of the following is'
+[eval] low_rank_residual_rank_16_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] low_rank_residual_rank_16_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] low_rank_residual_rank_16_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. Which of the following is'
+[eval] low_rank_residual_rank_16_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] low_rank_residual_rank_16_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': British royal family, and so on. These are all examples of what type of concept? The'
+[leader] best={'candidate': 'low_rank_residual_rank_16_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 3, 'translated_strict_hits': 0, 'translated_category_hits': 3, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.7613826394081116, 'val_mse': 0.4955282211303711, 'promising': 1, 'good': 0, 'strong': 0}
+[candidate] fitting low_rank_residual_rank_32_h28_to_h10
+[low_rank] rank=32 epoch=1 loss=0.599034
+[low_rank] rank=32 epoch=10 loss=0.363167
+[low_rank] rank=32 epoch=20 loss=0.371523
+[low_rank] rank=32 epoch=30 loss=0.349647
+[low_rank] rank=32 epoch=40 loss=0.347356
+[low_rank] rank=32 epoch=50 loss=0.342245
+[low_rank] rank=32 epoch=60 loss=0.356013
+[low_rank] rank=32 epoch=70 loss=0.374762
+[low_rank] rank=32 epoch=80 loss=0.345437
+[eval] low_rank_residual_rank_32_h28_to_h10 diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] low_rank_residual_rank_32_h28_to_h10 diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] low_rank_residual_rank_32_h28_to_h10 diana translated_late: orig=1 strict=0 cat=1 text=': British royal family, and so on. These are all examples of what type of concept? The'
+[eval] low_rank_residual_rank_32_h28_to_h10 diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] low_rank_residual_rank_32_h28_to_h10 diana wrong_entity_control: orig=0 strict=0 cat=0 text=': A famous composer, and the United Nations: An international organization. Which of the following is a'
+[eval] low_rank_residual_rank_32_h28_to_h10 alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] low_rank_residual_rank_32_h28_to_h10 alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] low_rank_residual_rank_32_h28_to_h10 alexander translated_late: orig=0 strict=0 cat=0 text=': A famous composer, and the United Nations: An international organization. Which of the following is a'
+[eval] low_rank_residual_rank_32_h28_to_h10 alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] low_rank_residual_rank_32_h28_to_h10 alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': American former professional boxer, and the United Nations: international organization. Which of the following is the'
+[eval] low_rank_residual_rank_32_h28_to_h10 ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] low_rank_residual_rank_32_h28_to_h10 ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] low_rank_residual_rank_32_h28_to_h10 ali translated_late: orig=1 strict=0 cat=1 text=': American former professional boxer, and the United Nations: international organization. Which of the following is the'
+[eval] low_rank_residual_rank_32_h28_to_h10 ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] low_rank_residual_rank_32_h28_to_h10 ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A fictional island in the movie Jurassic Park, and the United Nations: An international organization. Which'
+[eval] low_rank_residual_rank_32_h28_to_h10 jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] low_rank_residual_rank_32_h28_to_h10 jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] low_rank_residual_rank_32_h28_to_h10 jurassic translated_late: orig=0 strict=1 cat=1 text=': A fictional island in the movie Jurassic Park, and the United Nations: An international organization. Which'
+[eval] low_rank_residual_rank_32_h28_to_h10 jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] low_rank_residual_rank_32_h28_to_h10 jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': City in the United States, and the United Nations: International organization. Which of the following is'
+[eval] low_rank_residual_rank_32_h28_to_h10 nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] low_rank_residual_rank_32_h28_to_h10 nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] low_rank_residual_rank_32_h28_to_h10 nyc translated_late: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. Which of the following is'
+[eval] low_rank_residual_rank_32_h28_to_h10 nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] low_rank_residual_rank_32_h28_to_h10 nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': British royal family, and so on. These are all examples of what type of concept? The'
+[leader] best={'candidate': 'low_rank_residual_rank_32_h28_to_h10', 'source_layer': 28, 'readout_layer': 10, 'translated_original_hits': 3, 'translated_strict_hits': 1, 'translated_category_hits': 4, 'raw_original_hits': 1, 'random_original_hits': 0, 'wrong_original_hits': 0, 'oracle_original_hits': 3, 'val_cosine': 0.8078963160514832, 'val_mse': 0.39516371488571167, 'promising': 1, 'good': 1, 'strong': 1}
+[adaptive] strong adapter found; confirming on alternate split seed
+[pairs] confirm_train prompts=50/1536 pairs=641/12000
+[pairs] confirm_train prompts=100/1536 pairs=1313/12000
+[pairs] confirm_train prompts=150/1536 pairs=1926/12000
+[pairs] confirm_train prompts=200/1536 pairs=2546/12000
+[pairs] confirm_train prompts=250/1536 pairs=3184/12000
+[pairs] confirm_train prompts=300/1536 pairs=3843/12000
+[pairs] confirm_train prompts=350/1536 pairs=4494/12000
+[pairs] confirm_train prompts=400/1536 pairs=5104/12000
+[pairs] confirm_train prompts=450/1536 pairs=5768/12000
+[pairs] confirm_train prompts=500/1536 pairs=6371/12000
+[pairs] confirm_train prompts=550/1536 pairs=6990/12000
+[pairs] confirm_train prompts=600/1536 pairs=7614/12000
+[pairs] confirm_train prompts=650/1536 pairs=8251/12000
+[pairs] confirm_train prompts=700/1536 pairs=8925/12000
+[pairs] confirm_train prompts=750/1536 pairs=9541/12000
+[pairs] confirm_train prompts=800/1536 pairs=10229/12000
+[pairs] confirm_train prompts=850/1536 pairs=10822/12000
+[pairs] confirm_train prompts=900/1536 pairs=11511/12000
+[pairs] confirm_train prompts=939/1536 pairs=12000/12000
+[pairs] confirm_val prompts=50/384 pairs=668/2400
+[pairs] confirm_val prompts=100/384 pairs=1334/2400
+[pairs] confirm_val prompts=150/384 pairs=1947/2400
+[pairs] confirm_val prompts=184/384 pairs=2400/2400
+[candidate] fitting low_rank_residual_rank_32_h28_to_h10_confirm_seed
+[low_rank] rank=32 epoch=1 loss=0.647162
+[low_rank] rank=32 epoch=10 loss=0.396985
+[low_rank] rank=32 epoch=20 loss=0.407059
+[low_rank] rank=32 epoch=30 loss=0.375836
+[low_rank] rank=32 epoch=40 loss=0.347053
+[low_rank] rank=32 epoch=50 loss=0.422535
+[low_rank] rank=32 epoch=60 loss=0.355778
+[low_rank] rank=32 epoch=70 loss=0.404518
+[low_rank] rank=32 epoch=80 loss=0.405397
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed diana oracle_readout: orig=0 strict=0 cat=0 text=': A country in Europe, and the United States: A country in North America. Which of the'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed diana raw_late: orig=0 strict=0 cat=0 text=": A person's name, and the number 10. How can these elements be connected to"
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed diana translated_late: orig=1 strict=0 cat=1 text=': British royal family, and so on. These are all examples of what type of concept? The'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed diana random_norm_control: orig=0 strict=0 cat=0 text='What is the relationship between the above three? The relationship between the three is that they are all entities'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed diana wrong_entity_control: orig=0 strict=0 cat=0 text=': A famous composer, and the United Nations: An international organization. Which of the following is the'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed alexander oracle_readout: orig=0 strict=1 cat=0 text=': A title for Alexander the Great, and the name of a 2003 film starring'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed alexander raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics to represent an unknown quantity. Which of the following is the most similar'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed alexander translated_late: orig=0 strict=0 cat=0 text=': A famous composer, and the United Nations: An international organization. Which of the following is the'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed alexander random_norm_control: orig=0 strict=0 cat=0 text='700: a model of smartphone, 5G: the fifth generation of mobile communication technology'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed alexander wrong_entity_control: orig=0 strict=0 cat=0 text=': American former professional football player, and the United Nations: international organization. Which of the following is'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed ali oracle_readout: orig=1 strict=1 cat=1 text=': American former professional boxer, Muhammad Ali: American former professional boxer, and so on. The question'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed ali raw_late: orig=0 strict=0 cat=0 text=': A variable used in mathematics, and the number 10. How are these five items related'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed ali translated_late: orig=0 strict=0 cat=0 text=': American former professional football player, and the United Nations: international organization. Which of the following is'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed ali random_norm_control: orig=0 strict=0 cat=0 text='.264: Free software, 2008: Year, 200'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed ali wrong_entity_control: orig=0 strict=0 cat=0 text=': A type of animal, and the United Nations: International organization. Which of the following is a'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed jurassic oracle_readout: orig=1 strict=0 cat=1 text=': A 1993 American science fiction film directed by Steven Spielberg, and the 1'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed jurassic raw_late: orig=0 strict=0 cat=0 text=': A place where people live, and the rest of the world: Everything else. The question is'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed jurassic translated_late: orig=0 strict=0 cat=0 text=': A type of animal, and the United Nations: International organization. Which of the following is a'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed jurassic random_norm_control: orig=0 strict=0 cat=0 text=': Unknown, 1: Unknown, 2: Unknown, 3: Unknown, 4'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed jurassic wrong_entity_control: orig=0 strict=0 cat=0 text=': Metropolis in the United States, and the United Nations: International organization. Which of the following'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed nyc oracle_readout: orig=1 strict=0 cat=1 text=': City in the United States, and the United Nations: International organization. What is the connection between'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed nyc raw_late: orig=1 strict=0 cat=1 text=': A city in the United States, and the United Nations: International organization. Which of the following'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed nyc translated_late: orig=0 strict=0 cat=1 text=': Metropolis in the United States, and the United Nations: International organization. Which of the following'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed nyc random_norm_control: orig=0 strict=0 cat=0 text='. The answer is: Samsung. The answer is: Samsung. The answer is: Samsung. The'
+[eval] low_rank_residual_rank_32_h28_to_h10_confirm_seed nyc wrong_entity_control: orig=0 strict=0 cat=0 text=': British royal family, and so on. These are all examples of what type of concept? The'
+[done] stopped_reason=strong_adapter_confirmed elapsed_seconds=342.2 out_dir=/ssd/mh3897/patchscope_results/qwen3_8b_adapter_search_strict_20260707_055910

@@ -1,0 +1,6 @@
+entity,entity_name,hits,total,png,pdf
+alexander,Alexander the Great,113,1296,/ssd/mh3897/patchscope_results/qwen3_8b_target_was_20260705_190308/plots/alexander__heatmap.png,/ssd/mh3897/patchscope_results/qwen3_8b_target_was_20260705_190308/plots/alexander__heatmap.pdf
+ali,Muhammad Ali,130,1296,/ssd/mh3897/patchscope_results/qwen3_8b_target_was_20260705_190308/plots/ali__heatmap.png,/ssd/mh3897/patchscope_results/qwen3_8b_target_was_20260705_190308/plots/ali__heatmap.pdf
+diana,"Diana, princess of Wales",121,1296,/ssd/mh3897/patchscope_results/qwen3_8b_target_was_20260705_190308/plots/diana__heatmap.png,/ssd/mh3897/patchscope_results/qwen3_8b_target_was_20260705_190308/plots/diana__heatmap.pdf
+jurassic,Jurassic Park,93,1296,/ssd/mh3897/patchscope_results/qwen3_8b_target_was_20260705_190308/plots/jurassic__heatmap.png,/ssd/mh3897/patchscope_results/qwen3_8b_target_was_20260705_190308/plots/jurassic__heatmap.pdf
+nyc,New York City,31,1296,/ssd/mh3897/patchscope_results/qwen3_8b_target_was_20260705_190308/plots/nyc__heatmap.png,/ssd/mh3897/patchscope_results/qwen3_8b_target_was_20260705_190308/plots/nyc__heatmap.pdf

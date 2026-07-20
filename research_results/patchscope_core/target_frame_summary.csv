@@ -1,0 +1,9 @@
+condition,target_frame,cells,strict,category,category_only,strict_or_category
+baseline_original,original few-shot target,6480,40,555,528,568
+target_described_as,x can be described as,6480,10,250,241,251
+target_refers_to,x refers to,6480,112,417,330,442
+target_name_of,x is the name of,6480,21,742,722,743
+target_best_known_as,x is best known as,6480,85,500,426,511
+target_was,x was,6480,10,1081,1073,1083
+target_global_suffix,x was known for her public life. This person was,6480,12,251,239,251
+target_entity_specific_suffix,entity-specific target suffix,6480,109,2307,2198,2307

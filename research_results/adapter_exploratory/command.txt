@@ -1,0 +1,1 @@
+scripts/inspect/patchscope_adapter_search.py --hf-model Qwen/Qwen3-8B --out-dir /ssd/mh3897/patchscope_results/qwen3_8b_adapter_search_strict_20260707_055910 --device cuda --time-limit-seconds 7200 --initial-pairs 12000 --expanded-pairs 24000 --candidate-soft-limit-seconds 900 --low-rank-weight-decay 0.001

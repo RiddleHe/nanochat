@@ -1,0 +1,10 @@
+Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 265.92it/s]
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+The attention mask is not set and cannot be inferred from input because pad token is same as eos token. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
+prompt: 'Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x refers to'
+tgt_pos: 29  tgt_token: ' x'
+generated_text: 'the number of letters in the name of the country, y refers to the number of letters in the'
+prompt_only_scores: {'diana': 0, 'alexander': 0, 'ali': 0, 'jurassic': 0, 'nyc': 0}
+Wrote /ssd/mh3897/patchscope_results/qwen3_8b_no_patch_refers_to_20260705_190020/no_patch_target_prompt.json
+Wrote /ssd/mh3897/patchscope_results/qwen3_8b_no_patch_refers_to_20260705_190020/no_patch_target_prompt.csv
+Wrote /ssd/mh3897/patchscope_results/qwen3_8b_no_patch_refers_to_20260705_190020/no_patch_target_prompt.txt

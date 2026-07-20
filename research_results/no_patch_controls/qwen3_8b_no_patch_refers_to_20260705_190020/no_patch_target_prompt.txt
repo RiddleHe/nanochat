@@ -1,0 +1,19 @@
+prompt	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x refers to
+generated_text	the number of letters in the name of the country, y refers to the number of letters in the
+model	Qwen_Qwen3-8B
+max_tokens	20
+target_suffix	 refers to
+target_query	
+target_placeholder	x
+target_with_x	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x
+tgt_pos	29
+tgt_token_id	856
+tgt_token	 x
+target_token_count	32
+target_with_x_token_count	30
+prompt_only	True
+score_diana	0
+score_alexander	0
+score_ali	0
+score_jurassic	0
+score_nyc	0

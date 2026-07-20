@@ -1,0 +1,64 @@
+{
+  "model": "Qwen/Qwen3-8B-Base",
+  "merged_shards": 3,
+  "num_ordered_pairs": 16,
+  "pair_ids": [
+    "scientist_Einstein_into_Newton",
+    "scientist_Einstein_into_Darwin",
+    "scientist_Newton_into_Einstein",
+    "scientist_Newton_into_Darwin",
+    "scientist_Darwin_into_Einstein",
+    "scientist_Darwin_into_Newton",
+    "composer_Mozart_into_Bach",
+    "composer_Bach_into_Mozart",
+    "writer_Shakespeare_into_Dickens",
+    "writer_Dickens_into_Shakespeare",
+    "country_France_into_Japan",
+    "country_Japan_into_France",
+    "city_Paris_into_Tokyo",
+    "city_Tokyo_into_Paris",
+    "company_Google_into_Apple",
+    "company_Apple_into_Google"
+  ],
+  "all_position_oracle_mean_recovery": 1.0,
+  "all_position_oracle_min_recovery": 1.0,
+  "negative_control_mean_abs_recovery": 0.0,
+  "subject_curve_pr15_comparison": [
+    {
+      "layer": 0,
+      "observed_subject_recovery": 0.9956607177065296,
+      "pr15_reference": 0.994,
+      "delta": 0.0016607177065296463
+    },
+    {
+      "layer": 10,
+      "observed_subject_recovery": 0.928749744690708,
+      "pr15_reference": 0.92,
+      "delta": 0.008749744690707995
+    },
+    {
+      "layer": 22,
+      "observed_subject_recovery": 0.8524375006044824,
+      "pr15_reference": 0.849,
+      "delta": 0.0034375006044824463
+    },
+    {
+      "layer": 23,
+      "observed_subject_recovery": 0.7289377051302622,
+      "pr15_reference": 0.725,
+      "delta": 0.003937705130262259
+    },
+    {
+      "layer": 24,
+      "observed_subject_recovery": 0.40019374966365323,
+      "pr15_reference": 0.411,
+      "delta": -0.010806250336346745
+    },
+    {
+      "layer": 35,
+      "observed_subject_recovery": 0.0,
+      "pr15_reference": 0.0,
+      "delta": 0.0
+    }
+  ]
+}

@@ -1,0 +1,1315 @@
+model	Qwen_Qwen3-8B
+entity_key	diana
+source	Diana, princess of Wales
+target_full	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x is best known as
+target_suffix	 is best known as
+target_query	
+target_placeholder	x
+tgt_pos	29
+tgt_token_id	856
+tgt_token	 x
+target_token_count	34
+target_with_x_token_count	30
+source_set	canonical
+inject_mode	residual
+normalize	True
+target	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x
+target_before_x	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, 
+target_with_x	Syria: Country in the Middle East, Leonardo DiCaprio: American actor, Samsung: South Korean multinational major appliance and consumer electronics corporation, x
+target_layer	ALL
+S00_T00	a country in the United Kingdom, and the United States is a country in North America. Which of
+S01_T00	a country in the United Kingdom, and the United States is a country in North America. Which of
+S02_T00	a country in the United Kingdom, and the United States is a country in North America. Which of
+S03_T00	a country in the United Kingdom, and the United States is a country in North America. Which of
+S04_T00	the home of the Welsh people, and the UK's fourth country, and the smallest of the four
+S05_T00	the home of the Wales national football team, and the Wales national rugby union team, and the Wales
+S06_T00	a country in the United Kingdom, and the United States is a country in North America. Which of
+S07_T00	the first king of the United Kingdom in the 19th century, and also the last British
+S08_T00	a brand of smartphones, and the United Nations: international organization. These are all examples of what type
+S09_T00	the manufacturer of smartphones, and the United Nations: international organization. These are all examples of what type
+S10_T00	a film director, and the United Nations: international organization. Which of the following is a correct statement
+S11_T00	a film director, and the founder of the Leonardo DiCaprio Foundation, which focuses on environmental issues
+S12_T00	: A. A place B. A person C. A company D. A thing
+S13_T00	the manufacturer of smartphones, and the United Nations: international organization. These are all examples of what type
+S14_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S15_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S16_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S17_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S18_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S19_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S20_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S21_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S22_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S23_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S24_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S25_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S26_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S27_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S28_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S29_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S30_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S31_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S32_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S33_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S34_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sun"
+S35_T00	the manufacturer of smartphones, and the company's name is derived from the Korean word for "sunrise
+S00_T01	a: ?
+S01_T01	a country in the United Kingdom, and the United States is a country in North America. Which of
+S02_T01	a country in the United Kingdom, and the United States is a country in North America. Which of
+S03_T01	a country in the United Kingdom, and the United States is a country in North America. Which of
+S04_T01	a football team, and the United States is the world's largest economy. Which of the following is
+S05_T01	a: (A) American actor, (B) South Korean corporation, (C) American corporation
+S06_T01	a term for the legal principle of "no fault" in divorce, but it is also a city
+S07_T01	a singer, and the United Nations: international organization. Which of the following is a correct statement about
+S08_T01	the founder of the company, and the company is known for its high-quality products.  The company
+S09_T01	the founder of the company, and the company is known for its smartphones, and the company is also
+S10_T01	the founder of Samsung, and the company is based in South Korea, and the company is known for
+S11_T01	the founder of the company, and the company is known for its high-quality products.  The company
+S12_T01	the founder of the company, and the company is known for its Galaxy series of smartphones. The company
+S13_T01	a singer, and the United Nations: international organization. Which of the following is a correct statement about
+S14_T01	an actor, and also a producer, director, and screenwriter. He has been nominated for many
+S15_T01	a film actor, and also a producer, director, and environmental activist, and the 20
+S16_T01	a film actor, but also has a role in the music industry, and is a producer, director
+S17_T01	a film actor, and also a producer, director, and screenwriter. He is one of the
+S18_T01	the company that makes the Galaxy series of smartphones, and the Galaxy S series. The Galaxy S series
+S19_T01	the manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S20_T01	the manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S21_T01	a manufacturer of smartphones, and the United Nations: international organization. Which of the following is a correct
+S22_T01	a manufacturer of smartphones, and the United Nations: international organization. Which of the following is a correct
+S23_T01	a manufacturer of smartphones, and the United Nations: international organization. These are all examples of what type
+S24_T01	a technology company, and the company is based in South Korea. The company is known for its smartphones
+S25_T01	the manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S26_T01	a technology company, and the company is based in South Korea. The company is known for its smartphones
+S27_T01	a manufacturer of smartphones, and the United Nations: international organization. These are all examples of what type
+S28_T01	a technology company, and the United Nations: international organization. These are all examples of what type of
+S29_T01	the manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S30_T01	the manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S31_T01	the manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S32_T01	a manufacturer of smartphones, and the United Nations: international organization. These are all examples of what type
+S33_T01	a technology company, and the United Nations: international organization. These are all examples of what type of
+S34_T01	a technology company, and the company is based in South Korea. The company is known for its smartphones
+S35_T01	a manufacturer of smartphones, and the United Nations: international organization. These are all examples of what type
+S00_T02	a country in the United Kingdom, and the United States is a country in North America. Which of
+S01_T02	a country in the United Kingdom, and the United States is a country in North America. Which of
+S02_T02	a country in the United Kingdom, and the United States is a country in North America. Which of
+S03_T02	a country in the United Kingdom, and the United States is a country in North America. Which of
+S04_T02	a country in the United Kingdom, and the United States is a country in North America. Which of
+S05_T02	the home of the Queen of England, and the United States: Country in North America. Which of
+S06_T02	the country of the United Kingdom, and the United States is the country of the United States. Which
+S07_T02	the company that makes smartphones, and the company is based in South Korea, and the company is known
+S08_T02	the name of the planet, and the word "Wales" is the name of a country in
+S09_T02	the home of the Samsung Galaxy smartphones, and the United Nations: international organization. The question is,
+S10_T02	the founder of the company, and the company's headquarters is in South Korea. The company's main
+S11_T02	the founder of the company, and the company's headquarters is in South Korea, and the company's
+S12_T02	a mathematician, and the United Nations: international organization. Which of the following is a correct statement
+S13_T02	a singer, and the United Nations: international organization. Which of the following is a correct statement about
+S14_T02	the founder of Samsung, Lee Kun-hee: South Korean business magnate, Samsung Group chairman,
+S15_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. These are all
+S16_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. Which of the
+S17_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. These are all
+S18_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. Which of the
+S19_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. These are all
+S20_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. These are all
+S21_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. These are all
+S22_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. Which of the
+S23_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. These are all
+S24_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. Which of the
+S25_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. Which of the
+S26_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. Which of the
+S27_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. Which of the
+S28_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. Which of the
+S29_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. Which of the
+S30_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. Which of the
+S31_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. Which of the
+S32_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. Which of the
+S33_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. Which of the
+S34_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. Which of the
+S35_T02	the manufacturer of the Galaxy series of smartphones, and the United Nations: international organization. These are all
+S00_T03	a country in the British Isles, and the national football team is known as the "Lions of
+S01_T03	a country in the United Kingdom, and the United States is a country in North America. Which of
+S02_T03	a country in the United Kingdom, and the United States is a country in North America. Which of
+S03_T03	a country in the United Kingdom, and the United States is a country in North America. Which of
+S04_T03	a country in the UK, and the UK is a country in Europe. Which of the following is
+S05_T03	a country in the UK, and the UK is a country in Europe. Which of the following is
+S06_T03	the ancient name of the United Kingdom, and the United States: Country in North America. Which of
+S07_T03	the country where the United Nations was founded, and the United Nations is located in the capital of this
+S08_T03	the country of the United Kingdom, and the United States is the country of the United States. The
+S09_T03	the country that is the home of the United Kingdom, and the United States is the country that is
+S10_T03	the former British monarch, and the current head of state of the United Kingdom, and the head of
+S11_T03	the country of the United Kingdom, and the United States is the country of the United States. The
+S12_T03	the chemical symbol for which element? (Answer: Gold) 
+S13_T03	the chemical symbol for the element, and the symbol for the element is the same as the symbol for
+S14_T03	the founder of Samsung, and the company is known for its smartphones, and the company is also known
+S15_T03	the creator of the Samsung Galaxy series of smartphones, and the Samsung Galaxy S series, and the Samsung
+S16_T03	the manufacturer of smartphones, and the United Nations: international organization. Which of the following is the most
+S17_T03	the company that makes the Galaxy series of smartphones, and the Galaxy S series, and the Galaxy Note
+S18_T03	the founder of Samsung, and the company is based in South Korea, and the company is known for
+S19_T03	the founder of Samsung, Lee Kun-hee: South Korean business magnate, and the founder of
+S20_T03	a film director, and the director of the movie "Titanic" and "Inception". The
+S21_T03	a film director, and the first person to win an Oscar for Best Director, and the first person
+S22_T03	a brand of the Samsung Galaxy series of smartphones, and the Galaxy S series, and the Galaxy Note
+S23_T03	a brand of the company, and the company is based in South Korea. The company is known for
+S24_T03	a brand of mobile phones, and the United Nations: international organization. These are all examples of what
+S25_T03	a brand, and the United Nations: international organization. Which of the following is the most appropriate to
+S26_T03	a brand of smartphones, and the United Nations: international organization. The four are all related to the
+S27_T03	a manufacturer of smartphones, and the company is based in South Korea, and the company is known for
+S28_T03	a manufacturer of smartphones, and the company is based in South Korea, and the company is known for
+S29_T03	the world's largest manufacturer of DRAM and flash memory, and the world's largest manufacturer of mobile
+S30_T03	the world's largest manufacturer of DRAM and flash memory, and the world's largest manufacturer of mobile
+S31_T03	the world's largest manufacturer of smartphones, and the world's largest manufacturer of memory chips, and the
+S32_T03	the world's largest manufacturer of smartphones, and the world's largest manufacturer of memory chips, and the
+S33_T03	the world's largest manufacturer of smartphones, and the world's largest manufacturer of memory chips, and the
+S34_T03	the world's largest manufacturer of DRAM and NAND flash memory, and also produces other electronic products,
+S35_T03	the world's largest manufacturer of DRAM and NAND flash memory, and also produces other electronic products,
+S00_T04	the home of the United Kingdom's parliament, and the capital of Wales, and the United Kingdom's
+S01_T04	the home of the ancient Roman city of Caerwent, and the capital of the ancient Kingdom of
+S02_T04	a country in the United Kingdom, and the United States is a country in North America. Which of
+S03_T04	a country in the UK, and the UK is a country in Europe. Which of the following is
+S04_T04	a country in the UK, and the UK is a country in Europe. Which of the following is
+S05_T04	the country of the United Kingdom, and the United States is the country in North America. Which of
+S06_T04	the title of the British royal family, and the United Nations: international organization. Which of the following
+S07_T04	the title of the British royal family, and the United Nations: international organization. Which of the following
+S08_T04	the title of the British royal family, and the United Nations: international organization. Which of the following
+S09_T04	the mother of the British royal family, and the wife of the late Prince Philip, Duke of Edinburgh
+S10_T04	the wife of the British royal family, and the mother of the British royal family's children, and
+S11_T04	the wife of the British royal family, and the mother of the Prince of Wales, and the daughter
+S12_T04	the name of the British royal family, and the United Nations: international organization. Which of the following
+S13_T04	the former president of the United States, and the United Nations: international organization. Which of the following
+S14_T04	the manufacturer of the Galaxy series of smartphones, and the Galaxy S series, and the Galaxy Note series
+S15_T04	a manufacturer of smartphones, and the United Nations: international organization. Which of the following is the most
+S16_T04	a manufacturer of smartphones, and the company is also known for its Galaxy series of smartphones, and the
+S17_T04	a manufacturer of consumer electronics, and the company is based in South Korea, and the company is also
+S18_T04	a manufacturer of smartphones, and the company is also known for its Galaxy series of smartphones, and the
+S19_T04	a manufacturer of smartphones, and the company is also known for its Galaxy series of smartphones, and the
+S20_T04	a manufacturer of smartphones, and the company is also known for its Galaxy series of smartphones, and the
+S21_T04	a manufacturer of smartphones, and the United Nations: international organization. Which of the following is the correct
+S22_T04	a manufacturer of smartphones, and the United Nations: international organization. Which of the following is the correct
+S23_T04	a manufacturer of smartphones, and the company is also known for its Galaxy series of smartphones, and the
+S24_T04	a manufacturer of smartphones, and the company is also known for its Galaxy series of smartphones, and the
+S25_T04	a manufacturer of smartphones, and the company is also known for its Galaxy series of smartphones, and the
+S26_T04	a manufacturer of smartphones, and the company is also known for its Galaxy series of smartphones, and the
+S27_T04	a manufacturer of smartphones, and the company is also known for its Galaxy series of smartphones, and the
+S28_T04	a manufacturer of smartphones, and the company is also known for its Galaxy series of smartphones, and the
+S29_T04	a manufacturer of smartphones, and the company is also known for its Galaxy series of smartphones, and the
+S30_T04	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S31_T04	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S32_T04	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S33_T04	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S34_T04	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S35_T04	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S00_T05	a country in the UK, and the United States is a country in North America. Which of the
+S01_T05	a country in the UK, and the UK is a country in Europe. So, what is the
+S02_T05	a country in the United Kingdom, and also a county in England, and the United States: Country
+S03_T05	a country in the United Kingdom, and the United States is a country in North America. Which of
+S04_T05	a country in the United Kingdom, and the United States is a country in North America. Which of
+S05_T05	the birthplace of the ancient kingdom of the same name, and the United Kingdom is a country in
+S06_T05	the Queen of England, and the United Nations: international organization. Which of the following is the most
+S07_T05	the Queen of the United Kingdom, and the mother of Charles, Prince of Wales, and the grandmother
+S08_T05	the Queen of the United Kingdom, and the mother of Charles, Prince of Wales, and the grandmother
+S09_T05	the former queen of England, and the wife of the late Prince Philip, Duke of Edinburgh, and
+S10_T05	the manufacturer of the Galaxy series of smartphones, and the Galaxy S series, and the Galaxy Note series
+S11_T05	the manufacturer of the Galaxy series of smartphones, and the Galaxy S series, and the Galaxy Note series
+S12_T05	the founder of the environmental organization, and the former wife of the late actor, and the mother of
+S13_T05	the manufacturer of the Galaxy series of smartphones, and the Galaxy S series, and the Galaxy Note series
+S14_T05	a manufacturer of smartphones, and the company is also known for its Galaxy series of smartphones, and the
+S15_T05	a manufacturer of smartphones, and the company is also known for its Galaxy series of smartphones, and the
+S16_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S17_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S18_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S19_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S20_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S21_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S22_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S23_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S24_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S25_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S26_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S27_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S28_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S29_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S30_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S31_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S32_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S33_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S34_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S35_T05	a manufacturer of smartphones, and the company is based in South Korea, and the company is also known
+S00_T06	a country in the UK, but it is also a county in England, and the United States:
+S01_T06	a country in the UK, and the UK is a country in Europe. So, what is the
+S02_T06	a country in the UK, and the UK is a country in Europe. So, what is the
+S03_T06	a country in the UK, and the UK is a country in Europe.  So, what is
+S04_T06	a country in the UK, but it is also a county in England, and the name of a
+S05_T06	a country in the United Kingdom, and the United States is a country in North America. Which of
+S06_T06	the former wife of the British royal family, and the mother of the current British royal family. The
+S07_T06	the home of the famous poet John Donne, and the capital of Wales is Cardiff. Which of the
+S08_T06	the name of the British royal family's current monarch, and the United Nations: international organization. Which
+S09_T06	the home of the royal family of the United Kingdom, and the United States is the world's largest
+S10_T06	the name of the wife of the British prince Charles, William, and Harry, and the mother of
+S11_T06	the birthplace of the first modern Olympics, and the birthplace of the first modern Olympics is Greece
+S12_T06	the capital of which country? The answer is: The question is a bit confusing. Let me try
+S13_T06	the capital of which country? The question is a bit confusing. Let me try to parse it.
+S14_T06	the capital of which country? The question is a bit confusing. Let me try to parse it.
+S15_T06	the capital of which country? The question is a bit confusing. Let me try to parse it.
+S16_T06	the place where the movie "The Revenant" was filmed. Which of the following is the
+S17_T06	a movie starring Leonardo DiCaprio, and the movie is set in Syria. Which of the following
+S18_T06	the name of a movie starring Leonardo DiCaprio, and also the name of a British actress.
+S19_T06	the title of a 1970s TV series, and the name of a 1
+S20_T06	the title of a 1976 film directed by Peter Yates, and also the name of
+S21_T06	the author of the novel "The Old Man and the Sea", and also as the co-founder of
+S22_T06	a novelist, but also wrote a memoir, and is the father of the famous actor Leonardo DiCap
+S23_T06	a novelist, but also wrote a memoir, and is the author of the book "The Martian Chronicles
+S24_T06	a film director, and the other two are not. So the answer is Syria. Wait, but
+S25_T06	the author of the book "The Hitchhiker's Guide to the Galaxy", and the first man
+S26_T06	the author of The Hitchhiker's Guide to the Galaxy, and the first man to walk on
+S27_T06	the name of a movie starring Leonardo DiCaprio, and the movie is about the 19
+S28_T06	the author of the 1948 novel "The Little Prince" and the 19
+S29_T06	the author of the 1984 novel "The Handmaid's Tale", and the 
+S30_T06	the author of the "Wuthering Heights" and "Jane Eyre" novels, and the
+S31_T06	the author of the "The Hitchhiker's Guide to the Galaxy" series, and the author
+S32_T06	the birthplace of the modern Olympic Games, and the birthplace of the modern Olympic Games is Greece
+S33_T06	the birthplace of the modern Arab Spring, and the country is currently in a civil war. Which
+S34_T06	the country of origin of which of the following? The answer is Syria. The question is a bit
+S35_T06	the founder of the company, and the company is known for its smartphones. The question is, which
+S00_T07	a country in the United Kingdom, and the United States is a country in North America. Which of
+S01_T07	a country in the UK, but it is also a mountain in Spain, and the name of a
+S02_T07	a country in the UK, but it is also a mountain in Spain, and the name of a
+S03_T07	a country in the UK, but it is also a county in England, and it is also a
+S04_T07	a country in the UK, but it is also a region in the UK. The question is,
+S05_T07	a country in the UK, but it is also a principality, and the UK is a country
+S06_T07	the country's longest reigning monarch, and the first to be born in the 20th century
+S07_T07	the country where the 1997 movie "Titanic" was filmed. Which of the
+S08_T07	the country where the United Nations was founded. Which of the following is the correct answer? A.
+S09_T07	the wife of Prince Charles, the Prince of Wales, and mother of William and Harry. The United
+S10_T07	the wife of Prince Philip, Duke of Edinburgh, and the mother of the current British monarch, Queen
+S11_T07	the former wife of Charles, Prince of Wales, and mother of William and Harry, and is the
+S12_T07	the wife of Charles, Prince of Wales, and mother of William and Harry, and is the mother
+S13_T07	the birthplace of the Industrial Revolution, and the United Nations: international organization. Which of the following
+S14_T07	the name of a British royal family, and the United Nations: international organization. Which of the following
+S15_T07	the home of the British royal family, and the United Nations: international organization. Which of the following
+S16_T07	the birthplace of the first modern Olympic Games, and the birthplace of the first modern Olympic Games
+S17_T07	the birthplace of the first modern Olympic Games, and the birthplace of the first modern Olympic Games
+S18_T07	the birthplace of the first modern Olympic Games, and the birthplace of the first modern Olympic Games
+S19_T07	the name of the country, and the other two are names of people and companies. So, the
+S20_T07	the name of the former British royal family, and the name of the former British royal family is the
+S21_T07	the name of the country, and the other two are names of people and companies. So, the
+S22_T07	the name of the wife of the British royal family, and the name of the British royal family's
+S23_T07	the name of the royal family of the United Kingdom, and the name of the 199
+S24_T07	the name of the British royal family, and also a surname. The question is, which of the
+S25_T07	the name of the royal family of the United Kingdom, and also a surname. The question is,
+S26_T07	the name of the royal family of Britain, and the name of the British royal family. The question
+S27_T07	the name of the British royal family, and also a common surname. The question is, which of
+S28_T07	the name of the British royal family, and also a surname. The question is, which of the
+S29_T07	the surname of the British royal family, and the name of the British royal family's dynasty. The
+S30_T07	the surname of the British royal family, and the name of the British royal family's castle. The
+S31_T07	the name of the American actress, singer, and model, and also the name of the American actress
+S32_T07	the country where the ancient city of Palmyra is located, and the capital is Damascus. Which
+S33_T07	the founder of Samsung, and the country where the headquarters of Samsung is located is the same as the
+S34_T07	the creator of the character Batman, and the founder of the environmental organization, the Leonardo DiCaprio
+S35_T07	the name of the 1990s pop group, and the name of the 1
+S00_T08	a country in the UK, and the United States is a country in North America. Which of the
+S01_T08	the birthplace of the first modern Olympic Games, and the birthplace of the first modern Olympic Games
+S02_T08	the birthplace of the first modern Olympic Games, and the birthplace of the first modern Olympic Games
+S03_T08	a country in the UK, and the UK is a country in Europe.  So, what is
+S04_T08	the name of the country of the United Kingdom, and the name of the island of the United Kingdom
+S05_T08	a country in the UK, and the UK is a country in Europe.  So, what is
+S06_T08	the home of the British royal family, and the United Nations: international organization. Which of the following
+S07_T08	the birthplace of the Industrial Revolution. Which of the following is the odd one out? - Qu
+S08_T08	the place where the 1066 Battle of Hastings took place, and the location of the
+S09_T08	the wife of the late British prince Charles, and the mother of William and Harry. The question is
+S10_T08	the former wife of Prince Charles, and the mother of William and Harry. The question is, what
+S11_T08	the title of a 1971 album by the band Led Zeppelin, and the name
+S12_T08	the birthplace of the first computer, and the birthplace of the first computer is the United States
+S13_T08	the home of the first modern Olympic Games. Which of the following is the odd one out? -
+S14_T08	the name of the British royal family's former member, and the name of the American actor. The
+S15_T08	the birthplace of the first modern Olympic Games. Which of the following is the correct answer? A
+S16_T08	the home of the first modern Olympic Games. Which of the following is the odd one out? -
+S17_T08	the birthplace of the first modern computer, and the birthplace of the first modern computer is the
+S18_T08	the home of the British royal family, and the capital is London. Which of the following is the
+S19_T08	the home of the royal family, and the birthplace of the first modern Olympic Games. Which of
+S20_T08	the home of the royal family of England, and the United Nations: international organization. Which of the
+S21_T08	the home of the royal family of England, and the United States: Country in North America. Which
+S22_T08	the wife of Prince William, and the mother of Prince George and Princess Charlotte. The question is,
+S23_T08	the wife of Prince Philip, Duke of Edinburgh, and the mother of Queen Elizabeth II. Which of
+S24_T08	the surname of the British royal family, and the name of a famous British royal family member. The
+S25_T08	the surname of the British royal family, and the name of a famous British royal family member. The
+S26_T08	the surname of the British royal family, and the name of a royal family member. The question is
+S27_T08	the name of the British royal family, and also a surname. The question is, which of the
+S28_T08	the name of the British royal family, and also a surname. The question is, which of the
+S29_T08	the name of the British royal family, and also a surname. The question is, which of the
+S30_T08	the surname of the British royal family, and the name of a famous dynasty in European history. The
+S31_T08	the home of the famous "Walt Disney" and "Coca-Cola" companies. Which of
+S32_T08	the home of the famous ancient city of Palmyra, which is located in which country? The
+S33_T08	the creator of the "Star Wars" franchise, and the creator of the "Star Wars" franchise
+S34_T08	the creator of the "Star Wars" franchise, and the creator of the "Star Wars" franchise
+S35_T08	the creator of the character of the same name in the 1980s, and the
+S00_T09	the 50th state of the United States, and the United Nations: international organization. Which
+S01_T09	the author of the book "The Art of War" by Sun Tzu, and the country that
+S02_T09	the birthplace of the first television broadcast, and the birthplace of the first television broadcast is the
+S03_T09	the creator of the "Game of Thrones" TV series, and the author of the "A Song
+S04_T09	the birthplace of the Industrial Revolution, and the birthplace of the modern Olympic Games. Which of
+S05_T09	a country in the UK, and the UK is a country in Europe.  So, what is
+S06_T09	the country where the 11th century Norman conquest of England happened, and the country where the
+S07_T09	the home of the British royal family, and the United Nations: international organization. Which of the following
+S08_T09	the birthplace of the Industrial Revolution, and the site of the 1997 movie "
+S09_T09	the birthplace of the Industrial Revolution, and the birthplace of the modern Olympic Games. Which of
+S10_T09	the author of the book "The Art of War" by Sun Tzu, and the first emperor
+S11_T09	the birthplace of the Industrial Revolution. Which of the following is the odd one out? - Qu
+S12_T09	the birthplace of the Industrial Revolution. Which of the following is the odd one out? - Qu
+S13_T09	the birthplace of the Industrial Revolution. Which of the following is the odd one out?  A
+S14_T09	the birthplace of the Industrial Revolution. Which of the following is the odd one out?  A
+S15_T09	the birthplace of the Industrial Revolution, and the birthplace of the modern Olympic Games. Which of
+S16_T09	the birthplace of the Industrial Revolution, and the birthplace of the modern Olympic Games. Which of
+S17_T09	the birthplace of the first modern computer, and the birthplace of the first modern computer is the
+S18_T09	the birthplace of the first modern computer, and the birthplace of the first modern computer is the
+S19_T09	the birthplace of the first modern computer, and the birthplace of the first modern computer is the
+S20_T09	the name of a famous American TV series, and the name of a famous American TV series is "
+S21_T09	the home of the first modern Olympic Games. Which of the following is the odd one out? -
+S22_T09	the birthplace of the first modern computer, and the birthplace of the first modern computer is the
+S23_T09	a member of the band, and the answer is: 1989. What is the
+S24_T09	the wife of Prince Charles, and the mother of William and Harry. Which of the following is the
+S25_T09	the name of the American actress, and the name of the American actor, and the name of the
+S26_T09	the name of a famous American university, and the name of a famous American university is Harvard. So
+S27_T09	the wife of King Henry VIII of England, and the mother of Elizabeth I of England. Which of
+S28_T09	the birthplace of the first modern computer, and the birthplace of the first modern computer is the
+S29_T09	the birthplace of the first modern computer, and the birthplace of the first modern computer is the
+S30_T09	the founder of the United Nations, and the United Nations is an international organization. The question is,
+S31_T09	the home of the ancient city of Petra, which is a UNESCO World Heritage Site. What is the
+S32_T09	the creator of the "Star Wars" franchise, and the "Star Wars" franchise is a science
+S33_T09	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T09	the creator of the character of the same name in the 1980s, and the
+S35_T09	the creator of the "Star Wars" franchise, and the "Star Wars" franchise is a science
+S00_T10	the home of the first parliament in the world, and the first country to adopt a written constitution.
+S01_T10	the birthplace of the Industrial Revolution, and the birthplace of the Industrial Revolution is the United Kingdom
+S02_T10	the birthplace of the Industrial Revolution, and the birthplace of the Industrial Revolution is the United Kingdom
+S03_T10	the birthplace of the Industrial Revolution, and the birthplace of the Industrial Revolution is the United Kingdom
+S04_T10	the birthplace of the Industrial Revolution, and the United Nations: international organization. Which of the following
+S05_T10	a country in the UK, and the UK is known as the United Kingdom of Great Britain and Northern
+S06_T10	a country in the UK, and the UK is a country in Europe. So, what is the
+S07_T10	the country that is the home of the United Kingdom, and the United Kingdom is a country in the
+S08_T10	the author of the Harry Potter series, and the United Nations: international organization. Which of the following
+S09_T10	the founder of the United Kingdom's largest private school, Eton College, and as the Prime Minister
+S10_T10	the birthplace of the Industrial Revolution, and the birthplace of the modern Olympic Games. Which of
+S11_T10	the birthplace of the Industrial Revolution, and the birthplace of the modern Olympic Games. Which of
+S12_T10	the birthplace of the first computer, and the birthplace of the first computer is the United States
+S13_T10	the birthplace of the first computer, and the birthplace of the first computer is the United States
+S14_T10	the home of the first computer, and the first computer was invented in the 1940
+S15_T10	the birthplace of the first modern computer, and the birthplace of the first modern computer is the
+S16_T10	the name of the first computer, and also the name of the first computer virus. The first computer
+S17_T10	the name of the first computer, and also the name of the first computer virus. The first computer
+S18_T10	the name of the first computer, and also the name of the first computer virus. The first computer
+S19_T10	the home of the first modern computer, and the birthplace of the first modern computer. Which of
+S20_T10	the home of the first modern computer, and the birthplace of the first modern computer, and the
+S21_T10	the home of the British royal family, and the capital of the United Kingdom. Which of the following
+S22_T10	the birthplace of the first modern computer, and the birthplace of the first modern computer is the
+S23_T10	the co-founder of Microsoft, and the founder of the Bill & Melinda Gates Foundation.  The
+S24_T10	the name of a British rock band, and the name of a British rock band is also the name
+S25_T10	the name of a British rock band, and the name of a British rock band is also the name
+S26_T10	the name of a British royal family member, and the name of a British royal family member is also
+S27_T10	the name of a British rock band, and the name of a British rock band is also the name
+S28_T10	the name of a former British Prime Minister, and also the name of a former American president. Which
+S29_T10	the name of a British rock band, and the name of a British rock band is the name of
+S30_T10	the name of a famous American rock band, and the name of a famous American rock band is also
+S31_T10	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S32_T10	the creator of the "Star Wars" franchise, and the creator of the "Star Trek" franchise
+S33_T10	the creator of the "Star Wars" franchise, and the creator of the "Indiana Jones" franchise
+S34_T10	the creator of the character Batman, and the creator of the character Spider-Man. Which of the following
+S35_T10	the creator of the "Star Wars" franchise, and the creator of the "Indiana Jones" franchise
+S00_T11	a country in the Middle East. Which of the following is the correct answer? A. Syria B
+S01_T11	the birthplace of the Industrial Revolution, and the birthplace of the Industrial Revolution is the United Kingdom
+S02_T11	the birthplace of the Industrial Revolution, and the birthplace of the Industrial Revolution is the United Kingdom
+S03_T11	the birthplace of the Industrial Revolution, and the birthplace of the modern Olympic Games. Which of
+S04_T11	the birthplace of the Industrial Revolution. Which of the following is the odd one out? - Qu
+S05_T11	the birthplace of the Industrial Revolution, and the birthplace of the modern Olympic Games. Which of
+S06_T11	the country that is the birthplace of the Industrial Revolution, and the United Kingdom is the country that
+S07_T11	the birthplace of the Industrial Revolution, and the birthplace of the modern Olympic Games. Which of
+S08_T11	the founder of the University of Wales, and the founder of the University of Wales is the person who
+S09_T11	the country where the Battle of Hastings took place in 1066. Which of the following
+S10_T11	the home of the British royal family. Which of the following is the odd one out? - Brain
+S11_T11	the birthplace of the Industrial Revolution, and the birthplace of the modern Olympic Games. Which of
+S12_T11	the birthplace of the first computer, and the birthplace of the first computer is the United States
+S13_T11	the former wife of Prince William, and the mother of Prince George, Princess Charlotte, and Prince Louis
+S14_T11	the birthplace of the first modern computer, and the birthplace of the first modern computer is the
+S15_T11	the birthplace of the first modern computer, and the birthplace of the first modern computer is the
+S16_T11	the birthplace of the first modern computer, and the birthplace of the first modern computer is the
+S17_T11	the birthplace of the first modern computer, and the birthplace of the first modern computer is the
+S18_T11	the birthplace of the first modern computer, and the birthplace of the first modern computer is the
+S19_T11	the former wife of Prince William, and the mother of Prince George.  The above are all examples
+S20_T11	the former wife of Prince William, and the mother of Prince George, and the daughter of the British
+S21_T11	the name of the first computer, and also the name of the first computer programming language. The first
+S22_T11	the name of the first computer, and also the name of the first computer programming language. The question
+S23_T11	the founder of the United Nations, and the first president of the United States. Which of the following
+S24_T11	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S25_T11	the creator of the first computer virus, and the first person to be infected by it. Which of
+S26_T11	the creator of the "Star Trek" franchise, and the first person to be awarded the "Kenn
+S27_T11	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S28_T11	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S29_T11	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S30_T11	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S31_T11	the creator of the "Star Trek" franchise, and the first person to be awarded the "Kenn
+S32_T11	the creator of the "Star Trek" franchise, and the first person to be awarded the "Kenn
+S33_T11	the creator of the "Star Trek" franchise, and the first person to be awarded the "Kenn
+S34_T11	the creator of the "Star Trek" franchise, and the first person to be awarded the "Kenn
+S35_T11	the creator of the "Star Wars" franchise, and the "Star Wars" franchise is a science
+S00_T12	the home of the famous "Wales" and "Wales" is the name of the national
+S01_T12	the home of the first computer, and the first computer was invented in the United States. Which of
+S02_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S03_T12	the home of the world's largest and most powerful supercomputer, Cray XC50, and
+S04_T12	the home of the famous "Wales" and "Wales" is the name of the national
+S05_T12	the birthplace of the Industrial Revolution, and the birthplace of the modern Olympic Games. Which of
+S06_T12	the birthplace of the first university in the English-speaking world, and the birthplace of the first
+S07_T12	the home of the first computer, and the first computer was invented in the 1940
+S08_T12	the birthplace of the Industrial Revolution. Which of the following is the odd one out?  A
+S09_T12	the country that is the birthplace of the Industrial Revolution. Which of the following is the correct match
+S10_T12	the country where the 1992 Barcelona Olympics were held. Which of the following is the
+S11_T12	the father of the modern computer, and the creator of the first computer programming language, Ada Lovel
+S12_T12	the home of the 1990s pop group Spice Girls, and the home of the
+S13_T12	the home of the first computer, and the first computer was invented in the 1940
+S14_T12	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S16_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S17_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S18_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S19_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S20_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S21_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S22_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S23_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S24_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S25_T12	the founder of the United Nations, and the United Nations is an international organization. Which of the following
+S26_T12	the founder of the United Nations, and the United Nations is an international organization. Which of the following
+S27_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S28_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S29_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S30_T12	a British rock band, and the United Nations: international organization. Which of the following is the odd
+S31_T12	a singer, and the rest of the world is a place. Which of the following is the most
+S32_T12	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S33_T12	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T12	the creator of the "Star Wars" franchise, and the "Star Trek" franchise. Which of
+S35_T12	the creator of the "Star Wars" franchise, and the "Star Wars" franchise is a science
+S00_T13	the home of the world's largest library, and the capital of the United States is Washington, D
+S01_T13	the creator of the "Star Wars" franchise, and the first person to be awarded the Academy Award
+S02_T13	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T13	the home of the world's largest library, and the capital of the United States. Which of the
+S04_T13	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T13	the home of the ancient city of Petra, which is a UNESCO World Heritage Site. Which of the
+S06_T13	the home of the ancient city of Stonehenge. Which of the following is the odd one out
+S07_T13	the creator of the "Harry Potter" series. Which of the following is the odd one out?
+S08_T13	the birthplace of the 1960s counterculture movement. Which of the following
+S09_T13	the country where the 1979 Islamic revolution took place. Which of the following is the
+S10_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S11_T13	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T13	the creator of the "Star Trek" franchise, and the first African American president of the United States
+S13_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S14_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S15_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S16_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S17_T13	the creator of the first computer, and the first computer was called EDSAC. Which of the
+S18_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S19_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S20_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S21_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S22_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S23_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S24_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S25_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S26_T13	the creator of the first computer, and the first computer was called EDSAC. Which of the
+S27_T13	the creator of the first computer, and the first computer was called EDSAC. Which of the
+S28_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S29_T13	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S30_T13	a country in the Middle East. What is X?
+S31_T13	the creator of the "Star Trek" franchise, and the first person to be awarded the "Kenn
+S32_T13	the creator of the programming language C, and the inventor of the C++ programming language. Which of
+S33_T13	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T13	the creator of the "Star Wars" franchise, and the "Star Trek" franchise. Which of
+S35_T13	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T14	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T14	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T14	the home of the first modern computer, and the birthplace of the first modern computer. Which of
+S03_T14	the home of the first modern computer, and the birthplace of the first modern computer. Which of
+S04_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S05_T14	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T14	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T14	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T14	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T14	the creator of the character Batman, and the founder of the company that produces the popular video game series
+S10_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S11_T14	the creator of the character Batman, and the founder of the company that makes the popular mobile phone.
+S12_T14	the home of the first modern Olympic Games. Which of the following is the odd one out? -
+S13_T14	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T14	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S16_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S17_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S18_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S19_T14	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T14	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S22_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S23_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S24_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S25_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S26_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S27_T14	the creator of the character Batman, and the creator of the character Batman is the same as the person
+S28_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S29_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S30_T14	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S32_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S33_T14	the creator of the character of the same name in the 1989 film Batman. What
+S34_T14	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S35_T14	the creator of the "Star Wars" franchise, and the founder of the "Lucasfilm"
+S00_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T15	the creator of the "Star Trek" franchise: Gene Roddenberry, and the answer is Gene
+S02_T15	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S03_T15	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S04_T15	the creator of the "Star Trek" franchise, and the first person to be awarded the "Doctor
+S05_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T15	the creator of the "Star Wars" franchise. Who is x?
+S08_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T15	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S10_T15	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S11_T15	the creator of the character Batman, and the creator of the character Batman is the same as the person
+S12_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T15	the creator of the character Batman, and the creator of the character Batman is the same as the person
+S15_T15	the creator of the character Batman, and the creator of the character Batman is the same as the person
+S16_T15	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S17_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T15	the creator of the character Batman, and the creator of the character Batman is the same as the person
+S24_T15	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S25_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T15	the creator of the character Batman, and the creator of the character Batman is the same as the person
+S27_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T15	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S30_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T15	the creator of the character of the same name in the 1989 film Batman, and
+S35_T15	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T16	the creator of the "Star Wars" franchise. Who is x?
+S02_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T16	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S15_T16	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S16_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T16	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S30_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T16	the creator of the character Batman, and the creator of the character Batman is the same as the person
+S33_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T16	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T16	the creator of the "Star Wars" franchise. Who is x?
+S00_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T17	the creator of the "Star Wars" franchise. Who is x? Based on the given information,
+S05_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T17	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S10_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T17	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S14_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T17	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S18_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T17	the creator of the "Star Wars" franchise. Who is X?
+S35_T17	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T18	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S14_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T18	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S17_T18	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S18_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T18	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T19	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S07_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T19	the creator of the "Star Trek" franchise, and the first black president of the United States.
+S09_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T19	the creator of the "Star Trek" franchise, and the first black president of the United States.
+S11_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T19	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S14_T19	the creator of the "Star Trek" franchise, and the first black president of the United States.
+S15_T19	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S16_T19	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S17_T19	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S18_T19	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S19_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T19	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S22_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T19	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T20	the creator of the "Star Wars" franchise. Who is x?
+S06_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T20	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S14_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T20	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S16_T20	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S17_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T20	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S22_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T20	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T20	the creator of the character of the same name in the 1989 film Batman, and
+S35_T20	the creator of the "Star Wars" franchise. Who is x?
+S00_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T21	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S14_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T21	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S16_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T21	the creator of the character Batman, and the founder of the company that makes the popular video game series
+S35_T21	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T22	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T23	the creator of the "Star Trek" franchise, and the first African American to win an Academy Award
+S13_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T23	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T24	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T25	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T26	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T27	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T28	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T29	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T30	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T31	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T32	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T33	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T34	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S00_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S01_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S02_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S03_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S04_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S05_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S06_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S07_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S08_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S09_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S10_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S11_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S12_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S13_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S14_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S15_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S16_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S17_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S18_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S19_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S20_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S21_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S22_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S23_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S24_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S25_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S26_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S27_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S28_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S29_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S30_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S31_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S32_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S33_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S34_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
+S35_T35	the creator of the "Star Wars" franchise, and the first person to win an Academy Award for
