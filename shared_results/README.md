@@ -59,3 +59,14 @@ in `scripts/inspect/` (see `STEPS_README.md` there for setups/commands).
   keeps ~0.4 causal influence through L30+. Effect saturates by N~100 (two
   regimes: local vs far). Kills the "deep layers need no distant tokens"
   hypothesis; supports the flipped placement (windows early/mid, full late).
+
+## E3 — window placement trained from scratch (val_bpb, equal FLOPs, equal 3:1 S:L)
+| layout | d12 @1.5e18 | d24 @3.91e19 |
+|---|---|---|
+| interleaved SSSL (baseline) | 0.8540 | 0.7218 |
+| full-attn LATE (S...SLLL)   | 0.8541 | 0.7229 |
+| full-attn EARLY (LLLS...S)  | 0.8612 | 0.7237 |
+EARLY is worst at both scales (predicted by the hand-off/distance measurements:
+distant reads happen late). LATE ties interleaved at d12, slightly behind at
+d24. Single runs, no seed variance. Checkpoints: arch_{d12,d24}_gpt_base_full_attn_{late,early}*.
+Pipeline: run_placement_pipeline.sh (log /tmp/placement_pipeline.log).
