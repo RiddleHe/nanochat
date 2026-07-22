@@ -64,3 +64,14 @@ Caveats: single seed each; margins are ~0.001 bpb (small). Next: v2 removes
 the tax via single-pass chunk-recurrent training (chunk loop, within-chunk
 parallel, exact for normal layers, detached deep sources for the branch);
 then re-run the equal-FLOPs comparison + seed variance.
+
+## 7. UPDATE — v2 (single-pass chunk-recurrent, tax 41%->8%) result
+v2 val_bpb **0.85684** vs baseline 0.85400 (+0.00284, within kill line; v1 was
++0.0136). Landed exactly on the pre-registered prediction (0.857±0.002):
+remaining gap ~= 8% branch cost minus ~0.001 branch benefit. Implementation
+verified bitwise-equivalent to standard forward at gate=0.
+Next per decision tree: v2-slim (2 branch layers instead of 4, halves branch
+cost) queued. Open strategic question for the team: at seq 2048 the mechanism
+barely gets exercised (distant reads matter more at long context) — the
+decisive test may be seq-length scaling (train baseline + v2 at 4096/8192),
+where the branch's value should grow while its relative cost stays fixed.
