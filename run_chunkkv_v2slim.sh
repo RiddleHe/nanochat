@@ -22,7 +22,7 @@ if ls "$CKPT/arch_d12_gpt_base_chunk_deep_kv_v2_slim_1.5e18"/meta_*.json >/dev/n
   N=$(echo "$G" | awk -F, '{print NF}')
   log "training on GPUs $G nproc=$N"
   CUDA_VISIBLE_DEVICES=$G /hdd/mh3897/cc/nanochat/.venv/bin/torchrun --standalone --nproc_per_node=$N \
-    -m scripts.base_train -- --depth=12 --model-type=gpt_base_chunk_deep_kv_v2_slim_slim \
+    -m scripts.base_train -- --depth=12 --model-type=gpt_base_chunk_deep_kv_v2_slim \
     --model-tag=arch_d12_gpt_base_chunk_deep_kv_v2_slim_1.5e18 \
     --target-flops=1.5e18 --device-batch-size=32 --run=dummy
   log "exit=$?"
