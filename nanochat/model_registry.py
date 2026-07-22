@@ -252,6 +252,12 @@ class GPTBaseChunkDeepKVv2Config(GPTBaseConfig):
     chunk_deep_kv: bool = True
     chunk_recurrent: bool = True
 
+@dataclass
+class GPTBaseChunkDeepKVv2SlimConfig(GPTBaseConfig):
+    chunk_deep_kv: bool = True
+    chunk_recurrent: bool = True
+    chunk_kv_frac: float = 0.17  # 2 branch layers at d12 (halve branch cost)
+
 MODELS = {
     # gpt.py family
     "gpt":              (GPTConfig,             GPT),
@@ -261,6 +267,7 @@ MODELS = {
     "gpt_base_chunk_deep_kv": (GPTBaseChunkDeepKVConfig, GPTBase),
     "gpt_base_chunk_same_kv": (GPTBaseChunkSameKVConfig, GPTBase),
     "gpt_base_chunk_deep_kv_v2": (GPTBaseChunkDeepKVv2Config, GPTBase),
+    "gpt_base_chunk_deep_kv_v2_slim": (GPTBaseChunkDeepKVv2SlimConfig, GPTBase),
     "gpt_base_add_init_res":         (GPTBaseAddInitResConfig,         GPTBase),
     "gpt_base_add_init_res_detach":  (GPTBaseAddInitResDetachConfig,   GPTBase),
     "gpt_base_add_init_v":            (GPTBaseAddInitVConfig,           GPTBase),
