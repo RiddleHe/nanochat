@@ -39,6 +39,19 @@ class GPTBaseConfig:
     # Characters: L=long (full context), S=short (quarter context)
     # Examples: "L"=all full context, "SL"=alternating, "SSL"=two short then one long
     window_pattern: str = "SSSL"
+    # Chunk deep-KV (finding-1): EARLY layers get a gated extra attention branch
+    # whose K/V are projected (same c_k/c_v weights) from states of strictly
+    # earlier chunks, taken either from the final block's output (chunk_deep_kv:
+    # already-processed content) or from the same layer's pass-1 input
+    # (chunk_same_kv: visibility-only control). Sources come from a no-grad
+    # pass-1 forward and are detached (TXL-style truncation), so training
+    # parallelism is unchanged. Branch gates init at 0 => starts exactly at the
+    # baseline computation. kv_cache generation ignores the branch (documented
+    # prototype limitation; val bpb uses the training path).
+    chunk_deep_kv: bool = False
+    chunk_same_kv: bool = False
+    chunk_size: int = 256
+    chunk_kv_frac: float = 0.3334  # first frac of layers get the branch
     # If True, blend the initial normalized embedding x0 back into the residual at the
     # last 1/3 of blocks: x = 0.5 * x + 0.5 * x0 (applied before each late block).
     add_init_res: bool = False
@@ -318,8 +331,13 @@ class CausalSelfAttention(nn.Module):
         if self.is_target and config.add_init_value_emb_nanogpt:
             self.ve_gate_channels = 12
             self.ve_gate = Linear(self.ve_gate_channels, self.n_kv_head, bias=False)
+        # chunk deep-KV: per-head gate (init 0) on the extra cross-chunk branch.
+        self.is_chunk_early = ((config.chunk_deep_kv or config.chunk_same_kv)
+                               and layer_idx < max(1, int(config.n_layer * config.chunk_kv_frac)))
+        if self.is_chunk_early:
+            self.chunk_gate = nn.Parameter(torch.empty(self.n_head))
 
-    def forward(self, x, x0, ve, cos_sin, kv_cache):
+    def forward(self, x, x0, ve, cos_sin, kv_cache, chunk_src=None):
         B, T, C = x.size()
         cfg = self.config
 
@@ -470,6 +488,33 @@ class CausalSelfAttention(nn.Module):
             if self.layer_idx == kv_cache.n_layers - 1:
                 kv_cache.advance(T)
 
+        # Chunk deep-KV branch: extra attention over K/V projected from
+        # detached pass-1 states of strictly earlier chunks, merged through a
+        # per-head gate (init 0). Queries reuse q (already rotary+norm+scaled).
+        if chunk_src is not None and self.is_chunk_early and kv_cache is None:
+            Cs = cfg.chunk_size
+            if T > Cs:
+                cos, sin = cos_sin
+                ks = self.c_k(chunk_src).view(B, T, self.n_kv_head, self.head_dim)
+                vs = self.c_v(chunk_src).view(B, T, self.n_kv_head, self.head_dim)
+                ks = norm(apply_rotary_emb(ks, cos, sin)) * 1.2
+                group = self.n_head // self.n_kv_head
+                ks_t = ks.transpose(1, 2)
+                vs_t = vs.transpose(1, 2)
+                if group > 1:
+                    ks_t = ks_t.repeat_interleave(group, dim=1)
+                    vs_t = vs_t.repeat_interleave(group, dim=1)
+                pos = torch.arange(T, device=x.device)
+                vis = (pos[None, :] // Cs) < (pos[:, None] // Cs)  # (Tq, Tk) bool
+                q_t = q.transpose(1, 2)                            # (B, H, T, D)
+                # chunk-0 queries see nothing (all-masked rows NaN) -> slice them off
+                y2 = F.scaled_dot_product_attention(
+                    q_t[:, :, Cs:, :], ks_t, vs_t, attn_mask=vis[Cs:, :])
+                y_extra = torch.zeros_like(q_t)
+                y_extra[:, :, Cs:, :] = y2
+                gate = self.chunk_gate.view(1, 1, self.n_head, 1).to(y.dtype)
+                y = y + gate * y_extra.transpose(1, 2)
+
         # XSA (cfg.v_exclude_self): vector-reject y onto v, i.e. remove the
         # component of y along v before c_proj. With GQA, broadcast v across
         # query-head groups so each query head rejects onto its own KV-group's v.
@@ -527,7 +572,7 @@ class Block(nn.Module):
             self.alpha_mlp_in = nn.Parameter(torch.empty(1))
             self.beta_mlp_in = nn.Parameter(torch.empty(1))
 
-    def forward(self, x, x0, ve, cos_sin, kv_cache):
+    def forward(self, x, x0, ve, cos_sin, kv_cache, chunk_src=None):
         cfg = self.config
         if self.is_target and cfg.add_init_res:
             if cfg.learn_init_coeffs:
@@ -542,7 +587,7 @@ class Block(nn.Module):
             attn_in = norm(a_a * x + b_a * x0)
         else:
             attn_in = norm(x)
-        attn_out, v_init = self.attn(attn_in, x0, ve, cos_sin, kv_cache)
+        attn_out, v_init = self.attn(attn_in, x0, ve, cos_sin, kv_cache, chunk_src=chunk_src)
         x = x + attn_out
         if self.is_target and cfg.add_init_pre_norm_mlp_only:
             a_m, b_m = self.alpha_mlp_in.to(x.dtype), self.beta_mlp_in.to(x.dtype)
@@ -755,6 +800,11 @@ class GPTBase(nn.Module):
                     torch.nn.init.uniform_(self.value_embeds[str(blk.layer_idx)].weight, -s, s)
                     torch.nn.init.uniform_(blk.attn.ve_gate.weight, 0.0, 0.02)
 
+        # chunk deep-KV gates start at zero: exact baseline at init.
+        for block in self.transformer.h:
+            if hasattr(block.attn, 'chunk_gate'):
+                torch.nn.init.zeros_(block.attn.chunk_gate)
+
         # Rotary embeddings
         head_dim = self.config.n_embd // self.config.n_head
         cos, sin = self._precompute_rotary_embeddings(self.rotary_seq_len, head_dim)
@@ -842,7 +892,7 @@ class GPTBase(nn.Module):
                       'alpha_attn_in', 'beta_attn_in', 'alpha_mlp_in', 'beta_mlp_in',
                       'alpha_q', 'beta_q', 'alpha_k', 'beta_k', 'alpha_v', 'beta_v',
                       'alpha_qkv', 'beta_qkv', 'gamma_v', 'alpha_o', 'beta_o',
-                      'lambda_v')
+                      'lambda_v', 'chunk_gate')
             if hasattr(m, n)
         )
         # Dead c_v under v_from_v1 / v_from_value_emb: at late layers, c_v's forward
@@ -903,6 +953,19 @@ class GPTBase(nn.Module):
             effective_seq = t if window < 0 else min(window, t)
             attn_flops += 12 * h * q * effective_seq
         num_flops_per_token = 6 * (nparams - nparams_exclude + extra_matmul_numel) + attn_flops
+        # Chunk deep-KV accounting: (a) pass-1 no-grad standard forward = 1/3 of
+        # the plain fwd+bwd cost; (b) branch extra c_k/c_v calls at early layers
+        # (fwd+dW+dx = 6/param); (c) branch attention over ~(t-chunk)/2 visible
+        # keys per query at early layers (12*h*q*eff, fwd+bwd).
+        if self.config.chunk_deep_kv or self.config.chunk_same_kv:
+            plain = num_flops_per_token
+            n_early = sum(1 for b in self.transformer.h
+                          if getattr(b.attn, 'is_chunk_early', False))
+            proj_numel = sum(b.attn.c_k.weight.numel() + b.attn.c_v.weight.numel()
+                             for b in self.transformer.h
+                             if getattr(b.attn, 'is_chunk_early', False))
+            eff = max(0, (t - self.config.chunk_size) / 2)
+            num_flops_per_token = plain + plain / 3 + 6 * proj_numel + n_early * 12 * h * q * eff
         return num_flops_per_token
 
     def num_scaling_params(self):
@@ -955,6 +1018,8 @@ class GPTBase(nn.Module):
             # betas so it gets the high-LR / no-decay treatment, matching the user
             # intent that this scalar should be free to grow above 1.0 if helpful.
             if hasattr(block.attn, 'gamma_v'): beta_params.append(block.attn.gamma_v)
+            # chunk deep-KV per-head gates: init 0, free to grow -> beta treatment.
+            if hasattr(block.attn, 'chunk_gate'): beta_params.append(block.attn.chunk_gate)
         coeff_params = alpha_params + beta_params
 
         # Dead params under v_from_v1 / v_from_value_emb: late-layer c_v.weight
@@ -1072,19 +1137,40 @@ class GPTBase(nn.Module):
         x0 = x
         if self.config.detach_init_value:
             x0 = x0.detach()
-        ve = None
         capture_v1 = self.config.add_init_v or self.config.v_from_v1
-        for i, block in enumerate(self.transformer.h):
-            # ve fed to block: per-late-layer VE table lookup under
-            # v_from_value_emb / add_init_value_emb / add_init_value_emb_nanogpt,
-            # otherwise the captured layer-0 v (for add_init_v / v_from_v1) or None.
-            if (self.config.v_from_value_emb or self.config.add_init_value_emb or self.config.add_init_value_emb_nanogpt) and str(i) in self.value_embeds:
-                ve_in = self.value_embeds[str(i)](idx).to(x.dtype)
+
+        def run_trunk(x_in, x0_in, chunk_srcs=None, collect=None):
+            xc, ve = x_in, None
+            inputs = {}
+            for i, block in enumerate(self.transformer.h):
+                if collect is not None and i in collect:
+                    inputs[i] = xc
+                if (self.config.v_from_value_emb or self.config.add_init_value_emb or self.config.add_init_value_emb_nanogpt) and str(i) in self.value_embeds:
+                    ve_in = self.value_embeds[str(i)](idx).to(xc.dtype)
+                else:
+                    ve_in = ve
+                src = None if chunk_srcs is None else chunk_srcs.get(i)
+                xc, v_init = block(xc, x0_in, ve_in, cos_sin, kv_cache, chunk_src=src)
+                if capture_v1 and i == 0:
+                    ve = v_init
+            return xc, inputs
+
+        chunk_on = ((self.config.chunk_deep_kv or self.config.chunk_same_kv)
+                    and kv_cache is None)
+        if chunk_on:
+            early = [i for i, b in enumerate(self.transformer.h)
+                     if getattr(b.attn, "is_chunk_early", False)]
+            with torch.no_grad():
+                xf, inputs = run_trunk(x.detach(), x0.detach(),
+                                       collect=set(early) if self.config.chunk_same_kv else None)
+            if self.config.chunk_deep_kv:
+                src_all = norm(xf)
+                chunk_srcs = {i: src_all for i in early}
             else:
-                ve_in = ve
-            x, v_init = block(x, x0, ve_in, cos_sin, kv_cache)
-            if capture_v1 and i == 0:
-                ve = v_init
+                chunk_srcs = {i: norm(inputs[i]) for i in early}
+            x, _ = run_trunk(x, x0, chunk_srcs)
+        else:
+            x, _ = run_trunk(x, x0)
         x = norm(x)
 
         # Forward the lm_head (compute logits)

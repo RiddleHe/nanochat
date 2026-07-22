@@ -239,12 +239,22 @@ from nanochat.model.gpt_attn_res_sink import GPTAttnResSinkConfig, GPTAttnResSin
 # -----------------------------------------------------------------------------
 # Registry: model_type string -> (ConfigClass, ModelClass)
 # -----------------------------------------------------------------------------
+@dataclass
+class GPTBaseChunkDeepKVConfig(GPTBaseConfig):
+    chunk_deep_kv: bool = True
+
+@dataclass
+class GPTBaseChunkSameKVConfig(GPTBaseConfig):
+    chunk_same_kv: bool = True
+
 MODELS = {
     # gpt.py family
     "gpt":              (GPTConfig,             GPT),
     "gpt_nolambda":     (GPTNoLambdaConfig,     GPT),
     # gpt_base.py family
     "gpt_base":                (GPTBaseConfig,             GPTBase),
+    "gpt_base_chunk_deep_kv": (GPTBaseChunkDeepKVConfig, GPTBase),
+    "gpt_base_chunk_same_kv": (GPTBaseChunkSameKVConfig, GPTBase),
     "gpt_base_add_init_res":         (GPTBaseAddInitResConfig,         GPTBase),
     "gpt_base_add_init_res_detach":  (GPTBaseAddInitResDetachConfig,   GPTBase),
     "gpt_base_add_init_v":            (GPTBaseAddInitVConfig,           GPTBase),
