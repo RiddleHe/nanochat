@@ -247,6 +247,11 @@ class GPTBaseChunkDeepKVConfig(GPTBaseConfig):
 class GPTBaseChunkSameKVConfig(GPTBaseConfig):
     chunk_same_kv: bool = True
 
+@dataclass
+class GPTBaseChunkDeepKVv2Config(GPTBaseConfig):
+    chunk_deep_kv: bool = True
+    chunk_recurrent: bool = True
+
 MODELS = {
     # gpt.py family
     "gpt":              (GPTConfig,             GPT),
@@ -255,6 +260,7 @@ MODELS = {
     "gpt_base":                (GPTBaseConfig,             GPTBase),
     "gpt_base_chunk_deep_kv": (GPTBaseChunkDeepKVConfig, GPTBase),
     "gpt_base_chunk_same_kv": (GPTBaseChunkSameKVConfig, GPTBase),
+    "gpt_base_chunk_deep_kv_v2": (GPTBaseChunkDeepKVv2Config, GPTBase),
     "gpt_base_add_init_res":         (GPTBaseAddInitResConfig,         GPTBase),
     "gpt_base_add_init_res_detach":  (GPTBaseAddInitResDetachConfig,   GPTBase),
     "gpt_base_add_init_v":            (GPTBaseAddInitVConfig,           GPTBase),

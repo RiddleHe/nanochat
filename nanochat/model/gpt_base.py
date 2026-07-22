@@ -52,6 +52,12 @@ class GPTBaseConfig:
     chunk_same_kv: bool = False
     chunk_size: int = 256
     chunk_kv_frac: float = 0.3334  # first frac of layers get the branch
+    # v2: single-pass chunk-recurrent training. Chunks run sequentially through
+    # ALL layers; normal layers attend to [previous chunks' same-layer KV (with
+    # grad) + own chunk] via FA3 bottom-right causal alignment => mathematically
+    # equivalent to standard training. Early layers' branch reads the cached
+    # (detached) final states of finished chunks. No pass-1 tax.
+    chunk_recurrent: bool = False
     # If True, blend the initial normalized embedding x0 back into the residual at the
     # last 1/3 of blocks: x = 0.5 * x + 0.5 * x0 (applied before each late block).
     add_init_res: bool = False
@@ -337,7 +343,7 @@ class CausalSelfAttention(nn.Module):
         if self.is_chunk_early:
             self.chunk_gate = nn.Parameter(torch.empty(self.n_head))
 
-    def forward(self, x, x0, ve, cos_sin, kv_cache, chunk_src=None):
+    def forward(self, x, x0, ve, cos_sin, kv_cache, chunk_src=None, chunk_ctx=None):
         B, T, C = x.size()
         cfg = self.config
 
@@ -471,7 +477,29 @@ class CausalSelfAttention(nn.Module):
 
         # Flash Attention (FA3 on Hopper+, PyTorch SDPA fallback elsewhere)
         # window_size is (left, right) tuple: (N, 0) for causal, (-1, 0) for full context
-        if kv_cache is None:
+        if chunk_ctx is not None and kv_cache is None:
+            # v2 chunk-recurrent: x is ONE chunk; prepend previous chunks'
+            # same-layer K/V (kept with grad => exact equivalence for this
+            # attention) and let FA3's bottom-right causal alignment handle the
+            # suffix-query mask. Then append this chunk's K/V to the cache.
+            pk, pv = chunk_ctx["kv"].get(self.layer_idx, (None, None))
+            k_cat = k if pk is None else torch.cat([pk, k], dim=1)
+            v_cat = v if pv is None else torch.cat([pv, v], dim=1)
+            chunk_ctx["kv"][self.layer_idx] = (k_cat, v_cat)
+            y = flash_attn.flash_attn_func(q, k_cat, v_cat, causal=True, window_size=self.window_size)
+            # early-layer branch over finished chunks' final states (detached):
+            # sources are strictly earlier chunks => every query sees all of them.
+            bk, bv = chunk_ctx["branch"].get(self.layer_idx, (None, None))
+            if self.is_chunk_early and bk is not None:
+                group = self.n_head // self.n_kv_head
+                bk_t, bv_t = bk.transpose(1, 2), bv.transpose(1, 2)
+                if group > 1:
+                    bk_t = bk_t.repeat_interleave(group, dim=1)
+                    bv_t = bv_t.repeat_interleave(group, dim=1)
+                y2 = F.scaled_dot_product_attention(q.transpose(1, 2), bk_t, bv_t)
+                gate = self.chunk_gate.view(1, 1, self.n_head, 1).to(y.dtype)
+                y = y + gate * y2.transpose(1, 2)
+        elif kv_cache is None:
             # Training: causal attention with optional sliding window
             y = flash_attn.flash_attn_func(q, k, v, causal=True, window_size=self.window_size)
         else:
@@ -572,7 +600,7 @@ class Block(nn.Module):
             self.alpha_mlp_in = nn.Parameter(torch.empty(1))
             self.beta_mlp_in = nn.Parameter(torch.empty(1))
 
-    def forward(self, x, x0, ve, cos_sin, kv_cache, chunk_src=None):
+    def forward(self, x, x0, ve, cos_sin, kv_cache, chunk_src=None, chunk_ctx=None):
         cfg = self.config
         if self.is_target and cfg.add_init_res:
             if cfg.learn_init_coeffs:
@@ -587,7 +615,7 @@ class Block(nn.Module):
             attn_in = norm(a_a * x + b_a * x0)
         else:
             attn_in = norm(x)
-        attn_out, v_init = self.attn(attn_in, x0, ve, cos_sin, kv_cache, chunk_src=chunk_src)
+        attn_out, v_init = self.attn(attn_in, x0, ve, cos_sin, kv_cache, chunk_src=chunk_src, chunk_ctx=chunk_ctx)
         x = x + attn_out
         if self.is_target and cfg.add_init_pre_norm_mlp_only:
             a_m, b_m = self.alpha_mlp_in.to(x.dtype), self.beta_mlp_in.to(x.dtype)
@@ -965,7 +993,8 @@ class GPTBase(nn.Module):
                              for b in self.transformer.h
                              if getattr(b.attn, 'is_chunk_early', False))
             eff = max(0, (t - self.config.chunk_size) / 2)
-            num_flops_per_token = plain + plain / 3 + 6 * proj_numel + n_early * 12 * h * q * eff
+            tax = 0 if self.config.chunk_recurrent else plain / 3
+            num_flops_per_token = plain + tax + 6 * proj_numel + n_early * 12 * h * q * eff
         return num_flops_per_token
 
     def num_scaling_params(self):
@@ -1154,6 +1183,55 @@ class GPTBase(nn.Module):
                 if capture_v1 and i == 0:
                     ve = v_init
             return xc, inputs
+
+        if self.config.chunk_recurrent and kv_cache is None:
+            # v2 single-pass chunk loop. Rotary tensors are sliced per chunk so
+            # absolute positions are preserved; branch sources accumulate as
+            # chunks finish (project once per chunk per early layer, cached).
+            Cs = self.config.chunk_size
+            cos_full, sin_full = cos_sin
+            early = [i for i, b in enumerate(self.transformer.h)
+                     if getattr(b.attn, "is_chunk_early", False)]
+            ctx = {"kv": {}, "branch": {}}
+            outs = []
+            for c0 in range(0, T, Cs):
+                c1 = min(c0 + Cs, T)
+                cs_chunk = (cos_full[:, c0:c1], sin_full[:, c0:c1])
+                xc = x[:, c0:c1]
+                x0c = x0[:, c0:c1]
+                ve_c = None
+                for i, block in enumerate(self.transformer.h):
+                    if (self.config.v_from_value_emb or self.config.add_init_value_emb or self.config.add_init_value_emb_nanogpt) and str(i) in self.value_embeds:
+                        ve_in = self.value_embeds[str(i)](idx[:, c0:c1]).to(xc.dtype)
+                    else:
+                        ve_in = ve_c
+                    xc, v_init = block(xc, x0c, ve_in, cs_chunk, kv_cache, chunk_ctx=ctx)
+                    if (self.config.add_init_v or self.config.v_from_v1) and i == 0:
+                        ve_c = v_init
+                outs.append(xc)
+                # this chunk is finished: bank its (detached) final states as
+                # branch K/V for every early layer, rotary at absolute positions.
+                if self.config.chunk_deep_kv and early:
+                    srcn = norm(xc.detach())
+                    for i in early:
+                        attn = self.transformer.h[i].attn
+                        bk = attn.c_k(srcn).view(x.size(0), c1 - c0, attn.n_kv_head, attn.head_dim)
+                        bv = attn.c_v(srcn).view(x.size(0), c1 - c0, attn.n_kv_head, attn.head_dim)
+                        bk = norm(apply_rotary_emb(bk, cs_chunk[0], cs_chunk[1])) * 1.2
+                        pbk, pbv = ctx["branch"].get(i, (None, None))
+                        ctx["branch"][i] = (bk if pbk is None else torch.cat([pbk, bk], dim=1),
+                                            bv if pbv is None else torch.cat([pbv, bv], dim=1))
+            x = torch.cat(outs, dim=1)
+            x = norm(x)
+            # fall through to lm_head below
+            softcap = 15
+            logits = self.lm_head(x)
+            logits = logits[..., :self.config.vocab_size]
+            logits = logits.float()
+            logits = softcap * torch.tanh(logits / softcap)
+            if targets is not None:
+                return F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-1, reduction=loss_reduction)
+            return logits
 
         chunk_on = ((self.config.chunk_deep_kv or self.config.chunk_same_kv)
                     and kv_cache is None)
