@@ -46,3 +46,21 @@ H100 bf16 at mfu ~35% ~= 3.5e14 FLOP/s/GPU; 4 fully-idle GPUs = 1.4e15.
 With the only-fully-idle policy on a shared box, 100B-token 1-2B runs are
 NOT realistic here; compute-optimal 1.6B is borderline (needs ~1.5 idle
 days x4). Team decision needed: dedicated allocation or external compute.
+
+## 6. UPDATE — full three-number verdict (equal-token referee run done)
+| run | steps | val_bpb |
+|---|---|---|
+| baseline (full 1.5e18) | 3766 | 0.85400 |
+| equal-token baseline (1.06e18, completed schedule) | 2661 | 0.86863 |
+| chunk deep_kv | 2663 | **0.86757** |
+| chunk same_kv (control) | 2663 | 0.86928 |
+
+Ordering deep < equaltoken < same is exactly the theory's prediction:
+- deep_kv − equaltoken = **−0.00106**: the branch is per-token BENEFICIAL;
+  the entire equal-FLOPs loss vs baseline is the v1 two-pass tax (+41% compute).
+- deep_kv − same_kv = −0.00171: the benefit comes specifically from PROCESSED
+  content; mere extra long-range visibility (same_kv) is slightly harmful.
+Caveats: single seed each; margins are ~0.001 bpb (small). Next: v2 removes
+the tax via single-pass chunk-recurrent training (chunk loop, within-chunk
+parallel, exact for normal layers, detached deep sources for the branch);
+then re-run the equal-FLOPs comparison + seed variance.
