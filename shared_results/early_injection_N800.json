@@ -1,0 +1,18 @@
+{
+ "model": "Qwen/Qwen3-8B-Base",
+ "distance": 800,
+ "n_pairs": 16,
+ "l_early": 8,
+ "l_deep": 30,
+ "l_mask": 24,
+ "window": 256,
+ "recovery": {
+  "ref_interchange": 0.9732010133456024,
+  "inject_replace": 0.47499965365098995,
+  "window_only": -0.008416628055790104,
+  "window_plus_inject": 0.14322380948411395,
+  "inject_add_a0.5": 0.021527415374035287,
+  "inject_add_a1.0": 0.11406878689687976,
+  "inject_add_a2.0": 0.3338626752819657
+ }
+}
