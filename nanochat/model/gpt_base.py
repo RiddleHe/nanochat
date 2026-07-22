@@ -268,8 +268,11 @@ class GPTBase(nn.Module):
         for layer_idx in range(config.n_layer):
             char = pattern[layer_idx % len(pattern)]
             window_sizes.append(char_to_window[char])
-        # Final layer always gets full context
-        window_sizes[-1] = (long_window, 0)
+        # Final layer always gets full context — but only for TILED patterns.
+        # A full-length pattern (len == n_layer) is an explicit per-layer layout
+        # (window-placement experiments) and is respected verbatim.
+        if len(pattern) < config.n_layer:
+            window_sizes[-1] = (long_window, 0)
         return window_sizes
 
     def get_device(self):
