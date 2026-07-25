@@ -40,11 +40,14 @@ class GPTBaseConfig:
     # Examples: "L"=all full context, "SL"=alternating, "SSL"=two short then one long
     window_pattern: str = "SSSL"
     # Skip-ahead routing. "none" preserves the original GPTBase architecture.
-    # Dense gates use 2*sigmoid(logit); sparse gates hard-zero values below the threshold
-    # while using a straight-through gradient through the dense gate.
+    # Tanh gates use 1 + 0.5*tanh(logit), while the legacy sigmoid gates use
+    # 2*sigmoid(logit). Sparse gates hard-zero values below the threshold while
+    # using a straight-through gradient through the dense gate.
     skip_ahead_mode: str = "none"  # one of: none, dense, sparse
     skip_gate_source: str = "current"  # one of: current, x0
+    skip_gate_type: str = "tanh"  # one of: tanh, sigmoid
     skip_threshold: float = 0.5
+    skip_gate_l2_weight: float = 0.01
 
 
 def norm(x):
@@ -175,8 +178,12 @@ class GPTBase(nn.Module):
             f"Invalid skip_ahead_mode: {config.skip_ahead_mode}"
         assert config.skip_gate_source in {"current", "x0"}, \
             f"Invalid skip_gate_source: {config.skip_gate_source}"
+        assert config.skip_gate_type in {"tanh", "sigmoid"}, \
+            f"Invalid skip_gate_type: {config.skip_gate_type}"
         assert config.skip_threshold >= 0.0, \
             f"skip_threshold must be non-negative, got {config.skip_threshold}"
+        assert config.skip_gate_l2_weight >= 0.0, \
+            f"skip_gate_l2_weight must be non-negative, got {config.skip_gate_l2_weight}"
         # Compute per-layer window sizes for sliding window attention
         # window_size is (left, right) tuple: (-1, 0) for full context, (N, 0) for sliding window
         self.window_sizes = self._compute_window_sizes(config)
@@ -243,8 +250,8 @@ class GPTBase(nn.Module):
             torch.nn.init.uniform_(block.mlp.c_fc.weight, -s * 0.4, s * 0.4)  # 0.4x init scale for c_fc
             torch.nn.init.zeros_(block.mlp.c_proj.weight)
 
-        # Zero logits give 2*sigmoid(0) = 1, so every skip-ahead variant starts
-        # exactly at the original GPTBase computation.
+        # Zero logits give a gate of 1 for both gate types, so every skip-ahead
+        # variant starts exactly at the original GPTBase computation.
         for gate in self.skip_gates:
             torch.nn.init.zeros_(gate.weight)
 
@@ -387,10 +394,16 @@ class GPTBase(nn.Module):
             dict(kind='adamw', params=embedding_params, lr=embedding_lr * dmodel_lr_scale, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.001),
             dict(kind='adamw', params=smear_params, lr=0.2, betas=(0.8, 0.95), eps=1e-10, weight_decay=0.0),
         ]
+        # Previous skip-gate projection optimizer setup (kept for comparison):
+        # if skip_gate_params:
+        #     param_groups.append(dict(
+        #         kind='adamw', params=skip_gate_params, lr=scalar_lr * dmodel_lr_scale,
+        #         betas=(0.8, 0.95), eps=1e-10, weight_decay=0.0,
+        #     ))
         if skip_gate_params:
             param_groups.append(dict(
-                kind='adamw', params=skip_gate_params, lr=scalar_lr * dmodel_lr_scale,
-                betas=(0.8, 0.95), eps=1e-10, weight_decay=0.0,
+                kind='adamw', params=skip_gate_params, lr=0.001,
+                betas=(0.9, 0.999), eps=1e-10, weight_decay=0.0,
             ))
         # Muon groups (matrix params, grouped by shape for stacking)
         for shape in sorted({p.shape for p in matrix_params}):
@@ -406,22 +419,35 @@ class GPTBase(nn.Module):
             group["initial_lr"] = group["lr"]
         return optimizer
 
-    def _compute_skip_gate(self, layer_idx, x, x0):
-        """Return a (B, T, 1) dense or hard-zero skip-ahead gate."""
+    def _compute_skip_gate(self, layer_idx, x, x0, return_regularizer_logits=False):
+        """Return a (B, T, 1) gate and, optionally, logits for gate-only L2."""
         source = x if self.config.skip_gate_source == "current" else x0
-        logits = self.skip_gates[layer_idx](norm(source))
-        soft_gate = 2.0 * torch.sigmoid(logits)
+        normalized_source = norm(source)
+        logits = self.skip_gates[layer_idx](normalized_source)
+        if self.config.skip_gate_type == "tanh":
+            soft_gate = 1.0 + 0.5 * torch.tanh(logits)
+        else:
+            soft_gate = 2.0 * torch.sigmoid(logits)
         if self.config.skip_ahead_mode == "dense":
-            return soft_gate
+            gate = soft_gate
+        else:
+            # Forward: exactly zero below threshold, continuous soft value otherwise.
+            # Backward: act as soft_gate everywhere so a skipped gate can turn back on.
+            hard_gate = torch.where(
+                soft_gate >= self.config.skip_threshold,
+                soft_gate,
+                torch.zeros_like(soft_gate),
+            )
+            gate = soft_gate + (hard_gate - soft_gate).detach()
 
-        # Forward: exactly zero below threshold, continuous soft value otherwise.
-        # Backward: act as soft_gate everywhere so a skipped gate can turn back on.
-        hard_gate = torch.where(
-            soft_gate >= self.config.skip_threshold,
-            soft_gate,
-            torch.zeros_like(soft_gate),
-        )
-        return soft_gate + (hard_gate - soft_gate).detach()
+        if not return_regularizer_logits:
+            return gate
+
+        # Recompute the cheap scalar projection with detached activations. This
+        # preserves the L2 gradient to gate weights without directly regularizing
+        # the transformer residual stream.
+        regularizer_logits = self.skip_gates[layer_idx](normalized_source.detach())
+        return gate, regularizer_logits
 
     def forward(self, idx, targets=None, kv_cache=None, loss_reduction='mean'):
         B, T = idx.size()
@@ -459,13 +485,25 @@ class GPTBase(nn.Module):
                 x = x + gate * x_pre_smear
 
         # Forward the trunk of the Transformer.
+        gate_regularizer_logits = []
         if self.config.skip_ahead_mode == "none":
             for block in self.transformer.h:
                 x = block(x, cos_sin, kv_cache)
         else:
             x0 = x
             for layer_idx, block in enumerate(self.transformer.h):
-                gate = self._compute_skip_gate(layer_idx, x, x0)
+                regularize_gate = (
+                    self.training
+                    and targets is not None
+                    and self.config.skip_gate_l2_weight > 0.0
+                )
+                if regularize_gate:
+                    gate, regularizer_logits = self._compute_skip_gate(
+                        layer_idx, x, x0, return_regularizer_logits=True
+                    )
+                    gate_regularizer_logits.append(regularizer_logits.float())
+                else:
+                    gate = self._compute_skip_gate(layer_idx, x, x0)
                 x = block(x, cos_sin, kv_cache, gate=gate)
         x = norm(x)
 
@@ -480,6 +518,23 @@ class GPTBase(nn.Module):
             # training: given the targets, compute and return the loss
             # TODO experiment with chunked cross-entropy?
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-1, reduction=loss_reduction)
+            if gate_regularizer_logits:
+                # Average z^2 over layers, then apply the same valid-token
+                # reduction as cross-entropy. Evaluation excludes this term.
+                gate_l2_per_token = torch.stack(gate_regularizer_logits).square().mean(dim=(0, 3))
+                valid = targets != -1
+                gate_l2_valid = gate_l2_per_token[valid]
+                if loss_reduction == "none":
+                    gate_l2 = torch.where(
+                        valid,
+                        gate_l2_per_token,
+                        torch.zeros_like(gate_l2_per_token),
+                    ).view(-1)
+                elif loss_reduction == "sum":
+                    gate_l2 = gate_l2_valid.sum()
+                else:
+                    gate_l2 = gate_l2_valid.mean()
+                loss = loss + self.config.skip_gate_l2_weight * gate_l2
             return loss
         else:
             # inference: just return the logits directly

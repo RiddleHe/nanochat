@@ -31,20 +31,34 @@ from nanochat.model.gpt_base import GPTBaseConfig, GPTBase
 class SkipAheadDenseConfig(GPTBaseConfig):
     skip_ahead_mode: str = "dense"
     skip_gate_source: str = "current"
+    skip_gate_type: str = "sigmoid"
 
 @dataclass
 class SkipAheadSparseConfig(GPTBaseConfig):
     skip_ahead_mode: str = "sparse"
     skip_gate_source: str = "current"
+    skip_gate_type: str = "sigmoid"
 
 @dataclass
 class SkipAheadDenseX0Config(GPTBaseConfig):
     skip_ahead_mode: str = "dense"
     skip_gate_source: str = "x0"
+    skip_gate_type: str = "sigmoid"
 
 @dataclass
 class SkipAheadSparseX0Config(GPTBaseConfig):
     skip_ahead_mode: str = "sparse"
+    skip_gate_source: str = "x0"
+    skip_gate_type: str = "sigmoid"
+
+@dataclass
+class SkipAheadDenseTanhConfig(GPTBaseConfig):
+    skip_ahead_mode: str = "dense"
+    skip_gate_source: str = "current"
+
+@dataclass
+class SkipAheadDenseX0TanhConfig(GPTBaseConfig):
+    skip_ahead_mode: str = "dense"
     skip_gate_source: str = "x0"
 
 # -----------------------------------------------------------------------------
@@ -60,6 +74,8 @@ MODELS = {
     "skip_ahead_sparse":     (SkipAheadSparseConfig,      GPTBase),
     "skip_ahead_dense_x0":   (SkipAheadDenseX0Config,     GPTBase),
     "skip_ahead_sparse_x0":  (SkipAheadSparseX0Config,    GPTBase),
+    "skip_ahead_dense_tanh": (SkipAheadDenseTanhConfig,   GPTBase),
+    "skip_ahead_dense_x0_tanh": (SkipAheadDenseX0TanhConfig, GPTBase),
 }
 
 
