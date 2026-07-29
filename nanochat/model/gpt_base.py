@@ -40,6 +40,31 @@ class GPTBaseConfig:
     # Examples: "L"=all full context, "SL"=alternating, "SSL"=two short then one long
     window_pattern: str = "SSSL"
 
+    # --- Chunk deep-KV (research/chunk-deep-kv) --------------------------------
+    # The sequence is cut into chunks of `chunk_size`. EARLY layers (the first
+    # `chunk_kv_frac` of layers) get an extra gated attention branch whose K/V
+    # are projected -- through the layer's own c_k/c_v, no new matrices -- from
+    # states of STRICTLY EARLIER chunks. Two source choices:
+    #   chunk_deep_kv: the final block's output   (already-processed content)
+    #   chunk_same_kv: the same layer's input     (visibility-only control)
+    # The control isolates "processed content" from "just seeing further".
+    # Sources are detached (Transformer-XL style truncation), so no gradient
+    # flows across chunks and training parallelism is unchanged. Per-head gates
+    # init at 0 => the model starts bit-exactly at the baseline computation.
+    chunk_deep_kv: bool = False
+    chunk_same_kv: bool = False
+    chunk_size: int = 256
+    chunk_kv_frac: float = 0.3334  # first frac of layers get the branch
+    # v1 (chunk_recurrent=False) obtains the sources from a no-grad pass-1
+    # forward over the whole sequence, costing ~+41% training FLOPs.
+    # v2 (chunk_recurrent=True) is a single-pass chunk loop: chunks run
+    # sequentially through ALL layers, normal layers attend to
+    # [previous chunks' same-layer KV (with grad) + own chunk] via FA3's
+    # bottom-right causal alignment => mathematically equivalent to standard
+    # training, and the branch reads the cached (detached) final states of
+    # already-finished chunks. No pass-1 tax; residual cost ~+8% is the branch.
+    chunk_recurrent: bool = False
+
 
 def norm(x):
     return F.rms_norm(x, (x.size(-1),)) # note that this will run in bf16, seems ok
@@ -77,8 +102,26 @@ class CausalSelfAttention(nn.Module):
         self.c_k = Linear(self.n_embd, self.n_kv_head * self.head_dim, bias=False)
         self.c_v = Linear(self.n_embd, self.n_kv_head * self.head_dim, bias=False)
         self.c_proj = Linear(self.n_embd, self.n_embd, bias=False)
+        # Chunk deep-KV: per-head gate (init 0) on the extra cross-chunk branch.
+        # Only the first `chunk_kv_frac` of layers carry one.
+        self.is_chunk_early = ((config.chunk_deep_kv or config.chunk_same_kv)
+                               and layer_idx < max(1, int(config.n_layer * config.chunk_kv_frac)))
+        if self.is_chunk_early:
+            self.chunk_gate = nn.Parameter(torch.empty(self.n_head))
 
-    def forward(self, x, cos_sin, kv_cache):
+    def _chunk_branch(self, q, bk, bv, y):
+        """Attend q over branch keys/values (bk, bv) and merge via the per-head
+        gate. Shapes: q (B,T,H,D); bk/bv (B,S,Hkv,D); y (B,T,H,D)."""
+        group = self.n_head // self.n_kv_head
+        bk_t, bv_t = bk.transpose(1, 2), bv.transpose(1, 2)
+        if group > 1:
+            bk_t = bk_t.repeat_interleave(group, dim=1)
+            bv_t = bv_t.repeat_interleave(group, dim=1)
+        y2 = F.scaled_dot_product_attention(q.transpose(1, 2), bk_t, bv_t)
+        gate = self.chunk_gate.view(1, 1, self.n_head, 1).to(y.dtype)
+        return y + gate * y2.transpose(1, 2)
+
+    def forward(self, x, cos_sin, kv_cache, chunk_src=None, chunk_ctx=None):
         B, T, C = x.size()
 
         # Project the input to get queries, keys, and values
@@ -96,7 +139,23 @@ class CausalSelfAttention(nn.Module):
 
         # Flash Attention (FA3 on Hopper+, PyTorch SDPA fallback elsewhere)
         # window_size is (left, right) tuple: (N, 0) for causal, (-1, 0) for full context
-        if kv_cache is None:
+        if chunk_ctx is not None and kv_cache is None:
+            # v2 chunk-recurrent: x is ONE chunk. Prepend previous chunks'
+            # same-layer K/V (kept WITH grad => exact equivalence to standard
+            # attention) and let FA3's bottom-right causal alignment give the
+            # suffix queries the right mask. Then bank this chunk's K/V.
+            pk, pv = chunk_ctx["kv"].get(self.layer_idx, (None, None))
+            k_cat = k if pk is None else torch.cat([pk, k], dim=1)
+            v_cat = v if pv is None else torch.cat([pv, v], dim=1)
+            chunk_ctx["kv"][self.layer_idx] = (k_cat, v_cat)
+            y = flash_attn.flash_attn_func(q, k_cat, v_cat, causal=True, window_size=self.window_size)
+            # Early-layer branch over finished chunks' final states (detached).
+            # Sources are strictly earlier chunks, so every query in this chunk
+            # may see all of them -> no mask needed.
+            bk, bv = chunk_ctx["branch"].get(self.layer_idx, (None, None))
+            if self.is_chunk_early and bk is not None:
+                y = self._chunk_branch(q, bk, bv, y)
+        elif kv_cache is None:
             # Training: causal attention with optional sliding window
             y = flash_attn.flash_attn_func(q, k, v, causal=True, window_size=self.window_size)
         else:
@@ -112,6 +171,32 @@ class CausalSelfAttention(nn.Module):
             # Advance position after last layer processes
             if self.layer_idx == kv_cache.n_layers - 1:
                 kv_cache.advance(T)
+
+        # v1 chunk deep-KV branch: extra attention over K/V projected from the
+        # detached pass-1 states of strictly earlier chunks. Queries reuse q
+        # (already rotary'd, QK-normed and scaled).
+        if chunk_src is not None and self.is_chunk_early and kv_cache is None:
+            Cs = self.config.chunk_size
+            if T > Cs:
+                cos, sin = cos_sin
+                bk = self.c_k(chunk_src).view(B, T, self.n_kv_head, self.head_dim)
+                bv = self.c_v(chunk_src).view(B, T, self.n_kv_head, self.head_dim)
+                bk = norm(apply_rotary_emb(bk, cos, sin)) * 1.2
+                group = self.n_head // self.n_kv_head
+                bk_t, bv_t = bk.transpose(1, 2), bv.transpose(1, 2)
+                if group > 1:
+                    bk_t = bk_t.repeat_interleave(group, dim=1)
+                    bv_t = bv_t.repeat_interleave(group, dim=1)
+                pos = torch.arange(T, device=x.device)
+                vis = (pos[None, :] // Cs) < (pos[:, None] // Cs)  # (Tq, Tk) strictly-earlier-chunk
+                q_t = q.transpose(1, 2)                            # (B, H, T, D)
+                # chunk-0 queries see nothing (all-masked rows -> NaN), so slice them off
+                y2 = F.scaled_dot_product_attention(
+                    q_t[:, :, Cs:, :], bk_t, bv_t, attn_mask=vis[Cs:, :])
+                y_extra = torch.zeros_like(q_t)
+                y_extra[:, :, Cs:, :] = y2
+                gate = self.chunk_gate.view(1, 1, self.n_head, 1).to(y.dtype)
+                y = y + gate * y_extra.transpose(1, 2)
 
         # Re-assemble the heads and project back to residual stream.
         y = y.contiguous().view(B, T, -1)
@@ -140,8 +225,8 @@ class Block(nn.Module):
         self.attn = CausalSelfAttention(config, layer_idx, window_size)
         self.mlp = MLP(config)
 
-    def forward(self, x, cos_sin, kv_cache):
-        x = x + self.attn(norm(x), cos_sin, kv_cache)
+    def forward(self, x, cos_sin, kv_cache, chunk_src=None, chunk_ctx=None):
+        x = x + self.attn(norm(x), cos_sin, kv_cache, chunk_src=chunk_src, chunk_ctx=chunk_ctx)
         x = x + self.mlp(norm(x))
         return x
 
@@ -214,6 +299,10 @@ class GPTBase(nn.Module):
             torch.nn.init.zeros_(block.attn.c_proj.weight) # projections are zero
             torch.nn.init.uniform_(block.mlp.c_fc.weight, -s * 0.4, s * 0.4)  # 0.4x init scale for c_fc
             torch.nn.init.zeros_(block.mlp.c_proj.weight)
+            # chunk deep-KV gates start at 0 => the branch contributes nothing and
+            # the model is bit-exactly the baseline at step 0.
+            if hasattr(block.attn, 'chunk_gate'):
+                torch.nn.init.zeros_(block.attn.chunk_gate)
 
         # Rotary embeddings
         head_dim = self.config.n_embd // self.config.n_head
@@ -299,6 +388,22 @@ class GPTBase(nn.Module):
             effective_seq = t if window < 0 else min(window, t)
             attn_flops += 12 * h * q * effective_seq
         num_flops_per_token = 6 * (nparams - nparams_exclude) + attn_flops
+        # Chunk deep-KV honest accounting. Three extra costs:
+        #   (a) v1 only: the no-grad pass-1 forward = 1/3 of a plain fwd+bwd;
+        #   (b) the branch's extra c_k/c_v calls at early layers (6/param);
+        #   (c) the branch attention itself: each query sees ~(t-chunk)/2 keys
+        #       on average, at each early layer (12*h*q*eff for fwd+bwd).
+        # Measured ratios vs baseline at d12 shape: v1 1.414x, v2 1.081x.
+        if self.config.chunk_deep_kv or self.config.chunk_same_kv:
+            plain = num_flops_per_token
+            n_early = sum(1 for b in self.transformer.h
+                          if getattr(b.attn, 'is_chunk_early', False))
+            proj_numel = sum(b.attn.c_k.weight.numel() + b.attn.c_v.weight.numel()
+                             for b in self.transformer.h
+                             if getattr(b.attn, 'is_chunk_early', False))
+            eff = max(0, (t - self.config.chunk_size) / 2)
+            tax = 0 if self.config.chunk_recurrent else plain / 3
+            num_flops_per_token = plain + tax + 6 * proj_numel + n_early * 12 * h * q * eff
         return num_flops_per_token
 
     def num_scaling_params(self):
@@ -318,6 +423,9 @@ class GPTBase(nn.Module):
         lm_head = sum(p.numel() for p in self.lm_head.parameters())
         transformer_matrices = sum(p.numel() for p in self.transformer.h.parameters())
         scalars = self.smear_gate.weight.numel() + self.smear_lambda.numel()
+        # chunk gates already live inside transformer.h, so they are counted in
+        # transformer_matrices above; nothing to add here (kept as a note so the
+        # assert below stays understandable).
         total = wte + lm_head + transformer_matrices + scalars
         assert total == sum(p.numel() for p in self.parameters()), "Parameter count mismatch"
         return {
@@ -337,7 +445,14 @@ class GPTBase(nn.Module):
         embedding_params = list(self.transformer.wte.parameters())
         lm_head_params = list(self.lm_head.parameters())
         smear_params = [self.smear_gate.weight, self.smear_lambda]
-        assert len(list(self.parameters())) == len(matrix_params) + len(embedding_params) + len(lm_head_params) + len(smear_params)
+        # chunk deep-KV per-head gates (init 0): 1-D, so they are NOT picked up by
+        # the dim>=2 matrix filter. Give them the scalar/AdamW treatment with no
+        # weight decay so a useful branch is free to grow away from 0.
+        chunk_gate_params = [b.attn.chunk_gate for b in self.transformer.h
+                             if hasattr(b.attn, 'chunk_gate')]
+        assert len(list(self.parameters())) == (len(matrix_params) + len(embedding_params)
+                                                + len(lm_head_params) + len(smear_params)
+                                                + len(chunk_gate_params))
 
         # Scale the LR for the AdamW parameters by ∝1/√dmodel (tuned for 768 dim model)
         dmodel_lr_scale = (model_dim / 768) ** -0.5
@@ -350,6 +465,10 @@ class GPTBase(nn.Module):
             dict(kind='adamw', params=embedding_params, lr=embedding_lr * dmodel_lr_scale, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.001),
             dict(kind='adamw', params=smear_params, lr=0.2, betas=(0.8, 0.95), eps=1e-10, weight_decay=0.0),
         ]
+        if chunk_gate_params:
+            param_groups.append(dict(kind='adamw', params=chunk_gate_params,
+                                     lr=scalar_lr * dmodel_lr_scale, betas=(0.8, 0.95),
+                                     eps=1e-10, weight_decay=0.0))
         # Muon groups (matrix params, grouped by shape for stacking)
         for shape in sorted({p.shape for p in matrix_params}):
             group_params = [p for p in matrix_params if p.shape == shape]
@@ -400,8 +519,67 @@ class GPTBase(nn.Module):
                 x = x + gate * x_pre_smear
 
         # Forward the trunk of the Transformer.
-        for block in self.transformer.h:
-            x = block(x, cos_sin, kv_cache)
+        cfg = self.config
+        chunk_early = [i for i, b in enumerate(self.transformer.h)
+                       if getattr(b.attn, 'is_chunk_early', False)]
+
+        if cfg.chunk_recurrent and kv_cache is None:
+            # ---- v2: single-pass chunk-recurrent trunk -----------------------
+            # Chunks run sequentially through ALL layers. Normal layers keep full
+            # gradient flow over previous chunks' same-layer KV, so this is
+            # mathematically equivalent to the standard trunk (verified bit-exact
+            # at gate=0 in tests/test_chunk_deep_kv.py). Only the branch sources
+            # are detached. Rotary is sliced per chunk to preserve absolute pos.
+            Cs = cfg.chunk_size
+            cos_full, sin_full = cos_sin
+            ctx = {"kv": {}, "branch": {}}
+            outs = []
+            for c0 in range(0, T, Cs):
+                c1 = min(c0 + Cs, T)
+                cs_chunk = (cos_full[:, c0:c1], sin_full[:, c0:c1])
+                xc = x[:, c0:c1]
+                for block in self.transformer.h:
+                    xc = block(xc, cs_chunk, kv_cache, chunk_ctx=ctx)
+                outs.append(xc)
+                # This chunk is finished: bank its (detached) final states as
+                # branch K/V for every early layer, rotary'd at absolute positions.
+                if cfg.chunk_deep_kv and chunk_early:
+                    srcn = norm(xc.detach())
+                    for i in chunk_early:
+                        attn = self.transformer.h[i].attn
+                        bk = attn.c_k(srcn).view(B, c1 - c0, attn.n_kv_head, attn.head_dim)
+                        bv = attn.c_v(srcn).view(B, c1 - c0, attn.n_kv_head, attn.head_dim)
+                        bk = norm(apply_rotary_emb(bk, cs_chunk[0], cs_chunk[1])) * 1.2
+                        pbk, pbv = ctx["branch"].get(i, (None, None))
+                        ctx["branch"][i] = (bk if pbk is None else torch.cat([pbk, bk], dim=1),
+                                            bv if pbv is None else torch.cat([pbv, bv], dim=1))
+            x = torch.cat(outs, dim=1)
+        elif (cfg.chunk_deep_kv or cfg.chunk_same_kv) and kv_cache is None:
+            # ---- v1: two-pass trunk (pass-1 is no-grad; costs ~+41% FLOPs) ----
+            def run_trunk(xin, chunk_srcs=None, collect=None):
+                collected = {}
+                xc = xin
+                for i, block in enumerate(self.transformer.h):
+                    if collect is not None and i in collect:
+                        collected[i] = xc
+                    src = None if chunk_srcs is None else chunk_srcs.get(i)
+                    xc = block(xc, cos_sin, kv_cache, chunk_src=src)
+                return xc, collected
+
+            with torch.no_grad():
+                xf, inputs = run_trunk(x.detach(),
+                                       collect=set(chunk_early) if cfg.chunk_same_kv else None)
+            if cfg.chunk_deep_kv:
+                # deep sources: the final block's output (already-processed content)
+                src_all = norm(xf)
+                chunk_srcs = {i: src_all for i in chunk_early}
+            else:
+                # same-layer control: each early layer reads its OWN input depth
+                chunk_srcs = {i: norm(inputs[i]) for i in chunk_early}
+            x, _ = run_trunk(x, chunk_srcs)
+        else:
+            for block in self.transformer.h:
+                x = block(x, cos_sin, kv_cache)
         x = norm(x)
 
         # Forward the lm_head (compute logits)
