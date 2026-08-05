@@ -40,14 +40,17 @@ class GPTBaseConfig:
     # Examples: "L"=all full context, "SL"=alternating, "SSL"=two short then one long
     window_pattern: str = "SSSL"
     # Skip-ahead routing. "none" preserves the original GPTBase architecture.
-    # Tanh gates use 1 + 0.5*tanh(logit), while the legacy sigmoid gates use
-    # 2*sigmoid(logit). Sparse gates hard-zero values below the threshold while
-    # using a straight-through gradient through the dense gate.
+    # Tanh gates use 1 + 0.5*tanh(logit), sqrt gates use the positive,
+    # polynomial-tail mapping 0.1 + 0.9*(z + sqrt(1 + z^2)), and legacy
+    # sigmoid gates use 2*sigmoid(logit). Sparse gates hard-zero values below
+    # the threshold while using a straight-through gradient through the dense gate.
     skip_ahead_mode: str = "none"  # one of: none, dense, sparse
     skip_gate_source: str = "current"  # one of: current, x0
-    skip_gate_type: str = "tanh"  # one of: tanh, sigmoid
+    skip_gate_type: str = "tanh"  # one of: tanh, sigmoid, sqrt
     skip_threshold: float = 0.5
     skip_gate_l2_weight: float = 0.01
+    skip_gate_recovery_weight: float = 0.0
+    skip_gate_recovery_margin: float = 3.0
 
 
 def norm(x):
@@ -178,12 +181,16 @@ class GPTBase(nn.Module):
             f"Invalid skip_ahead_mode: {config.skip_ahead_mode}"
         assert config.skip_gate_source in {"current", "x0"}, \
             f"Invalid skip_gate_source: {config.skip_gate_source}"
-        assert config.skip_gate_type in {"tanh", "sigmoid"}, \
+        assert config.skip_gate_type in {"tanh", "sigmoid", "sqrt"}, \
             f"Invalid skip_gate_type: {config.skip_gate_type}"
         assert config.skip_threshold >= 0.0, \
             f"skip_threshold must be non-negative, got {config.skip_threshold}"
         assert config.skip_gate_l2_weight >= 0.0, \
             f"skip_gate_l2_weight must be non-negative, got {config.skip_gate_l2_weight}"
+        assert config.skip_gate_recovery_weight >= 0.0, \
+            f"skip_gate_recovery_weight must be non-negative, got {config.skip_gate_recovery_weight}"
+        assert config.skip_gate_recovery_margin >= 0.0, \
+            f"skip_gate_recovery_margin must be non-negative, got {config.skip_gate_recovery_margin}"
         # Compute per-layer window sizes for sliding window attention
         # window_size is (left, right) tuple: (-1, 0) for full context, (N, 0) for sliding window
         self.window_sizes = self._compute_window_sizes(config)
@@ -420,14 +427,26 @@ class GPTBase(nn.Module):
         return optimizer
 
     def _compute_skip_gate(self, layer_idx, x, x0, return_regularizer_logits=False):
-        """Return a (B, T, 1) gate and, optionally, logits for gate-only L2."""
+        """Return a (B, T, 1) gate and, optionally, detached-input logits for regularization."""
         source = x if self.config.skip_gate_source == "current" else x0
         normalized_source = norm(source)
         logits = self.skip_gates[layer_idx](normalized_source)
         if self.config.skip_gate_type == "tanh":
             soft_gate = 1.0 + 0.5 * torch.tanh(logits)
-        else:
+        elif self.config.skip_gate_type == "sigmoid":
             soft_gate = 2.0 * torch.sigmoid(logits)
+        else:
+            # Positive, unbounded gate with a polynomial negative tail. Compute
+            # in FP32 and rationalize the negative branch to avoid cancellation
+            # in z + sqrt(1 + z^2) for large negative logits.
+            logits_fp32 = logits.float()
+            root = torch.sqrt(1.0 + logits_fp32.square())
+            multiplier = torch.where(
+                logits_fp32 >= 0.0,
+                logits_fp32 + root,
+                1.0 / (root - logits_fp32),
+            )
+            soft_gate = (0.1 + 0.9 * multiplier).to(logits.dtype)
         if self.config.skip_ahead_mode == "dense":
             gate = soft_gate
         else:
@@ -444,10 +463,22 @@ class GPTBase(nn.Module):
             return gate
 
         # Recompute the cheap scalar projection with detached activations. This
-        # preserves the L2 gradient to gate weights without directly regularizing
-        # the transformer residual stream.
+        # preserves the auxiliary gradient to gate weights without directly
+        # regularizing the transformer residual stream.
         regularizer_logits = self.skip_gates[layer_idx](normalized_source.detach())
         return gate, regularizer_logits
+
+    def _compute_gate_regularizer(self, regularizer_logits):
+        """Return the weighted per-token gate regularizer, averaged over layers."""
+        penalty = regularizer_logits.new_zeros(regularizer_logits.shape)
+        if self.config.skip_gate_l2_weight > 0.0:
+            penalty = penalty + self.config.skip_gate_l2_weight * regularizer_logits.square()
+        if self.config.skip_gate_recovery_weight > 0.0:
+            negative_tail = F.relu(
+                -regularizer_logits - self.config.skip_gate_recovery_margin
+            )
+            penalty = penalty + self.config.skip_gate_recovery_weight * negative_tail.square()
+        return penalty.mean(dim=(0, 3))
 
     def forward(self, idx, targets=None, kv_cache=None, loss_reduction='mean'):
         B, T = idx.size()
@@ -495,7 +526,10 @@ class GPTBase(nn.Module):
                 regularize_gate = (
                     self.training
                     and targets is not None
-                    and self.config.skip_gate_l2_weight > 0.0
+                    and (
+                        self.config.skip_gate_l2_weight > 0.0
+                        or self.config.skip_gate_recovery_weight > 0.0
+                    )
                 )
                 if regularize_gate:
                     gate, regularizer_logits = self._compute_skip_gate(
@@ -519,22 +553,24 @@ class GPTBase(nn.Module):
             # TODO experiment with chunked cross-entropy?
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-1, reduction=loss_reduction)
             if gate_regularizer_logits:
-                # Average z^2 over layers, then apply the same valid-token
-                # reduction as cross-entropy. Evaluation excludes this term.
-                gate_l2_per_token = torch.stack(gate_regularizer_logits).square().mean(dim=(0, 3))
+                # Apply the same valid-token reduction as cross-entropy.
+                # Evaluation excludes this auxiliary term.
+                gate_regularizer_per_token = self._compute_gate_regularizer(
+                    torch.stack(gate_regularizer_logits)
+                )
                 valid = targets != -1
-                gate_l2_valid = gate_l2_per_token[valid]
+                gate_regularizer_valid = gate_regularizer_per_token[valid]
                 if loss_reduction == "none":
-                    gate_l2 = torch.where(
+                    gate_regularizer = torch.where(
                         valid,
-                        gate_l2_per_token,
-                        torch.zeros_like(gate_l2_per_token),
+                        gate_regularizer_per_token,
+                        torch.zeros_like(gate_regularizer_per_token),
                     ).view(-1)
                 elif loss_reduction == "sum":
-                    gate_l2 = gate_l2_valid.sum()
+                    gate_regularizer = gate_regularizer_valid.sum()
                 else:
-                    gate_l2 = gate_l2_valid.mean()
-                loss = loss + self.config.skip_gate_l2_weight * gate_l2
+                    gate_regularizer = gate_regularizer_valid.mean()
+                loss = loss + gate_regularizer
             return loss
         else:
             # inference: just return the logits directly

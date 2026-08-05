@@ -61,6 +61,15 @@ class SkipAheadDenseX0TanhConfig(GPTBaseConfig):
     skip_ahead_mode: str = "dense"
     skip_gate_source: str = "x0"
 
+@dataclass
+class SkipAheadDenseSqrtConfig(GPTBaseConfig):
+    skip_ahead_mode: str = "dense"
+    skip_gate_source: str = "current"
+    skip_gate_type: str = "sqrt"
+    skip_gate_l2_weight: float = 0.0
+    skip_gate_recovery_weight: float = 0.01
+    skip_gate_recovery_margin: float = 3.0
+
 # -----------------------------------------------------------------------------
 # Registry: model_type string -> (ConfigClass, ModelClass)
 # -----------------------------------------------------------------------------
@@ -76,6 +85,7 @@ MODELS = {
     "skip_ahead_sparse_x0":  (SkipAheadSparseX0Config,    GPTBase),
     "skip_ahead_dense_tanh": (SkipAheadDenseTanhConfig,   GPTBase),
     "skip_ahead_dense_x0_tanh": (SkipAheadDenseX0TanhConfig, GPTBase),
+    "skip_ahead_dense_sqrt": (SkipAheadDenseSqrtConfig, GPTBase),
 }
 
 

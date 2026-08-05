@@ -36,6 +36,7 @@ def test_registry_variants():
         "skip_ahead_sparse_x0": ("sparse", "x0", "sigmoid"),
         "skip_ahead_dense_tanh": ("dense", "current", "tanh"),
         "skip_ahead_dense_x0_tanh": ("dense", "x0", "tanh"),
+        "skip_ahead_dense_sqrt": ("dense", "current", "sqrt"),
     }
     for name, (mode, source, gate_type) in expected.items():
         config_cls, model_cls = get_model(name)
@@ -62,9 +63,9 @@ def test_non_skip_checkpoint_does_not_get_gate_type():
     assert "skip_gate_type" not in model_config
 
 
-def test_skip_gates_initialize_to_one_for_both_gate_types():
+def test_skip_gates_initialize_to_one_for_all_gate_types():
     x = torch.randn(2, 4, 32)
-    for gate_type in ("tanh", "sigmoid"):
+    for gate_type in ("tanh", "sigmoid", "sqrt"):
         model = make_model(skip_ahead_mode="dense", skip_gate_type=gate_type)
         for layer_idx in range(model.config.n_layer):
             gate = model._compute_skip_gate(layer_idx, x, x)
@@ -91,6 +92,31 @@ def test_legacy_sigmoid_gate_is_between_zero_and_two():
         model.skip_gates[0].weight.fill_(0.1)
     gate = model._compute_skip_gate(0, torch.ones(1, 2, 32), torch.ones(1, 2, 32))
     assert torch.all((0 < gate) & (gate < 2))
+
+
+def test_sqrt_gate_is_positive_unbounded_and_has_recoverable_negative_tail():
+    model = make_model(
+        n_layer=1,
+        skip_ahead_mode="dense",
+        skip_gate_type="sqrt",
+        skip_gate_l2_weight=0.0,
+    )
+    x = torch.ones(1, 1, 32)
+    with torch.no_grad():
+        model.skip_gates[0].weight.fill_(-100.0 / 32.0)
+
+    negative_gate = model._compute_skip_gate(0, x, x)
+    assert torch.all(negative_gate > 0.1)
+    negative_gate.sum().backward()
+    assert torch.count_nonzero(model.skip_gates[0].weight.grad) == 32
+
+    model.skip_gates[0].weight.grad = None
+    with torch.no_grad():
+        model.skip_gates[0].weight.fill_(100.0 / 32.0)
+    positive_gate = model._compute_skip_gate(0, x, x)
+    assert torch.all(positive_gate > 100.0)
+    positive_gate.sum().backward()
+    assert torch.count_nonzero(model.skip_gates[0].weight.grad) == 32
 
 
 def test_x0_gate_uses_x0_instead_of_current_state():
@@ -212,3 +238,23 @@ def test_gate_logit_l2_is_added_only_during_training():
     (train_loss - eval_loss).backward()
     assert model.skip_gates[0].weight.grad is not None
     assert torch.count_nonzero(model.skip_gates[0].weight.grad) > 0
+
+
+def test_gate_recovery_loss_only_penalizes_logits_below_negative_margin():
+    model = make_model(
+        n_layer=1,
+        skip_ahead_mode="dense",
+        skip_gate_type="sqrt",
+        skip_gate_l2_weight=0.0,
+        skip_gate_recovery_weight=0.01,
+        skip_gate_recovery_margin=3.0,
+    )
+    logits = torch.tensor([[[[-5.0], [-3.0], [10.0]]]], requires_grad=True)
+    penalty = model._compute_gate_regularizer(logits)
+    torch.testing.assert_close(penalty, torch.tensor([[0.04, 0.0, 0.0]]))
+
+    penalty.sum().backward()
+    torch.testing.assert_close(
+        logits.grad,
+        torch.tensor([[[[-0.04], [0.0], [0.0]]]]),
+    )
