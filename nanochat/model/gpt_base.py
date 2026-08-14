@@ -39,6 +39,11 @@ class GPTBaseConfig:
     # Characters: L=long (full context), S=short (quarter context)
     # Examples: "L"=all full context, "SL"=alternating, "SSL"=two short then one long
     window_pattern: str = "SSSL"
+    # If > 0, S layers use this ABSOLUTE width instead of sequence_len/4. The
+    # default (S = seq/4) scales the window with sequence length, which keeps the
+    # number of window-relay hops needed to cover the sequence constant (~4) at
+    # every length -- the hop-coverage experiments need that confound removed.
+    window_fixed: int = 0
     # Chunk deep-KV (finding-1): EARLY layers get a gated extra attention branch
     # whose K/V are projected (same c_k/c_v weights) from states of strictly
     # earlier chunks, taken either from the final block's output (chunk_deep_kv:
@@ -879,7 +884,12 @@ class GPTBase(nn.Module):
         assert all(c in "SL" for c in pattern), f"Invalid window_pattern: {pattern}. Use only S and L."
         # Map characters to window sizes
         long_window = config.sequence_len
-        short_window = -(-long_window // 4 // 128) * 128  # ceil to FA3 tile size (2048 -> 768)
+        if config.window_fixed > 0:
+            assert config.window_fixed % 128 == 0, \
+                f"window_fixed must be a multiple of the FA3 tile (128), got {config.window_fixed}"
+            short_window = min(config.window_fixed, long_window)
+        else:
+            short_window = -(-long_window // 4 // 128) * 128  # ceil to FA3 tile size (2048 -> 768)
         char_to_window = {
             "L": (long_window, 0),
             "S": (short_window, 0),
