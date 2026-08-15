@@ -39,6 +39,11 @@ class GPTBaseConfig:
     # Characters: L=long (full context), S=short (quarter context)
     # Examples: "L"=all full context, "SL"=alternating, "SSL"=two short then one long
     window_pattern: str = "SSSL"
+    # If > 0, S layers use this ABSOLUTE width instead of sequence_len/4.
+    # Ported from yuchen/patchscope-bov (af53226): the default S = seq/4 keeps
+    # the number of window-relay hops constant at every length, which is exactly
+    # the confound the hop-coverage experiments remove.
+    window_fixed: int = 0
     # Skip-ahead routing. "none" preserves the original GPTBase architecture.
     # Tanh gates use 1 + 0.5*tanh(logit), sqrt gates use the positive,
     # polynomial-tail mapping 0.1 + 0.9*(z + sqrt(1 + z^2)), and legacy
@@ -305,7 +310,12 @@ class GPTBase(nn.Module):
         assert all(c in "SL" for c in pattern), f"Invalid window_pattern: {pattern}. Use only S and L."
         # Map characters to window sizes
         long_window = config.sequence_len
-        short_window = -(-long_window // 4 // 128) * 128  # ceil to FA3 tile size (2048 -> 768)
+        if config.window_fixed > 0:
+            assert config.window_fixed % 128 == 0, \
+                f"window_fixed must be a multiple of the FA3 tile (128), got {config.window_fixed}"
+            short_window = min(config.window_fixed, long_window)
+        else:
+            short_window = -(-long_window // 4 // 128) * 128  # ceil to FA3 tile size (2048 -> 768)
         char_to_window = {
             "L": (long_window, 0),
             "S": (short_window, 0),
@@ -315,8 +325,13 @@ class GPTBase(nn.Module):
         for layer_idx in range(config.n_layer):
             char = pattern[layer_idx % len(pattern)]
             window_sizes.append(char_to_window[char])
-        # Final layer always gets full context
-        window_sizes[-1] = (long_window, 0)
+        # Final layer always gets full context -- but only for TILED patterns.
+        # A full-length pattern (len == n_layer) is an explicit per-layer layout
+        # and is respected verbatim; without this, "global only at layer 8"
+        # would silently become "globals at 8 and 12" and the single-global
+        # placement experiments would be measuring the wrong architecture.
+        if len(pattern) < config.n_layer:
+            window_sizes[-1] = (long_window, 0)
         return window_sizes
 
     def get_device(self):
