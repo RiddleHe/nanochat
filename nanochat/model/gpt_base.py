@@ -39,15 +39,13 @@ class GPTBaseConfig:
     # Characters: L=long (full context), S=short (quarter context)
     # Examples: "L"=all full context, "SL"=alternating, "SSL"=two short then one long
     window_pattern: str = "SSSL"
-    # Skip-ahead routing. "none" preserves the original GPTBase architecture.
+    # Skip-gate routing. Disabled preserves the original GPTBase architecture.
     # Tanh gates use 1 + 0.5*tanh(logit), sqrt gates use the positive,
     # polynomial-tail mapping 0.1 + 0.9*(z + sqrt(1 + z^2)), and legacy
-    # sigmoid gates use 2*sigmoid(logit). Sparse gates hard-zero values below
-    # the threshold while using a straight-through gradient through the dense gate.
-    skip_ahead_mode: str = "none"  # one of: none, dense, sparse
+    # sigmoid gates use 2*sigmoid(logit).
+    skip_gate_enabled: bool = False
     skip_gate_source: str = "current"  # one of: current, x0
     skip_gate_type: str = "tanh"  # one of: tanh, sigmoid, sqrt
-    skip_threshold: float = 0.5
     skip_gate_l2_weight: float = 0.01
     skip_gate_recovery_weight: float = 0.0
     skip_gate_recovery_margin: float = 3.0
@@ -177,14 +175,12 @@ class GPTBase(nn.Module):
         """
         super().__init__()
         self.config = config
-        assert config.skip_ahead_mode in {"none", "dense", "sparse"}, \
-            f"Invalid skip_ahead_mode: {config.skip_ahead_mode}"
+        assert isinstance(config.skip_gate_enabled, bool), \
+            f"skip_gate_enabled must be a bool, got {config.skip_gate_enabled!r}"
         assert config.skip_gate_source in {"current", "x0"}, \
             f"Invalid skip_gate_source: {config.skip_gate_source}"
         assert config.skip_gate_type in {"tanh", "sigmoid", "sqrt"}, \
             f"Invalid skip_gate_type: {config.skip_gate_type}"
-        assert config.skip_threshold >= 0.0, \
-            f"skip_threshold must be non-negative, got {config.skip_threshold}"
         assert config.skip_gate_l2_weight >= 0.0, \
             f"skip_gate_l2_weight must be non-negative, got {config.skip_gate_l2_weight}"
         assert config.skip_gate_recovery_weight >= 0.0, \
@@ -212,7 +208,7 @@ class GPTBase(nn.Module):
         self.skip_gates = nn.ModuleList([
             Linear(config.n_embd, 1, bias=False)
             for _ in range(config.n_layer)
-        ]) if config.skip_ahead_mode != "none" else nn.ModuleList()
+        ]) if config.skip_gate_enabled else nn.ModuleList()
         # Smear: mix previous token's embedding into current token (cheap bigram-like info)
         self.smear_gate = Linear(24, 1, bias=False)
         self.smear_lambda = nn.Parameter(torch.zeros(1))
@@ -257,7 +253,7 @@ class GPTBase(nn.Module):
             torch.nn.init.uniform_(block.mlp.c_fc.weight, -s * 0.4, s * 0.4)  # 0.4x init scale for c_fc
             torch.nn.init.zeros_(block.mlp.c_proj.weight)
 
-        # Zero logits give a gate of 1 for both gate types, so every skip-ahead
+        # Zero logits give a gate of 1 for every gate type, so every skip-ahead
         # variant starts exactly at the original GPTBase computation.
         for gate in self.skip_gates:
             torch.nn.init.zeros_(gate.weight)
@@ -437,8 +433,9 @@ class GPTBase(nn.Module):
             soft_gate = 2.0 * torch.sigmoid(logits)
         else:
             # Positive, unbounded gate with a polynomial negative tail. Compute
-            # in FP32 and rationalize the negative branch to avoid cancellation
-            # in z + sqrt(1 + z^2) for large negative logits.
+            # in FP32. For negative z, z + root subtracts nearly equal values;
+            # the equivalent 1 / (root - z) instead adds root + |z| in the
+            # denominator and preserves the small positive result.
             logits_fp32 = logits.float()
             root = torch.sqrt(1.0 + logits_fp32.square())
             multiplier = torch.where(
@@ -447,17 +444,7 @@ class GPTBase(nn.Module):
                 1.0 / (root - logits_fp32),
             )
             soft_gate = (0.1 + 0.9 * multiplier).to(logits.dtype)
-        if self.config.skip_ahead_mode == "dense":
-            gate = soft_gate
-        else:
-            # Forward: exactly zero below threshold, continuous soft value otherwise.
-            # Backward: act as soft_gate everywhere so a skipped gate can turn back on.
-            hard_gate = torch.where(
-                soft_gate >= self.config.skip_threshold,
-                soft_gate,
-                torch.zeros_like(soft_gate),
-            )
-            gate = soft_gate + (hard_gate - soft_gate).detach()
+        gate = soft_gate
 
         if not return_regularizer_logits:
             return gate
@@ -517,7 +504,7 @@ class GPTBase(nn.Module):
 
         # Forward the trunk of the Transformer.
         gate_regularizer_logits = []
-        if self.config.skip_ahead_mode == "none":
+        if not self.config.skip_gate_enabled:
             for block in self.transformer.h:
                 x = block(x, cos_sin, kv_cache)
         else:

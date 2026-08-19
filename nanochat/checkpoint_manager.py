@@ -26,11 +26,23 @@ def _patch_missing_config_keys(model_config_kwargs):
     if "window_pattern" not in model_config_kwargs:
         model_config_kwargs["window_pattern"] = "L"
         log0(f"Patching missing window_pattern in model config to 'L'")
-    # Skip-ahead checkpoints created before gate types were configurable used
-    # 2*sigmoid. Preserve that behavior instead of applying the new tanh default.
-    if "skip_ahead_mode" in model_config_kwargs and "skip_gate_type" not in model_config_kwargs:
-        model_config_kwargs["skip_gate_type"] = "sigmoid"
-        log0("Patching missing skip_gate_type in model config to 'sigmoid'")
+    # Convert the retired dense/sparse mode to the continuous-gate enable flag.
+    legacy_mode = model_config_kwargs.pop("skip_ahead_mode", None)
+    model_config_kwargs.pop("skip_threshold", None)
+    if legacy_mode == "sparse":
+        raise ValueError(
+            "Sparse skip-ahead checkpoints are unsupported because their hard "
+            "threshold used a straight-through surrogate gradient"
+        )
+    if legacy_mode is not None:
+        if legacy_mode not in {"none", "dense"}:
+            raise ValueError(f"Invalid legacy skip_ahead_mode: {legacy_mode}")
+        model_config_kwargs.setdefault("skip_gate_enabled", legacy_mode == "dense")
+        # Skip-ahead checkpoints created before gate types were configurable used
+        # 2*sigmoid. Preserve that behavior instead of applying the tanh default.
+        if legacy_mode == "dense" and "skip_gate_type" not in model_config_kwargs:
+            model_config_kwargs["skip_gate_type"] = "sigmoid"
+            log0("Patching missing skip_gate_type in model config to 'sigmoid'")
 
 def _patch_missing_keys(model_data, model_config):
     """Add default values for new parameters that may be missing in old checkpoints."""

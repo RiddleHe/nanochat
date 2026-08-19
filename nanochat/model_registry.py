@@ -28,42 +28,30 @@ class GPTNoLambdaConfig(GPTConfig):
 from nanochat.model.gpt_base import GPTBaseConfig, GPTBase
 
 @dataclass
-class SkipAheadDenseConfig(GPTBaseConfig):
-    skip_ahead_mode: str = "dense"
+class SkipAheadConfig(GPTBaseConfig):
+    skip_gate_enabled: bool = True
     skip_gate_source: str = "current"
     skip_gate_type: str = "sigmoid"
 
 @dataclass
-class SkipAheadSparseConfig(GPTBaseConfig):
-    skip_ahead_mode: str = "sparse"
-    skip_gate_source: str = "current"
-    skip_gate_type: str = "sigmoid"
-
-@dataclass
-class SkipAheadDenseX0Config(GPTBaseConfig):
-    skip_ahead_mode: str = "dense"
+class SkipAheadX0Config(GPTBaseConfig):
+    skip_gate_enabled: bool = True
     skip_gate_source: str = "x0"
     skip_gate_type: str = "sigmoid"
 
 @dataclass
-class SkipAheadSparseX0Config(GPTBaseConfig):
-    skip_ahead_mode: str = "sparse"
-    skip_gate_source: str = "x0"
-    skip_gate_type: str = "sigmoid"
-
-@dataclass
-class SkipAheadDenseTanhConfig(GPTBaseConfig):
-    skip_ahead_mode: str = "dense"
+class SkipAheadTanhConfig(GPTBaseConfig):
+    skip_gate_enabled: bool = True
     skip_gate_source: str = "current"
 
 @dataclass
-class SkipAheadDenseX0TanhConfig(GPTBaseConfig):
-    skip_ahead_mode: str = "dense"
+class SkipAheadX0TanhConfig(GPTBaseConfig):
+    skip_gate_enabled: bool = True
     skip_gate_source: str = "x0"
 
 @dataclass
-class SkipAheadDenseSqrtConfig(GPTBaseConfig):
-    skip_ahead_mode: str = "dense"
+class SkipAheadSqrtConfig(GPTBaseConfig):
+    skip_gate_enabled: bool = True
     skip_gate_source: str = "current"
     skip_gate_type: str = "sqrt"
     skip_gate_l2_weight: float = 0.0
@@ -78,15 +66,21 @@ MODELS = {
     "gpt":              (GPTConfig,             GPT),
     "gpt_nolambda":     (GPTNoLambdaConfig,     GPT),
     # gpt_base.py family
-    "gpt_base":              (GPTBaseConfig,              GPTBase),
-    "skip_ahead_dense":      (SkipAheadDenseConfig,       GPTBase),
-    "skip_ahead_sparse":     (SkipAheadSparseConfig,      GPTBase),
-    "skip_ahead_dense_x0":   (SkipAheadDenseX0Config,     GPTBase),
-    "skip_ahead_sparse_x0":  (SkipAheadSparseX0Config,    GPTBase),
-    "skip_ahead_dense_tanh": (SkipAheadDenseTanhConfig,   GPTBase),
-    "skip_ahead_dense_x0_tanh": (SkipAheadDenseX0TanhConfig, GPTBase),
-    "skip_ahead_dense_sqrt": (SkipAheadDenseSqrtConfig, GPTBase),
+    "gpt_base":              (GPTBaseConfig,        GPTBase),
+    "skip_ahead":            (SkipAheadConfig,       GPTBase),
+    "skip_ahead_x0":         (SkipAheadX0Config,     GPTBase),
+    "skip_ahead_tanh":       (SkipAheadTanhConfig,   GPTBase),
+    "skip_ahead_x0_tanh":    (SkipAheadX0TanhConfig, GPTBase),
+    "skip_ahead_sqrt":       (SkipAheadSqrtConfig,   GPTBase),
+    # Historical names retained only so existing continuous-gate checkpoints load.
+    "skip_ahead_dense":         (SkipAheadConfig,       GPTBase),
+    "skip_ahead_dense_x0":      (SkipAheadX0Config,     GPTBase),
+    "skip_ahead_dense_tanh":    (SkipAheadTanhConfig,   GPTBase),
+    "skip_ahead_dense_x0_tanh": (SkipAheadX0TanhConfig, GPTBase),
+    "skip_ahead_dense_sqrt":    (SkipAheadSqrtConfig,   GPTBase),
 }
+
+REMOVED_MODEL_TYPES = {"skip_ahead_sparse", "skip_ahead_sparse_x0"}
 
 
 def register(name, config_cls, model_cls):
@@ -96,6 +90,11 @@ def register(name, config_cls, model_cls):
 
 def get_model(name="gpt"):
     """Get (ConfigClass, ModelClass) by name."""
+    if name in REMOVED_MODEL_TYPES:
+        raise ValueError(
+            f"Model type '{name}' was removed because hard-threshold sparse routing "
+            "used a straight-through surrogate gradient"
+        )
     if name not in MODELS:
         available = ", ".join(sorted(MODELS.keys()))
         raise ValueError(f"Unknown model type '{name}'. Available: {available}")
