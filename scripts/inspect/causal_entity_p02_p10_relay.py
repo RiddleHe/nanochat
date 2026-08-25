@@ -27,7 +27,7 @@ import torch
 
 MODEL = "Qwen/Qwen3-8B-Base"
 TEMPLATE = "Everyone knows {entity} was a celebrated {role}. The {role} was"
-RESULT_ROOT = Path("/ssd/mh3897/patchscope_results")
+RESULT_ROOT = Path("results/patchscopes")
 REFERENCE_ROOT = RESULT_ROOT / "qwen3_8b_base_causal_entity_position_handoff_20260713_181400"
 REFERENCE_METADATA = REFERENCE_ROOT / "pair_metadata.csv"
 REFERENCE_SUMMARY = REFERENCE_ROOT / "summary_by_layer_and_position.csv"

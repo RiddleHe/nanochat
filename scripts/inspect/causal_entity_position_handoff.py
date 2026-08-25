@@ -27,7 +27,7 @@ import torch
 import torch.nn.functional as F
 
 
-RESULT_ROOT = Path("/ssd/mh3897/patchscope_results")
+RESULT_ROOT = Path("results/patchscopes")
 DEFAULT_MODEL = "Qwen/Qwen3-8B-Base"
 TEMPLATE = "Everyone knows {name} was a celebrated {role}. The {role} was"
 HOOK_DEFINITION = "cumulative residual state at output of transformer block; layer 0 is output of block 0"

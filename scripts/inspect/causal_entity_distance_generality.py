@@ -31,9 +31,9 @@ import torch
 
 MODEL = "Qwen/Qwen3-8B-Base"
 N_LAYERS = 36
-REFERENCE_RELAY = Path("/ssd/mh3897/patchscope_results/qwen3_8b_base_p02_p10_relay_20260714_030311")
+REFERENCE_RELAY = Path("results/patchscopes/qwen3_8b_base_p02_p10_relay_20260714_030311")
 REFERENCE_METADATA = REFERENCE_RELAY / "pair_metadata.csv"
-REFERENCE_HANDOFF = Path("/ssd/mh3897/patchscope_results/qwen3_8b_base_causal_entity_position_handoff_20260713_181400")
+REFERENCE_HANDOFF = Path("results/patchscopes/qwen3_8b_base_causal_entity_position_handoff_20260713_181400")
 HOOK_DEFINITION = "cumulative residual state at output of transformer block; layer 0 is output of block 0"
 ATTENTION_HOOK_DEFINITION = "self-attention output after o_proj and before residual addition at P_readout"
 TARGET_LENGTHS = [0, 8, 32, 64, 128]

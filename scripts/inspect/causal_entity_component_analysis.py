@@ -19,7 +19,7 @@ N_LAYERS = 36
 N_PAIRS = 16
 SCAN_LAYERS = [23, 24, 25, 26]
 BOOTSTRAP_SEED = 20260715
-REFERENCE_RELAY = Path("/ssd/mh3897/patchscope_results/qwen3_8b_base_p02_p10_relay_20260714_030311")
+REFERENCE_RELAY = Path("results/patchscopes/qwen3_8b_base_p02_p10_relay_20260714_030311")
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
