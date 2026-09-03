@@ -30,7 +30,7 @@ Training is driven by the script under `nanorl/runs/`, which launches a vLLM rol
 
 ```bibtex
 @misc{nanochat-arch,
-  author = {Muyu He, Yuchen Liu},
+  author = {Muyu He, Yuchen Liu, Ran Tao},
   title = {nanochat-arch: Architecture experiments on nanochat},
   year = {2026},
   publisher = {GitHub},
