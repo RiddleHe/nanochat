@@ -74,7 +74,23 @@ def compute_advantages(
         return ((grouped - group_mean) / (group_std + 1e-8)).view(-1)
     if algorithm == "reinforce":
         return rewards - rewards.mean()
+    if algorithm == "maxrl":
+        return compute_maxrl_advantages(rewards)
     raise ValueError(f"unknown RL algorithm: {algorithm!r}")
+
+
+def compute_maxrl_advantages(binary_reward: torch.Tensor) -> torch.Tensor:
+    """MaxRL group-relative advantage from binary (0/1) rewards.
+
+    Zero-out advantages when the group mean is 0 (all wrong) to avoid
+    a degenerate gradient signal — there is nothing to reinforce.
+    """
+    reward_mean = binary_reward.mean(dim=0, keepdim=True)
+    return torch.where(
+        reward_mean > 0,
+        (binary_reward - reward_mean) / reward_mean,
+        torch.zeros_like(binary_reward),
+    )
 
 
 def _masked_token_mean(values: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
@@ -95,6 +111,8 @@ def grpo_loss(
     response_mask,
     clip=0.2,
     kl_coeff=0.0,
+    inference_logprobs=None,
+    C: float = 0.0,
     **kwargs,
 ):
     """Per-token PPO-style surrogate with symmetric clip, sequence-mean aggregated."""
@@ -107,6 +125,11 @@ def grpo_loss(
     ratio = (lp - old_lp).exp()                                      # [B, T]
     clipped = torch.clamp(ratio, 1.0 - clip, 1.0 + clip)
     per_token = -torch.min(ratio * adv, clipped * adv)               # [B, T]
+    if C > 0.0 and inference_logprobs is not None:
+        inf_lp = inference_logprobs.float()
+        tis_ratio = (lp - inf_lp).exp()
+        per_token = per_token * tis_ratio.clamp(max=C).detach()
+        
     loss = _masked_sequence_mean(per_token, mask)
 
     if kl_coeff > 0:
@@ -125,6 +148,8 @@ def dapo_loss(
     response_mask,
     clip_low=0.8,
     clip_high=1.28,
+    inference_logprobs=None,
+    C: float = 0.0,
     **kwargs,
 ):
     """DAPO per-token clipped surrogate with asymmetric (clip-higher) bounds."""
@@ -136,6 +161,10 @@ def dapo_loss(
     ratio = (lp - old_lp).exp()
     clipped = torch.clamp(ratio, clip_low, clip_high)
     per_token = -torch.min(ratio * adv, clipped * adv)
+    if C > 0.0 and inference_logprobs is not None:
+        inf_lp = inference_logprobs.float()
+        tis_ratio = (lp - inf_lp).exp()
+        per_token = per_token * tis_ratio.clamp(max=C).detach()
     return _masked_token_mean(per_token, mask)
 
 
@@ -144,6 +173,8 @@ def reinforce_loss(
     old_logprobs,
     advantages,
     response_mask,
+    inference_logprobs=None,
+    C: float = 0.0,
     **kwargs,
 ):
     """Per-token REINFORCE with mean-subtracted advantage, sequence-mean aggregated."""
@@ -151,6 +182,10 @@ def reinforce_loss(
     adv = advantages.float().unsqueeze(-1)
     mask = response_mask.float()
     per_token = -(lp * adv)
+    if C > 0.0 and inference_logprobs is not None:
+        inf_lp = inference_logprobs.float()
+        tis_ratio = (lp - inf_lp).exp()
+        per_token = per_token * tis_ratio.clamp(max=C).detach()
     return _masked_sequence_mean(per_token, mask)
 
 
@@ -161,6 +196,8 @@ def gspo_loss(
     response_mask,
     clip=0.2,
     kl_coeff=0.0,
+    inference_logprobs=None,
+    C: float = 0.0,
     **kwargs,
 ):
     """GSPO sequence-level clipped surrogate with length-normalized log-ratio."""
@@ -174,6 +211,10 @@ def gspo_loss(
     ratio = seq_log_ratio.exp().unsqueeze(-1)                       # [B, 1]
     clipped = torch.clamp(ratio, 1.0 - clip, 1.0 + clip)            # [B, 1]
     per_seq = -torch.min(ratio * adv, clipped * adv)                # [B, 1]
+    if C > 0.0 and inference_logprobs is not None:
+        inf_lp = inference_logprobs.float()
+        tis_ratio = (lp - inf_lp).exp()
+        per_seq = per_seq * tis_ratio.clamp(max=C).detach()
     loss = _masked_sequence_mean(per_seq, mask)                     # broadcasts vs [B, T] mask
 
     if kl_coeff > 0:
@@ -189,6 +230,8 @@ def cispo_loss(
     advantages,
     response_mask,
     clip_high=0.2,
+    inference_logprobs=None,
+    C: float = 0.0,
     **kwargs,
 ):
     """CISPO loss (MiniMax-M1). One-sided IS-weight clip, stop-gradient on weight,
@@ -201,7 +244,33 @@ def cispo_loss(
     ratio = (lp - old_lp).exp()                               # [B, T]
     clipped = torch.clamp(ratio, max=1.0 + clip_high).detach()
     per_token = -clipped * adv * lp                           # [B, T]
+    if C > 0.0 and inference_logprobs is not None:
+        inf_lp = inference_logprobs.float()
+        tis_ratio = (lp - inf_lp).exp()
+        per_token = per_token * tis_ratio.clamp(max=C).detach()
     return _masked_token_mean(per_token, mask)
+
+
+def maxrl_loss(
+    logprobs,
+    old_logprobs,
+    advantages,
+    response_mask,
+    inference_logprobs=None,
+    C: float = 0.0,
+    **kwargs,
+):
+    """MaxRL loss (Tajwar et al., 2026). REINFORCE with binary-reward advantages.
+
+    Advantages must come from ``compute_maxrl_advantages`` (or ``compute_advantages``
+    with algorithm="maxrl"), which expects rewards to be binary (1.0 = correct and
+    well-formatted, 0.0 otherwise).
+    """
+    lp = logprobs.float()
+    adv = advantages.float().unsqueeze(-1)   # [B, 1]
+    mask = response_mask.float()
+    per_token = -(lp * adv)                  # [B, T]
+    return _masked_sequence_mean(per_token, mask)
 
 
 ALGORITHMS = {
@@ -210,4 +279,5 @@ ALGORITHMS = {
     "reinforce": reinforce_loss,
     "gspo": gspo_loss,
     "cispo": cispo_loss,
+    "maxrl": maxrl_loss,
 }
