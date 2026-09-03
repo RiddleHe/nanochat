@@ -88,11 +88,31 @@ def _masked_sequence_mean(values: torch.Tensor, mask: torch.Tensor) -> torch.Ten
     return seq_mean.mean()
 
 
+def _apply_entropy_top_frac(mask: torch.Tensor, entropy: torch.Tensor, top_frac: float) -> torch.Tensor:
+    """Narrow `mask` to keep only tokens whose entropy is in the top `top_frac` of
+    the masked positions in the batch. Implements the paper's "forking tokens"
+    selective-gradient scheme: only top-k high-entropy response tokens contribute.
+
+    If ``top_frac`` is None/<=0/>=1, returns mask unchanged.
+    """
+    if top_frac is None or top_frac <= 0.0 or top_frac >= 1.0:
+        return mask
+    mask_bool = mask.bool()
+    ent_masked = entropy.float()[mask_bool]
+    if ent_masked.numel() == 0:
+        return mask
+    thresh = torch.quantile(ent_masked, 1.0 - top_frac)
+    keep = (entropy >= thresh).to(mask.dtype) * mask
+    return keep
+
+
 def grpo_loss(
     logprobs,
     old_logprobs,
     advantages,
     response_mask,
+    entropy=None,
+    entropy_top_frac=None,
     clip=0.2,
     kl_coeff=0.0,
     **kwargs,
@@ -103,6 +123,8 @@ def grpo_loss(
     old_lp = old_logprobs.float()
     adv = advantages.float().unsqueeze(-1)                          # [B, 1]
     mask = response_mask.float()
+    if entropy is not None:
+        mask = _apply_entropy_top_frac(mask, entropy, entropy_top_frac)
 
     ratio = (lp - old_lp).exp()                                      # [B, T]
     clipped = torch.clamp(ratio, 1.0 - clip, 1.0 + clip)
@@ -123,15 +145,25 @@ def dapo_loss(
     old_logprobs,
     advantages,
     response_mask,
+    entropy=None,
+    entropy_top_frac=None,
     clip_low=0.8,
     clip_high=1.28,
     **kwargs,
 ):
-    """DAPO per-token clipped surrogate with asymmetric (clip-higher) bounds."""
+    """DAPO per-token clipped surrogate with asymmetric (clip-higher) bounds.
+
+    When ``entropy_top_frac`` is given (e.g. 0.2) and ``entropy`` is provided,
+    gradient is restricted to the top-fraction of highest-entropy response
+    tokens per batch — this is the 80/20 paper's "forking tokens" selective
+    training scheme.
+    """
     lp = logprobs.float()
     old_lp = old_logprobs.float()
     adv = advantages.float().unsqueeze(-1)
     mask = response_mask.float()
+    if entropy is not None:
+        mask = _apply_entropy_top_frac(mask, entropy, entropy_top_frac)
 
     ratio = (lp - old_lp).exp()
     clipped = torch.clamp(ratio, clip_low, clip_high)
@@ -144,12 +176,16 @@ def reinforce_loss(
     old_logprobs,
     advantages,
     response_mask,
+    entropy=None,
+    entropy_top_frac=None,
     **kwargs,
 ):
     """Per-token REINFORCE with mean-subtracted advantage, sequence-mean aggregated."""
     lp = logprobs.float()
     adv = advantages.float().unsqueeze(-1)
     mask = response_mask.float()
+    if entropy is not None:
+        mask = _apply_entropy_top_frac(mask, entropy, entropy_top_frac)
     per_token = -(lp * adv)
     return _masked_sequence_mean(per_token, mask)
 
