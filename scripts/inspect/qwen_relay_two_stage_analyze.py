@@ -39,21 +39,29 @@ def main():
             base_ok[r["condition"]] += r["output_category"] == "expected_only"
 
     s1 = defaultdict(list); s1rec = defaultdict(list); plane = defaultdict(list)
+    nat_margin = defaultdict(list); nat_rel = defaultdict(list)   # natural divergence at T (no injection)
     for r in rows:
         if r["condition"] == "stage1_transfer":
             plane[(r["source_layer_s"], r["relay_layer_t"])].append(r["transfer_proj"])
+            nat_margin[r["relay_layer_t"]].append(r["ll_margin_d"] - r["ll_margin_r"])
+            if "clean_diff_rel" in r:
+                nat_rel[r["relay_layer_t"]].append(r["clean_diff_rel"])
             if r["relay_layer_t"] - r["source_layer_s"] == w:
                 s1[r["source_layer_s"]].append(r["transfer_proj"])
                 if r["ll_recovery"] is not None:
                     s1rec[r["source_layer_s"]].append(r["ll_recovery"])
-    s2 = defaultdict(list)
+    s2 = defaultdict(list); s2b = defaultdict(list)
+    relay = defaultdict(list); rlb = defaultdict(list)
     for r in rows:
+        ok = r.get("output_category") == "expected_only"
         if r["condition"] == "stage2_direct":
-            s2[r["relay_layer_t"]].append(r["output_category"] == "expected_only")
-    relay = defaultdict(list)
-    for r in rows:
-        if r["condition"] == "relay":
-            relay[r["source_layer_s"]].append(r["output_category"] == "expected_only")
+            s2[r["relay_layer_t"]].append(ok)
+        elif r["condition"] == "stage2_block":
+            s2b[r["relay_layer_t"]].append(ok)
+        elif r["condition"] == "relay":
+            relay[r["source_layer_s"]].append(ok)
+        elif r["condition"] == "relay_block":
+            rlb[r["source_layer_s"]].append(ok)
 
     S_ax = sorted(s1); T_ax = sorted(s2)
     s1m = np.array([np.mean(s1[s]) for s in S_ax])
@@ -76,7 +84,20 @@ def main():
                (True, True): "C: contradiction -> inspect pass-3 transplant",
                (True, False): "D: late peak is an overwrite artifact"}[(s1_mid_sub, s2_mid_high)]
 
+    # controls: readout's direct entity read blocked after T
+    s2b_m = {t: float(np.mean(v)) for t, v in sorted(s2b.items())}
+    rlb_m = {s: float(np.mean(v)) for s, v in sorted(rlb.items())}
+    nat_m = {t: float(np.mean(v)) for t, v in sorted(nat_margin.items())}
+    ctrl_note = None
+    if s2b_m:
+        mid_b = float(np.mean([v for t, v in s2b_m.items() if 8 <= t <= 20]))
+        ctrl_note = ("stage2 mid-T survival: direct=%.2f vs blocked-reread=%.2f -> %s" % (
+            s2_mid, mid_b,
+            "override was LATE RE-READING of the entity (not norm burial)" if mid_b - s2_mid >= 0.3
+            else "blocking re-reading does NOT rescue mid-T -> loss is not (only) re-reading"))
     summary = {"n_cases": base_n["donor_baseline"], "baseline_ok": dict(base_ok), "baseline_n": dict(base_n),
+               "stage2_block_by_T": s2b_m, "relay_block_by_S": rlb_m,
+               "natural_ll_margin_gap_by_T": nat_m, "control_note": ctrl_note,
                "stage1_transfer_by_S": {s: float(np.mean(s1[s])) for s in S_ax},
                "stage1_llrecovery_by_S": {s: (float(np.mean(s1rec[s])) if s1rec[s] else None) for s in S_ax},
                "stage2_survival_by_T": {t: float(np.mean(s2[t])) for t in T_ax},
@@ -93,7 +114,15 @@ def main():
     print(f"\n{'T':>3} {'stage2_survival':>16}")
     for t, v in zip(T_ax, s2m):
         print(f"{t:3d} {v:16.2f}")
+    if s2b_m or rlb_m:
+        print(f"\n{'layer':>5} {'stage2_direct':>14} {'stage2_block':>13} {'relay':>7} {'relay_block':>12}")
+        for x in sorted(set(s2b_m) | set(rlb_m)):
+            def g(d, k): return f"{d[k]:.2f}" if k in d else "  -  "
+            print(f"{x:5d} {g(dict(zip(T_ax, s2m)), x):>14} {g(s2b_m, x):>13} {g(dict(zip(S_ax, rl)), x):>7} {g(rlb_m, x):>12}")
+    print(f"\nnatural logit-lens margin gap (clean donor - clean recipient) by T:",
+          {t: round(v, 2) for t, v in nat_m.items() if t % 4 == 0 or t >= 30})
     print(f"\nstage1 mid(S8-20)={s1_mid:.3f} late={s1_late:.3f} | stage2 mid(T8-20)={s2_mid:.2f}")
+    if ctrl_note: print("CONTROL:", ctrl_note)
     print("VERDICT:", verdict)
 
     # curves
@@ -102,6 +131,12 @@ def main():
     ax.plot(T_ax, s2m, "-", color=YELLOW, lw=2.4, label="stage 2: direct donor-state survival vs T")
     ax.plot(S_ax, rl, "-", color=PURPLE, lw=2.4, label="relay flip rate (original readout) vs S")
     ax.plot(S_ax, pred, "--", color=PURPLE, lw=1.6, alpha=0.7, label="predicted relay = stage1 x stage2")
+    if s2b_m:
+        ax.plot(list(s2b_m), list(s2b_m.values()), ":", color=YELLOW, lw=2.2,
+                label="stage 2 + readout's entity re-read blocked after T")
+    if rlb_m:
+        ax.plot(list(rlb_m), list(rlb_m.values()), ":", color=PURPLE, lw=2.2,
+                label="relay + re-read blocked after T")
     ax.set_xlabel("layer (S for stage 1 / relay; T for stage 2)", color=MUTED); ax.set_ylabel("score / rate", color=MUTED)
     ax.set_ylim(-0.1, 1.05); ax.grid(True, color=GRID, lw=0.8); ax.set_axisbelow(True)
     for sp in ax.spines.values(): sp.set_visible(False)
