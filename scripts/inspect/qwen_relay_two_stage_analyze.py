@@ -32,9 +32,13 @@ def main():
     meta = json.loads((run / "metadata.json").read_text())
     L = meta["n_layers"]; w = meta["relay_width"]
 
-    base_ok = defaultdict(int); base_n = defaultdict(int)
+    base_ok = defaultdict(int); base_n = defaultdict(int); seen_base = set()
     for r in rows:
         if r["condition"] in ("donor_baseline", "recipient_baseline"):
+            k = (r["condition"], r["template_id"], r["pair_id"])
+            if k in seen_base:      # merged runs repeat the baselines; count each case once
+                continue
+            seen_base.add(k)
             base_n[r["condition"]] += 1
             base_ok[r["condition"]] += r["output_category"] == "expected_only"
 
