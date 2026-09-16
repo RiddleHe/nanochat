@@ -107,13 +107,28 @@ def main() -> int:
     ap.add_argument("--pair-ids", type=parse_ints, default=None)
     ap.add_argument("--relay-width", type=int, default=4)
     ap.add_argument("--max-new-tokens", type=int, default=12)
-    ap.add_argument("--stage1-full-plane", action="store_true", default=True)
+    ap.add_argument("--width-only", action="store_true",
+                    help="stage 1 only at T=S+width instead of the full (S,T) plane")
+    ap.add_argument("--stage2-layers", type=parse_ints, default=None,
+                    help="subset of T for stage 2 (default: every layer)")
+    ap.add_argument("--device", default="cuda")
+    ap.add_argument("--cpu-threads", type=int, default=48)
     ap.add_argument("--out-dir", required=True)
     args = ap.parse_args()
+    args.stage1_full_plane = not args.width_only
 
-    device = torch.device("cuda")
-    model, tokenizer, layers = load_model(args.model, device)
+    device = torch.device(args.device)
+    if device.type == "cpu":
+        torch.set_num_threads(args.cpu_threads)
+        # bf16 on CPU (avx512_bf16 present on this host); collaborator's loader would pick fp32
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        tokenizer = AutoTokenizer.from_pretrained(args.model, use_fast=True)
+        model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.bfloat16).to(device).eval()
+        layers = list(model.model.layers)
+    else:
+        model, tokenizer, layers = load_model(args.model, device)
     L = len(layers)
+    stage2_T = args.stage2_layers if args.stage2_layers is not None else list(range(L))
     pair_ids = args.pair_ids if args.pair_ids is not None else list(range(len(PAIRS)))
     templates = [t for t in TEMPLATES if t.template_id in args.template_ids]
 
@@ -148,8 +163,8 @@ def main() -> int:
                 m_d = [logit_lens_margin(model, d_fin[t], d_tok, r_tok) for t in range(L)]
                 m_r = [logit_lens_margin(model, r_fin[t], d_tok, r_tok) for t in range(L)]
 
-                # STAGE 2: direct donor readout-state transplant at every T
-                for T in range(L):
+                # STAGE 2: direct donor readout-state transplant at each selected T
+                for T in stage2_T:
                     row = score_completion(greedy_completion(
                         model, tokenizer, layers, recip, device, args.max_new_tokens,
                         relay_layer=T, relay_state=d_fin[T]), dn, rn)

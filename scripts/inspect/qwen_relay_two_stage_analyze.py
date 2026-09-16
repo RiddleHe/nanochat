@@ -60,12 +60,15 @@ def main():
     s1r = np.array([np.mean(s1rec[s]) if s1rec[s] else np.nan for s in S_ax])
     s2m = np.array([np.mean(s2[t]) for t in T_ax])
     rl = np.array([np.mean(relay[s]) for s in S_ax])
-    pred = np.array([np.clip(np.mean(s1[s]), 0, 1) * np.mean(s2[s + w]) for s in S_ax])
+    def s2_at(t):  # nearest measured T when stage 2 was run on a subset of layers
+        tt = min(T_ax, key=lambda x: abs(x - t))
+        return np.mean(s2[tt])
+    pred = np.array([np.clip(np.mean(s1[s]), 0, 1) * s2_at(s + w) for s in S_ax])
 
     mid = [s for s in S_ax if 8 <= s <= 20]
     late = [s for s in S_ax if s >= L - 8]
     s1_mid = float(np.mean([np.mean(s1[s]) for s in mid])); s1_late = float(np.mean([np.mean(s1[s]) for s in late]))
-    s2_mid = float(np.mean([np.mean(s2[t]) for t in range(8, 21)]))
+    s2_mid = float(np.mean([np.mean(s2[t]) for t in T_ax if 8 <= t <= 20]))
     s1_mid_sub = s1_mid >= 0.3
     s2_mid_high = s2_mid >= 0.6
     verdict = {(False, True): "A: late transfer real; overwrite irrelevant",
