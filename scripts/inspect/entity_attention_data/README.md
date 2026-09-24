@@ -1,10 +1,10 @@
 # Entity-attention inputs
 
-For experiments 01–10, use **entities100_balanced12.json** (also available as experiments/entity_attention/data/entities100.json). It is the current ordered cohort of 100 people: 50 one-token and 50 two-token names under the recorded Qwen tokenizer and five templates. Preserve order, because array index defines entity_id.
+For experiments 01–10, use **entities100_balanced12.json**. It is the current ordered cohort of 100 people: 50 one-token and 50 two-token names under the recorded Qwen tokenizer and five templates. Preserve order, because array index defines entity_id.
 
 Template IDs: 0 direct_fact, 1 person_in_list, 2 friend, 3 visitor_register, 7 name_badge. The main script treats every token in the inserted name as the entity span. It excludes any appended description from that span.
 
-The portable [experiment package](../../../experiments/entity_attention/README.md) contains the canonical identity map, exact templates, current correct/incorrect/human description mappings, cohort configs, launch commands, audits and plotters. The private [results README](https://github.com/RiddleHe/entity-attention-results) is the complete handoff.
+The self-contained private [experiment repository](https://github.com/RiddleHe/entity-attention-results) contains the runnable code, canonical identity map, exact templates, description mappings, cohort configs, audits, plotting scripts and saved results. Its root README is the complete handoff; no second repository is needed to run those experiments.
 
 ~~~bash
 python scripts/inspect/qwen_entity_attention_ablation.py \

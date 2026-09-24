@@ -145,7 +145,7 @@ def test_policy_cleanup_after_exception():
 
 
 def test_manifest_and_duplicates(tmp_path):
-    manifest = Path(core.__file__).parent / 'entity_attention_data/full_names100.json'
+    manifest = Path(core.__file__).parent / 'entity_attention_data/entities100_balanced12.json'
     entities, digest = core.load_entities(manifest)
     assert len(entities) == 100 and len(set(name for name, _ in entities)) == 100
     assert len(digest) == 64
