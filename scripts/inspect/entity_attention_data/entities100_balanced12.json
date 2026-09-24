@@ -1,0 +1,402 @@
+[
+  {
+    "entity": "Einstein",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "Newton",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "Darwin",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "Tesla",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "Euler",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "Gauss",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "Turing",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "Kepler",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "Edison",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "Nobel",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "Fibonacci",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "Fourier",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "Aristotle",
+    "entity_group": "Philosophy and psychology"
+  },
+  {
+    "entity": "Plato",
+    "entity_group": "Philosophy and psychology"
+  },
+  {
+    "entity": "Kant",
+    "entity_group": "Philosophy and psychology"
+  },
+  {
+    "entity": "Freud",
+    "entity_group": "Philosophy and psychology"
+  },
+  {
+    "entity": "Nietzsche",
+    "entity_group": "Philosophy and psychology"
+  },
+  {
+    "entity": "Shakespeare",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "Dickens",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "Tolkien",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "Kafka",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "Orwell",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "Trump",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Mozart",
+    "entity_group": "Classical music"
+  },
+  {
+    "entity": "Bach",
+    "entity_group": "Classical music"
+  },
+  {
+    "entity": "Picasso",
+    "entity_group": "Visual arts"
+  },
+  {
+    "entity": "Gandhi",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Mandela",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Lincoln",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Churchill",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Thatcher",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Merkel",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Macron",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Netanyahu",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Erdogan",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Reagan",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Nixon",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Truman",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Eisenhower",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Putin",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Stalin",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Lenin",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Hitler",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Messi",
+    "entity_group": "Sport"
+  },
+  {
+    "entity": "Spielberg",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Elvis",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Madonna",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Rihanna",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Modi",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Oprah",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Emily Dickinson",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "Mary Shelley",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "Oscar Wilde",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "Victor Hugo",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "Toni Morrison",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "Barack Obama",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Rosa Parks",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Thomas Jefferson",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Eleanor Roosevelt",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Anne Frank",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Cristiano Ronaldo",
+    "entity_group": "Sport"
+  },
+  {
+    "entity": "Michael Jordan",
+    "entity_group": "Sport"
+  },
+  {
+    "entity": "Kobe Bryant",
+    "entity_group": "Sport"
+  },
+  {
+    "entity": "Serena Williams",
+    "entity_group": "Sport"
+  },
+  {
+    "entity": "Michael Phelps",
+    "entity_group": "Sport"
+  },
+  {
+    "entity": "Muhammad Ali",
+    "entity_group": "Sport"
+  },
+  {
+    "entity": "LeBron James",
+    "entity_group": "Sport"
+  },
+  {
+    "entity": "Marilyn Monroe",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Beyoncé",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Freddie Mercury",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Robert Boyle",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "John Dalton",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "Neil Armstrong",
+    "entity_group": "Space exploration"
+  },
+  {
+    "entity": "Sally Ride",
+    "entity_group": "Space exploration"
+  },
+  {
+    "entity": "Rachel Carson",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "Vera Rubin",
+    "entity_group": "Science and mathematics"
+  },
+  {
+    "entity": "John Locke",
+    "entity_group": "Philosophy and psychology"
+  },
+  {
+    "entity": "Adam Smith",
+    "entity_group": "Economics"
+  },
+  {
+    "entity": "Benjamin Franklin",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "George Washington",
+    "entity_group": "Political and social figures"
+  },
+  {
+    "entity": "Brad Pitt",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Tom Cruise",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Bruce Lee",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Julia Roberts",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Emma Watson",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Emma Stone",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Jennifer Lawrence",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Taylor Swift",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Lady Gaga",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Whitney Houston",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Robert Frost",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "William Blake",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "John Milton",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "James Joyce",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "Harper Lee",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "Stephen King",
+    "entity_group": "Literature"
+  },
+  {
+    "entity": "Bob Dylan",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Johnny Cash",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Louis Armstrong",
+    "entity_group": "Film and popular music"
+  },
+  {
+    "entity": "Miles Davis",
+    "entity_group": "Film and popular music"
+  }
+]

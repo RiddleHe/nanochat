@@ -1,17 +1,20 @@
 """Ablate or supplement direct attention to an entity in Qwen layers.
 
-Each prompt contains one celebrity. Generated-token queries always lose the
-entity value contribution in every layer. Optionally, prompt queries strictly
-between the entity and final prompt token do too. For every width/start-layer
+Each prompt contains one named entity, represented by its complete token span.
+Generated-token queries always lose all entity value contributions in every
+layer. Optionally, prompt queries strictly after the entity span and before
+the final prompt token do too. For every width/start-layer
 span, the final prompt query additionally loses the entity value contribution
 in the selected layers. Native SDPA attention weights and normalization are
 unchanged. Raw continuations are saved for manual semantic scoring.
 
 The optional rescue condition records the ordinary final-prompt-query
-attention to the entity, then runs the bottleneck while adding any positive
-ordinary-minus-live entity-attention deficit after softmax. Other attention
-coefficients are not renormalized, so the effective coefficient sum can
-exceed one.
+attention to the entity, then runs the bottleneck with a positive-only (default)
+or signed ordinary-minus-live correction per entity token and head after
+softmax, then sums the corrected value contributions over the span. Restoration traces retain each
+entity token's coefficients separately within each head. Other attention
+coefficients are not renormalized, so the effective coefficient sum need
+not equal one. Signed restoration can increase or decrease the entity contribution.
 """
 
 from __future__ import annotations
@@ -98,6 +101,14 @@ TEMPLATES = [
         "Respond with only one short answer.\n"
         "Answer:",
     ),
+    Template(
+        7,
+        "name_badge",
+        "The name printed on the badge is {entity}.\n"
+        "Question: What name is printed on the badge?\n"
+        "Respond with only the name.\n"
+        "Answer:",
+    ),
 ]
 
 ORIGINAL_ENTITIES = [
@@ -181,19 +192,34 @@ class EncodedPrompt:
     entity_description: str | None = None
     description_positions: tuple[int, ...] = ()
     description_tail_position: int | None = None
+    entity_positions: tuple[int, ...] = ()
+
+    def __post_init__(self):
+        # Preserve legacy callers constructing a single-token EncodedPrompt.
+        positions = _resolve_entity_positions(self.entity_position, self.entity_positions or None)
+        if positions[-1] >= len(self.ids) - 1:
+            raise ValueError("entity span must precede the final prompt token")
+        object.__setattr__(self, "entity_positions", positions)
+
+    @property
+    def entity_end_position(self) -> int:
+        """Inclusive final token of the name; descriptions are outside the span."""
+        return self.entity_positions[-1]
 
 
 @dataclass
 class AblationState:
     disabled_layers: frozenset[int] = frozenset()
     entity_position: int | None = None
+    entity_positions: tuple[int, ...] = ()
     readout_position: int | None = None
     prompt_length: int | None = None
     block_intermediate_prompt: bool = False
     capture_ordinary_entity_attention: bool = False
     restore_layers: frozenset[int] = frozenset()
+    restore_policy: str = "positive-only"
     ordinary_entity_attention: dict[int, torch.Tensor] | None = None
-    restore_trace: dict[int, dict[str, list[float]]] | None = None
+    restore_trace: dict[int, dict[str, Any]] | None = None
     applications: int = 0
     intermediate_applications: int = 0
     generated_applications: int = 0
@@ -201,6 +227,19 @@ class AblationState:
 
 
 ABLATION = AblationState()
+
+
+def _resolve_entity_positions(
+    entity_position: int, entity_positions: tuple[int, ...] | None = None,
+) -> tuple[int, ...]:
+    positions = (entity_position,) if entity_positions is None else tuple(entity_positions)
+    if (
+        not positions or any(type(p) is not int for p in positions)
+        or positions[0] != entity_position or positions[0] < 0
+        or positions != tuple(range(positions[0], positions[-1] + 1))
+    ):
+        raise ValueError("entity positions must be a nonempty contiguous span starting at entity_position")
+    return positions
 
 
 def _repeat_kv(hidden_states: torch.Tensor, n_rep: int) -> torch.Tensor:
@@ -215,16 +254,16 @@ def _repeat_kv(hidden_states: torch.Tensor, n_rep: int) -> torch.Tensor:
     )
 
 
-def _final_entity_attention(
+def _final_entity_attention_by_token(
     module,
     query: torch.Tensor,
     key: torch.Tensor,
     attention_mask: torch.Tensor | None,
     scaling: float,
     readout_local: int,
-    entity_position: int,
+    entity_positions: tuple[int, ...],
 ) -> torch.Tensor:
-    """Return the final prompt query's entity coefficient per query head."""
+    """Return [batch, query head, entity token] coefficients before span reduction."""
     key_states = _repeat_kv(key, module.num_key_value_groups)
     key_length = key_states.shape[-2]
     final_query = query[:, :, readout_local : readout_local + 1, :]
@@ -239,7 +278,17 @@ def _final_entity_attention(
     final_weights = F.softmax(
         final_scores, dim=-1, dtype=torch.float32
     )
-    return final_weights[:, :, 0, entity_position]
+    return final_weights[:, :, 0, list(entity_positions)]
+
+
+def _final_entity_attention(
+    module, query, key, attention_mask, scaling, readout_local,
+    entity_position: int,
+) -> torch.Tensor:
+    """Legacy single-token coefficient helper; no entity-span aggregation."""
+    return _final_entity_attention_by_token(
+        module, query, key, attention_mask, scaling, readout_local, (entity_position,),
+    ).squeeze(-1)
 
 
 def entity_zero_attention_forward(
@@ -259,9 +308,10 @@ def entity_zero_attention_forward(
             raise RuntimeError("active entity policy is missing prompt boundaries")
         query_length = query.shape[-2]
         key_length = key.shape[-2]
-        if not 0 <= ABLATION.entity_position < key_length:
+        positions = ABLATION.entity_positions
+        if not positions or not 0 <= positions[0] <= positions[-1] < key_length:
             raise RuntimeError(
-                f"entity position {ABLATION.entity_position} outside key length {key_length}"
+                f"entity span {positions} outside key length {key_length}"
             )
         query_start = key_length - query_length
         query_positions = list(range(query_start, query_start + query_length))
@@ -285,15 +335,18 @@ def entity_zero_attention_forward(
                 raise RuntimeError(
                     f"layer {module.layer_idx} ordinary entity attention captured twice"
                 )
-            ordinary_attention = _final_entity_attention(
+            ordinary_attention = _final_entity_attention_by_token(
                 module,
                 query,
                 key,
                 attention_mask,
                 scaling,
                 readout_queries[0],
-                ABLATION.entity_position,
+                positions,
             )
+            # Keep the historical reference shape for single-token callers.
+            if len(positions) == 1:
+                ordinary_attention = ordinary_attention.squeeze(-1)
             ABLATION.ordinary_entity_attention[module.layer_idx] = (
                 ordinary_attention.detach().float().clone()
             )
@@ -318,7 +371,7 @@ def entity_zero_attention_forward(
             intermediate_queries = [
                 index
                 for index, position in enumerate(query_positions)
-                if ABLATION.entity_position
+                if positions[-1]
                 < position
                 < ABLATION.readout_position
             ]
@@ -345,7 +398,7 @@ def entity_zero_attention_forward(
         zero_output = None
         if affected_queries:
             zero_value = value.clone()
-            zero_value[:, :, ABLATION.entity_position, :] = 0
+            zero_value[:, :, list(positions), :] = 0
             zero_output, _ = sdpa_attention_forward(
                 module,
                 query,
@@ -396,57 +449,64 @@ def entity_zero_attention_forward(
                         f"layer {module.layer_idx} entity attention restored twice"
                     )
                 readout_local = readout_queries[0]
-                live_attention = _final_entity_attention(
+                live_attention = _final_entity_attention_by_token(
                     module,
                     query,
                     key,
                     attention_mask,
                     scaling,
                     readout_local,
-                    ABLATION.entity_position,
+                    positions,
                 ).float()
                 ordinary_attention = ABLATION.ordinary_entity_attention[
                     module.layer_idx
                 ].to(device=live_attention.device, dtype=torch.float32)
+                if len(positions) == 1 and ordinary_attention.ndim == 2:
+                    ordinary_attention = ordinary_attention.unsqueeze(-1)
                 if ordinary_attention.shape != live_attention.shape:
                     raise RuntimeError(
                         "ordinary and live entity-attention shapes do not match"
                     )
-                deficit = (ordinary_attention - live_attention).clamp_min(0)
+                deficit = ordinary_attention - live_attention
+                if ABLATION.restore_policy == "positive-only":
+                    deficit = deficit.clamp_min(0)
                 value_states = _repeat_kv(
                     value, module.num_key_value_groups
                 )
                 entity_value = value_states[
-                    :, :, ABLATION.entity_position, :
+                    :, :, list(positions), :
                 ]
                 supplement = (
                     deficit.to(entity_value.dtype).unsqueeze(-1)
                     * entity_value
-                )
+                ).sum(dim=-2)
                 attention_output[:, readout_local, :, :] += supplement
                 effective_entity_attention = live_attention + deficit
                 ABLATION.restore_trace[module.layer_idx] = {
-                    "ordinary_entity_attention": ordinary_attention[0]
-                    .detach()
-                    .cpu()
-                    .tolist(),
-                    "live_entity_attention_before_restore": live_attention[0]
-                    .detach()
-                    .cpu()
-                    .tolist(),
-                    "added_entity_attention_deficit": deficit[0]
-                    .detach()
-                    .cpu()
-                    .tolist(),
-                    "effective_entity_attention": effective_entity_attention[0]
-                    .detach()
-                    .cpu()
-                    .tolist(),
-                    "effective_attention_sum": (1.0 + deficit[0])
-                    .detach()
-                    .cpu()
-                    .tolist(),
+                    "entity_positions": list(positions),
+                    "restore_policy": ABLATION.restore_policy,
+                    "signed_entity_attention_correction_by_token": deficit[0].detach().cpu().tolist(),
+                    "correction_cast_max_abs_error": (
+                        deficit.to(entity_value.dtype).float() - deficit
+                    ).abs().max().item(),
+                    "effective_entity_attention_max_abs_error": (
+                        effective_entity_attention - ordinary_attention
+                    ).abs().max().item(),
+                    "ordinary_entity_attention_by_token": ordinary_attention[0].detach().cpu().tolist(),
+                    "live_entity_attention_by_token": live_attention[0].detach().cpu().tolist(),
+                    "added_entity_attention_deficit_by_token": deficit[0].detach().cpu().tolist(),
+                    "effective_entity_attention_by_token": effective_entity_attention[0].detach().cpu().tolist(),
                 }
+                # Preserve historical single-token outputs without assigning a
+                # summed entity-attention statistic to multi-token names.
+                if len(positions) == 1:
+                    ABLATION.restore_trace[module.layer_idx].update({
+                        "ordinary_entity_attention": ordinary_attention[0, :, 0].detach().cpu().tolist(),
+                        "live_entity_attention_before_restore": live_attention[0, :, 0].detach().cpu().tolist(),
+                        "added_entity_attention_deficit": deficit[0, :, 0].detach().cpu().tolist(),
+                        "effective_entity_attention": effective_entity_attention[0, :, 0].detach().cpu().tolist(),
+                        "effective_attention_sum": (1.0 + deficit[0, :, 0]).detach().cpu().tolist(),
+                    })
                 ABLATION.restore_applications += 1
             return attention_output, None
 
@@ -468,14 +528,17 @@ def capture_ordinary_entity_attention(
     entity_position: int,
     readout_position: int,
     prompt_length: int,
+    entity_positions: tuple[int, ...] | None = None,
 ):
     if ABLATION.entity_position is not None:
         raise RuntimeError("nested entity-attention policies are not supported")
-    if not 0 <= entity_position < readout_position == prompt_length - 1:
+    positions = _resolve_entity_positions(entity_position, entity_positions)
+    if not positions[-1] < readout_position == prompt_length - 1:
         raise ValueError(
-            "expected entity_position < readout_position == prompt_length - 1"
+            "expected entity span end < readout_position == prompt_length - 1"
         )
     ABLATION.entity_position = entity_position
+    ABLATION.entity_positions = positions
     ABLATION.readout_position = readout_position
     ABLATION.prompt_length = prompt_length
     ABLATION.capture_ordinary_entity_attention = True
@@ -485,6 +548,7 @@ def capture_ordinary_entity_attention(
         yield ABLATION
     finally:
         ABLATION.entity_position = None
+        ABLATION.entity_positions = ()
         ABLATION.readout_position = None
         ABLATION.prompt_length = None
         ABLATION.capture_ordinary_entity_attention = False
@@ -501,19 +565,26 @@ def disable_entity_attention(
     block_intermediate_prompt: bool,
     restore_layers: range = range(0),
     ordinary_entity_attention: dict[int, torch.Tensor] | None = None,
+    entity_positions: tuple[int, ...] | None = None,
+    restore_policy: str = "positive-only",
 ):
     if ABLATION.entity_position is not None:
         raise RuntimeError("nested entity-attention policies are not supported")
-    if not 0 <= entity_position < readout_position == prompt_length - 1:
+    if restore_policy not in ("positive-only", "signed"):
+        raise ValueError(f"unknown entity-attention restoration policy: {restore_policy}")
+    positions = _resolve_entity_positions(entity_position, entity_positions)
+    if not positions[-1] < readout_position == prompt_length - 1:
         raise ValueError(
-            "expected entity_position < readout_position == prompt_length - 1"
+            "expected entity span end < readout_position == prompt_length - 1"
         )
     ABLATION.disabled_layers = frozenset(layers)
     ABLATION.entity_position = entity_position
+    ABLATION.entity_positions = positions
     ABLATION.readout_position = readout_position
     ABLATION.prompt_length = prompt_length
     ABLATION.block_intermediate_prompt = block_intermediate_prompt
     ABLATION.restore_layers = frozenset(restore_layers)
+    ABLATION.restore_policy = restore_policy
     ABLATION.ordinary_entity_attention = ordinary_entity_attention
     ABLATION.restore_trace = {}
     ABLATION.applications = 0
@@ -525,10 +596,12 @@ def disable_entity_attention(
     finally:
         ABLATION.disabled_layers = frozenset()
         ABLATION.entity_position = None
+        ABLATION.entity_positions = ()
         ABLATION.readout_position = None
         ABLATION.prompt_length = None
         ABLATION.block_intermediate_prompt = False
         ABLATION.restore_layers = frozenset()
+        ABLATION.restore_policy = "positive-only"
         ABLATION.ordinary_entity_attention = None
         ABLATION.restore_trace = None
         ABLATION.applications = 0
@@ -570,6 +643,8 @@ def encode_prompt(
     entity_group: str,
     description: str | None = None,
 ) -> EncodedPrompt:
+    if not entity or entity != entity.strip() or "\n" in entity or "\r" in entity:
+        raise ValueError("entity must be a nonempty name without surrounding whitespace or newlines")
     if template.text.count("{entity}") != 1:
         raise ValueError("expected exactly one entity placeholder")
     prefix, suffix = template.text.split("{entity}")
@@ -587,9 +662,9 @@ def encode_prompt(
         for index, (left, right) in enumerate(encoded["offset_mapping"])
         if (left, right) != (0, 0) and right > start and left < end
     ]
-    if len(positions) != 1:
+    if not positions or positions != list(range(positions[0], positions[-1] + 1)):
         raise RuntimeError(
-            f"{template.name}/{entity}: entity must be exactly one token; got {positions}"
+            f"{template.name}/{entity}: entity must occupy a contiguous token span; got {positions}"
         )
     description_positions = ()
     if description is not None:
@@ -602,7 +677,7 @@ def encode_prompt(
             and right > description_start and left < description_end
         )
         if not description_positions or not (
-            positions[0] < min(description_positions)
+            positions[-1] < min(description_positions)
             <= max(description_positions) < len(encoded["input_ids"]) - 1
         ):
             raise RuntimeError("description must lie between entity and readout")
@@ -617,6 +692,7 @@ def encode_prompt(
         ids=ids,
         tokens=list(tokenizer.convert_ids_to_tokens(ids)),
         entity_position=positions[0],
+        entity_positions=tuple(positions),
         entity_phrase=entity_phrase,
         entity_description=description,
         description_positions=description_positions,
@@ -694,6 +770,7 @@ def ordinary_entity_attention_reference(
         encoded.entity_position,
         len(encoded.ids) - 1,
         len(encoded.ids),
+        entity_positions=encoded.entity_positions,
     ) as state:
         model(
             input_ids=input_ids,
@@ -749,11 +826,16 @@ def parse_args() -> argparse.Namespace:
         help="optional comma-separated subset; default is every valid start layer",
     )
     parser.add_argument("--entity-ids", type=parse_ints)
-    parser.add_argument(
+    entity_source = parser.add_mutually_exclusive_group()
+    entity_source.add_argument(
         "--entity-set",
         choices=sorted(ENTITY_SETS),
         default="original10",
         help="entity pool; original10 preserves the previous default",
+    )
+    entity_source.add_argument(
+        "--entities-json", type=Path,
+        help='ordered JSON list of names or objects with "entity" and optional "entity_group"; supports complete multi-token names',
     )
     parser.add_argument("--template-ids", type=parse_ints)
     parser.add_argument(
@@ -766,7 +848,7 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help=(
             "remove the entity value contribution in every layer for prompt "
-            "queries strictly between the entity and final prompt token; "
+            "queries strictly after the entity span and before the final prompt token; "
             "generated queries are always blocked"
         ),
     )
@@ -784,10 +866,18 @@ def parse_args() -> argparse.Namespace:
         type=int,
         help=(
             "run only the bottleneck entity-attention rescue: from this layer "
-            "through the final layer, add the positive per-head ordinary-minus-"
+            "through the final layer, sum the selected per-token/per-head ordinary-minus-"
             "live entity-attention deficit to the final prompt query after "
             "native attention, without renormalizing other coefficients"
         ),
+    )
+    parser.add_argument(
+        "--restore-entity-attention-policy",
+        choices=("positive-only", "signed"),
+        default="positive-only",
+        help=("positive-only preserves the existing add-only rescue; signed retains "
+              "negative ordinary-minus-live corrections and restores each entity "
+              "coefficient to its ordinary value without renormalizing other tokens"),
     )
     parser.add_argument(
         "--skip-baselines",
@@ -822,9 +912,38 @@ def base_row(encoded: EncodedPrompt) -> dict[str, Any]:
         "prompt": encoded.prompt,
         "entity_position": encoded.entity_position,
         "entity_token": encoded.tokens[encoded.entity_position],
+        "entity_positions": list(encoded.entity_positions),
+        "entity_end_position": encoded.entity_end_position,
+        "entity_token_count": len(encoded.entity_positions),
+        "entity_token_ids": [encoded.ids[p] for p in encoded.entity_positions],
+        "entity_tokens": [encoded.tokens[p] for p in encoded.entity_positions],
         "readout_position": len(encoded.ids) - 1,
         "prompt_length": len(encoded.ids),
     }
+
+
+def load_entities(path: Path) -> tuple[list[tuple[str, str]], str]:
+    raw = path.read_bytes()
+    records = json.loads(raw)
+    if not isinstance(records, list) or not records:
+        raise ValueError("entity manifest must be a nonempty ordered JSON list")
+    entities = []
+    for record in records:
+        if isinstance(record, str):
+            name, group = record, "custom"
+        elif isinstance(record, dict):
+            name, group = record.get("entity"), record.get("entity_group", "custom")
+        else:
+            raise ValueError("entity entries must be names or objects")
+        if (
+            not isinstance(name, str) or not name or name != name.strip()
+            or "\n" in name or "\r" in name or not isinstance(group, str)
+        ):
+            raise ValueError("invalid entity name or group in manifest")
+        entities.append((name, group))
+    if len({name for name, _ in entities}) != len(entities):
+        raise ValueError("entity manifest contains duplicate names")
+    return entities, hashlib.sha256(raw).hexdigest()
 
 
 def load_entity_descriptions(path: Path | None, entity_pool):
@@ -859,7 +978,7 @@ def validate_policy_counts(
     expected_intermediate = 0
     if block_intermediate_prompt:
         expected_intermediate = n_layers * (
-            len(encoded.ids) - encoded.entity_position - 2
+            len(encoded.ids) - encoded.entity_end_position - 2
         )
     expected_generated = n_layers * max(generated_token_count - 1, 0)
     observed = (
@@ -906,12 +1025,18 @@ def main() -> int:
             "entity-attention restore requires "
             "--block-intermediate-prompt-entity"
         )
+    if args.restore_entity_attention_policy != "positive-only" and not restore_only:
+        raise ValueError("a signed restoration policy requires --restore-entity-attention-start-layer")
     if any(width < 1 for width in args.widths):
         raise ValueError("all widths must be positive")
     if args.max_new_tokens < 1:
         raise ValueError("--max-new-tokens must be positive")
 
-    entity_pool = ENTITY_SETS[args.entity_set]
+    entities_sha256 = None
+    if args.entities_json is not None:
+        entity_pool, entities_sha256 = load_entities(args.entities_json)
+    else:
+        entity_pool = ENTITY_SETS[args.entity_set]
     if len({entity for entity, _ in entity_pool}) != len(entity_pool):
         raise RuntimeError(f"{args.entity_set} contains duplicate entities")
     selected_templates = select(TEMPLATES, args.template_ids, "template")
@@ -966,20 +1091,23 @@ def main() -> int:
         "n_layers": n_layers,
         "layer_definition": "zero-based self-attention module index",
         "span_interval": "start_layer <= layer < end_layer_exclusive",
+        "entity_unit": "all tokenizer positions overlapping the complete name",
+        "restoration_trace_layout": "per layer: [query_head][entity_token], in entity_positions order; no entity-token aggregation; legacy scalar-per-head aliases only for single-token names",
+        "entity_position_compatibility": "entity_position/entity_token refer to the first token; entity_positions defines the full span",
         "intervention": (
             "none; ordinary greedy generation with native SDPA"
             if args.ordinary_baseline_only
             else (
-                "bottleneck plus an add-only final-prompt entity-attention "
+                f"bottleneck plus a {args.restore_entity_attention_policy} final-prompt entity-attention "
                 "rescue: generated and intermediate post-entity prompt queries "
                 "lose the entity value in every layer; from the requested start "
-                "layer through the final layer, the positive per-head ordinary-"
-                "minus-live entity-attention deficit times the live entity value "
+                "layer through the final layer, the selected per-token/per-head ordinary-"
+                "minus-live entity-attention correction times the live entity value "
                 "is added after native attention; other coefficients are unchanged "
-                "and the effective coefficient sum may exceed one"
+                "and the effective coefficient sum need not equal one"
                 if restore_only
                 else (
-                    "native SDPA with only the entity value zeroed before the "
+                    "native SDPA with every value in the entity span zeroed before the "
                     "weighted sum; generated queries are blocked in every layer, "
                     "intermediate post-entity prompt queries are blocked in every "
                     "layer only when requested, and the final prompt query is "
@@ -999,10 +1127,14 @@ def main() -> int:
             not control_only
         ),
         "final_prompt_entity_attention_restore": restore_only,
+        "restore_policy_name": args.restore_entity_attention_policy if restore_only else None,
+        "restore_trace_legacy_deficit_fields": "Legacy deficit fields contain the selected policy correction; they can be negative under signed restoration.",
         "restore_policy": (
-            "max(ordinary_entity_attention - live_entity_attention, 0) "
-            "added times entity value after native attention, independently "
-            "per query head; no renormalization"
+            ("ordinary_entity_attention - live_entity_attention "
+             if args.restore_entity_attention_policy == "signed" else
+             "max(ordinary_entity_attention - live_entity_attention, 0) ")
+            + "added times entity value after native attention, independently "
+            "per query head and entity token, then summed over the entity span; no renormalization"
             if restore_only
             else None
         ),
@@ -1011,7 +1143,9 @@ def main() -> int:
         ),
         "restore_end_layer_exclusive": n_layers if restore_only else None,
         "templates": [asdict(template) for _, template in selected_templates],
-        "entity_set": args.entity_set,
+        "entity_set": "custom" if args.entities_json else args.entity_set,
+        "entities_json": str(args.entities_json.resolve()) if args.entities_json else None,
+        "entities_sha256": entities_sha256,
         "entity_descriptions_json": (
             str(args.entity_descriptions_json.resolve())
             if args.entity_descriptions_json else None
@@ -1019,7 +1153,7 @@ def main() -> int:
         "entity_descriptions_sha256": descriptions_sha256,
         "entity_descriptions": descriptions,
         "entity_phrase_format": "{entity} ({description})" if descriptions else "{entity}",
-        "ablation_and_answer_target": "original single-token entity name",
+        "ablation_and_answer_target": "complete original entity name span; added descriptions excluded",
         "entities": [
             {
                 "entity_id": entity_id,
@@ -1075,6 +1209,8 @@ def main() -> int:
                     True,
                     restore_layers=restore_layers,
                     ordinary_entity_attention=ordinary_reference,
+                    entity_positions=encoded.entity_positions,
+                    restore_policy=args.restore_entity_attention_policy,
                 ) as state:
                     completion = completion_fields(
                         greedy_completion(
@@ -1105,17 +1241,24 @@ def main() -> int:
                     generated_applications = state.generated_applications
                     restore_applications = state.restore_applications
                 positive_deficit_heads = sum(
-                    deficit > 0.0
+                    any(deficit > 0.0 for deficit in token_deficits)
                     for trace in restore_trace.values()
-                    for deficit in trace["added_entity_attention_deficit"]
+                    for token_deficits in trace["added_entity_attention_deficit_by_token"]
                 )
-                total_deficit = sum(
-                    deficit
-                    for trace in restore_trace.values()
-                    for deficit in trace["added_entity_attention_deficit"]
-                )
+                corrections = [
+                    correction for trace in restore_trace.values()
+                    for head in trace["signed_entity_attention_correction_by_token"]
+                    for correction in head
+                ]
                 write_jsonl(output, {
                     "condition": "last_token_bottleneck_entity_attention_restore",
+                    "restore_policy": args.restore_entity_attention_policy,
+                    "entity_attention_correction_counts": {
+                        "positive": sum(x > 0 for x in corrections),
+                        "negative": sum(x < 0 for x in corrections),
+                        "zero": sum(x == 0 for x in corrections),
+                    },
+                    "total_signed_entity_attention_correction": sum(corrections),
                     **base_row(encoded),
                     "width": n_layers - restore_start,
                     "start_layer": restore_start,
@@ -1135,7 +1278,13 @@ def main() -> int:
                         restore_applications
                     ),
                     "positive_deficit_head_layers": positive_deficit_heads,
-                    "total_added_entity_attention_deficit": total_deficit,
+                    **({
+                        "total_added_entity_attention_deficit": sum(
+                            deficit
+                            for trace in restore_trace.values()
+                            for deficit in trace["added_entity_attention_deficit"]
+                        ),
+                    } if len(encoded.entity_positions) == 1 else {}),
                     "entity_attention_restore_trace": restore_trace,
                     **completion,
                 })
@@ -1168,6 +1317,7 @@ def main() -> int:
                         len(encoded.ids) - 1,
                         len(encoded.ids),
                         args.block_intermediate_prompt_entity,
+                        entity_positions=encoded.entity_positions,
                     ) as state:
                         completion = completion_fields(
                             greedy_completion(
@@ -1236,6 +1386,7 @@ def main() -> int:
                     len(encoded.ids) - 1,
                     len(encoded.ids),
                     args.block_intermediate_prompt_entity,
+                    entity_positions=encoded.entity_positions,
                 ) as state:
                     completion = completion_fields(
                         greedy_completion(
