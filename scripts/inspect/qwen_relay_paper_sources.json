@@ -1,0 +1,190 @@
+{
+  "description": "Paper-only packaging of the executed wide-single run; no exploratory probes included.",
+  "historical_run_protocol_sha256": "18a3f8602128da7ed5d8071aa1829b97c6b0c293235413fb5e35222feb919791",
+  "baseline_source_hashes": {
+    "qwen_relay_supplied_baseline.py": "7649455a2d9f4d8a709d83fb6b8e632c2f53139def9f21ef21048036704b8d6f",
+    "qwen_relay_supplied_common.py": "845b239be109a7441402756eddbdbb1a263dfbbba7f1776aafbf5c49b76ca837",
+    "entities100.json": "354ce3a954251ab5c596cdbd1ffade227d144ed8d81a8704d6790dc2cfd28e99",
+    "qwen_entity_attention_ablation.py": "156f07207c631827afa930e0792777de2354306d44abe82058bb6479f878a481",
+    "qwen_entity_relay_fixed_window.py": "ccfda6dbcb8f1119463246f6e99460e85871920bb08a572e90a262ac9ad04c28",
+    "qwen_relay_x_window.py": "6c1419bad027b539641833ceb5ca2c43b468bb028a27002ce988163ac913d65d"
+  },
+  "original_source_hashes": {
+    "qwen_relay_x_quick_probe.py": "1f8bb4f86d5d54960d2542a606e645fb3e8ae1227480c34542cf381e04af42ee",
+    "qwen_relay_x_window.py": "6c1419bad027b539641833ceb5ca2c43b468bb028a27002ce988163ac913d65d",
+    "qwen_relay_controlled_common.py": "b92a2d12bb6357595a1d82607500eb67c54a3cbeaace1c53266c9ef5a8e5eae2",
+    "qwen_entity_attention_ablation.py": "156f07207c631827afa930e0792777de2354306d44abe82058bb6479f878a481",
+    "relay_x_gpu_queue.py": "c8b136ca8a5322be64072a3da502b31ea9eb52799aa92c864592336ef0bd19cd",
+    "qwen_relay_wide_single.py": "07a416027846142b709160655cb0a5b3919e28a33e932ecde7e8b3cd7c87fb76",
+    "qwen_relay_supplied_common.py": "845b239be109a7441402756eddbdbb1a263dfbbba7f1776aafbf5c49b76ca837"
+  },
+  "package_source_hashes": {
+    "scripts/inspect/qwen_relay_wide_single.py": "9fefa6b5a90a8f72a0dbf35b0ebcbebf1aa7060e8540e566103209c9d86e2624",
+    "scripts/inspect/qwen_relay_supplied_common.py": "5ed78c8224972aaf9af1c9f645ba6b299f8879a5189e1e0bbc6edfacfe5bf5fe",
+    "scripts/inspect/qwen_relay_paper_runtime.py": "bdb991818b6c5a38d134d149b52d254ba330f8ea9c670ab92c3da285410a4730",
+    "scripts/inspect/qwen_relay_paper_queue.py": "7724feca06d9bc25115e971aa2c14477e332aa473342d90df1c93d90feb98b6a",
+    "scripts/inspect/qwen_relay_paper_provenance.py": "d5f5823b4793db61669a11620b34e3f6f59b4a6e60013a797753e1cfcc7178fb",
+    "scripts/inspect/qwen_entity_attention_ablation.py": "156f07207c631827afa930e0792777de2354306d44abe82058bb6479f878a481",
+    "scripts/inspect/qwen_entity_relay_fixed_window.py": "ccfda6dbcb8f1119463246f6e99460e85871920bb08a572e90a262ac9ad04c28",
+    "scripts/inspect/entity_attention_data/entities100_balanced12.json": "354ce3a954251ab5c596cdbd1ffade227d144ed8d81a8704d6790dc2cfd28e99"
+  },
+  "function_fingerprints": [
+    {
+      "path": "scripts/inspect/qwen_relay_paper_runtime.py",
+      "function": "stamp",
+      "original_file": "qwen_relay_x_window.py",
+      "ast_without_imports_sha256": "9026c9b4d78e8ee9ab45967430b4668cc3970ca91df9dd072e53e1206767a6f1"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_paper_runtime.py",
+      "function": "save_json",
+      "original_file": "qwen_relay_x_window.py",
+      "ast_without_imports_sha256": "dad473cc1f2b65a6a4cca511251cc4212117a296a97d725bf5380071102d0564"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_paper_runtime.py",
+      "function": "outside_layers",
+      "original_file": "qwen_relay_x_window.py",
+      "ast_without_imports_sha256": "4fea3d75bac09427c211fd4978babfc89315d432ce1f0d50146b9f075a95ede6"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_paper_runtime.py",
+      "function": "clean",
+      "original_file": "qwen_relay_controlled_common.py",
+      "ast_without_imports_sha256": "85cadb214f316fc72aec72f679cf6e1e7bf9579da38de49beb113fca21e811e0"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_paper_runtime.py",
+      "function": "hashes",
+      "original_file": "qwen_relay_controlled_common.py",
+      "ast_without_imports_sha256": "eb86d1ddbfaca826ab29254bc300679db79e81253acf840cbbceeb65f36510d3"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_paper_runtime.py",
+      "function": "configure_model",
+      "original_file": "qwen_relay_controlled_common.py",
+      "ast_without_imports_sha256": "b7c06fcc5159548f86e75c86548169d6b25e56e94cc06e30591689a61bc5a0ad"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_paper_runtime.py",
+      "function": "consistent_cache_prefill",
+      "original_file": "qwen_relay_x_quick_probe.py",
+      "ast_without_imports_sha256": "f2ea41fd809de0336c1c2c70e67f8455157db4d9e191e69f601e30f70d204325"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_paper_queue.py",
+      "function": "now",
+      "original_file": "relay_x_gpu_queue.py",
+      "ast_without_imports_sha256": "f3f4e6fa0392243ed417df6f94b426659518076edef5def84870adbe3b1768ec"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_paper_queue.py",
+      "function": "snapshot",
+      "original_file": "relay_x_gpu_queue.py",
+      "ast_without_imports_sha256": "a18e48e852c15d752aa2f25f5c68cbdabc2891c5c066390870bdfb9aa7c33de6"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_paper_queue.py",
+      "function": "available",
+      "original_file": "relay_x_gpu_queue.py",
+      "ast_without_imports_sha256": "c0761f78f400d85a08c9addf5c9b0e0351b53995e297570c715f3bcad2971734"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_paper_queue.py",
+      "function": "wait_gpu",
+      "original_file": "relay_x_gpu_queue.py",
+      "ast_without_imports_sha256": "6132a7d5ef84c0d84a07fad6bbdaca693d7b786716f53ef079272e563c43c5bb"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_supplied_common.py",
+      "function": "validate_pair",
+      "original_file": "qwen_relay_supplied_common.py",
+      "ast_without_imports_sha256": "1d26d774169acd1a718922bb28afbf28b46b3ee7687b6ee22098373911a720c5"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_supplied_common.py",
+      "function": "inputs",
+      "original_file": "qwen_relay_supplied_common.py",
+      "ast_without_imports_sha256": "1ad0c7d1c1b08de68a96cb56e10c429db9b4684dc4b5b696402b5b8d46474590"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_supplied_common.py",
+      "function": "policy",
+      "original_file": "qwen_relay_supplied_common.py",
+      "ast_without_imports_sha256": "d351d8ae6e584f6a6859e94cf6b1cb3cf47b028dcedd5bfa96bb0070d0012ecd"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_supplied_common.py",
+      "function": "counts",
+      "original_file": "qwen_relay_supplied_common.py",
+      "ast_without_imports_sha256": "2ead6b8d4db7acbf0e3c16fc1f0e0ddc1a85f1c5f303f982e693a7ecd55a6690"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_supplied_common.py",
+      "function": "generate",
+      "original_file": "qwen_relay_supplied_common.py",
+      "ast_without_imports_sha256": "e2df331788db5d674e744a7202b0474875f209920429c12e930180c7113f7a86"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_supplied_common.py",
+      "function": "capture",
+      "original_file": "qwen_relay_supplied_common.py",
+      "ast_without_imports_sha256": "dfdf266b4f35a7046b90589100d0c7ddd9f37bac18895cb7e3129b0a8b1a037f"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_supplied_common.py",
+      "function": "run_relay",
+      "original_file": "qwen_relay_supplied_common.py",
+      "ast_without_imports_sha256": "7ecce6fb90f93e2ae4ff3702bd8f5c1ca4423a303f92607c82d8df4c4a016388"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_wide_single.py",
+      "function": "digest",
+      "original_file": "qwen_relay_wide_single.py",
+      "ast_without_imports_sha256": "54b524044f492bc68f15e03368f3311c987a867d8b595b8a138351b7049c94ec"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_wide_single.py",
+      "function": "signature",
+      "original_file": "qwen_relay_wide_single.py",
+      "ast_without_imports_sha256": "4af72445af94d004fa236a5ebe707eb32ef3c66cf9e09c1fde0ce17916499eb5"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_wide_single.py",
+      "function": "windows",
+      "original_file": "qwen_relay_wide_single.py",
+      "ast_without_imports_sha256": "21500fd7c8d51dfecd010cf0020ba4b672ad48edbe784761437800010a495421"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_wide_single.py",
+      "function": "select_pairs",
+      "original_file": "qwen_relay_wide_single.py",
+      "ast_without_imports_sha256": "4dcdc4ba7474e8dca14a7242319b1b189c156e166ce2e0620be220895cc74f67"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_wide_single.py",
+      "function": "control_decision",
+      "original_file": "qwen_relay_wide_single.py",
+      "ast_without_imports_sha256": "61d54d7cc11b44897f72fb5c86b3fcba31c061281673f00d0be0847bd4f78056"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_wide_single.py",
+      "function": "read_rows",
+      "original_file": "qwen_relay_wide_single.py",
+      "ast_without_imports_sha256": "f844ce6fe306376a1c2b58c6d980410bb95e0308f1731f63444dadb37442a5f6"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_wide_single.py",
+      "function": "run",
+      "original_file": "qwen_relay_wide_single.py",
+      "ast_without_imports_sha256": "0ea40b7ef04063e33d6613ab42594d08b4fa0f6af690abd1905d3bcbaaf4fa7c"
+    },
+    {
+      "path": "scripts/inspect/qwen_relay_wide_single.py",
+      "function": "main",
+      "original_file": "qwen_relay_wide_single.py",
+      "ast_without_imports_sha256": "3cc8509f4d897100f39230ad016c6fe175e8458e961f329907e4f7411efff940"
+    }
+  ],
+  "audit_note": "All listed function ASTs match executed server sources with import statements excluded. Preflight changed to check the explicit old/new source map. New protocol version and new output directory required; archived results are not overwritten."
+}
