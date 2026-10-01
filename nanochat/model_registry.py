@@ -235,6 +235,7 @@ class GPTBaseAddInitPreNormMlpOnlyLearnConfig(GPTBaseConfig):
 # -----------------------------------------------------------------------------
 from nanochat.model.gpt_attn_res import GPTAttnResConfig, GPTAttnRes
 from nanochat.model.gpt_attn_res_sink import GPTAttnResSinkConfig, GPTAttnResSink
+from nanochat.model.gpt_base_attn_res_qkv import GPTBaseAttnResQKVConfig, GPTBaseAttnResQKV
 
 # -----------------------------------------------------------------------------
 # Registry: model_type string -> (ConfigClass, ModelClass)
@@ -287,6 +288,7 @@ MODELS = {
     "gpt_base_add_init_pre_norm_attn_only_learn": (GPTBaseAddInitPreNormAttnOnlyLearnConfig, GPTBase),
     "gpt_base_add_init_pre_norm_mlp_only_learn":  (GPTBaseAddInitPreNormMlpOnlyLearnConfig,  GPTBase),
     # standalone variants
+    "gpt_base_attn_res_qkv": (GPTBaseAttnResQKVConfig, GPTBaseAttnResQKV),
     "attn_res":      (GPTAttnResConfig,     GPTAttnRes),
     "attn_res_sink": (GPTAttnResSinkConfig, GPTAttnResSink),
 }
