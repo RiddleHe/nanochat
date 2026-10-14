@@ -22,13 +22,13 @@ import pyarrow.parquet as pq
 from nanochat.common import get_dist_info
 from nanochat.dataset import list_parquet_files
 
-def _document_batches(split, resume_state_dict, tokenizer_batch_size):
+def _document_batches(split, resume_state_dict, tokenizer_batch_size, exact_resume=False):
     """
     Infinite iterator over document batches (list of text strings) from parquet files.
 
-    Handles DDP sharding and approximate resume. Each yield is (text_batch, (pq_idx, rg_idx, epoch))
-    where text_batch is a list of document strings, indices track position for resumption,
-    and epoch counts how many times we've cycled through the dataset (starts at 1).
+    Handles DDP sharding and document-level cursors. exact_resume=False preserves
+    legacy behavior (skip the remainder of the saved row group). Each yield is
+    (text_batch, cursor); epoch counts dataset passes, starting at 1.
     """
     ddp, ddp_rank, ddp_local_rank, ddp_world_size = get_dist_info()
 
@@ -52,19 +52,24 @@ def _document_batches(split, resume_state_dict, tokenizer_batch_size):
             # Start from resume point if resuming on same file, otherwise from DDP rank
             if first_pass and (resume_rg_idx is not None) and (pq_idx == resume_pq_idx):
                 base_idx = resume_rg_idx // ddp_world_size
-                base_idx += 1  # advance by 1 so we don't repeat data after resuming
+                if not exact_resume:
+                    base_idx += 1  # legacy approximate resume skips the rest of this group
                 rg_idx = base_idx * ddp_world_size + ddp_rank
                 if rg_idx >= pf.num_row_groups:
                     pq_idx += 1
                     continue
-                resume_rg_idx = None  # only do this once
             else:
                 rg_idx = ddp_rank
             while rg_idx < pf.num_row_groups:
                 rg = pf.read_row_group(rg_idx)
                 batch = rg.column('text').to_pylist()
-                for i in range(0, len(batch), tokenizer_batch_size):
-                    yield batch[i:i+tokenizer_batch_size], (pq_idx, rg_idx, epoch)
+                start = 0
+                if exact_resume and first_pass and pq_idx == resume_pq_idx and rg_idx == resume_rg_idx:
+                    start = resume_state_dict.get("doc_idx", 0)
+                for i in range(start, len(batch), tokenizer_batch_size):
+                    cursor = {"pq_idx": pq_idx, "rg_idx": rg_idx, "epoch": epoch,
+                              "doc_idx": i + tokenizer_batch_size}
+                    yield batch[i:i+tokenizer_batch_size], cursor
                 rg_idx += ddp_world_size
             pq_idx += 1
         first_pass = False
@@ -75,7 +80,7 @@ def tokenizing_distributed_data_loader_with_state_bos_bestfit(
     tokenizer, B, T, split,
     tokenizer_threads=4, tokenizer_batch_size=128,
     device="cuda", resume_state_dict=None,
-    buffer_size=1000
+    buffer_size=1000, exact_resume=False
 ):
     """
     BOS-aligned dataloader with Best-Fit Cropping.
@@ -96,21 +101,21 @@ def tokenizing_distributed_data_loader_with_state_bos_bestfit(
     assert split in ["train", "val"], "split must be 'train' or 'val'"
 
     row_capacity = T + 1
-    batches = _document_batches(split, resume_state_dict, tokenizer_batch_size)
+    batches = _document_batches(split, resume_state_dict, tokenizer_batch_size, exact_resume)
     bos_token = tokenizer.get_bos_token_id()
-    doc_buffer = []
-    pq_idx, rg_idx, epoch = 0, 0, 1
+    cursor = dict(resume_state_dict or {"pq_idx": 0, "rg_idx": 0, "epoch": 1})
+    doc_buffer = list(cursor.pop("doc_buffer", [])) if exact_resume else []
 
     def refill_buffer():
-        nonlocal pq_idx, rg_idx, epoch
-        doc_batch, (pq_idx, rg_idx, epoch) = next(batches)
+        nonlocal cursor
+        doc_batch, cursor = next(batches)
         token_lists = tokenizer.encode(doc_batch, prepend=bos_token, num_threads=tokenizer_threads)
         for tokens in token_lists:
             doc_buffer.append(tokens)
 
     # Pre-allocate buffers once: layout is [inputs (B*T) | targets (B*T)]
     # This gives us contiguous views and a single HtoD transfer
-    use_cuda = device == "cuda"
+    use_cuda = torch.device(device).type == "cuda"
     row_buffer = torch.empty((B, row_capacity), dtype=torch.long) # for building rows without creating Python lists
     cpu_buffer = torch.empty(2 * B * T, dtype=torch.long, pin_memory=use_cuda) # staging area (CPU)
     gpu_buffer = torch.empty(2 * B * T, dtype=torch.long, device=device) # on-device buffer
@@ -154,7 +159,11 @@ def tokenizing_distributed_data_loader_with_state_bos_bestfit(
         cpu_inputs.copy_(row_buffer[:, :-1])
         cpu_targets.copy_(row_buffer[:, 1:])
 
-        state_dict = {"pq_idx": pq_idx, "rg_idx": rg_idx, "epoch": epoch}
+        state_dict = dict(cursor)
+        if exact_resume:
+            # Token lists are immutable; copying just the outer list freezes this
+            # cursor without copying the entire token buffer on every microstep.
+            state_dict["doc_buffer"] = list(doc_buffer)
 
         # Single HtoD copy into persistent GPU buffer and yield
         gpu_buffer.copy_(cpu_buffer, non_blocking=use_cuda)

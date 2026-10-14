@@ -78,7 +78,7 @@ class CausalSelfAttention(nn.Module):
         self.c_v = Linear(self.n_embd, self.n_kv_head * self.head_dim, bias=False)
         self.c_proj = Linear(self.n_embd, self.n_embd, bias=False)
 
-    def forward(self, x, cos_sin, kv_cache):
+    def forward(self, x, cos_sin, kv_cache, cache_layer_idx=None):
         B, T, C = x.size()
 
         # Project the input to get queries, keys, and values
@@ -101,7 +101,8 @@ class CausalSelfAttention(nn.Module):
             y = flash_attn.flash_attn_func(q, k, v, causal=True, window_size=self.window_size)
         else:
             # Inference: use flash_attn_with_kvcache which handles cache management
-            k_cache, v_cache = kv_cache.get_layer_cache(self.layer_idx)
+            layer_idx = self.layer_idx if cache_layer_idx is None else cache_layer_idx
+            k_cache, v_cache = kv_cache.get_layer_cache(layer_idx)
             y = flash_attn.flash_attn_with_kvcache(
                 q, k_cache, v_cache,
                 k=k, v=v,
@@ -110,7 +111,7 @@ class CausalSelfAttention(nn.Module):
                 window_size=self.window_size,
             )
             # Advance position after last layer processes
-            if self.layer_idx == kv_cache.n_layers - 1:
+            if layer_idx == kv_cache.n_layers - 1:
                 kv_cache.advance(T)
 
         # Re-assemble the heads and project back to residual stream.
@@ -140,8 +141,8 @@ class Block(nn.Module):
         self.attn = CausalSelfAttention(config, layer_idx, window_size)
         self.mlp = MLP(config)
 
-    def forward(self, x, cos_sin, kv_cache):
-        x = x + self.attn(norm(x), cos_sin, kv_cache)
+    def forward(self, x, cos_sin, kv_cache, cache_layer_idx=None):
+        x = x + self.attn(norm(x), cos_sin, kv_cache, cache_layer_idx)
         x = x + self.mlp(norm(x))
         return x
 
@@ -203,6 +204,9 @@ class GPTBase(nn.Module):
         # Embedding and unembedding
         torch.nn.init.normal_(self.transformer.wte.weight, mean=0.0, std=0.8)
         torch.nn.init.normal_(self.lm_head.weight, mean=0.0, std=0.001)
+        # __init__ may run on meta; to_empty does not preserve its initialization.
+        torch.nn.init.uniform_(self.smear_gate.weight, -24**-0.5, 24**-0.5)
+        torch.nn.init.zeros_(self.smear_lambda)
 
         # Transformer blocks: uniform init with bound = sqrt(3) * std (same standard deviation as normal)
         n_embd = self.config.n_embd
@@ -364,6 +368,11 @@ class GPTBase(nn.Module):
             group["initial_lr"] = group["lr"]
         return optimizer
 
+    def _forward_blocks(self, x, cos_sin, kv_cache):
+        for block in self.transformer.h:
+            x = block(x, cos_sin, kv_cache)
+        return x
+
     def forward(self, idx, targets=None, kv_cache=None, loss_reduction='mean'):
         B, T = idx.size()
 
@@ -373,6 +382,9 @@ class GPTBase(nn.Module):
         assert self.cos.dtype == COMPUTE_DTYPE, f"Rotary embeddings must be in {COMPUTE_DTYPE}, got {self.cos.dtype}"
         # if kv cache exists, we need to offset the rotary embeddings to the current position in the cache
         T0 = 0 if kv_cache is None else kv_cache.get_pos()
+        assert T0 + T <= self.cos.size(1), "Sequence exceeds rotary cache"
+        if kv_cache is not None:
+            assert T0 + T <= kv_cache.max_seq_len, "Sequence exceeds KV cache"
         cos_sin = self.cos[:, T0:T0+T], self.sin[:, T0:T0+T] # truncate cache to current sequence length
 
         # Embed the tokens
@@ -383,25 +395,23 @@ class GPTBase(nn.Module):
         # Smear: mix previous token's embedding into current position (cheap bigram info)
         if kv_cache is None:
             # Training / naive generate: full sequence available, use fast slice
-            assert T > 1, "Training forward pass should have T > 1"
             gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, 1:, :24]))
             x = torch.cat([x[:, :1], x[:, 1:] + gate * x[:, :-1]], dim=1)
         else:
             # KV cache inference: read prev embedding from cache, store current for next step
             x_pre_smear = kv_cache.prev_embedding
             kv_cache.prev_embedding = x[:, -1:, :]
-            if T > 1:
+            if x_pre_smear is not None:
+                previous = torch.cat([x_pre_smear, x[:, :-1]], dim=1)
+                gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, :, :24]))
+                x = x + gate * previous
+            elif T > 1:
                 # Prefill: apply smear to positions 1+, same as training
                 gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, 1:, :24]))
                 x = torch.cat([x[:, :1], x[:, 1:] + gate * x[:, :-1]], dim=1)
-            elif x_pre_smear is not None:
-                # Decode: single token, use cached prev embedding
-                gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, :, :24]))
-                x = x + gate * x_pre_smear
 
         # Forward the trunk of the Transformer.
-        for block in self.transformer.h:
-            x = block(x, cos_sin, kv_cache)
+        x = self._forward_blocks(x, cos_sin, kv_cache)
         x = norm(x)
 
         # Forward the lm_head (compute logits)

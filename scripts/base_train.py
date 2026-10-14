@@ -34,6 +34,7 @@ from nanochat.checkpoint_manager import save_checkpoint, load_checkpoint
 from nanochat.loss_eval import evaluate_bpb
 from nanochat.engine import Engine
 from nanochat.flash_attention import HAS_FA3
+from nanochat.training_state import save_training_state, load_training_state, check_finite_gradients
 from scripts.base_eval import evaluate_core
 print_banner()
 
@@ -44,11 +45,16 @@ parser = argparse.ArgumentParser(description="Pretrain base model")
 parser.add_argument("--run", type=str, default="dummy", help="wandb run name ('dummy' disables wandb logging)")
 # Runtime
 parser.add_argument("--device-type", type=str, default="", help="cuda|cpu|mps (empty = autodetect)")
+parser.add_argument("--seed", type=int, default=42)
+parser.add_argument("--no-compile", action="store_true", help="eager execution for debugging")
+parser.add_argument("--exact-resume", action="store_true", help="save per-rank token buffer and pending batch; automatic for loop variants")
+parser.add_argument("--check-finite", action="store_true", help="fail before an update on non-finite gradients; automatic for loop variants")
 # FP8 training
 parser.add_argument("--fp8", action="store_true", help="enable FP8 training (requires H100+ GPU and torchao)")
 parser.add_argument("--fp8-recipe", type=str, default="tensorwise", choices=["rowwise", "tensorwise"], help="FP8 scaling recipe: tensorwise (faster, recommended) or rowwise (more accurate but slower)")
 # Model architecture
 parser.add_argument("--depth", type=int, default=20, help="depth of the Transformer model")
+parser.add_argument("--num-loops", type=int, default=None, help="fixed rounds (loop variants default to 4); depth is effective depth")
 parser.add_argument("--aspect-ratio", type=int, default=64, help="model_dim = depth * aspect_ratio")
 parser.add_argument("--head-dim", type=int, default=128, help="target head dimension for attention")
 parser.add_argument("--max-seq-len", type=int, default=2048, help="max context length")
@@ -70,6 +76,7 @@ parser.add_argument("--warmup-steps", type=int, default=40, help="number of step
 parser.add_argument("--warmdown-ratio", type=float, default=0.65, help="ratio of iterations for LR warmdown")
 parser.add_argument("--final-lr-frac", type=float, default=0.05, help="final LR as fraction of initial LR")
 parser.add_argument("--resume-from-step", type=int, default=-1, help="resume training from this step (-1 = disable)")
+parser.add_argument("--stop-after-step", type=int, default=-1, help="save and pause at this absolute step, without changing the LR horizon")
 # Evaluation
 parser.add_argument("--eval-every", type=int, default=250, help="evaluate val bpb every N steps (-1 = disable)")
 parser.add_argument("--eval-tokens", type=int, default=80*524288, help="number of tokens to evaluate val loss on")
@@ -80,12 +87,26 @@ parser.add_argument("--save-every", type=int, default=-1, help="save checkpoints
 # Output
 parser.add_argument("--model-tag", type=str, default=None, help="override model tag for checkpoint directory name")
 args = parser.parse_args()
+is_loop = args.model_type in {"gpt_loop", "gpt_loop_untied"}
+if args.num_loops is None:
+    args.num_loops = 4 if is_loop else 1
+if not is_loop and args.num_loops != 1:
+    parser.error("--num-loops requires gpt_loop or gpt_loop_untied")
+if is_loop:
+    if args.fp8 or COMPUTE_DTYPE not in (torch.float32, torch.bfloat16):
+        parser.error("The loop baseline currently supports BF16/FP32 only, without FP8")
+    if args.total_batch_size <= 0 or (args.num_iterations <= 0 and args.target_flops <= 0):
+        parser.error("Loop comparisons require an explicit total batch size and step/FLOP budget")
+    if args.target_param_data_ratio <= 0:
+        parser.error("Keep target-param-data-ratio positive: it is also used for nanochat's LR/decay reference")
+    args.exact_resume = args.check_finite = True
 user_config = vars(args).copy()  # for logging
 # -----------------------------------------------------------------------------
 # Compute init and wandb logging
 
 device_type = autodetect_device_type() if args.device_type == "" else args.device_type
 ddp, ddp_rank, ddp_local_rank, ddp_world_size, device = compute_init(device_type)
+torch.manual_seed(args.seed)
 master_process = ddp_rank == 0 # this process will do logging, checkpointing etc.
 synchronize = torch.cuda.synchronize if device_type == "cuda" else lambda: None
 get_max_memory = torch.cuda.max_memory_allocated if device_type == "cuda" else lambda: 0
@@ -130,20 +151,22 @@ print0(f"Vocab size: {vocab_size:,}")
 
 ConfigClass, ModelClass = get_model(args.model_type)
 
-def build_model_meta(depth):
+def build_model_meta(depth, reference=False):
     """Build a model on meta device for a given depth (shapes/dtypes only, no data)."""
     # Model dim is nudged up to nearest multiple of head_dim for clean division
     # (FA3 requires head_dim divisible by 8, and this guarantees head_dim == args.head_dim exactly)
     base_dim = depth * args.aspect_ratio
     model_dim = ((base_dim + args.head_dim - 1) // args.head_dim) * args.head_dim
     num_heads = model_dim // args.head_dim
-    config = ConfigClass(
+    ConfigFactory, ModelFactory = get_model("gpt_base") if reference and is_loop else (ConfigClass, ModelClass)
+    config = ConfigFactory(
         sequence_len=args.max_seq_len, vocab_size=vocab_size,
         n_layer=depth, n_head=num_heads, n_kv_head=num_heads, n_embd=model_dim,
         window_pattern=args.window_pattern,
+        **({"num_loops": args.num_loops} if is_loop and not reference else {}),
     )
     with torch.device("meta"):
-        model_meta = ModelClass(config)
+        model_meta = ModelFactory(config)
     return model_meta
 
 # Build the model, move to device, init the weights
@@ -156,12 +179,31 @@ model.init_weights() # 3) All tensors get initialized
 
 # If we are resuming, overwrite the model parameters with those of the checkpoint
 base_dir = get_base_dir()
-output_dirname = args.model_tag if args.model_tag else f"d{args.depth}" # e.g. d12
+default_tag = f"{args.model_type}_d{args.depth}_r{args.num_loops}" if is_loop else f"d{args.depth}"
+output_dirname = args.model_tag if args.model_tag else default_tag
 checkpoint_dir = os.path.join(base_dir, "base_checkpoints", output_dirname)
 resuming = args.resume_from_step != -1
+if args.exact_resume and not resuming and os.path.isdir(checkpoint_dir):
+    if any(name.startswith("model_") and name.endswith(".pt") for name in os.listdir(checkpoint_dir)):
+        raise FileExistsError("Checkpoint tag already exists; use a new tag or --resume-from-step")
 if resuming:
     print0(f"Resuming optimization from step {args.resume_from_step}")
     model_data, optimizer_data, meta_data = load_checkpoint(checkpoint_dir, args.resume_from_step, device, load_optimizer=True, rank=ddp_rank)
+    if meta_data.get("model_type", "gpt") != args.model_type or meta_data["model_config"] != model_config_kwargs:
+        raise ValueError("Resume model configuration does not match checkpoint")
+    if args.exact_resume:
+        if meta_data.get("compute_dtype") != str(COMPUTE_DTYPE) or meta_data.get("attention_impl") != ("fa3" if using_fa3 else "sdpa"):
+            raise ValueError("Exact resume requires the same precision and attention implementation")
+        if meta_data.get("world_size") != ddp_world_size:
+            raise ValueError("Exact resume requires the same world size")
+        # Keep data packing, optimizer and schedules fixed. Runtime/logging and
+        # save/eval frequency may change; the full training horizon may not.
+        keys = ["device_batch_size", "total_batch_size", "num_iterations", "target_flops",
+                "target_param_data_ratio", "embedding_lr", "unembedding_lr", "matrix_lr",
+                "scalar_lr", "weight_decay", "warmup_steps", "warmdown_ratio", "final_lr_frac", "seed", "no_compile"]
+        for key in keys:
+            if meta_data["user_config"].get(key) != getattr(args, key):
+                raise ValueError(f"Exact resume requires unchanged {key}")
     model.load_state_dict(model_data, strict=True, assign=True)
     del model_data # free up this memory after the copy
 
@@ -246,7 +288,8 @@ def disable_fp8(model):
 # Compile the model
 
 orig_model = model # original, uncompiled model, for saving raw model state_dict and for inference/evaluation (because the shapes may change shape)
-model = torch.compile(model, dynamic=False) # the inputs to model will never change shape so dynamic=False is safe
+if not args.no_compile:
+    model = torch.compile(model, dynamic=False)
 
 # -----------------------------------------------------------------------------
 # Scaling laws and muP extrapolations to determine the optimal training horizon, batch size, learning rates, weight decay.
@@ -266,13 +309,18 @@ print0(f"Estimated FLOPs per token: {num_flops_per_token:e}")
 def get_scaling_params(m):
     # As for which params to use exactly, transformer matrices + lm_head gives cleanest scaling laws (see dev/LOG.md Jan 27, 2026)
     params_counts = m.num_scaling_params()
-    scaling_params = params_counts['transformer_matrices'] + params_counts['lm_head']
+    # Use the unshared-equivalent count ONLY for nanochat's hyperparameter
+    # heuristics, so sharing does not silently change the paired training recipe.
+    visits = m.config.n_layer // len(m.transformer.h)
+    scaling_params = visits * params_counts['transformer_matrices'] + params_counts['lm_head']
     return scaling_params
 num_scaling_params = get_scaling_params(model)
+if is_loop:
+    print0(f"Hyperparameter reference count (unshared-equivalent, NOT unique parameters): {num_scaling_params:,}")
 target_tokens = int(args.target_param_data_ratio * num_scaling_params) # optimal tokens for the model we are about to train
 
 # Our reference model is d12, this is where a lot of hyperparameters are tuned and then transfered to higher depths (muP style)
-d12_ref = build_model_meta(12) # creates the model on meta device
+d12_ref = build_model_meta(12, reference=True) # creates the model on meta device
 D_REF = args.target_param_data_ratio * get_scaling_params(d12_ref) # compute-optimal d12 training horizon in tokens (measured empirically)
 B_REF = 2**19 # optimal batch size at d12 ~= 524,288 tokens (measured empirically)
 
@@ -331,9 +379,14 @@ if scaler is not None:
 # -----------------------------------------------------------------------------
 # Initialize the DataLoaders for train/val
 dataloader_resume_state_dict = None if not resuming else meta_data["dataloader_state_dict"]
-train_loader = tokenizing_distributed_data_loader_with_state_bos_bestfit(tokenizer, args.device_batch_size, args.max_seq_len, split="train", device=device, resume_state_dict=dataloader_resume_state_dict)
+if resuming and args.exact_resume:
+    x, y, dataloader_resume_state_dict = load_training_state(checkpoint_dir, args.resume_from_step, ddp_rank, device, scaler)
+train_loader = tokenizing_distributed_data_loader_with_state_bos_bestfit(tokenizer, args.device_batch_size, args.max_seq_len, split="train", device=device, resume_state_dict=dataloader_resume_state_dict, exact_resume=args.exact_resume)
 build_val_loader = lambda: tokenizing_distributed_data_loader_bos_bestfit(tokenizer, args.device_batch_size, args.max_seq_len, split="val", device=device)
-x, y, dataloader_state_dict = next(train_loader) # kick off load of the very first batch of data
+if resuming and args.exact_resume:
+    dataloader_state_dict = dataloader_resume_state_dict
+else:
+    x, y, dataloader_state_dict = next(train_loader)
 
 # -----------------------------------------------------------------------------
 # Calculate the number of iterations we will train for and set up the various schedulers
@@ -355,6 +408,10 @@ elif args.target_param_data_ratio > 0:
 else:
     raise ValueError("No training horizon specified")
 total_tokens = total_batch_size * num_iterations # the actual number of tokens we will train for
+if num_iterations < 1 or args.resume_from_step > num_iterations:
+    raise ValueError("Invalid training horizon/resume step")
+if args.stop_after_step != -1 and not max(0, args.resume_from_step) < args.stop_after_step <= num_iterations:
+    raise ValueError("stop-after-step must be after the resume step and within the training horizon")
 print0(f"Total number of training tokens: {total_tokens:,}")
 print0(f"Tokens : Scaling params ratio: {total_batch_size * num_iterations / num_scaling_params:.2f}") # e.g. Chinchilla was ~20
 print0(f"Total training FLOPs estimate: {num_flops_per_token * total_tokens:e}")
@@ -416,8 +473,10 @@ print0(f"Tokens / micro-batch: {world_tokens_per_fwdbwd:,}")
 print0(f"Total batch size {total_batch_size:,} => gradient accumulation steps: {grad_accum_steps}")
 
 # Go!
+mfu = None  # A checkpoint already at the horizon performs no optimizer step.
 while True:
     last_step = step == num_iterations # loop runs num_iterations+1 times so that we can eval/save at the end
+    pause_step = step == args.stop_after_step
     flops_so_far = num_flops_per_token * total_batch_size * step
 
     # once in a while: evaluate the val bpb (all ranks participate)
@@ -477,7 +536,7 @@ while True:
         model.train()
 
     # save checkpoint: at the end of the run, or every save_every steps, except at the first step or the resume step
-    if last_step or (step > 0 and step != args.resume_from_step and args.save_every > 0 and step % args.save_every == 0):
+    if last_step or pause_step or (step > 0 and step != args.resume_from_step and args.save_every > 0 and step % args.save_every == 0):
         save_checkpoint(
             checkpoint_dir,
             step,
@@ -492,7 +551,10 @@ while True:
                 "device_batch_size": args.device_batch_size,
                 "max_seq_len": args.max_seq_len,
                 "total_batch_size": total_batch_size,
-                "dataloader_state_dict": dataloader_state_dict,
+                "dataloader_state_dict": {k: v for k, v in dataloader_state_dict.items() if k != "doc_buffer"},
+                "world_size": ddp_world_size,
+                "compute_dtype": str(COMPUTE_DTYPE),
+                "attention_impl": "fa3" if using_fa3 else "sdpa",
                 "loop_state": { # all loop state (other than step) so that we can resume training
                     "min_val_bpb": min_val_bpb,
                     "smooth_train_loss": smooth_train_loss,
@@ -501,9 +563,13 @@ while True:
             },
             rank=ddp_rank,
         )
+        if args.exact_resume:
+            save_training_state(checkpoint_dir, step, ddp_rank, x, y, dataloader_state_dict, scaler)
 
     # termination conditions (TODO: possibly also add loss explosions etc.)
-    if last_step:
+    if last_step or pause_step:
+        if pause_step:
+            print0(f"Paused at step {step}; resume with the SAME horizon and --resume-from-step {step}")
         break
 
     # -------------------------------------------------------------------------
@@ -511,9 +577,10 @@ while True:
     # evaluate the gradient
     synchronize()
     t0 = time.time()
+    train_loss = torch.zeros((), device=device)
     for micro_step in range(grad_accum_steps):
         loss = model(x, y)
-        train_loss = loss.detach() # for logging
+        train_loss += loss.detach() / grad_accum_steps
         loss = loss / grad_accum_steps # each .backward() is a grad sum => normalize loss here
         if scaler is not None:
             scaler.scale(loss).backward()
@@ -540,8 +607,12 @@ while True:
         scaler.step(optimizer)
         scaler.update()
     else:
+        if args.check_finite:
+            check_finite_gradients(orig_model, train_loss)
         optimizer.step()
     model.zero_grad(set_to_none=True)
+    if is_ddp_initialized():
+        dist.all_reduce(train_loss, op=dist.ReduceOp.AVG)
     train_loss_f = train_loss.item() # .item() is a CPU-GPU sync point
     synchronize()
     t1 = time.time()
@@ -611,7 +682,8 @@ get_report().log(section="Base model training", data=[
         "Number of parameters": num_params,
         "Number of FLOPs per token": f"{num_flops_per_token:e}",
         "Calculated number of iterations": num_iterations,
-        "Number of training tokens": total_tokens,
+        "Planned training tokens": total_tokens,
+        "Completed training tokens": total_batch_size * step,
         "Tokens : Scaling params ratio": total_batch_size * num_iterations / num_scaling_params,
         "DDP world size": ddp_world_size,
         "warmup_steps": args.warmup_steps,
@@ -622,7 +694,7 @@ get_report().log(section="Base model training", data=[
         "Minimum validation bpb": min_val_bpb if val_bpb is not None else None,
         "Final validation bpb": val_bpb,
         "CORE metric estimate": results.get("core_metric", None),
-        "MFU %": f"{mfu:.2f}%",
+        "MFU %": f"{mfu:.2f}%" if mfu is not None else None,
         "Total training flops": f"{flops_so_far:e}",
         "Total training time": f"{total_training_time/60:.2f}m",
         "Peak memory usage": f"{get_max_memory() / 1024 / 1024:.2f}MiB",

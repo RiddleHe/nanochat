@@ -26,6 +26,7 @@ class GPTNoLambdaConfig(GPTConfig):
 # gpt_base.py family: vanilla GPT-2 + smear (no value embeds, no lambdas)
 # -----------------------------------------------------------------------------
 from nanochat.model.gpt_base import GPTBaseConfig, GPTBase
+from nanochat.model.gpt_loop import GPTLoopConfig, GPTLoop, GPTLoopUntied
 
 # -----------------------------------------------------------------------------
 # Registry: model_type string -> (ConfigClass, ModelClass)
@@ -36,6 +37,8 @@ MODELS = {
     "gpt_nolambda":     (GPTNoLambdaConfig,     GPT),
     # gpt_base.py family
     "gpt_base":         (GPTBaseConfig,         GPTBase),
+    "gpt_loop":         (GPTLoopConfig,         GPTLoop),
+    "gpt_loop_untied":  (GPTLoopConfig,         GPTLoopUntied),
 }
 
 
