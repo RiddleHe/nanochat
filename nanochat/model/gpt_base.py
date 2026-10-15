@@ -1,8 +1,8 @@
 """
-GPT base model: vanilla GPT-2 style architecture (no value embeddings, no per-layer
-resid/x0 lambdas), with the smear gate retained.
+GPT base model: pre-normalized decoder-only Transformer with optional BoV
+value/input routing, no per-layer resid/x0 lambdas, and no embedding smear.
 
-Notable features (vs nanochat.model.gpt):
+Retained architectural and implementation choices:
 - rotary embeddings (and no positional embeddings)
 - QK norm
 - untied weights for token embedding and lm_head
@@ -12,7 +12,8 @@ Notable features (vs nanochat.model.gpt):
 - no bias in linear layers
 - Group-Query Attention (GQA) support for more efficient inference
 - Flash Attention 3 integration
-- Smear gate (cheap bigram-like info from previous token's embedding)
+- optional sliding-window attention
+- fixed Q/K sharpening and logit soft-capping
 """
 
 from dataclasses import dataclass
@@ -171,7 +172,7 @@ class GPTBaseConfig:
     # Apples-to-apples baseline for v_from_value_emb: same VE table, same
     # aligned init (VE_l[t] = c_v_l_init(norm(wte_init[t]))), but ADD to c_v(x)
     # rather than REPLACE it — mirrors add_init_res_v's relationship to
-    # v_from_x0. At step 0 with smear_lambda=0, v matches gpt_base (no-learn:
+    # v_from_x0. At step 0, v matches gpt_base (no-learn:
     # 0.5*c_v(x) + 0.5*c_v(norm(wte)) ≈ c_v(x); learn: beta=0 so v=c_v(x)
     # exactly). Late-layer c_v stays live (still computed for the blend), so
     # NO dead-cv FLOPs adjustment — FLOPs/token equals gpt_base; only the VE
@@ -191,7 +192,7 @@ class GPTBaseConfig:
     # as identity replacement rather than gpt.py's additive blend with c_v(x).
     # Strictly more expressive than v_from_x0: same "v depends only on token
     # ids" hypothesis without the rank-n_embd bottleneck. Init: each row is set
-    # to c_v_l_init(norm(wte_init[t])), so at step 0 (smear_lambda=0) v at late
+    # to c_v_l_init(norm(wte_init[t])), so at step 0 v at late
     # layers exactly matches v_from_x0 — clean apples-to-apples for the rank
     # lift. Late-layer c_v is dead (forward skipped, no grad path to loss) and
     # excluded from FLOPs / optimizer, mirroring v_from_v1. When
@@ -643,9 +644,6 @@ class GPTBase(nn.Module):
                     str(i): nn.Embedding(padded_vocab_size, kv_dim)
                     for i in range(config.n_layer) if _is_target_layer(i, config)
                 })
-        # Smear: mix previous token's embedding into current token (cheap bigram-like info)
-        self.smear_gate = Linear(24, 1, bias=False)
-        self.smear_lambda = nn.Parameter(torch.zeros(1))
         # To support meta device initialization, we init the rotary embeddings here, but it's just "fake" meta tensors only.
         # As for rotary_seq_len, these rotary embeddings are pretty small/cheap in memory,
         # so let's just over-compute them by 10X, but assert fail if we ever reach that amount.
@@ -717,7 +715,7 @@ class GPTBase(nn.Module):
                 attn.lambda_v.fill_(1.0)
 
         # Aligned init for the VE tables (v_from_value_emb / add_init_value_emb):
-        # VE_l[t] = c_v_l(norm(wte[t])). With smear_lambda=0 at init, v at late
+        # VE_l[t] = c_v_l(norm(wte[t])). At initialization, v at late
         # layers matches v_from_x0 at step 0 for v_from_value_emb, and the
         # add_init_value_emb blend (0.5/0.5 or beta=0) reduces to gpt_base.
         # With value_emb_shared, the single shared table is initialized once
@@ -831,7 +829,7 @@ class GPTBase(nn.Module):
         - Chinchilla counts exp/sum/divide in attention softmax as flops (a little sus and very tiny => we ignore)
         """
         nparams = sum(p.numel() for p in self.parameters())
-        # Exclude non-matmul params: embeddings, smear scalars, learnable blend coeffs
+        # Exclude non-matmul params: embeddings and learnable blend coeffs
         coeff_numel = sum(
             getattr(m, n).numel()
             for m in [b for b in self.transformer.h] + [b.attn for b in self.transformer.h]
@@ -869,7 +867,6 @@ class GPTBase(nn.Module):
                 value_embeds_numel += ve.weight.numel()
         nparams_exclude = (self.transformer.wte.weight.numel() +
                           value_embeds_numel +
-                          self.smear_gate.weight.numel() + self.smear_lambda.numel() +
                           coeff_numel + dead_cv_numel)
 
         # Extra (live) forward calls of c_q/c_k/c_v/c_proj at late layers — i.e. the
@@ -918,7 +915,7 @@ class GPTBase(nn.Module):
         wte = sum(p.numel() for p in self.transformer.wte.parameters())
         lm_head = sum(p.numel() for p in self.lm_head.parameters())
         transformer_matrices = sum(p.numel() for p in self.transformer.h.parameters())
-        scalars = self.smear_gate.weight.numel() + self.smear_lambda.numel()
+        scalars = 0  # Retain the reporting key; BoV coefficients are counted in the blocks.
         value_embeds = sum(p.numel() for p in self.value_embeds.parameters()) if (self.config.v_from_value_emb or self.config.add_init_value_emb or self.config.add_init_value_emb_nanogpt) else 0
         total = wte + lm_head + transformer_matrices + scalars + value_embeds
         assert total == sum(p.numel() for p in self.parameters()), "Parameter count mismatch"
@@ -979,11 +976,10 @@ class GPTBase(nn.Module):
         matrix_params = [p for p in all_block_params if p.dim() >= 2]  # exclude scalar coeffs
         embedding_params = list(self.transformer.wte.parameters())
         lm_head_params = list(self.lm_head.parameters())
-        smear_params = [self.smear_gate.weight, self.smear_lambda]
         # Value embeddings (v_from_value_emb / add_init_value_emb /
         # add_init_value_emb_nanogpt): own AdamW group, like gpt.py.
         value_embeds_params = list(self.value_embeds.parameters()) if (self.config.v_from_value_emb or self.config.add_init_value_emb or self.config.add_init_value_emb_nanogpt) else []
-        assert len(list(self.parameters())) == len(matrix_params) + len(embedding_params) + len(lm_head_params) + len(smear_params) + len(coeff_params) + len(lambda_v_params) + len(dead_param_ids) + len(value_embeds_params)
+        assert len(list(self.parameters())) == len(matrix_params) + len(embedding_params) + len(lm_head_params) + len(coeff_params) + len(lambda_v_params) + len(dead_param_ids) + len(value_embeds_params)
 
         # Scale the LR for the AdamW parameters by ∝1/√dmodel (tuned for 768 dim model)
         dmodel_lr_scale = (model_dim / 768) ** -0.5
@@ -994,7 +990,6 @@ class GPTBase(nn.Module):
             # AdamW groups (embeddings, lm_head, scalars)
             dict(kind='adamw', params=lm_head_params, lr=unembedding_lr * dmodel_lr_scale, betas=(0.8, 0.96), eps=1e-10, weight_decay=0.01),
             dict(kind='adamw', params=embedding_params, lr=embedding_lr * dmodel_lr_scale, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.001),
-            dict(kind='adamw', params=smear_params, lr=0.2, betas=(0.8, 0.95), eps=1e-10, weight_decay=0.0),
         ]
         # Learnable blend coeffs (only present when learn_init_coeffs is set).
         # alpha (main, init 1.0): low LR + weight decay, like gpt.py's resid_lambdas.
@@ -1042,27 +1037,8 @@ class GPTBase(nn.Module):
         x = x.to(COMPUTE_DTYPE) # ensure activations are in compute dtype (no-op usually, but active for fp16 code path)
         x = norm(x)
 
-        # Smear: mix previous token's embedding into current position (cheap bigram info)
-        if kv_cache is None:
-            # Training / naive generate: full sequence available, use fast slice
-            assert T > 1, "Training forward pass should have T > 1"
-            gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, 1:, :24]))
-            x = torch.cat([x[:, :1], x[:, 1:] + gate * x[:, :-1]], dim=1)
-        else:
-            # KV cache inference: read prev embedding from cache, store current for next step
-            x_pre_smear = kv_cache.prev_embedding
-            kv_cache.prev_embedding = x[:, -1:, :]
-            if T > 1:
-                # Prefill: apply smear to positions 1+, same as training
-                gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, 1:, :24]))
-                x = torch.cat([x[:, :1], x[:, 1:] + gate * x[:, :-1]], dim=1)
-            elif x_pre_smear is not None:
-                # Decode: single token, use cached prev embedding
-                gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, :, :24]))
-                x = x + gate * x_pre_smear
-
         # Forward the trunk of the Transformer.
-        # x0 = post-smear residual; used by all add_init_* paths inside Block/Attention.
+        # x0 = normalized token embedding; used by add_init_* paths inside Block/Attention.
         # detach_init_value: detach once here (idempotent — same as detaching per-block).
         # x is passed un-detached, so add_init_v's layer-0 v capture is unaffected.
         # ve = layer-0 v capture, only consumed by add_init_v (shared-mode value residual).

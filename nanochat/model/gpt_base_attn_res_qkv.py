@@ -8,8 +8,8 @@ A fourth query routes into the MLP after appending the attention output;
 one final query aggregates the completed bank for the language-model head.
 These are raw sublayer outputs, not cumulative residual states.
 
-Keeps GPTBase's smear, RoPE, QK norm/scaling, windows, and ReLU-squared MLP.
-No value embeddings, value gates, residual lambdas, or BoV mixing flags.
+Keeps GPTBase's RoPE, QK norm/scaling, windows, and ReLU-squared MLP.
+No embedding smear, value embeddings, value gates, residual lambdas, or BoV mixing flags.
 Query layout: [Q_0, K_0, V_0, MLP_0, ..., Q_{L-1}, K_{L-1}, V_{L-1},
 MLP_{L-1}, final, padding...]. Zero initialization gives uniform routing.
 """
@@ -96,7 +96,6 @@ class GPTBaseAttnResQKV(nn.Module):
         super().__init__()
         self.config = config
         assert config.n_layer > 0 and config.sequence_len > 0
-        assert config.n_embd >= 24, "Smear reads the first 24 embedding channels"
         self.window_sizes = self._compute_window_sizes(config)
 
         padded_vocab_size = ((config.vocab_size + pad_vocab_size_to - 1) // pad_vocab_size_to) * pad_vocab_size_to
@@ -115,11 +114,6 @@ class GPTBaseAttnResQKV(nn.Module):
         self.n_queries = 4 * config.n_layer + 1
         n_queries_padded = ((self.n_queries + 7) // 8) * 8
         self.attn_res_queries = nn.Parameter(torch.zeros(n_queries_padded, config.n_embd))
-
-        # Smear: mix previous token's embedding into current token (cheap bigram info)
-        self.smear_gate = Linear(24, 1, bias=False)
-        self.smear_lambda = nn.Parameter(torch.zeros(1))
-
 
         # Rotary embeddings (over-computed 10X, same as base GPT)
         self.rotary_seq_len = config.sequence_len * 10
@@ -162,10 +156,6 @@ class GPTBaseAttnResQKV(nn.Module):
         # AttnRes pseudo-queries: zero init (uniform initial attention weights)
         torch.nn.init.zeros_(self.attn_res_queries)
 
-        # Explicit initialization is essential after meta -> to_empty.
-        self.smear_gate.reset_parameters()
-        torch.nn.init.zeros_(self.smear_lambda)
-
         # Rotary embeddings
         head_dim = self.config.n_embd // self.config.n_head
         cos, sin = self._precompute_rotary_embeddings(self.rotary_seq_len, head_dim)
@@ -206,8 +196,7 @@ class GPTBaseAttnResQKV(nn.Module):
     def estimate_flops(self):
         nparams = sum(p.numel() for p in self.parameters())
         nparams_exclude = (self.transformer.wte.weight.numel() +
-                          self.attn_res_queries.numel() +
-                          self.smear_gate.weight.numel() + self.smear_lambda.numel())
+                          self.attn_res_queries.numel())
         h, q, t = self.config.n_head, self.config.n_embd // self.config.n_head, self.config.sequence_len
         attn_flops = 0
         for window_size in self.window_sizes:
@@ -228,8 +217,7 @@ class GPTBaseAttnResQKV(nn.Module):
         wte = sum(p.numel() for p in self.transformer.wte.parameters())
         lm_head = sum(p.numel() for p in self.lm_head.parameters())
         transformer_matrices = sum(p.numel() for p in self.transformer.h.parameters())
-        scalars = (self.attn_res_queries.numel() +
-                   self.smear_gate.weight.numel() + self.smear_lambda.numel())
+        scalars = self.attn_res_queries.numel()
         total = wte + lm_head + transformer_matrices + scalars
         assert total == sum(p.numel() for p in self.parameters()), "Parameter count mismatch"
         return {
@@ -249,9 +237,8 @@ class GPTBaseAttnResQKV(nn.Module):
         embedding_params = list(self.transformer.wte.parameters())
         lm_head_params = list(self.lm_head.parameters())
         attn_res_params = [self.attn_res_queries]
-        smear_params = [self.smear_gate.weight, self.smear_lambda]
         assert len(list(self.parameters())) == (len(matrix_params) + len(embedding_params) +
-            len(lm_head_params) + len(attn_res_params) + len(smear_params))
+            len(lm_head_params) + len(attn_res_params))
 
         dmodel_lr_scale = (model_dim / 768) ** -0.5
         print0(f"Scaling the LR for the AdamW parameters ∝1/√({model_dim}/768) = {dmodel_lr_scale:.6f}")
@@ -260,7 +247,6 @@ class GPTBaseAttnResQKV(nn.Module):
             dict(kind='adamw', params=lm_head_params, lr=unembedding_lr * dmodel_lr_scale, betas=(0.8, 0.96), eps=1e-10, weight_decay=0.01),
             dict(kind='adamw', params=embedding_params, lr=embedding_lr * dmodel_lr_scale, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.001),
             dict(kind='adamw', params=attn_res_params, lr=0.001, betas=(0.9, 0.999), eps=1e-10, weight_decay=0.0),
-            dict(kind='adamw', params=smear_params, lr=0.2, betas=(0.8, 0.95), eps=1e-10, weight_decay=0.0),
         ]
         for shape in sorted({p.shape for p in matrix_params}):
             group_params = [p for p in matrix_params if p.shape == shape]
@@ -289,21 +275,7 @@ class GPTBaseAttnResQKV(nn.Module):
         x = x.to(COMPUTE_DTYPE)
         x = norm(x)
 
-        # Preserve smear across prefill, single-token decode, and chunked decode.
-        previous = None if kv_cache is None else kv_cache.prev_embedding
-        if kv_cache is not None:
-            kv_cache.prev_embedding = x[:, -1:, :]
-        first = x[:, :1]
-        if previous is not None:
-            gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(first[..., :24]))
-            first = first + gate * previous
-        if T > 1:
-            gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, 1:, :24]))
-            x = torch.cat([first, x[:, 1:] + gate * x[:, :-1]], dim=1)
-        else:
-            x = first
-
-        # The bank contains post-smear x0 and raw (not residual-added) outputs.
+        # The bank contains normalized token embeddings and raw sublayer outputs.
         sources = [x]
         for i, block in enumerate(self.transformer.h):
             queries = self.attn_res_queries[4*i:4*i+4]
