@@ -4,7 +4,7 @@ Model registry for selecting between different model architectures.
 Usage:
     from nanochat.model_registry import get_model
     ConfigClass, ModelClass = get_model("gpt")        # base GPT
-    ConfigClass, ModelClass = get_model("gpt_base")   # vanilla GPT-2 + smear
+    ConfigClass, ModelClass = get_model("gpt_base")   # Transformer without value embeds, lambdas, or smear
 
 All variants are registered eagerly at module-import time. Configs that only
 flip flags on a base config are subclassed inline and grouped by their model
@@ -23,7 +23,7 @@ class GPTNoLambdaConfig(GPTConfig):
     use_lambdas: bool = False
 
 # -----------------------------------------------------------------------------
-# gpt_base.py family: vanilla GPT-2 + smear (no value embeds, no lambdas)
+# gpt_base.py family: pre-norm Transformer (no value embeds, lambdas, or smear)
 # -----------------------------------------------------------------------------
 from nanochat.model.gpt_base import GPTBaseConfig, GPTBase
 

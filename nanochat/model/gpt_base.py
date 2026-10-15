@@ -1,8 +1,8 @@
 """
-GPT base model: vanilla GPT-2 style architecture (no value embeddings, no per-layer
-resid/x0 lambdas), with the smear gate retained.
+GPT base model: pre-normalized decoder-only Transformer with no value embeddings,
+per-layer resid/x0 lambdas, or previous-token embedding smear.
 
-Notable features (vs nanochat.model.gpt):
+Retained architectural and implementation choices:
 - rotary embeddings (and no positional embeddings)
 - QK norm
 - untied weights for token embedding and lm_head
@@ -12,7 +12,8 @@ Notable features (vs nanochat.model.gpt):
 - no bias in linear layers
 - Group-Query Attention (GQA) support for more efficient inference
 - Flash Attention 3 integration
-- Smear gate (cheap bigram-like info from previous token's embedding)
+- optional sliding-window attention
+- fixed Q/K sharpening and logit soft-capping
 """
 
 from dataclasses import dataclass
@@ -171,9 +172,6 @@ class GPTBase(nn.Module):
             ]),
         })
         self.lm_head = Linear(config.n_embd, padded_vocab_size, bias=False)
-        # Smear: mix previous token's embedding into current token (cheap bigram-like info)
-        self.smear_gate = Linear(24, 1, bias=False)
-        self.smear_lambda = nn.Parameter(torch.zeros(1))
         # To support meta device initialization, we init the rotary embeddings here, but it's just "fake" meta tensors only.
         # As for rotary_seq_len, these rotary embeddings are pretty small/cheap in memory,
         # so let's just over-compute them by 10X, but assert fail if we ever reach that amount.
@@ -288,9 +286,8 @@ class GPTBase(nn.Module):
         - Chinchilla counts exp/sum/divide in attention softmax as flops (a little sus and very tiny => we ignore)
         """
         nparams = sum(p.numel() for p in self.parameters())
-        # Exclude non-matmul params: embeddings and smear scalars
-        nparams_exclude = (self.transformer.wte.weight.numel() +
-                          self.smear_gate.weight.numel() + self.smear_lambda.numel())
+        # Exclude token embeddings: they are lookups, not matmuls.
+        nparams_exclude = self.transformer.wte.weight.numel()
         h, q, t = self.config.n_head, self.config.n_embd // self.config.n_head, self.config.sequence_len
         # Sum attention FLOPs per layer, accounting for sliding window
         attn_flops = 0
@@ -317,7 +314,7 @@ class GPTBase(nn.Module):
         wte = sum(p.numel() for p in self.transformer.wte.parameters())
         lm_head = sum(p.numel() for p in self.lm_head.parameters())
         transformer_matrices = sum(p.numel() for p in self.transformer.h.parameters())
-        scalars = self.smear_gate.weight.numel() + self.smear_lambda.numel()
+        scalars = 0  # Retain the reporting key for compatibility with other models.
         total = wte + lm_head + transformer_matrices + scalars
         assert total == sum(p.numel() for p in self.parameters()), "Parameter count mismatch"
         return {
@@ -329,6 +326,7 @@ class GPTBase(nn.Module):
         }
 
     def setup_optimizer(self, unembedding_lr=0.004, embedding_lr=0.2, matrix_lr=0.02, weight_decay=0.0, scalar_lr=0.5):
+        # scalar_lr is accepted for the shared trainer interface; GPTBase has no scalars.
         model_dim = self.config.n_embd
         ddp, rank, local_rank, world_size = get_dist_info()
 
@@ -336,8 +334,7 @@ class GPTBase(nn.Module):
         matrix_params = [p for p in self.transformer.h.parameters() if p.dim() >= 2]
         embedding_params = list(self.transformer.wte.parameters())
         lm_head_params = list(self.lm_head.parameters())
-        smear_params = [self.smear_gate.weight, self.smear_lambda]
-        assert len(list(self.parameters())) == len(matrix_params) + len(embedding_params) + len(lm_head_params) + len(smear_params)
+        assert len(list(self.parameters())) == len(matrix_params) + len(embedding_params) + len(lm_head_params)
 
         # Scale the LR for the AdamW parameters by ∝1/√dmodel (tuned for 768 dim model)
         dmodel_lr_scale = (model_dim / 768) ** -0.5
@@ -345,10 +342,9 @@ class GPTBase(nn.Module):
 
         # Build param_groups with all required fields explicit
         param_groups = [
-            # AdamW groups (embeddings, lm_head, scalars)
+            # AdamW groups (embeddings and lm_head)
             dict(kind='adamw', params=lm_head_params, lr=unembedding_lr * dmodel_lr_scale, betas=(0.8, 0.96), eps=1e-10, weight_decay=0.01),
             dict(kind='adamw', params=embedding_params, lr=embedding_lr * dmodel_lr_scale, betas=(0.8, 0.995), eps=1e-10, weight_decay=0.001),
-            dict(kind='adamw', params=smear_params, lr=0.2, betas=(0.8, 0.95), eps=1e-10, weight_decay=0.0),
         ]
         # Muon groups (matrix params, grouped by shape for stacking)
         for shape in sorted({p.shape for p in matrix_params}):
@@ -379,25 +375,6 @@ class GPTBase(nn.Module):
         x = self.transformer.wte(idx) # embed current token
         x = x.to(COMPUTE_DTYPE) # ensure activations are in compute dtype (no-op usually, but active for fp16 code path)
         x = norm(x)
-
-        # Smear: mix previous token's embedding into current position (cheap bigram info)
-        if kv_cache is None:
-            # Training / naive generate: full sequence available, use fast slice
-            assert T > 1, "Training forward pass should have T > 1"
-            gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, 1:, :24]))
-            x = torch.cat([x[:, :1], x[:, 1:] + gate * x[:, :-1]], dim=1)
-        else:
-            # KV cache inference: read prev embedding from cache, store current for next step
-            x_pre_smear = kv_cache.prev_embedding
-            kv_cache.prev_embedding = x[:, -1:, :]
-            if T > 1:
-                # Prefill: apply smear to positions 1+, same as training
-                gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, 1:, :24]))
-                x = torch.cat([x[:, :1], x[:, 1:] + gate * x[:, :-1]], dim=1)
-            elif x_pre_smear is not None:
-                # Decode: single token, use cached prev embedding
-                gate = self.smear_lambda.to(x.dtype) * torch.sigmoid(self.smear_gate(x[:, :, :24]))
-                x = x + gate * x_pre_smear
 
         # Forward the trunk of the Transformer.
         for block in self.transformer.h:
