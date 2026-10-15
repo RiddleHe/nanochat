@@ -14,7 +14,7 @@ class Tokenizer:
         return [[prepend] + [int(d) + 1] * (3 + int(d) % 19) for d in docs]
 
 
-@pytest.mark.parametrize("rank,world", [(0, 1), (0, 2), (1, 2)])
+@pytest.mark.parametrize("rank,world", [(0, 1), (0, 2), (1, 2), (0, 4), (1, 4), (2, 4), (3, 4)])
 def test_exact_resume_across_documents_groups_files_epochs(tmp_path, monkeypatch, rank, world):
     paths = []
     for i in range(3):

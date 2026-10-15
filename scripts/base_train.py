@@ -53,8 +53,9 @@ parser.add_argument("--check-finite", action="store_true", help="fail before an 
 parser.add_argument("--fp8", action="store_true", help="enable FP8 training (requires H100+ GPU and torchao)")
 parser.add_argument("--fp8-recipe", type=str, default="tensorwise", choices=["rowwise", "tensorwise"], help="FP8 scaling recipe: tensorwise (faster, recommended) or rowwise (more accurate but slower)")
 # Model architecture
-parser.add_argument("--depth", type=int, default=20, help="depth of the Transformer model")
-parser.add_argument("--num-loops", type=int, default=None, help="fixed rounds (loop variants default to 4); depth is effective depth")
+parser.add_argument("--depth", type=int, default=20, help="actual layers per loop, or layers of a non-loop model")
+parser.add_argument("--depth-semantics", choices=["physical", "effective"], default="physical", help="effective is ONLY for legacy loop runs; new runs specify actual layers per loop")
+parser.add_argument("--num-loops", type=int, default=None, help="fixed passes over the entire layer stack (loop variants default to 4)")
 parser.add_argument("--aspect-ratio", type=int, default=64, help="model_dim = depth * aspect_ratio")
 parser.add_argument("--head-dim", type=int, default=128, help="target head dimension for attention")
 parser.add_argument("--max-seq-len", type=int, default=2048, help="max context length")
@@ -84,9 +85,12 @@ parser.add_argument("--core-metric-every", type=int, default=2000, help="evaluat
 parser.add_argument("--core-metric-max-per-task", type=int, default=500, help="examples per task for CORE metric")
 parser.add_argument("--sample-every", type=int, default=2000, help="sample from model every N steps (-1 = disable)")
 parser.add_argument("--save-every", type=int, default=-1, help="save checkpoints every N steps (-1 = only at end)")
+parser.add_argument("--save-steps", type=int, nargs="*", default=[], help="also save at these absolute steps, e.g. 0 10 50 100 250")
 # Output
 parser.add_argument("--model-tag", type=str, default=None, help="override model tag for checkpoint directory name")
 args = parser.parse_args()
+if any(step < 0 for step in args.save_steps):
+    parser.error("--save-steps must be nonnegative")
 is_loop = args.model_type in {"gpt_loop", "gpt_loop_untied"}
 if args.num_loops is None:
     args.num_loops = 4 if is_loop else 1
@@ -159,12 +163,18 @@ def build_model_meta(depth, reference=False):
     model_dim = ((base_dim + args.head_dim - 1) // args.head_dim) * args.head_dim
     num_heads = model_dim // args.head_dim
     ConfigFactory, ModelFactory = get_model("gpt_base") if reference and is_loop else (ConfigClass, ModelClass)
-    config = ConfigFactory(
+    config_fields = dict(
         sequence_len=args.max_seq_len, vocab_size=vocab_size,
-        n_layer=depth, n_head=num_heads, n_kv_head=num_heads, n_embd=model_dim,
+        n_head=num_heads, n_kv_head=num_heads, n_embd=model_dim,
         window_pattern=args.window_pattern,
-        **({"num_loops": args.num_loops} if is_loop and not reference else {}),
     )
+    if is_loop and not reference:
+        if args.depth_semantics == "physical":
+            config = ConfigFactory.from_block_depth(depth, num_loops=args.num_loops, **config_fields)
+        else:
+            config = ConfigFactory(n_layer=depth, num_loops=args.num_loops, **config_fields)
+    else:
+        config = ConfigFactory(n_layer=depth, **config_fields)
     with torch.device("meta"):
         model_meta = ModelFactory(config)
     return model_meta
@@ -174,12 +184,17 @@ model = build_model_meta(args.depth) # 1) Build on meta device (only shapes/dtyp
 model_config = model.config
 model_config_kwargs = asdict(model_config)
 print0(f"Model config:\n{json.dumps(model_config_kwargs, indent=2)}")
+if is_loop:
+    print0(f"Loop layout: {model_config.block_depth} layers per pass x {args.num_loops} passes = "
+           f"{model_config.n_layer} executed layers; {len(model.transformer.h)} independently parameterized blocks; "
+           f"width {model_config.n_embd}")
 model.to_empty(device=device) # 2) All tensors get storage on target device but with uninitialized (garbage) data
 model.init_weights() # 3) All tensors get initialized
 
 # If we are resuming, overwrite the model parameters with those of the checkpoint
 base_dir = get_base_dir()
-default_tag = f"{args.model_type}_d{args.depth}_r{args.num_loops}" if is_loop else f"d{args.depth}"
+default_tag = (f"{args.model_type}_b{model_config.block_depth}_r{args.num_loops}_e{model_config.n_layer}"
+               if is_loop else f"d{args.depth}")
 output_dirname = args.model_tag if args.model_tag else default_tag
 checkpoint_dir = os.path.join(base_dir, "base_checkpoints", output_dirname)
 resuming = args.resume_from_step != -1
@@ -536,7 +551,8 @@ while True:
         model.train()
 
     # save checkpoint: at the end of the run, or every save_every steps, except at the first step or the resume step
-    if last_step or pause_step or (step > 0 and step != args.resume_from_step and args.save_every > 0 and step % args.save_every == 0):
+    if last_step or pause_step or (step != args.resume_from_step and
+            (step in args.save_steps or (step > 0 and args.save_every > 0 and step % args.save_every == 0))):
         save_checkpoint(
             checkpoint_dir,
             step,
@@ -639,7 +655,7 @@ while True:
     else:
         eta_str = ""
     epoch = f"{dataloader_state_dict['epoch']} pq: {dataloader_state_dict['pq_idx']} rg: {dataloader_state_dict['rg_idx']}"
-    print0(f"step {step:05d}/{num_iterations:05d} ({pct_done:.2f}%) | loss: {debiased_smooth_loss:.6f} | lrm: {lrm:.2f} | dt: {dt * 1000:.2f}ms | tok/sec: {tok_per_sec:,} | bf16_mfu: {mfu:.2f} | epoch: {epoch} | total time: {total_training_time/60:.2f}m{eta_str}")
+    print0(f"step {step:05d}/{num_iterations:05d} ({pct_done:.2f}%) | loss: {debiased_smooth_loss:.6f} | raw_loss: {train_loss_f:.6f} | lrm: {lrm:.2f} | dt: {dt * 1000:.2f}ms | tok/sec: {tok_per_sec:,} | bf16_mfu: {mfu:.2f} | epoch: {epoch} | total time: {total_training_time/60:.2f}m{eta_str}")
     if step % 100 == 0:
         log_data = {
             "step": step,

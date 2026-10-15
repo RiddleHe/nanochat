@@ -1,7 +1,8 @@
 """Fixed-depth recurrence over GPTBase blocks; no exit gate or intermediate loss.
 
-n_layer is the EFFECTIVE depth. For example, n_layer=24, num_loops=4 owns
-six blocks and applies them four times. Embeddings and LM head run only once.
+Checkpoint n_layer is the EFFECTIVE depth for backwards compatibility.
+Use from_block_depth(24, num_loops=4, ...) for 24 real blocks executed 4 times.
+Embeddings and LM head run only once.
 """
 from dataclasses import asdict, dataclass
 
@@ -15,6 +16,15 @@ class GPTLoopConfig(GPTBaseConfig):
     num_loops: int = 4
     window_pattern: str = "L"
 
+    @classmethod
+    def from_block_depth(cls, block_depth, num_loops=4, **kwargs):
+        """Specify actual blocks explicitly without changing legacy checkpoints."""
+        return cls(n_layer=block_depth * num_loops, num_loops=num_loops, **kwargs)
+
+    @property
+    def block_depth(self):
+        return self.n_layer // self.num_loops
+
     def __post_init__(self):
         if self.num_loops < 1 or self.n_layer < 1 or self.n_layer % self.num_loops:
             raise ValueError("n_layer must be positive and divisible by num_loops >= 1")
@@ -26,7 +36,7 @@ class GPTLoop(GPTBase):
     def __init__(self, config, pad_vocab_size_to=64):
         physical = asdict(config)
         physical.pop("num_loops")
-        physical["n_layer"] //= config.num_loops
+        physical["n_layer"] = config.block_depth
         super().__init__(GPTBaseConfig(**physical), pad_vocab_size_to)
         self.config = config
         self.window_sizes *= config.num_loops

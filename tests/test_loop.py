@@ -43,9 +43,9 @@ def nontrivial(model):
     return model
 
 
-def matched_pair():
-    loop = nontrivial(make())
-    untied = make(GPTLoopUntied)
+def matched_pair(cfg=None):
+    loop = nontrivial(make(cfg=cfg))
+    untied = make(GPTLoopUntied, cfg=cfg)
     state = loop.state_dict()
     for key in untied.state_dict():
         if key.startswith("transformer.h."):
@@ -109,8 +109,11 @@ def test_matched_initialization_and_r1():
     torch.testing.assert_close(r1(x), base(x), rtol=0, atol=0)
 
 
-def test_forward_and_summed_shared_gradients():
-    loop, untied = matched_pair()
+@pytest.mark.parametrize("blocks,loops", [(2, 2), (24, 4)])
+def test_forward_and_summed_shared_gradients(blocks, loops):
+    cfg = GPTLoopConfig.from_block_depth(blocks, num_loops=loops, n_embd=64,
+            n_head=1, n_kv_head=1, vocab_size=64, sequence_len=32)
+    loop, untied = matched_pair(cfg)
     x, y = tokens(), tokens()
     torch.testing.assert_close(loop(x), untied(x), rtol=0, atol=0)
     loop(x, y).backward()
@@ -123,7 +126,7 @@ def test_forward_and_summed_shared_gradients():
         if name.startswith("transformer.h."):
             parts = name.split(".")
             grads = []
-            for offset in (0, 2):
+            for offset in range(0, blocks * loops, blocks):
                 parts[2] = str(int(name.split(".")[2]) + offset)
                 grads.append(independent[".".join(parts)].grad)
             expected = sum(grads)
@@ -146,6 +149,38 @@ def test_counts_flops_and_independence():
     assert d24.estimate_flops() == 5_284_823_040
 
 
+def test_physical_depth_24_loops_4():
+    cfg = GPTLoopConfig.from_block_depth(24, num_loops=4, n_embd=1536,
+            n_head=12, n_kv_head=12, vocab_size=32768, sequence_len=2048)
+    assert cfg.block_depth == 24 and cfg.n_layer == 96 and cfg.n_embd == 1536
+    with torch.device("meta"):
+        loop = GPTLoop(cfg)
+        untied = GPTLoopUntied(cfg)
+    assert len(loop.transformer.h) == 24 and len(untied.transformer.h) == 96
+    assert len(loop.window_sizes) == 96
+    assert loop.num_scaling_params()["total"] == 780_140_569
+    assert loop.estimate_flops() == untied.estimate_flops()
+    # Existing checkpoint configs must retain their old interpretation.
+    legacy = GPTLoopConfig(n_layer=24, num_loops=4)
+    assert legacy.block_depth == 6
+
+
+def test_physical_depth_executes_every_block_four_times():
+    cfg = GPTLoopConfig.from_block_depth(24, num_loops=4, n_embd=64,
+            n_head=1, n_kv_head=1, vocab_size=64, sequence_len=32)
+    model = nontrivial(make(cfg=cfg))
+    calls = []
+    handles = [block.register_forward_hook(lambda m, a, o, i=i: calls.append(i))
+               for i, block in enumerate(model.transformer.h)]
+    loss = model(tokens(), tokens())
+    loss.backward()
+    check_finite_gradients(model, loss)
+    assert calls == list(range(24)) * 4
+    assert all(p.grad is not None for p in model.parameters())
+    for handle in handles:
+        handle.remove()
+
+
 def test_execution_counts_and_gqa():
     model = nontrivial(make(cfg=config(n_embd=128, n_head=2, n_kv_head=1, num_loops=4)))
     counts = {"embedding": 0, "head": 0, "block": 0}
@@ -165,9 +200,12 @@ def test_execution_counts_and_gqa():
         handle.remove()
 
 
+@pytest.mark.parametrize("blocks,loops", [(2, 2), (24, 4)])
 @pytest.mark.parametrize("chunks", [[12], [1] * 12, [3, 2, 7]])
-def test_cache_and_causality(chunks):
-    model = nontrivial(make()).eval()
+def test_cache_and_causality(chunks, blocks, loops):
+    cfg = GPTLoopConfig.from_block_depth(blocks, num_loops=loops, n_embd=64,
+            n_head=1, n_kv_head=1, vocab_size=64, sequence_len=32)
+    model = nontrivial(make(cfg=cfg)).eval()
     cfg = model.config
     cache = KVCache(2, cfg.n_kv_head, 32, 64, cfg.n_layer, DEVICE, COMPUTE_DTYPE)
     x = tokens()
@@ -192,8 +230,11 @@ def test_cache_and_causality(chunks):
         model(x, kv_cache=bad)
 
 
-def test_optimizer_checkpoint_and_nonfinite(tmp_path):
-    model = nontrivial(make())
+@pytest.mark.parametrize("blocks,loops", [(2, 2), (24, 4)])
+def test_optimizer_checkpoint_and_nonfinite(tmp_path, blocks, loops):
+    cfg = GPTLoopConfig.from_block_depth(blocks, num_loops=loops, n_embd=64,
+            n_head=1, n_kv_head=1, vocab_size=64, sequence_len=32)
+    model = nontrivial(make(cfg=cfg))
     opt = model.setup_optimizer()
     parameters = [p for group in opt.param_groups for p in group["params"]]
     assert len(parameters) == len({id(p) for p in parameters}) == len(list(model.parameters()))
