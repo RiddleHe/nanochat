@@ -1,0 +1,30 @@
+{
+  "experiment": "vo_independent",
+  "completed_utc": "2026-10-20T08:54:11.389786+00:00",
+  "updates": 200,
+  "train_tokens": 104857600,
+  "trainable_parameters": 11796480,
+  "development": {
+    "ce": 2.4106648741289973,
+    "bpb": 0.7395707351547606,
+    "tokens": 4194304,
+    "bytes": 19695100,
+    "sequences": 2048
+  },
+  "confirmation": {
+    "ce": 2.408867878257297,
+    "bpb": 0.7455212132279748,
+    "tokens": 4194304,
+    "bytes": 19523798,
+    "sequences": 2048
+  },
+  "frozen_weights_unchanged": true,
+  "elapsed_seconds": 7289.448991380865,
+  "median_step_seconds": 33.578790885047056,
+  "peak_gpu_memory_mib": 25554.39794921875,
+  "limitations": [
+    "One adaptation seed and one pretraining seed; exploratory fixed-hyperparameter screen.",
+    "No claim of matched total training FLOPs; no early-training prediction tested.",
+    "All 24 layers targeted together; does not isolate individual bottleneck layers."
+  ]
+}

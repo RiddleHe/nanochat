@@ -1,0 +1,30 @@
+{
+  "experiment": "mlp_shared_small",
+  "completed_utc": "2026-10-20T10:56:41.101791+00:00",
+  "updates": 200,
+  "train_tokens": 104857600,
+  "trainable_parameters": 2949120,
+  "development": {
+    "ce": 2.4445031476789154,
+    "bpb": 0.7499477274997782,
+    "tokens": 4194304,
+    "bytes": 19695100,
+    "sequences": 2048
+  },
+  "confirmation": {
+    "ce": 2.4454488269693684,
+    "bpb": 0.756843947291415,
+    "tokens": 4194304,
+    "bytes": 19523798,
+    "sequences": 2048
+  },
+  "frozen_weights_unchanged": true,
+  "elapsed_seconds": 7458.070618010126,
+  "median_step_seconds": 34.34201794001274,
+  "peak_gpu_memory_mib": 29925.58935546875,
+  "limitations": [
+    "One adaptation seed and one pretraining seed; exploratory fixed-hyperparameter screen.",
+    "No claim of matched total training FLOPs; no early-training prediction tested.",
+    "All 24 layers targeted together; does not isolate individual bottleneck layers."
+  ]
+}
