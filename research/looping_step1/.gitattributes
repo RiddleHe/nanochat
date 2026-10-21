@@ -1,0 +1,4 @@
+recorded/** linguist-generated=true
+docs/figures/** linguist-generated=true
+*.pdf binary linguist-generated=true
+*.png binary linguist-generated=true

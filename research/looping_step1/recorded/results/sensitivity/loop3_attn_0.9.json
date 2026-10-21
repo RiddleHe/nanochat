@@ -1,0 +1,917 @@
+{
+  "loop": 3,
+  "module": "attn",
+  "scale": 0.9,
+  "summary": {
+    "ce": 2.663827764801681,
+    "bpb": 0.8125620457672311,
+    "tokens": 262144,
+    "bytes": 1237218,
+    "sequences": 128
+  },
+  "rows": [
+    {
+      "sequence": 0,
+      "nats": 4540.9951171875,
+      "byte_nats": 4540.1826171875,
+      "bytes": 9772,
+      "tokens": 2048
+    },
+    {
+      "sequence": 1,
+      "nats": 6804.15234375,
+      "byte_nats": 6791.470703125,
+      "bytes": 9163,
+      "tokens": 2048
+    },
+    {
+      "sequence": 2,
+      "nats": 3684.472900390625,
+      "byte_nats": 3677.91796875,
+      "bytes": 10177,
+      "tokens": 2048
+    },
+    {
+      "sequence": 3,
+      "nats": 6003.5517578125,
+      "byte_nats": 5989.80859375,
+      "bytes": 9134,
+      "tokens": 2048
+    },
+    {
+      "sequence": 4,
+      "nats": 6907.2099609375,
+      "byte_nats": 6862.087890625,
+      "bytes": 9274,
+      "tokens": 2048
+    },
+    {
+      "sequence": 5,
+      "nats": 4531.201171875,
+      "byte_nats": 4523.625,
+      "bytes": 9379,
+      "tokens": 2048
+    },
+    {
+      "sequence": 6,
+      "nats": 5381.1748046875,
+      "byte_nats": 5373.4765625,
+      "bytes": 9952,
+      "tokens": 2048
+    },
+    {
+      "sequence": 7,
+      "nats": 5184.193359375,
+      "byte_nats": 5175.68212890625,
+      "bytes": 9183,
+      "tokens": 2048
+    },
+    {
+      "sequence": 8,
+      "nats": 5541.759765625,
+      "byte_nats": 5522.12646484375,
+      "bytes": 8775,
+      "tokens": 2048
+    },
+    {
+      "sequence": 9,
+      "nats": 6016.7109375,
+      "byte_nats": 6014.21435546875,
+      "bytes": 10027,
+      "tokens": 2048
+    },
+    {
+      "sequence": 10,
+      "nats": 5027.26171875,
+      "byte_nats": 5027.26171875,
+      "bytes": 9714,
+      "tokens": 2048
+    },
+    {
+      "sequence": 11,
+      "nats": 5205.6357421875,
+      "byte_nats": 5205.6357421875,
+      "bytes": 10255,
+      "tokens": 2048
+    },
+    {
+      "sequence": 12,
+      "nats": 5186.962890625,
+      "byte_nats": 5186.962890625,
+      "bytes": 9721,
+      "tokens": 2048
+    },
+    {
+      "sequence": 13,
+      "nats": 5260.13916015625,
+      "byte_nats": 5260.13916015625,
+      "bytes": 10242,
+      "tokens": 2048
+    },
+    {
+      "sequence": 14,
+      "nats": 4333.06640625,
+      "byte_nats": 4333.06640625,
+      "bytes": 9469,
+      "tokens": 2048
+    },
+    {
+      "sequence": 15,
+      "nats": 5322.0341796875,
+      "byte_nats": 5322.0341796875,
+      "bytes": 10479,
+      "tokens": 2048
+    },
+    {
+      "sequence": 16,
+      "nats": 5285.6044921875,
+      "byte_nats": 5285.6044921875,
+      "bytes": 10410,
+      "tokens": 2048
+    },
+    {
+      "sequence": 17,
+      "nats": 5869.39111328125,
+      "byte_nats": 5864.31396484375,
+      "bytes": 10043,
+      "tokens": 2048
+    },
+    {
+      "sequence": 18,
+      "nats": 6070.89599609375,
+      "byte_nats": 6057.3193359375,
+      "bytes": 10163,
+      "tokens": 2048
+    },
+    {
+      "sequence": 19,
+      "nats": 5862.154296875,
+      "byte_nats": 5860.3564453125,
+      "bytes": 9617,
+      "tokens": 2048
+    },
+    {
+      "sequence": 20,
+      "nats": 3916.45361328125,
+      "byte_nats": 3885.893310546875,
+      "bytes": 9717,
+      "tokens": 2048
+    },
+    {
+      "sequence": 21,
+      "nats": 6406.73095703125,
+      "byte_nats": 6400.71044921875,
+      "bytes": 9918,
+      "tokens": 2048
+    },
+    {
+      "sequence": 22,
+      "nats": 5403.1240234375,
+      "byte_nats": 5369.9365234375,
+      "bytes": 9905,
+      "tokens": 2048
+    },
+    {
+      "sequence": 23,
+      "nats": 6244.44921875,
+      "byte_nats": 6233.31103515625,
+      "bytes": 9743,
+      "tokens": 2048
+    },
+    {
+      "sequence": 24,
+      "nats": 5721.3251953125,
+      "byte_nats": 5700.95703125,
+      "bytes": 8942,
+      "tokens": 2048
+    },
+    {
+      "sequence": 25,
+      "nats": 5748.63232421875,
+      "byte_nats": 5724.19580078125,
+      "bytes": 9364,
+      "tokens": 2048
+    },
+    {
+      "sequence": 26,
+      "nats": 5473.05419921875,
+      "byte_nats": 5461.0576171875,
+      "bytes": 9905,
+      "tokens": 2048
+    },
+    {
+      "sequence": 27,
+      "nats": 6661.025390625,
+      "byte_nats": 6658.71484375,
+      "bytes": 8981,
+      "tokens": 2048
+    },
+    {
+      "sequence": 28,
+      "nats": 5187.5283203125,
+      "byte_nats": 5177.1787109375,
+      "bytes": 10267,
+      "tokens": 2048
+    },
+    {
+      "sequence": 29,
+      "nats": 6236.9091796875,
+      "byte_nats": 6218.771484375,
+      "bytes": 9594,
+      "tokens": 2048
+    },
+    {
+      "sequence": 30,
+      "nats": 4727.158203125,
+      "byte_nats": 4700.07568359375,
+      "bytes": 10028,
+      "tokens": 2048
+    },
+    {
+      "sequence": 31,
+      "nats": 6022.30810546875,
+      "byte_nats": 6016.0908203125,
+      "bytes": 9816,
+      "tokens": 2048
+    },
+    {
+      "sequence": 32,
+      "nats": 5837.09716796875,
+      "byte_nats": 5826.1005859375,
+      "bytes": 10181,
+      "tokens": 2048
+    },
+    {
+      "sequence": 33,
+      "nats": 5681.455078125,
+      "byte_nats": 5680.3095703125,
+      "bytes": 9226,
+      "tokens": 2048
+    },
+    {
+      "sequence": 34,
+      "nats": 5562.189453125,
+      "byte_nats": 5538.95654296875,
+      "bytes": 9693,
+      "tokens": 2048
+    },
+    {
+      "sequence": 35,
+      "nats": 4573.67919921875,
+      "byte_nats": 4561.25927734375,
+      "bytes": 10432,
+      "tokens": 2048
+    },
+    {
+      "sequence": 36,
+      "nats": 5289.1572265625,
+      "byte_nats": 5283.5791015625,
+      "bytes": 10092,
+      "tokens": 2048
+    },
+    {
+      "sequence": 37,
+      "nats": 5517.83740234375,
+      "byte_nats": 5499.1484375,
+      "bytes": 9991,
+      "tokens": 2048
+    },
+    {
+      "sequence": 38,
+      "nats": 4987.6103515625,
+      "byte_nats": 4977.50048828125,
+      "bytes": 10116,
+      "tokens": 2048
+    },
+    {
+      "sequence": 39,
+      "nats": 4824.2802734375,
+      "byte_nats": 4822.484375,
+      "bytes": 10149,
+      "tokens": 2048
+    },
+    {
+      "sequence": 40,
+      "nats": 5659.3916015625,
+      "byte_nats": 5646.6923828125,
+      "bytes": 9334,
+      "tokens": 2048
+    },
+    {
+      "sequence": 41,
+      "nats": 4996.13623046875,
+      "byte_nats": 4985.8994140625,
+      "bytes": 8611,
+      "tokens": 2048
+    },
+    {
+      "sequence": 42,
+      "nats": 5612.77294921875,
+      "byte_nats": 5607.17041015625,
+      "bytes": 9889,
+      "tokens": 2048
+    },
+    {
+      "sequence": 43,
+      "nats": 6251.150390625,
+      "byte_nats": 6234.234375,
+      "bytes": 9937,
+      "tokens": 2048
+    },
+    {
+      "sequence": 44,
+      "nats": 4504.9111328125,
+      "byte_nats": 4473.326171875,
+      "bytes": 10356,
+      "tokens": 2048
+    },
+    {
+      "sequence": 45,
+      "nats": 5536.19140625,
+      "byte_nats": 5536.19140625,
+      "bytes": 7640,
+      "tokens": 2048
+    },
+    {
+      "sequence": 46,
+      "nats": 6133.47998046875,
+      "byte_nats": 6108.11328125,
+      "bytes": 9317,
+      "tokens": 2048
+    },
+    {
+      "sequence": 47,
+      "nats": 6703.349609375,
+      "byte_nats": 6670.740234375,
+      "bytes": 9473,
+      "tokens": 2048
+    },
+    {
+      "sequence": 48,
+      "nats": 4369.6552734375,
+      "byte_nats": 4345.5341796875,
+      "bytes": 10306,
+      "tokens": 2048
+    },
+    {
+      "sequence": 49,
+      "nats": 4625.5029296875,
+      "byte_nats": 4619.55029296875,
+      "bytes": 10373,
+      "tokens": 2048
+    },
+    {
+      "sequence": 50,
+      "nats": 5819.7109375,
+      "byte_nats": 5801.89208984375,
+      "bytes": 10225,
+      "tokens": 2048
+    },
+    {
+      "sequence": 51,
+      "nats": 5975.92333984375,
+      "byte_nats": 5946.267578125,
+      "bytes": 10107,
+      "tokens": 2048
+    },
+    {
+      "sequence": 52,
+      "nats": 4814.0419921875,
+      "byte_nats": 4803.1689453125,
+      "bytes": 9825,
+      "tokens": 2048
+    },
+    {
+      "sequence": 53,
+      "nats": 4544.3701171875,
+      "byte_nats": 4535.1123046875,
+      "bytes": 9408,
+      "tokens": 2048
+    },
+    {
+      "sequence": 54,
+      "nats": 5383.5625,
+      "byte_nats": 5366.78125,
+      "bytes": 9542,
+      "tokens": 2048
+    },
+    {
+      "sequence": 55,
+      "nats": 5392.28271484375,
+      "byte_nats": 5375.779296875,
+      "bytes": 9841,
+      "tokens": 2048
+    },
+    {
+      "sequence": 56,
+      "nats": 6033.7900390625,
+      "byte_nats": 6001.595703125,
+      "bytes": 9354,
+      "tokens": 2048
+    },
+    {
+      "sequence": 57,
+      "nats": 6422.4580078125,
+      "byte_nats": 6420.0869140625,
+      "bytes": 8952,
+      "tokens": 2048
+    },
+    {
+      "sequence": 58,
+      "nats": 5402.6953125,
+      "byte_nats": 5387.16015625,
+      "bytes": 10584,
+      "tokens": 2048
+    },
+    {
+      "sequence": 59,
+      "nats": 5579.4833984375,
+      "byte_nats": 5569.390625,
+      "bytes": 9821,
+      "tokens": 2048
+    },
+    {
+      "sequence": 60,
+      "nats": 5369.07421875,
+      "byte_nats": 5364.11279296875,
+      "bytes": 9392,
+      "tokens": 2048
+    },
+    {
+      "sequence": 61,
+      "nats": 4325.5869140625,
+      "byte_nats": 4310.1240234375,
+      "bytes": 9265,
+      "tokens": 2048
+    },
+    {
+      "sequence": 62,
+      "nats": 4467.71728515625,
+      "byte_nats": 4467.71728515625,
+      "bytes": 9396,
+      "tokens": 2048
+    },
+    {
+      "sequence": 63,
+      "nats": 4703.8173828125,
+      "byte_nats": 4703.8173828125,
+      "bytes": 9255,
+      "tokens": 2048
+    },
+    {
+      "sequence": 64,
+      "nats": 5461.06396484375,
+      "byte_nats": 5454.328125,
+      "bytes": 9708,
+      "tokens": 2048
+    },
+    {
+      "sequence": 65,
+      "nats": 7255.31982421875,
+      "byte_nats": 7255.31982421875,
+      "bytes": 8330,
+      "tokens": 2048
+    },
+    {
+      "sequence": 66,
+      "nats": 7219.5986328125,
+      "byte_nats": 7219.5986328125,
+      "bytes": 8832,
+      "tokens": 2048
+    },
+    {
+      "sequence": 67,
+      "nats": 6364.4052734375,
+      "byte_nats": 6347.49658203125,
+      "bytes": 7654,
+      "tokens": 2048
+    },
+    {
+      "sequence": 68,
+      "nats": 5844.109375,
+      "byte_nats": 5822.63232421875,
+      "bytes": 9453,
+      "tokens": 2048
+    },
+    {
+      "sequence": 69,
+      "nats": 5698.88916015625,
+      "byte_nats": 5698.88916015625,
+      "bytes": 9254,
+      "tokens": 2048
+    },
+    {
+      "sequence": 70,
+      "nats": 5461.34228515625,
+      "byte_nats": 5448.53076171875,
+      "bytes": 9886,
+      "tokens": 2048
+    },
+    {
+      "sequence": 71,
+      "nats": 6344.32861328125,
+      "byte_nats": 6344.32861328125,
+      "bytes": 10005,
+      "tokens": 2048
+    },
+    {
+      "sequence": 72,
+      "nats": 5914.72265625,
+      "byte_nats": 5914.72265625,
+      "bytes": 10298,
+      "tokens": 2048
+    },
+    {
+      "sequence": 73,
+      "nats": 6373.5703125,
+      "byte_nats": 6371.6171875,
+      "bytes": 10172,
+      "tokens": 2048
+    },
+    {
+      "sequence": 74,
+      "nats": 5582.078125,
+      "byte_nats": 5575.0947265625,
+      "bytes": 10190,
+      "tokens": 2048
+    },
+    {
+      "sequence": 75,
+      "nats": 5456.2119140625,
+      "byte_nats": 5451.0078125,
+      "bytes": 9914,
+      "tokens": 2048
+    },
+    {
+      "sequence": 76,
+      "nats": 5274.10791015625,
+      "byte_nats": 5266.580078125,
+      "bytes": 9316,
+      "tokens": 2048
+    },
+    {
+      "sequence": 77,
+      "nats": 5296.22802734375,
+      "byte_nats": 5274.00146484375,
+      "bytes": 9542,
+      "tokens": 2048
+    },
+    {
+      "sequence": 78,
+      "nats": 4909.86865234375,
+      "byte_nats": 4875.7548828125,
+      "bytes": 9375,
+      "tokens": 2048
+    },
+    {
+      "sequence": 79,
+      "nats": 2900.66162109375,
+      "byte_nats": 2900.66162109375,
+      "bytes": 9402,
+      "tokens": 2048
+    },
+    {
+      "sequence": 80,
+      "nats": 4982.0205078125,
+      "byte_nats": 4961.9853515625,
+      "bytes": 8977,
+      "tokens": 2048
+    },
+    {
+      "sequence": 81,
+      "nats": 5420.18603515625,
+      "byte_nats": 5413.9697265625,
+      "bytes": 8884,
+      "tokens": 2048
+    },
+    {
+      "sequence": 82,
+      "nats": 5290.4521484375,
+      "byte_nats": 5271.1123046875,
+      "bytes": 9511,
+      "tokens": 2048
+    },
+    {
+      "sequence": 83,
+      "nats": 5771.1728515625,
+      "byte_nats": 5753.03759765625,
+      "bytes": 9385,
+      "tokens": 2048
+    },
+    {
+      "sequence": 84,
+      "nats": 5734.591796875,
+      "byte_nats": 5721.25048828125,
+      "bytes": 8283,
+      "tokens": 2048
+    },
+    {
+      "sequence": 85,
+      "nats": 6207.7822265625,
+      "byte_nats": 6207.7822265625,
+      "bytes": 9746,
+      "tokens": 2048
+    },
+    {
+      "sequence": 86,
+      "nats": 6822.693359375,
+      "byte_nats": 6822.693359375,
+      "bytes": 9988,
+      "tokens": 2048
+    },
+    {
+      "sequence": 87,
+      "nats": 6315.3251953125,
+      "byte_nats": 6315.3251953125,
+      "bytes": 9448,
+      "tokens": 2048
+    },
+    {
+      "sequence": 88,
+      "nats": 5102.1962890625,
+      "byte_nats": 5089.45947265625,
+      "bytes": 9876,
+      "tokens": 2048
+    },
+    {
+      "sequence": 89,
+      "nats": 3781.403076171875,
+      "byte_nats": 3766.003173828125,
+      "bytes": 10239,
+      "tokens": 2048
+    },
+    {
+      "sequence": 90,
+      "nats": 4393.2578125,
+      "byte_nats": 4391.271484375,
+      "bytes": 9417,
+      "tokens": 2048
+    },
+    {
+      "sequence": 91,
+      "nats": 5771.1083984375,
+      "byte_nats": 5766.5322265625,
+      "bytes": 10690,
+      "tokens": 2048
+    },
+    {
+      "sequence": 92,
+      "nats": 4868.5029296875,
+      "byte_nats": 4860.5048828125,
+      "bytes": 9423,
+      "tokens": 2048
+    },
+    {
+      "sequence": 93,
+      "nats": 4582.966796875,
+      "byte_nats": 4582.966796875,
+      "bytes": 8563,
+      "tokens": 2048
+    },
+    {
+      "sequence": 94,
+      "nats": 6015.19140625,
+      "byte_nats": 5990.91845703125,
+      "bytes": 8692,
+      "tokens": 2048
+    },
+    {
+      "sequence": 95,
+      "nats": 6204.41552734375,
+      "byte_nats": 6187.39501953125,
+      "bytes": 9911,
+      "tokens": 2048
+    },
+    {
+      "sequence": 96,
+      "nats": 5530.79296875,
+      "byte_nats": 5523.9169921875,
+      "bytes": 10025,
+      "tokens": 2048
+    },
+    {
+      "sequence": 97,
+      "nats": 7372.52978515625,
+      "byte_nats": 7372.52978515625,
+      "bytes": 9086,
+      "tokens": 2048
+    },
+    {
+      "sequence": 98,
+      "nats": 4645.625,
+      "byte_nats": 4631.7548828125,
+      "bytes": 10237,
+      "tokens": 2048
+    },
+    {
+      "sequence": 99,
+      "nats": 3969.050537109375,
+      "byte_nats": 3955.27099609375,
+      "bytes": 10138,
+      "tokens": 2048
+    },
+    {
+      "sequence": 100,
+      "nats": 3967.6064453125,
+      "byte_nats": 3967.5390625,
+      "bytes": 10671,
+      "tokens": 2048
+    },
+    {
+      "sequence": 101,
+      "nats": 5987.8046875,
+      "byte_nats": 5959.30224609375,
+      "bytes": 9657,
+      "tokens": 2048
+    },
+    {
+      "sequence": 102,
+      "nats": 8941.52734375,
+      "byte_nats": 8918.373046875,
+      "bytes": 9585,
+      "tokens": 2048
+    },
+    {
+      "sequence": 103,
+      "nats": 3752.3837890625,
+      "byte_nats": 3741.45068359375,
+      "bytes": 11107,
+      "tokens": 2048
+    },
+    {
+      "sequence": 104,
+      "nats": 3457.30615234375,
+      "byte_nats": 3455.24365234375,
+      "bytes": 10972,
+      "tokens": 2048
+    },
+    {
+      "sequence": 105,
+      "nats": 4883.7421875,
+      "byte_nats": 4877.23095703125,
+      "bytes": 9556,
+      "tokens": 2048
+    },
+    {
+      "sequence": 106,
+      "nats": 5432.5380859375,
+      "byte_nats": 5408.2890625,
+      "bytes": 8990,
+      "tokens": 2048
+    },
+    {
+      "sequence": 107,
+      "nats": 6756.10986328125,
+      "byte_nats": 6753.287109375,
+      "bytes": 8413,
+      "tokens": 2048
+    },
+    {
+      "sequence": 108,
+      "nats": 5449.24365234375,
+      "byte_nats": 5434.6259765625,
+      "bytes": 10201,
+      "tokens": 2048
+    },
+    {
+      "sequence": 109,
+      "nats": 4552.736328125,
+      "byte_nats": 4547.439453125,
+      "bytes": 10067,
+      "tokens": 2048
+    },
+    {
+      "sequence": 110,
+      "nats": 6438.705078125,
+      "byte_nats": 6414.1943359375,
+      "bytes": 10440,
+      "tokens": 2048
+    },
+    {
+      "sequence": 111,
+      "nats": 4800.36328125,
+      "byte_nats": 4786.365234375,
+      "bytes": 10463,
+      "tokens": 2048
+    },
+    {
+      "sequence": 112,
+      "nats": 4512.3095703125,
+      "byte_nats": 4474.35693359375,
+      "bytes": 10099,
+      "tokens": 2048
+    },
+    {
+      "sequence": 113,
+      "nats": 4980.1806640625,
+      "byte_nats": 4964.8515625,
+      "bytes": 10620,
+      "tokens": 2048
+    },
+    {
+      "sequence": 114,
+      "nats": 5535.5458984375,
+      "byte_nats": 5533.8798828125,
+      "bytes": 8660,
+      "tokens": 2048
+    },
+    {
+      "sequence": 115,
+      "nats": 6171.185546875,
+      "byte_nats": 6163.0693359375,
+      "bytes": 10082,
+      "tokens": 2048
+    },
+    {
+      "sequence": 116,
+      "nats": 5104.31640625,
+      "byte_nats": 5097.439453125,
+      "bytes": 9077,
+      "tokens": 2048
+    },
+    {
+      "sequence": 117,
+      "nats": 5107.72802734375,
+      "byte_nats": 5099.5361328125,
+      "bytes": 9378,
+      "tokens": 2048
+    },
+    {
+      "sequence": 118,
+      "nats": 4494.5166015625,
+      "byte_nats": 4476.4189453125,
+      "bytes": 9879,
+      "tokens": 2048
+    },
+    {
+      "sequence": 119,
+      "nats": 5814.7412109375,
+      "byte_nats": 5804.599609375,
+      "bytes": 9535,
+      "tokens": 2048
+    },
+    {
+      "sequence": 120,
+      "nats": 5172.78173828125,
+      "byte_nats": 5141.10693359375,
+      "bytes": 9314,
+      "tokens": 2048
+    },
+    {
+      "sequence": 121,
+      "nats": 5624.720703125,
+      "byte_nats": 5609.2783203125,
+      "bytes": 9912,
+      "tokens": 2048
+    },
+    {
+      "sequence": 122,
+      "nats": 5091.4521484375,
+      "byte_nats": 5075.09814453125,
+      "bytes": 9287,
+      "tokens": 2048
+    },
+    {
+      "sequence": 123,
+      "nats": 6428.59423828125,
+      "byte_nats": 6427.1669921875,
+      "bytes": 9555,
+      "tokens": 2048
+    },
+    {
+      "sequence": 124,
+      "nats": 6331.49462890625,
+      "byte_nats": 6327.251953125,
+      "bytes": 9641,
+      "tokens": 2048
+    },
+    {
+      "sequence": 125,
+      "nats": 5859.6708984375,
+      "byte_nats": 5850.15380859375,
+      "bytes": 9297,
+      "tokens": 2048
+    },
+    {
+      "sequence": 126,
+      "nats": 4977.2861328125,
+      "byte_nats": 4962.45458984375,
+      "bytes": 10126,
+      "tokens": 2048
+    },
+    {
+      "sequence": 127,
+      "nats": 5874.474609375,
+      "byte_nats": 5865.99560546875,
+      "bytes": 9572,
+      "tokens": 2048
+    }
+  ],
+  "delta_ce": -0.06232719775289297,
+  "ci95": [
+    -0.07583322513382881,
+    -0.05020075247157365
+  ],
+  "improved_fraction": 0.9765625,
+  "uncertainty": "paired packed-sequence bootstrap, exploratory/unadjusted"
+}
