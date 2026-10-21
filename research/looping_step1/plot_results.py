@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from common import ROOT, SOURCE, GROUPS, VARIANTS, write_json, now
+from common import ROOT, GROUPS, VARIANTS, write_json, now
 
 OUT = ROOT / "figures"
 RESULTS = ROOT / "results"
@@ -187,11 +187,12 @@ def adaptation():
 def main():
     global OUT, RESULTS
     parser = argparse.ArgumentParser(description="Plot recorded results without a model or GPU")
-    parser.add_argument("--recorded", action="store_true")
+    parser.add_argument("--input", type=Path, default=ROOT, help="Run directory containing results/")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    if args.recorded:
-        RESULTS = SOURCE / "recorded/results"
+    RESULTS = args.input / "results"
+    if not RESULTS.is_dir():
+        parser.error(f"Results directory not found: {RESULTS}")
     OUT = args.output or (ROOT / "figures")
     OUT.mkdir(parents=True, exist_ok=True)
     plt.rcParams.update({
