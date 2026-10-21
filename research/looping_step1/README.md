@@ -4,21 +4,17 @@ This directory packages the three experiments completed on 2026-10-20.
 It does not change the baseline architecture, training code, checkpoint, or data.
 The target branch is `reasearch-looping` (spelling intentional), not `master`.
 
-Read [the illustrated English guide](docs/looping_step1_guide.pdf) for the full
-setup, calculations, figures, and interpretation. Numeric measurements are in
-`recorded/`; plots can be regenerated on a CPU without the model.
+This is a code-only package. Results, logs, figures, PDF documentation, datasets,
+and checkpoints are stored separately and are not tracked in this directory.
 
-## The question and the result
+## The question
 
 Do different uses of a shared Transformer block need different parameters?
 We measured local gradient directions, output-scale sensitivity, and the effect
 of giving each loop its own low-rank adapter.
 
-Independent adapters beat smaller shared adapters in all three module groups.
-They did **not clearly beat the parameter-matched shared control**: Q/K was
-slightly worse, V/O was effectively tied, and MLP was worse. This is a
-single-seed, final-checkpoint screen, not proof that sharing hurts quality,
-not an early-training predictor, and not a matched-total-FLOPs comparison.
+This is a single-seed, final-checkpoint screen, not an early-training predictor
+or a matched-total-FLOPs comparison.
 
 ## File map
 
@@ -30,12 +26,9 @@ not an early-training predictor, and not a matched-total-FLOPs comparison.
 | `experiments.py` | The three experiment routines and original-model evaluation |
 | `launch.py` | Three GPU workers, locks, shared LoRA queue, and completion plots |
 | `tests.py` | Tiny-model CPU tests and real-checkpoint GPU preflight |
-| `test_statistics.py` | Mean-order counterexample and all recorded gradient-cell checks |
+| `test_statistics.py` | Direction examples, mean-order counterexample, optional external-result audit |
 | `plot_results.py` | Five measured-result figure families; no model required |
 | `analyze_results.py` | Validate evaluation records; paired confirmation comparisons |
-| `docs/build_guide.py` | Build the English illustrated PDF with ReportLab |
-| `recorded/provenance.json` | Original run settings, source hashes, and historical validation |
-| `recorded/results/` | Numeric JSON/JSONL only; no text corpus or model weights |
 
 The baseline implementation is `nanochat/model/gpt_loop.py`, built on
 `nanochat/model/gpt_base.py`. It is not reimplemented here.
@@ -88,20 +81,18 @@ Within batch b, compute `c_b(r,s) = dot(g_r,b, g_s,b) / (norm(g_r,b) norm(g_s,b)
 The heatmap displays `mean_b c_b`, NOT `cos(mean_b g_r,b, mean_b g_s,b)`.
 The second figure averages within-batch norm shares. Small- and large-gradient
 batches have equal weight in the cosine mean. Invalid near-zero norms are
-masked; no measured pair was masked in this run.
+masked.
 
 Blue is aligned (+1); white is orthogonal (0); red is opposed (-1).
 Rows are physical layers, columns are loop pairs, and panels are matrix types.
 These are raw gradient directions, not Adam-preconditioned update directions.
 Negative cosine describes local contributions; it does not prove that untying helps.
 
-At layer 14 MLP expansion, loop pairs 2/3 and 2/4 have mean cosines -0.478904
-and -0.502525. They are negative in 30/32 and 31/32 batches, respectively.
 Mean-gradient cosine was NOT measured. It cannot be recovered from the stored
 per-batch cosines and norms; new gradient measurement, not retraining, is needed.
 
-The sum of four contributions was checked against autograd's shared-weight
-gradient on every batch. Maximum recorded relative error: 4.263e-8.
+The sum of four contributions is checked against autograd's shared-weight
+gradient on every batch.
 
 ## Experiment 2: output-scale sensitivity
 
@@ -152,36 +143,33 @@ all prediction tokens. Paired confirmation intervals resample the same sequence
 indices for both models and recompute the ratio of sums, not an unweighted mean
 of per-sequence BPBs.
 
-| Confirmation BPB (lower is better) | Shared small | Independent | Shared large |
-| --- | ---: | ---: | ---: |
-| Q/K | 0.766377 | 0.758668 | 0.757922 |
-| V/O | 0.750682 | 0.745521 | 0.745553 |
-| MLP | 0.756844 | 0.752161 | 0.747933 |
-
-The original model scores 0.851886 on this same confirmation selection. Gains
-over it include extra parameters and extra training, not just relaxed sharing.
+Gains over the original model include extra parameters and extra training,
+not just relaxed sharing. Compare independent adapters with both shared controls.
 
 ## Inspect and reproduce the analysis (CPU only)
 
-From the repository root, with Python, NumPy, and Matplotlib installed:
+From the repository root, test without downloading results:
 
 ```bash
 python research/looping_step1/test_statistics.py
-python research/looping_step1/plot_results.py --recorded
-python research/looping_step1/analyze_results.py
 python research/looping_step1/tests.py cpu
 ```
 
-The first test uses only the standard library. The last command needs PyTorch
-2.10 and the repository CPU dependencies; it runs 41 tiny-model checks.
-Plots go to `research/looping_step1/runs/local/figures`; comparisons and analysis
-go to `research/looping_step1/runs/analysis`. They do not touch archived records.
+The first command uses only the standard library; its measured-data audit is
+skipped unless an external run directory is supplied. The last command needs
+PyTorch 2.10 and the repository CPU dependencies; it runs 41 tiny-model checks.
 
-To build the PDF, additionally install ReportLab, then run:
+To analyze a completed run, install NumPy and Matplotlib and point to its
+`results/` and `experiment_manifest.json` (not included in Git):
 
 ```bash
-python research/looping_step1/docs/build_guide.py
+python research/looping_step1/test_statistics.py --input /absolute/path/to/completed-run
+python research/looping_step1/plot_results.py --input /absolute/path/to/completed-run
+python research/looping_step1/analyze_results.py --input /absolute/path/to/completed-run
 ```
+
+Plots go to `research/looping_step1/runs/local/figures`; comparisons and analysis
+go to `research/looping_step1/runs/analysis`. These outputs are ignored by Git.
 
 ## Reproduce measurement/training (explicit GPU action)
 
@@ -219,4 +207,4 @@ Gradient disagreement is batch-scale-dependent. Confirmation intervals do not
 account for seed variability, document clustering, or all exploratory choices.
 The next hypothesis is whether a LOCAL high-conflict position benefits from
 untying more than a low-conflict control, after controlling for output scaling.
-No follow-up GPU experiment is started by this package or document build.
+No follow-up GPU experiment is started automatically by this package.

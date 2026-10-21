@@ -1,6 +1,11 @@
 /runs/
 /baseline/
+/recorded/
+/docs/
+*.json
+*.jsonl
+*.log
+*.png
+*.pdf
 *.pt
 *.npy
-!recorded/results/
-!recorded/results/**

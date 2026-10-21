@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 ROOT = Path(__file__).resolve().parent
 parser = argparse.ArgumentParser(description="Validate recorded results and reproduce paired comparisons")
-parser.add_argument("--input", type=Path, default=ROOT / "recorded")
+parser.add_argument("--input", type=Path, required=True, help="Run directory containing results/ and experiment_manifest.json")
 parser.add_argument("--output", type=Path, default=ROOT / "runs/analysis")
 args = parser.parse_args()
 COLLECTED = args.input
@@ -55,7 +55,7 @@ baseline = {split: read(RESULTS / f"baseline_eval/{split}.json")
             for split in ("development", "confirmation")}
 for value in baseline.values():
     check_eval(value)
-manifest = read(COLLECTED / "provenance.json")
+manifest = read(COLLECTED / "experiment_manifest.json")
 report = {
     "scope": "Final-checkpoint exploratory screen; one pretraining/adaptation seed.",
     "baseline": {s: o["summary"] for s, o in baseline.items()},
@@ -139,9 +139,8 @@ report["audit"] = {
     "nine_runs_200_steps_and_all_evaluations_valid": True,
     "all_zero_adapter_evaluations_equal_baseline": True,
     "all_nine_frozen_weights_checks_passed": True,
-    "historical_remote_checkpoint_audit": manifest["historical_validation"]["checkpoint_audit"],
-    "audit_scope": "This script validates numeric records only. Checkpoints and GPU kernels are not bundled or rechecked here.",
-    "original_checkpoint_file_sha256": "e1f2a8988470cf346a9dfb23e8934879a64c70f6b8044997afa486bc93751e05",
+    "audit_scope": "This script validates numeric records only. Checkpoints and GPU kernels are not rechecked here.",
+    "original_checkpoint_file_sha256": manifest["checkpoint_sha256"],
 }
 (OUT / "final_analysis.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
 
