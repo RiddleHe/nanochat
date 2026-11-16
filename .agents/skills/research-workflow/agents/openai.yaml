@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research Workflow"
+  short_description: "Run research with compact memory and evidence checks"
+  default_prompt: "Use $research-workflow to set up project memory and turn my research question into a testable plan."

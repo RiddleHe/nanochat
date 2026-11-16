@@ -26,6 +26,34 @@ Add a function to `nanorl/loss.py` and register it in the `ALGORITHMS` dictionar
 
 Training is driven by the script under `nanorl/runs/`, which launches a vLLM rollout worker for fast batched sampling and a separate `torchrun` trainer; the two stay strictly in sync so every step's rollouts come from the just-checkpointed weights. See `knowledge/rl_training.md` for the longer guide.
 
+# Shared research agent workflow
+
+The optional [research-workflow skill](.agents/skills/research-workflow/SKILL.md)
+provides compact memory, task planning, experiment checks, and evidence-based
+handoffs. It includes a request-to-task prompt step; no external prompt service,
+account, API key, or experiment data is bundled.
+
+In Codex, open this repository and ask:
+
+> Use $research-workflow to set up this project's runbook and memory, then turn my
+> research question into a testable plan. Reuse existing records if present.
+
+For another repository, copy `.agents/skills/research-workflow/` into that repo's
+`.agents/skills/` directory. For another agent product, ask it to read SKILL.md and
+follow its linked instructions; automatic discovery depends on the product.
+The setup helper needs only Python 3.9+ and creates Git-ignored `.research/` files:
+
+```bash
+python3 .agents/skills/research-workflow/scripts/context.py init
+python3 .agents/skills/research-workflow/scripts/context.py resume
+```
+
+Your agent fills the short state/task records with your question, constraints,
+and evidence paths. It should merge a recovery pointer into existing project agent
+instructions, preserving other rules. No background monitoring, memory service,
+training, or publishing starts automatically. See [memory layout](.agents/skills/research-workflow/references/memory.md)
+and [research cases](.agents/skills/research-workflow/references/cases.md).
+
 # Cite
 
 ```bibtex

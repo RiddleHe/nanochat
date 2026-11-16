@@ -20,3 +20,6 @@ eval_logs/
 !.claude/skills/
 
 .DS_Store
+
+# Private agent state; the reusable workflow itself lives in .agents/skills.
+.research/
