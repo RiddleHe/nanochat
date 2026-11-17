@@ -1,0 +1,33 @@
+{
+  "study": "bov_d24_f3p91e19",
+  "reference": "arch_d24_gpt_base/meta_007809.json",
+  "seed": 42,
+  "dtype": "bfloat16",
+  "trainer_args": {
+    "depth": 24,
+    "aspect-ratio": 64,
+    "head-dim": 128,
+    "max-seq-len": 2048,
+    "window-pattern": "SSSL",
+    "device-batch-size": 4,
+    "total-batch-size": 1048576,
+    "num-iterations": -1,
+    "target-flops": 3.91e19,
+    "target-param-data-ratio": -1,
+    "embedding-lr": 0.3,
+    "unembedding-lr": 0.008,
+    "matrix-lr": 0.02,
+    "scalar-lr": 0.5,
+    "weight-decay": 0.28,
+    "warmup-steps": 40,
+    "warmdown-ratio": 0.65,
+    "final-lr-frac": 0.05,
+    "resume-from-step": -1,
+    "eval-every": 50,
+    "eval-tokens": 41943040,
+    "core-metric-every": -1,
+    "sample-every": -1,
+    "save-every": 1000,
+    "run": "dummy"
+  }
+}

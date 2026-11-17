@@ -14,6 +14,8 @@ Once the change is in `gpt_base.py`, register it in `nanochat/model_registry.py`
 
 Pretraining is launched from `scripts/base_train.py` via `torchrun`, which handles distributed setup, the learning-rate schedule, gradient accumulation, and periodic validation. For ablation studies, `runs/ablations.sh` wraps a batch of variants at the depth-appropriate compute budget (FLOPs defaults baked in for d12 and d24), automatically picks a sensible total batch size, and writes results into a depth-specific results folder. Variants whose checkpoint already exists in that folder are skipped, so a new variant slots in alongside the principled set without re-training the others. Validation bits-per-byte is logged throughout training and the per-variant curves get aggregated into a single CSV for direct comparison.
 
+For the fixed d24 BoV baseline budget, see [canonical recipes](runs/README.md). They pin 3.91e19 estimated training FLOPs and 1,048,576 tokens per optimizer step, with `gpt_base` and `gpt_base_no_embed_norm` entry points.
+
 Evaluation runs after training via `scripts/base_eval.py`. It scores the model on the DCLM CORE suite — 21 in-context-learning tasks defined in `configs/core.yaml` using prompt fixtures from `eval_bundle/` — by either picking the highest-log-probability answer (multiple choice) or generating a short answer and matching exactly (language modeling). Output lands as one CSV per model with per-task raw accuracy and a centered score that subtracts each task's random-guessing baseline, plus a single CORE aggregate that averages the centered scores.
 
 # nanoRL

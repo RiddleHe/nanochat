@@ -360,6 +360,9 @@ class GPTBase(nn.Module):
             group["initial_lr"] = group["lr"]
         return optimizer
 
+    def _prepare_embeddings(self, embeddings):
+        return norm(embeddings)
+
     def forward(self, idx, targets=None, kv_cache=None, loss_reduction='mean'):
         B, T = idx.size()
 
@@ -374,7 +377,7 @@ class GPTBase(nn.Module):
         # Embed the tokens
         x = self.transformer.wte(idx) # embed current token
         x = x.to(COMPUTE_DTYPE) # ensure activations are in compute dtype (no-op usually, but active for fp16 code path)
-        x = norm(x)
+        x = self._prepare_embeddings(x)
 
         # Forward the trunk of the Transformer.
         for block in self.transformer.h:

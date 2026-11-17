@@ -26,6 +26,7 @@ class GPTNoLambdaConfig(GPTConfig):
 # gpt_base.py family: pre-norm Transformer (no value embeds, lambdas, or smear)
 # -----------------------------------------------------------------------------
 from nanochat.model.gpt_base import GPTBaseConfig, GPTBase
+from nanochat.model.gpt_base_no_embed_norm import GPTBaseNoEmbedNorm
 
 # -----------------------------------------------------------------------------
 # Registry: model_type string -> (ConfigClass, ModelClass)
@@ -36,6 +37,7 @@ MODELS = {
     "gpt_nolambda":     (GPTNoLambdaConfig,     GPT),
     # gpt_base.py family
     "gpt_base":         (GPTBaseConfig,         GPTBase),
+    "gpt_base_no_embed_norm": (GPTBaseConfig,    GPTBaseNoEmbedNorm),
 }
 
 
