@@ -252,9 +252,9 @@ NANOCHAT_BASE_DIR=/local-ssd/mh3897 bash
 runs/bov/d24_f3p91e19/gpt_base_split_embed_shared_out_no_embed_norm.sh --dry-run`
 (as one shell command). Tests are in
 `tests/test_gpt_base_split_embed_shared_out_no_embed_norm.py`.
-`work/prepare_split_embed.py` freezes a new run, synthetic validation scripts,
-environment and dependencies; its `launch.sh` requires passed validation and
-explicit idle GPUs. Preparation and validation do not start dataset training.
+Use the canonical recipe for CPU/meta preparation (`--dry-run`) or explicit
+training (`--launch` with `CUDA_VISIBLE_DEVICES`). These commands do not copy
+source code or start a queue.
 
 ### Split embedding chunks with per-head output maps
 
@@ -273,11 +273,9 @@ work without any correction. Per target, removing W_V saves `2*D*D` forward or
 the existing Muon optimizer; there are no new scalar parameters.
 
 Model tests: `tests/test_gpt_base_split_embed_head_out_no_embed_norm.py`.
-`work/prepare_split_embed_head_out.py` freezes code, recipe, dependencies and
-synthetic GPU checks. `work/finalize_split_embed_head_out_validation.py` seals
-CPU/GPU results; the frozen launcher requires a passed two-rank preflight before
-training. `work/queue_head_out_after_single.py` queues it after a successful
-Single QK run and complete final checkpoint on idle GPUs 4/7.
+The canonical recipe resolves the fixed budget and starts training only with
+`--launch` and explicit `CUDA_VISIBLE_DEVICES`. Existing external run directories
+retain their copied validation and launch scripts.
 
 To add a sequential run while a queue is live, create a separate frozen queue
 with an explicit dependency on the first run's successful completion and complete
@@ -307,14 +305,12 @@ pooled model accepts summed head probabilities; its estimator adds `(H-1)*T`
 per target for both forward and training (the sum backward broadcasts gradients).
 Normalization remains excluded under the shared FLOP accounting convention.
 
-Separate prepare-only recipes: `pooled_qk_norm_input_sum.sh`,
-`single_qk_norm_input.sh`, and `multi_head_norm_input.sh`. Their D24 horizons are
-8,072, 8,779, and 8,072 steps. `work/prepare_norm_input.py` freezes distinct run
-directories; `work/norm-input-prepared-runs.json` indexes them. Each frozen
-`launch.sh --launch --gpus A,B` requires CPU/GPU validation and automatically
-runs the two-rank preflight before training. Default invocation only verifies.
-The single-head availability queue is `work/queue_norm_input.py`; it starts only
-its configured target after two consecutive idle observations of both GPUs.
+Separate recipes: `pooled_qk_norm_input_sum.sh`, `single_qk_norm_input.sh`,
+and `multi_head_norm_input.sh`. Their D24 horizons are 8,072, 8,779, and 8,072
+steps. Each recipe defaults to CPU/meta preparation and accepts explicit
+`--launch` with `CUDA_VISIBLE_DEVICES`. They do not create source snapshots,
+run GPU validation, or queue jobs. Already-prepared external runs retain their
+independent launch scripts and validation requirements.
 
 ### Projected single-head normalized values
 
@@ -332,16 +328,16 @@ FLOPs/token, 9,250 steps. Targets use FA3/SDPA; the uniform KV cache retains its
 allocation but uses only its first key/value head slot at targets.
 
 Recipe: `runs/bov/d24_f3p91e19/single_qk_value_proj_norm_input.sh`.
-Prepare and validate a separate frozen standby run with the research Python:
+Prepare without launching, using an existing tokenizer and dataset:
 
 ```bash
-python work/prepare_norm_input.py --variant single_qk_value_proj_norm_input --index work/value-proj-norm-input-prepared-runs.json
-python work/validate_norm_input_cpu.py --index work/value-proj-norm-input-prepared-runs.json
+PYTHON=/hdd/mh3897/nanochat/.venv/bin/python \
+NANOCHAT_BASE_DIR=/local-ssd/mh3897 \
+bash runs/bov/d24_f3p91e19/single_qk_value_proj_norm_input.sh --gpu-count 2 --dry-run
 ```
 
-The index records the frozen run directory. Its `launch.sh` verifies dependencies
-without starting anything; `launch.sh --launch --gpus A,B` requires two idle
-GPUs and completes pending synthetic GPU checks before dataset training. No
-queue is created by preparation. Model tests independently check dense attention
-and gradients, narrow projections, scalar optimizer membership, normalized input,
-cache behavior, checkpoint loading, and the analytical budget.
+Explicit `--launch` with `CUDA_VISIBLE_DEVICES` starts training directly.
+Model tests independently check dense attention and gradients, narrow projections,
+scalar optimizer membership, normalized input, cache behavior, checkpoint loading,
+and the analytical budget. Existing external run directories keep their own
+launchers and validation records.
