@@ -1,0 +1,136 @@
+<div id="combined-source-norms">
+  <style>
+    #combined-source-norms {position:relative;color-scheme:dark;color:var(--foreground);background:var(--background)}
+    #combined-source-norms h2 {padding-right:90px}
+    #combined-source-norms .chart {display:block;width:100%;margin:12px 0}
+    #combined-source-norms .chart text {fill:var(--foreground);font-size:12px;font-weight:400}
+    #combined-source-norms .legend {display:flex;gap:12px 18px;flex-wrap:wrap;align-items:center;margin-top:12px}
+    #combined-source-norms .legend button {display:inline-flex;gap:6px;align-items:center;background:transparent;border:0;padding:0;color:var(--foreground);font:inherit}
+    #combined-source-norms .legend button[aria-pressed="false"] {opacity:.45}
+    #combined-source-norms .swatch {display:inline-block;width:18px;height:3px}
+    #combined-source-norms .key {display:inline-flex;align-items:center;gap:6px}
+    #combined-source-norms .key-line {width:24px;display:inline-block;border-top:2px dashed var(--foreground)}
+    #combined-source-norms .key-line.short {width:16px}
+    #combined-source-norms .tooltip {position:absolute;pointer-events:none;background:var(--popover);color:var(--popover-foreground);padding:9px 12px;max-width:100%;box-sizing:border-box;z-index:2}
+    #combined-source-norms .hover-row {margin-top:5px}
+    @media (pointer:coarse) {#combined-source-norms .legend button {min-height:44px}}
+  </style>
+  <h2>Embedding + attention + MLP · L2 norms</h2>
+  <div class="subtitle text-small"></div>
+  <div class="legend text-small" aria-label="Models">
+    <button type="button" class="cursor-interaction" data-series="baseline" aria-pressed="true"><span class="swatch" style="background:var(--viz-series-1)"></span>● GPTBase</button>
+    <button type="button" class="cursor-interaction" data-series="variant" aria-pressed="true"><span class="swatch" style="background:var(--viz-series-2)"></span>■ No norm(x0)</button>
+    <span>Shading: mean ±1 SD</span>
+  </div>
+  <div class="legend text-small" aria-label="Connection styles">
+    <span class="key"><svg width="28" height="12" aria-hidden="true"><line x1="0" x2="28" y1="6" y2="6" stroke="currentColor" stroke-width="2" stroke-dasharray="7 4"></line></svg>A: attention</span>
+    <span class="key"><svg width="28" height="12" aria-hidden="true"><line x1="0" x2="28" y1="6" y2="6" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"></line></svg>M: MLP</span>
+  </div>
+  <svg class="chart" role="img" aria-label="Full validation mean L2 norms for Emb, attention, and MLP outputs in GPTBase and GPTBaseNoEmbedNorm, with token population standard deviation bands. Attention and MLP points are connected separately by dashed lines."></svg>
+  <div class="boundary text-small"></div>
+  <div class="band-note text-small" hidden></div>
+  <div class="tooltip text-small tabular-nums" role="tooltip" hidden></div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+  (()=>{
+    const root=document.getElementById('combined-source-norms'),data=__NORM_DATA__;
+    const svg=d3.select(root.querySelector('.chart')),tip=root.querySelector('.tooltip');
+    const fmt=new Intl.NumberFormat('en-US'),f=v=>v.toLocaleString('en-US',{maximumFractionDigits:2});
+    const models=data.series.map((s,i)=>({...s,color:`var(--viz-series-${i+1})`}));
+    const groups=models.flatMap(s=>['attention','mlp'].map(family=>({...s,id:s.id+'-'+family,model:s.id,family,values:s.values.filter(p=>p.family===family)})));
+    const logY=data.y_scale==='log',domainX=d3.extent(data.points,p=>p.x);
+    const sourceLabel=v=>v===-1?'Emb':(v%2===0?'A':'M')+Math.floor(v/2);
+    root.querySelector('.subtitle').textContent=`${fmt.format(data.tokens)} token occurrences · full validation · ${fmt.format(data.dimensions)} dimensions`;
+    root.querySelector('.boundary').textContent=(data.baseline_normalized_embedding?'Emb: GPTBase after RMSNorm; no norm(x0) raw':'Emb: raw lookup in both models')+' · attention/MLP: before residual addition';
+    let visible=new Set(models.map(s=>s.id)),pinned=null,lastDomain=null,lastWidth=null;
+    function restore(state){const s=state?.modelContent;if(s?.view!=='combined-source-norms'||s.run_id!==data.run_id)return;if(Array.isArray(s.visible))visible=new Set(s.visible.filter(id=>models.some(m=>m.id===id)));pinned=Number.isFinite(s.position)&&s.position>=domainX[0]&&s.position<=domainX[1]?s.position:null;}
+    function save(){window.openai?.setWidgetState({modelContent:{view:'combined-source-norms',run_id:data.run_id,visible:[...visible],position:pinned},privateContent:null}).catch(()=>{});}
+    restore(window.openai?.widgetState);
+    function interpolate(values,at){
+      if(at<values[0].x||at>values.at(-1).x)return null;
+      const j=d3.bisector(p=>p.x).left(values,at);if(j===0)return {...values[0],exact:true};
+      if(j===values.length)return {...values.at(-1),exact:true};
+      const a=values[j-1],b=values[j],t=(at-a.x)/(b.x-a.x);
+      if(t<1e-8)return {...a,exact:true};if(t>1-1e-8)return {...b,exact:true};
+      return {x:at,mean:logY?Math.exp(Math.log(a.mean)+t*(Math.log(b.mean)-Math.log(a.mean))):a.mean+t*(b.mean-a.mean),std:a.std+t*(b.std-a.std),count:a.count,exact:false};
+    }
+    function draw(animate=false){
+      const w=root.getBoundingClientRect().width,h=w<440?410:460,l=w<440?76:92,r=18,t=20,b=76;
+      const x=d3.scaleLinear().domain(domainX).range([l+6,w-r-6]);
+      const shown=models.filter(s=>visible.has(s.id)).flatMap(s=>s.values),values=shown.length?shown:data.points;
+      const extent=d3.extent([...values.flatMap(p=>[p.lower,p.mean,p.upper]),...data.references.map(p=>p.value)].filter(v=>!logY||v>0));
+      const y=(logY?d3.scaleLog().domain([extent[0]/1.06,extent[1]*1.06]).nice():d3.scaleLinear().domain([0,extent[1]*1.06]).nice()).range([h-b-6,t+6]);
+      const oldY=y.copy().domain(lastDomain||y.domain()),transition=animate&&lastWidth===w&&!matchMedia('(prefers-reduced-motion: reduce)').matches;lastDomain=y.domain();lastWidth=w;
+      root.dataset.yDomain=JSON.stringify(y.domain());
+      const note=root.querySelector('.band-note');note.hidden=!shown.some(p=>p.lower<=0);note.textContent=logY?`SD bands extending below zero are clipped at the log-axis floor (${fmt.format(y.domain()[0])}).`:'SD bands clipped at zero.';
+      svg.selectAll('*').remove();svg.attr('viewBox',`0 0 ${w} ${h}`);
+      svg.append('title').text('GPTBase and GPTBaseNoEmbedNorm: all source L2 norms');
+      svg.append('desc').text('49 positions: Emb then alternating A0, M0 through A23, M23. Each model has separate dashed attention and MLP curves. Emb is standalone. Shading shows population standard deviation across token occurrences, not a confidence interval.');
+      svg.append('defs').append('clipPath').attr('id','combined-norm-clip').append('rect').attr('x',l).attr('y',t).attr('width',w-l-r).attr('height',h-b-t);
+      svg.append('rect').attr('data-chart-frame','').attr('x',l).attr('y',t).attr('width',w-l-r).attr('height',h-b-t).attr('fill','none').attr('stroke','var(--border)');
+      const factors=logY&&Math.log10(y.domain()[1]/y.domain()[0])>3?[1]:[1,2,5];
+      for(const v of (logY?y.ticks().filter(v=>factors.some(k=>Math.abs(v/10**Math.floor(Math.log10(v))-k)<1e-8)):y.ticks(5))){
+        svg.append('line').attr('x1',l).attr('x2',w-r).attr('y1',y(v)).attr('y2',y(v)).attr('stroke','var(--border)');
+        svg.append('text').attr('x',l-10).attr('y',y(v)+4).attr('text-anchor','end').text(fmt.format(v));
+      }
+      const ticks=w<440?[-1,16,33,47]:[-1,7,16,23,32,39,47];
+      for(const v of ticks)svg.append('text').attr('data-x-tick','').attr('x',x(v)).attr('y',h-b+23).attr('text-anchor',v===-1?'start':v===47?'end':'middle').text(sourceLabel(v));
+      svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(l+w-r)/2).attr('y',h-17).attr('text-anchor','middle').text(w<440?'Emb, A0, M0, …, A23, M23':'Source · Emb, A0, M0, A1, M1, …, A23, M23');
+      svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(18,${(t+h-b)/2}) rotate(-90)`).attr('text-anchor','middle').text(logY?'Mean L2 norm · log scale':'Mean L2 norm');
+      for(const ref of data.references){
+        svg.append('line').attr('data-reference',ref.id).attr('data-value',ref.value).attr('x1',l).attr('x2',w-r).attr('y1',y(ref.value)).attr('y2',y(ref.value)).attr('stroke','var(--foreground)').attr('stroke-opacity',.6).attr('stroke-dasharray',ref.dash);
+        svg.append('text').attr('data-reference-label','').attr('x',w-r-4).attr('y',y(ref.value)-8).attr('text-anchor','end').text(`${w<440?'Raw Emb':ref.label} ${f(ref.value)}`);
+      }
+      for(const model of models){
+        root.querySelector(`button[data-series="${model.id}"]`).setAttribute('aria-pressed',visible.has(model.id));
+        const g=svg.append('g').attr('data-series-group',model.id).attr('display',visible.has(model.id)?null:'none').attr('clip-path','url(#combined-norm-clip)');
+        for(const s of groups.filter(g=>g.model===model.id)){
+          const band=scale=>d3.area().x(p=>x(p.x)).y0(p=>scale(logY?Math.max(scale.domain()[0],p.lower):p.lower)).y1(p=>scale(p.upper));
+          const line=scale=>d3.line().x(p=>x(p.x)).y(p=>scale(p.mean));
+          const a=g.append('path').datum(s.values).attr('data-band',s.id).attr('d',band(transition?oldY:y)).attr('fill',s.color).attr('fill-opacity',.12);
+          const p=g.append('path').datum(s.values).attr('data-mean-line',s.id).attr('d',line(transition?oldY:y)).attr('fill','none').attr('stroke',s.color).attr('stroke-width',1.8).attr('stroke-dasharray',s.family==='attention'?'7 4':'3 3');
+          if(transition){a.transition().duration(180).attr('d',band(y));p.transition().duration(180).attr('d',line(y));}
+        }
+        const emb=model.values[0];
+        g.append('line').attr('data-emb-sd',model.id).attr('x1',x(-1)).attr('x2',x(-1)).attr('y1',y(logY?Math.max(y.domain()[0],emb.lower):emb.lower)).attr('y2',y(emb.upper)).attr('stroke',model.color).attr('stroke-width',6).attr('stroke-opacity',.25);
+        for(const p of model.values)g.append(model.id==='baseline'?'circle':'rect').attr('data-observation',model.id+'-'+p.index).attr('data-source',sourceLabel(p.x)).attr('data-mean',p.mean).attr('x',x(p.x)-2.5).attr('y',y(p.mean)-2.5).attr('width',5).attr('height',5).attr('cx',x(p.x)).attr('cy',y(p.mean)).attr('r',2.8).attr('fill',model.color);
+      }
+      const guide=svg.append('line').attr('data-chart-hover-guide','').attr('y1',t).attr('y2',h-b).attr('stroke','var(--foreground)').attr('stroke-opacity',.35).attr('visibility','hidden');
+      const hover=svg.append('g');
+      function clear(){tip.hidden=true;guide.attr('visibility','hidden');hover.selectAll('*').remove();}
+      function show(at){
+        guide.attr('x1',x(at)).attr('x2',x(at)).attr('visibility','visible');hover.selectAll('*').remove();tip.replaceChildren();
+        const head=document.createElement('div');head.textContent=Math.abs(at-Math.round(at))<1e-8?sourceLabel(Math.round(at)):`${sourceLabel(Math.floor(at))} → ${sourceLabel(Math.ceil(at))}`;tip.append(head);
+        let rows=0;
+        const hoverGroups=at<0?models.map(m=>({...m,model:m.id,family:'embedding',values:[m.values[0]]})):groups;
+        for(const s of hoverGroups){
+          if(!visible.has(s.model))continue;
+          const p=at<0?{...s.values[0],exact:true}:interpolate(s.values,at);if(!p)continue;rows++;
+          hover.append('circle').attr('data-chart-hover-marker',s.id).attr('cx',x(p.x)).attr('cy',y(p.mean)).attr('r',4).attr('fill',s.color);
+          const row=document.createElement('div');row.className='hover-row';row.dataset.tooltipSeries=s.id;
+          row.textContent=`${s.label} · ${s.family==='embedding'?'Emb':s.family==='attention'?'A':'M'} · mean ${f(p.mean)} · SD ${f(p.std)}${p.exact?'':' · interpolated'}`;tip.append(row);
+        }
+        tip.hidden=!rows;
+        const count=document.createElement('div');count.className='hover-row';count.textContent=`n = ${fmt.format(data.tokens)} per source`;tip.append(count);
+        tip.style.left=Math.max(0,Math.min(w-tip.offsetWidth,x(at)-tip.offsetWidth/2))+'px';
+        tip.style.top=(svg.node().getBoundingClientRect().top-root.getBoundingClientRect().top+t+6)+'px';
+      }
+      function coordinate(e){return Math.max(domainX[0],Math.min(domainX[1],x.invert(d3.pointer(e,svg.node())[0])));}
+      svg.append('rect').attr('data-chart-hit','').attr('data-chart-hover-overlay','cross-series').attr('x',l).attr('y',t).attr('width',w-l-r).attr('height',h-b-t).attr('fill','transparent')
+        .on('pointermove',e=>{if(pinned===null)show(coordinate(e));}).on('pointerleave',()=>{if(pinned===null)clear();})
+        .on('click',e=>{const at=coordinate(e);pinned=pinned!==null?null:at;if(pinned===null)clear();else show(pinned);save();});
+      if(pinned!==null)show(pinned);else clear();
+      // Remove optional crowded ticks and annotations; preserve axis labels.
+      let labels=[...svg.node().querySelectorAll('text')];
+      for(const label of labels){
+        if(!label.hasAttribute('data-x-tick'))continue;
+        const a=label.getBoundingClientRect();
+        if(labels.some(other=>{if(other===label||!other.isConnected)return false;const b=other.getBoundingClientRect();return a.left<b.right+4&&a.right+4>b.left&&a.top<b.bottom+4&&a.bottom+4>b.top;}))label.remove();
+      }
+    }
+    for(const button of root.querySelectorAll('button[data-series]'))button.addEventListener('click',()=>{const id=button.dataset.series;if(visible.has(id))visible.delete(id);else visible.add(id);draw(true);save();});
+    window.addEventListener('openai:set_globals',event=>{restore(event.detail?.globals?.widgetState);draw();});
+    new ResizeObserver(()=>draw()).observe(root);draw();
+  })();
+  </script>
+</div>

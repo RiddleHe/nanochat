@@ -1,0 +1,68 @@
+<div id="svd-k-chart">
+  <style>
+    #svd-k-chart {--background:#181818;--foreground:#eee;--border:#444;--popover:#252525;--popover-foreground:#eee;--viz-series-1:#70a9fa;--viz-series-2:#f6ce5b;--viz-series-3:#ec93cc;--viz-series-4:#75c7a4;--viz-series-5:#bf9af9;--viz-series-6:#f69e71;background:var(--background);color:var(--foreground);color-scheme:dark;padding:16px;position:relative}
+    #svd-k-chart .k-legend {display:flex;gap:10px 18px;flex-wrap:wrap;margin:16px 0}
+    #svd-k-chart .k-legend button {background:transparent;border:0;padding:0;font:inherit;color:var(--foreground);display:inline-flex;gap:6px;align-items:center}
+    #svd-k-chart .k-legend button[aria-pressed=false] {opacity:.4}
+    #svd-k-chart .k-chart {width:100%;display:block}
+    #svd-k-chart svg text {fill:var(--foreground);font-size:12px;font-weight:400}
+    #svd-k-chart .k-tooltip {position:absolute;pointer-events:none;background:var(--popover);color:var(--popover-foreground);padding:10px;z-index:5;max-width:280px}
+    #svd-k-chart .k-tooltip-grid {display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
+    #svd-k-chart .k-detail {margin-top:12px}
+  </style>
+  <h2 class="k-title"></h2>
+  <div class="text-small k-caption"></div>
+  <div class="k-legend text-small"></div>
+  <div class="k-holder"></div>
+  <div class="k-detail text-small tabular-nums" aria-live="polite"></div>
+  <div class="k-tooltip tooltip text-small tabular-nums" role="tooltip" hidden></div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+  (()=>{
+    const root=document.getElementById('svd-k-chart'),data=__SVD_K_DATA__,get=s=>root.querySelector(s);
+    get('.k-title').textContent=`GPTBase · ${data.kind} k and numerical rank by layer`;
+    get('.k-caption').textContent=`k at ${Math.round(data.threshold*100)}% of squared singular values · k per head · rank shown separately · zero-based indices`;
+    const rankGroups=[];for(const s of data.series){const key=JSON.stringify(s.values.map(v=>v.rank));let group=rankGroups.find(g=>g.key===key);if(!group){group={key,id:'rank'+rankGroups.length,heads:[],values:s.values.map(v=>({layer:v.layer,k:v.rank}))};rankGroups.push(group);}group.heads.push(s.head);}
+    const allIds=[...data.series.map(s=>s.head),...rankGroups.map(g=>g.id)];
+    let enabled=new Set(allIds),selection=null;
+    const color=h=>`var(--viz-series-${h%6+1})`,dash=h=>h<6?null:'6 4';
+    function restore(state){if(state?.modelContent?.run_id!==data.run_id||state.modelContent.view!==data.view)return;enabled=new Set(state.privateContent?.enabled??allIds);selection=state.modelContent.layer??null;}
+    restore(window.openai?.widgetState);
+    function save(){window.openai?.setWidgetState({modelContent:{run_id:data.run_id,view:data.view,layer:selection},privateContent:{enabled:[...enabled]}}).catch(()=>{});}
+    const buttons=data.series.map(s=>{const b=document.createElement('button');b.type='button';b.className='cursor-interaction';const sw=d3.select(b).append('svg').attr('width',24).attr('height',12).attr('aria-hidden','true');sw.append('line').attr('x1',1).attr('x2',23).attr('y1',6).attr('y2',6).attr('stroke',color(s.head)).attr('stroke-width',2).attr('stroke-dasharray',dash(s.head));b.append(document.createTextNode(`H${s.head} · k`));b.onclick=()=>{enabled.has(s.head)?enabled.delete(s.head):enabled.add(s.head);draw();save();};get('.k-legend').append(b);return {b,h:s.head};});
+    for(const g of rankGroups){const b=document.createElement('button');b.type='button';b.className='cursor-interaction';const sw=d3.select(b).append('svg').attr('width',24).attr('height',12).attr('aria-hidden','true');sw.append('line').attr('x1',1).attr('x2',23).attr('y1',6).attr('y2',6).attr('stroke','var(--foreground)').attr('stroke-width',2).attr('stroke-dasharray','3 3');b.append(document.createTextNode(g.heads.length===data.series.length?'Rank · all heads':'Rank · H'+g.heads.join(', H')));b.onclick=()=>{enabled.has(g.id)?enabled.delete(g.id):enabled.add(g.id);draw();save();};get('.k-legend').append(b);buttons.push({b,h:g.id});}
+    function draw(){
+      const holder=get('.k-holder'),width=holder.getBoundingClientRect().width;if(!width)return;holder.replaceChildren();get('.k-tooltip').hidden=true;get('.k-detail').textContent='';buttons.forEach(({b,h})=>b.setAttribute('aria-pressed',String(enabled.has(h))));
+      const height=410,left=64,right=14,top=14,bottom=52,all=data.series.flatMap(s=>s.values),extent=d3.extent(all.flatMap(d=>[d.k,d.rank]).filter(v=>v!==null)),padding=Math.max(2,(extent[1]-extent[0])*.07);
+      const x=d3.scaleLinear().domain(d3.extent(all,d=>d.layer)).range([left+5,width-right-5]),y=d3.scaleLinear().domain([Math.max(0,extent[0]-padding),extent[1]+padding]).nice().range([height-bottom-5,top+5]);
+      const svg=d3.select(holder).append('svg').attr('class','k-chart').attr('viewBox',`0 0 ${width} ${height}`).attr('role','img').attr('aria-label',`${data.kind} k and rank for every head across receiving layers`);
+      svg.append('title').text(`${data.kind} cutoff k and numerical rank`);svg.append('desc').text('One line per actual head. k captures 90 percent of squared singular values, extending cutoff ties. Matrix measurements; no token or head averaging. Numerical rank uses max(matrix shape) times FP64 epsilon times the largest singular value. Identical rank curves share one line. Vertical axis uses the observed range.');
+      svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','none').attr('stroke','var(--border)');
+      svg.append('g').selectAll('line').data(y.ticks(6)).join('line').attr('x1',left).attr('x2',width-right).attr('y1',y).attr('y2',y).attr('stroke','var(--border)').attr('stroke-opacity',.5);
+      const count=width<380?4:8,xd=x.domain(),ticks=[...new Set(d3.range(count).map(i=>Math.round(xd[0]+i*(xd[1]-xd[0])/(count-1))))];
+      const xa=svg.append('g').attr('transform',`translate(0,${height-bottom})`).call(d3.axisBottom(x).tickValues(ticks).tickFormat(d3.format('d')).tickSize(0).tickPadding(8)).call(g=>g.select('.domain').remove());
+      xa.selectAll('text').attr('text-anchor',d=>d===xd[0]?'start':d===xd[1]?'end':'middle');
+      svg.append('g').attr('transform',`translate(${left},0)`).call(d3.axisLeft(y).ticks(6).tickFormat(d3.format('d')).tickSize(0).tickPadding(8)).call(g=>g.select('.domain').remove());
+      svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+width-right)/2).attr('y',height-6).attr('text-anchor','middle').text('Receiving layer');
+      svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(17,${(top+height-bottom)/2}) rotate(-90)`).attr('text-anchor','middle').text('Singular directions · count');
+      for(const s of data.series.filter(s=>enabled.has(s.head))){svg.append('path').datum(s.values).attr('data-head',s.head).attr('d',d3.line().defined(d=>d.k!==null).x(d=>x(d.layer)).y(d=>y(d.k))).attr('fill','none').attr('stroke',color(s.head)).attr('stroke-width',1.8).attr('stroke-dasharray',dash(s.head));svg.append('g').selectAll('circle').data(s.values.filter(d=>d.k!==null)).join('circle').attr('cx',d=>x(d.layer)).attr('cy',d=>y(d.k)).attr('r',2).attr('fill',color(s.head));}
+      for(const g of rankGroups.filter(g=>enabled.has(g.id)))svg.append('path').datum(g.values).attr('data-rank',g.id).attr('d',d3.line().x(d=>x(d.layer)).y(d=>y(d.k))).attr('fill','none').attr('stroke','var(--foreground)').attr('stroke-width',2).attr('stroke-dasharray','3 3');
+      const guide=svg.append('line').attr('data-chart-hover-guide','').attr('stroke','var(--foreground)').attr('stroke-opacity',.5).attr('y1',top).attr('y2',height-bottom).attr('visibility','hidden'),markers=svg.append('g');
+      function show(value,event){
+        const lo=Math.floor(value),hi=Math.ceil(value),fraction=value-lo,rows=data.series.filter(s=>enabled.has(s.head)).map(s=>{const a=s.values[lo],b=s.values[hi];return {head:s.head,rank:a.rank+(b.rank-a.rank)*fraction,k:a.k===null||b.k===null?null:a.k+(b.k-a.k)*fraction};});
+        const rankRows=rankGroups.filter(g=>enabled.has(g.id)).map(g=>({id:g.id,k:g.values[lo].k+(g.values[hi].k-g.values[lo].k)*fraction}));
+        const exact=Math.abs(value-Math.round(value))<1e-8,title=exact?`Layer ${Math.round(value)} · k / rank`:`Layer ${value.toFixed(2)} · interpolated k / rank`;
+        guide.attr('x1',x(value)).attr('x2',x(value)).attr('visibility','visible');markers.selectAll('circle').data([...rows.filter(r=>r.k!==null),...rankRows]).join('circle').attr('data-chart-hover-marker','').attr('cx',x(value)).attr('cy',r=>y(r.k)).attr('r',3.5).attr('fill',r=>r.id?'var(--foreground)':color(r.head));
+        const text=title+' · '+rows.map(r=>`H${r.head}: ${r.k===null?'undefined':exact?r.k:r.k.toFixed(1)} / ${r.rank}`).join(' · ');
+        if(event){const tip=get('.k-tooltip');tip.replaceChildren();const header=document.createElement('div');header.textContent=title;tip.append(header);const grid=document.createElement('div');grid.className='k-tooltip-grid';for(const r of rows){const row=document.createElement('span');row.textContent=`H${r.head}: ${r.k===null?'undefined':exact?r.k:r.k.toFixed(1)} / ${r.rank}`;grid.append(row);}tip.append(grid);tip.hidden=false;const b=root.getBoundingClientRect();tip.style.left=Math.max(0,Math.min(event.clientX-b.left+10,b.width-tip.offsetWidth))+'px';tip.style.top=Math.max(0,event.clientY-b.top-tip.offsetHeight-8)+'px';}
+        return text;
+      }
+      if(selection!==null)get('.k-detail').textContent=show(selection);
+      const at=e=>Math.max(xd[0],Math.min(xd[1],x.invert(d3.pointer(e,svg.node())[0])));
+      svg.append('rect').attr('data-chart-hit','').attr('data-chart-hover-overlay','cross-series').attr('class','cursor-interaction').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','transparent').on('pointermove',e=>show(at(e),e)).on('click',e=>{selection=Math.round(at(e));draw();save();}).on('pointerleave',()=>{get('.k-tooltip').hidden=true;guide.attr('visibility','hidden');markers.selectAll('*').remove();if(selection!==null)show(selection);});
+      const boxes=[];for(const node of xa.selectAll('text').nodes()){const b=node.getBoundingClientRect();if(boxes.some(a=>b.left<a.right+4&&b.right+4>a.left))node.parentNode.remove();else boxes.push(b);}
+    }
+    window.addEventListener('openai:set_globals',e=>{restore(e.detail?.globals?.widgetState);draw();});new ResizeObserver(draw).observe(get('.k-holder'));draw();
+  })();
+  </script>
+</div>

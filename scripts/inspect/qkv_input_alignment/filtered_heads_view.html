@@ -1,0 +1,56 @@
+<div id="filtered-heads">
+  <style>
+    #filtered-heads {--background:#181818;--foreground:#eee;--border:#444;--popover:#252525;--popover-foreground:#eee;--viz-series-1:#70a9fa;background:var(--background);color:var(--foreground);color-scheme:dark;padding:16px;position:relative}
+    #filtered-heads .filtered-chart {width:100%;display:block}
+    #filtered-heads svg text {fill:var(--foreground);font-size:12px;font-weight:400}
+    #filtered-heads .filtered-legend {display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0}
+    #filtered-heads .color-ramp {width:160px;height:12px;background:linear-gradient(to right,var(--background),var(--viz-series-1))}
+    #filtered-heads .filtered-tooltip {position:absolute;pointer-events:none;background:var(--popover);color:var(--popover-foreground);padding:10px;z-index:5;max-width:280px}
+    #filtered-heads .filtered-detail {margin-top:12px}
+  </style>
+  <h2 class="filtered-title"></h2>
+  <div class="filtered-caption text-small"></div>
+  <div class="filtered-legend text-small"><span>0%</span><span class="color-ramp" aria-hidden="true"></span><span class="color-max"></span><span>Mean input alignment · hatched = unavailable</span></div>
+  <div class="filtered-holder"></div>
+  <div class="filtered-detail text-small tabular-nums" aria-live="polite"></div>
+  <div class="filtered-tooltip tooltip text-small tabular-nums" role="tooltip" hidden></div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+  (()=>{
+    const root=document.getElementById('filtered-heads'),data=__FILTERED_DATA__,get=s=>root.querySelector(s),pct=d3.format('.2%');
+    get('.filtered-title').textContent=`GPTBase · Q/K/V entries with k < ${data.cutoff}`;
+    get('.filtered-caption').textContent=`${data.rows.length} entries · Emb + attention · ${data.tokens.toLocaleString()} tokens · ${Math.round(data.threshold*100)}% squared-singular-value threshold · rows ordered by layer, Q/K/V, head`;
+    get('.color-max').textContent=d3.format('.0%')(data.color_domain[1]);
+    let selection=null;
+    function restore(state){if(state?.modelContent?.run_id===data.run_id&&state.modelContent.view===data.view)selection=state.modelContent.selection||null;}
+    restore(window.openai?.widgetState);
+    function save(){const p=selection?data.rows[selection.row]:null;window.openai?.setWidgetState({modelContent:{run_id:data.run_id,view:data.view,selection,entry:p?{layer:p.layer,kind:p.kind,head:p.head,k:p.k}:null}}).catch(()=>{});}
+    function description(r,c){const p=data.rows[r],label=c===0?'Emb':`Attention ${c-1}`,prefix=`L${p.layer} · ${p.kind} · head ${p.head} · k ${p.k} · ${label}`;
+      if(c>=p.mean.length)return prefix+' · unavailable';const v=p.mean[c];return prefix+` · alignment ${v===null?'undefined':pct(v)} · token std ${p.std[c]===null?'undefined':pct(p.std[c])} · reference k/${data.input_dimension} ${pct(p.reference)} · captured ${pct(p.captured)} · ${p.counts[c].toLocaleString()} valid tokens`;}
+    function draw(){
+      const holder=get('.filtered-holder'),width=holder.getBoundingClientRect().width;if(!width)return;holder.replaceChildren();get('.filtered-tooltip').hidden=true;get('.filtered-detail').textContent='';
+      const left=64,right=12,top=10,bottom=50,height=top+data.rows.length*23+bottom;
+      const svg=d3.select(holder).append('svg').attr('class','filtered-chart').attr('viewBox',`0 0 ${width} ${height}`).attr('role','img').attr('aria-label','Input alignment for all qualifying Q K V head entries; unlabeled rows, embedding and previous attention outputs as columns');
+      svg.append('title').text(`All Q/K/V entries with k < ${data.cutoff}`);svg.append('desc').text('Rows sorted by receiving layer, Q/K/V, then head. Hover or tap reveals identity. Hatching marks causally unavailable sources; dark cells represent low alignment, not missing sources.');
+      const pattern=svg.append('defs').append('pattern').attr('id','filtered-unavailable').attr('width',6).attr('height',6).attr('patternUnits','userSpaceOnUse');pattern.append('path').attr('d','M-1,1 L1,-1 M0,6 L6,0 M5,7 L7,5').attr('stroke','var(--border)').attr('stroke-width',1);
+      const x=d3.scaleBand().domain(d3.range(data.sources.length)).range([left,width-right]),y=d3.scaleBand().domain(d3.range(data.rows.length)).range([top,height-bottom]);
+      const css=getComputedStyle(root),color=d3.scaleLinear().domain(data.color_domain).range([css.getPropertyValue('--background').trim(),css.getPropertyValue('--viz-series-1').trim()]);
+      const cells=data.rows.flatMap((p,r)=>data.sources.map((_,c)=>({r,c,available:c<p.mean.length,value:p.mean[c]})));
+      svg.append('g').selectAll('rect').data(cells).join('rect').attr('data-filtered-cell','').attr('data-available',d=>String(d.available)).attr('x',d=>x(d.c)).attr('y',d=>y(d.r)).attr('width',x.bandwidth()).attr('height',y.bandwidth()).attr('fill',d=>!d.available?'url(#filtered-unavailable)':d.value===null?'var(--border)':color(d.value)).attr('aria-label',d=>description(d.r,d.c));
+      svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','none').attr('stroke','var(--border)');
+      const n=Math.min(data.sources.length,width<380?4:Math.max(2,Math.floor((width-left-right)/30))),ticks=n<=1?[0]:[...new Set(d3.range(n).map(i=>Math.round(i*(data.sources.length-1)/(n-1))))];
+      const xa=svg.append('g').attr('transform',`translate(0,${height-bottom})`).call(d3.axisBottom(x).tickValues(ticks).tickFormat(i=>data.sources[i]).tickSize(0).tickPadding(8)).call(g=>g.select('.domain').remove());
+      svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+width-right)/2).attr('y',height-6).attr('text-anchor','middle').text('Source layer · zero-based');
+      svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(20,${(top+height-bottom)/2}) rotate(-90)`).attr('text-anchor','middle').text('Head entry');
+      const marker=svg.append('rect').attr('fill','none').attr('stroke','var(--foreground)').attr('stroke-width',2).attr('visibility','hidden').attr('pointer-events','none');
+      function show(r,c,event){marker.attr('x',x(c)+1).attr('y',y(r)+1).attr('width',Math.max(0,x.bandwidth()-2)).attr('height',y.bandwidth()-2).attr('visibility','visible');const detail=description(r,c);if(event){const tip=get('.filtered-tooltip');tip.textContent=detail;tip.hidden=false;const b=root.getBoundingClientRect();tip.style.left=Math.max(0,Math.min(event.clientX-b.left+10,b.width-tip.offsetWidth))+'px';tip.style.top=Math.max(0,event.clientY-b.top-tip.offsetHeight-8)+'px';}return detail;}
+      const valid=()=>selection&&data.rows[selection.row]&&selection.column>=0&&selection.column<data.sources.length;
+      if(valid())get('.filtered-detail').textContent=show(selection.row,selection.column);
+      const at=e=>{const [mx,my]=d3.pointer(e,svg.node());return {row:Math.max(0,Math.min(data.rows.length-1,Math.floor((my-top)/y.bandwidth()))),column:Math.max(0,Math.min(data.sources.length-1,Math.floor((mx-left)/x.bandwidth())))};};
+      svg.append('rect').attr('data-chart-hit','').attr('class','cursor-interaction').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','transparent').on('pointermove',e=>{const s=at(e);show(s.row,s.column,e);}).on('click',e=>{selection=at(e);draw();save();}).on('pointerleave',()=>{get('.filtered-tooltip').hidden=true;marker.attr('visibility','hidden');if(valid())show(selection.row,selection.column);});
+      const boxes=[];for(const node of xa.selectAll('text').nodes()){const b=node.getBoundingClientRect();if(boxes.some(a=>b.left<a.right+4&&b.right+4>a.left))node.parentNode.remove();else boxes.push(b);}
+    }
+    window.addEventListener('openai:set_globals',e=>{restore(e.detail?.globals?.widgetState);draw();});new ResizeObserver(draw).observe(get('.filtered-holder'));draw();
+  })();
+  </script>
+</div>

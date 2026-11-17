@@ -1,0 +1,62 @@
+<div id="routing-__FAMILY__">
+<style>
+#routing-__FAMILY__{position:relative;color-scheme:only light;--background:#fff;--foreground:#202124;--muted-foreground:#5f6368;--border:#dadce0;--popover:#fff;--popover-foreground:#202124;--viz-series-1:#2864b4;background:var(--background);color:var(--foreground);padding:12px;box-sizing:border-box}
+#routing-__FAMILY__ .routing-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+#routing-__FAMILY__ figure{margin:0;min-width:0}
+#routing-__FAMILY__ svg{display:block;width:100%}
+#routing-__FAMILY__ svg text{fill:var(--foreground);font-size:12px;font-weight:400}
+#routing-__FAMILY__ .routing-legend{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:14px 0}
+#routing-__FAMILY__ .ramp{width:150px;height:12px;background:linear-gradient(to right,color-mix(in srgb,var(--viz-series-1) 4%,transparent),var(--viz-series-1))}
+#routing-__FAMILY__ #routing-tooltip{position:absolute;pointer-events:none;z-index:10;background:var(--popover);color:var(--popover-foreground);padding:8px;max-width:260px}
+#routing-__FAMILY__ #routing-detail{min-height:44px;margin-top:12px}
+@media(max-width:720px){#routing-__FAMILY__ .routing-panels{grid-template-columns:1fr;gap:24px}}
+</style>
+<h2>D24 · embedding + attention routing</h2>
+<p class="text-small">Q, K and V queries · mean across 262,144 token occurrences · zero-based layers</p>
+<div class="routing-legend text-small tabular-nums"><span>0</span><span class="ramp" aria-hidden="true"></span><span id="routing-scale-max"></span><span>Shared linear scale · hatched cells unavailable</span></div>
+<div class="routing-panels"></div>
+<p class="text-small">Emb = normalized token embedding · MLP sources omitted · no renormalization</p>
+<div id="routing-detail" class="text-small tabular-nums" aria-live="polite"></div>
+<div id="routing-tooltip" class="text-small tabular-nums" role="tooltip" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script>
+(()=>{
+const data=__ROUTING_DATA__,root=document.getElementById('routing-__FAMILY__');
+const get=id=>root.querySelector('#'+id),fmt=d3.format('.4f');
+const colorMax=d3.max(data.cells,c=>c.mean);get('routing-scale-max').textContent=fmt(colorMax);
+const lookup=new Map(data.cells.map(c=>[`${c.kind}:${c.layer}:${c.source_layer}`,c]));
+const rows=new Map(data.rows.map(r=>[`${r.kind}:${r.layer}`,r]));
+let pinned=null;const panels=[];
+function valid(p){return p?.run_id===data.run_id&&p?.family==='__FAMILY__'&&lookup.has(`${p.kind}:${p.layer}:${p.source_layer}`);}
+const saved=window.openai?.widgetState?.modelContent;if(valid(saved))pinned=saved;
+function description(c){const r=rows.get(`${c.kind}:${c.layer}`),emb=lookup.get(`${c.kind}:${c.layer}:-1`);return `${c.kind} · receiving layer ${c.layer} · ${c.source_layer===-1?'Embedding':'Attention source '+c.source_layer} · mean ${fmt(c.mean)} · token std ${fmt(c.std)} · displayed total ${fmt(r.attention_mass_mean+emb.mean)} · attention total ${fmt(r.attention_mass_mean)} (std ${fmt(r.attention_mass_std)})`;}
+for(const kind of ['Q','K','V']){const figure=document.createElement('figure'),caption=document.createElement('figcaption'),holder=document.createElement('div');caption.textContent=kind;figure.append(caption,holder);root.querySelector('.routing-panels').append(figure);panels.push({kind,holder});}
+function draw(p){
+ const width=p.holder.getBoundingClientRect().width;if(width<1)return;
+ const left=64,right=8,top=8,bottom=48,plotHeight=384,height=top+plotHeight+bottom;
+ p.holder.replaceChildren();
+ const svg=d3.select(p.holder).append('svg').attr('class','routing-chart').attr('viewBox',`0 0 ${width} ${height}`).attr('role','img').attr('aria-label',`${p.kind}: __FAMILY__-source routing weights, receiving layers on Y and source layers on X`);
+ svg.append('title').text(`${p.kind} __FAMILY__-source routing`);
+ svg.append('desc').text(`Mean applied depth-routing weight across 262144 tokens. Common linear scale from zero to ${colorMax}, the largest displayed mean across Q, K and V. No subset renormalization. Hatched cells are unavailable.`);
+ const pattern=svg.append('defs').append('pattern').attr('id',`mask-${p.kind}`).attr('width',6).attr('height',6).attr('patternUnits','userSpaceOnUse');
+ pattern.append('path').attr('d','M0,6L6,0').attr('stroke','var(--border)').attr('stroke-width',.6);
+ const x=d3.scaleBand().domain(d3.range(-1,data.depth-1)).range([left,width-right]);
+ const y=d3.scaleBand().domain(d3.range(data.depth)).range([top,top+plotHeight]);
+ const cells=d3.range(data.depth).flatMap(layer=>d3.range(-1,data.depth-1).map(source_layer=>({layer,source_layer,cell:lookup.get(`${p.kind}:${layer}:${source_layer}`)})));
+ svg.selectAll('rect.routing-cell').data(cells).join('rect').attr('class','routing-cell').attr('data-valid',c=>!!c.cell).attr('x',c=>x(c.source_layer)).attr('y',c=>y(c.layer)).attr('width',x.bandwidth()).attr('height',y.bandwidth()).attr('fill',c=>c.cell?'var(--viz-series-1)':`url(#mask-${p.kind})`).attr('fill-opacity',c=>c.cell?.mean===undefined?1:.04+.96*c.cell.mean/colorMax);
+ svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',plotHeight).attr('fill','none').attr('stroke','var(--border)');
+ const xa=svg.append('g').attr('data-source-axis','').attr('transform',`translate(0,${top+plotHeight})`).call(d3.axisBottom(x).tickValues([-1,7,15,data.depth-2]).tickFormat(v=>v===-1?'Emb':v).tickSize(0).tickPadding(7)).call(g=>g.select('.domain').remove());
+ xa.selectAll('.tick text').attr('text-anchor',v=>v===-1?'start':v===data.depth-2?'end':'middle');
+ svg.append('g').attr('transform',`translate(${left},0)`).call(d3.axisLeft(y).tickValues([0,3,6,9,12,15,18,21,23]).tickSize(0).tickPadding(6)).call(g=>g.select('.domain').remove());
+ svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+width-right)/2).attr('y',height-4).attr('text-anchor','middle').text('Emb / source attention layer');
+ svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(15,${top+plotHeight/2}) rotate(-90)`).attr('text-anchor','middle').text('Receiving layer');
+ if(pinned?.kind===p.kind){const c=lookup.get(`${p.kind}:${pinned.layer}:${pinned.source_layer}`);svg.append('rect').attr('x',x(c.source_layer)).attr('y',y(c.layer)).attr('width',x.bandwidth()).attr('height',y.bandwidth()).attr('fill','none').attr('stroke','var(--foreground)').attr('stroke-width',1.5);get('routing-detail').textContent=description(c);}
+ const hit=svg.append('rect').attr('data-chart-hit','').attr('class','cursor-interaction').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',plotHeight).attr('fill','transparent');
+ function at(e){const [px,py]=d3.pointer(e,svg.node());return lookup.get(`${p.kind}:${Math.floor((py-top)/y.step())}:${Math.floor((px-left)/x.step())-1}`);}
+ hit.on('pointermove',e=>{const c=at(e),tip=get('routing-tooltip');if(!c){tip.hidden=true;return;}tip.textContent=description(c);tip.hidden=false;const b=root.getBoundingClientRect();tip.style.left=Math.max(0,Math.min(e.clientX-b.left+10,b.width-tip.offsetWidth))+'px';tip.style.top=Math.max(0,e.clientY-b.top-tip.offsetHeight-8)+'px';}).on('pointerleave',()=>get('routing-tooltip').hidden=true).on('click',e=>{const c=at(e);if(!c)return;pinned={run_id:data.run_id,family:'__FAMILY__',kind:c.kind,layer:c.layer,source_layer:c.source_layer};panels.forEach(draw);window.openai?.setWidgetState({modelContent:pinned,privateContent:null})?.catch(()=>{});});
+}
+window.addEventListener('openai:set_globals',e=>{const s=e.detail?.globals?.widgetState?.modelContent;if(valid(s)){pinned=s;panels.forEach(draw);}});
+const observer=new ResizeObserver(()=>panels.forEach(draw));panels.forEach(p=>{draw(p);observer.observe(p.holder);});
+})();
+</script>
+</div>

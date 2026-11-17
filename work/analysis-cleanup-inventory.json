@@ -1,0 +1,38 @@
+[
+  {
+    "path": "/local-ssd/mh3897/analysis_runs/d24_qkv_input_alignment",
+    "allocated_bytes_before": 66719268864,
+    "directory_inode": 151258609,
+    "children": 2
+  },
+  {
+    "path": "/local-ssd/mh3897/analysis_runs/d24_no_embed_norm_v_comparison",
+    "allocated_bytes_before": 58385735680,
+    "directory_inode": 151266140,
+    "children": 2
+  },
+  {
+    "path": "/local-ssd/mh3897/analysis_runs/d24_raw_activation_norms",
+    "allocated_bytes_before": 46795333632,
+    "directory_inode": 151262661,
+    "children": 3
+  },
+  {
+    "path": "/local-ssd/mh3897/analysis_runs/d24_attn_res_qkv_source_contributions",
+    "allocated_bytes_before": 45445234688,
+    "directory_inode": 151258026,
+    "children": 1
+  },
+  {
+    "path": "/local-ssd/mh3897/analysis_runs/d24_qkv_separate_sources",
+    "allocated_bytes_before": 43580096512,
+    "directory_inode": 151257089,
+    "children": 1
+  },
+  {
+    "path": "/local-ssd/mh3897/analysis_runs/d24_attn_res_qkv_input_alignment",
+    "allocated_bytes_before": 29733699584,
+    "directory_inode": 151261423,
+    "children": 1
+  }
+]

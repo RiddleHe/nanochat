@@ -1,0 +1,30 @@
+{
+  "experiment": "d24_qkv_source_contributions",
+  "checkpoint_run": "bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z",
+  "checkpoint_step": 7809,
+  "num_sequences": 128,
+  "sequence_length": 2048,
+  "batch_size": 1,
+  "seed": 42,
+  "split": "val",
+  "sample_selection": "first_sequences_from_bos_bestfit_validation_loader",
+  "tokenizer_threads": 4,
+  "tokenizer_batch_size": 128,
+  "document_buffer_size": 1000,
+  "source_batch_size": 4,
+  "forward_dtype": "bfloat16",
+  "analysis_dtype": "float32",
+  "storage_dtype": "float32",
+  "summary_dtype": "float64",
+  "projection_location": "after_linear_before_rope_and_qk_norm_and_scaling",
+  "source_definition": "normalized_embedding_then_float32_sum_of_each_layers_attention_and_mlp_writes",
+  "weight_definition": "forward_weights_cast_to_bfloat16_then_float32_for_linear_analysis",
+  "std_ddof": 0,
+  "validation": {
+    "residual_relative_rms_max": 0.05,
+    "projection_relative_rms_max": 0.05,
+    "linear_reconstruction_relative_rms_max": 0.00002,
+    "normalization_relative_rms_max": 0.005,
+    "share_sum_max_error": 0.000002
+  }
+}

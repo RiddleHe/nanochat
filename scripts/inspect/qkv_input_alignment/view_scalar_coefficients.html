@@ -1,0 +1,82 @@
+<div id="scalar-qkv-all-sources">
+  <style>
+    #scalar-qkv-all-sources {color-scheme:only light;--background:#fff;--foreground:#202124;--muted-foreground:#5f6368;--border:#dadce0;--popover:#fff;--popover-foreground:#202124;--viz-series-1:#2864b4;--low:#f5f8fc;background:var(--background);color:var(--foreground);position:relative;padding:12px;box-sizing:border-box;}
+    #scalar-qkv-all-sources h2 {margin:0 90px 8px 0;}
+    #scalar-qkv-all-sources h3 {margin:14px 0 4px;}
+    #scalar-qkv-all-sources .subtitle {color:var(--muted-foreground);margin-bottom:12px;}
+    #scalar-qkv-all-sources .legend {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    #scalar-qkv-all-sources .ramp {width:150px;height:12px;background:linear-gradient(to right,var(--low),var(--viz-series-1));}
+    #scalar-qkv-all-sources .chart {display:block;width:100%;}
+    #scalar-qkv-all-sources .chart text {fill:var(--foreground);font-size:12px;font-weight:400;}
+    #scalar-qkv-all-sources .chart .frame {fill:none;stroke:var(--border);stroke-width:1;}
+    #scalar-qkv-all-sources .detail {margin-top:10px;min-height:20px;overflow-wrap:anywhere;}
+    #scalar-qkv-all-sources .tooltip {position:absolute;display:none;pointer-events:none;z-index:5;background:var(--popover);color:var(--popover-foreground);border:1px solid var(--border);padding:8px;max-width:260px;box-sizing:border-box;}
+  </style>
+  <h2>ScalarResQKV · learned coefficients</h2>
+  <div class="subtitle text-small">D24 · step 7,773 · no embedding norm · zero-based layers</div>
+  <div class="legend text-small"><span>0</span><span class="ramp" aria-hidden="true"></span><span class="maximum tabular-nums"></span><span>FP32 gate · shared linear scale</span><span>Hatched: unavailable</span></div>
+  <div class="panels"></div>
+  <div class="text-small">Source order: Emb, Attn 0, MLP 0, …, Attn 22, MLP 22 · raw Emb · unnormalized coefficients</div>
+  <div class="detail text-small tabular-nums" aria-live="polite"></div>
+  <div class="tooltip text-small tabular-nums" role="tooltip"></div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+  (() => {
+    const root=document.getElementById('scalar-qkv-all-sources'), data=__SCALAR_DATA__;
+    const kinds=['Q','K','V'], n=data.sources.length, lookup=new Map(data.cells.map(c=>[`${c.kind}/${c.layer}/${c.source}`,c]));
+    const tip=root.querySelector('.tooltip'), detail=root.querySelector('.detail');
+    const fmt=d3.format(',.6~f'), sourceName=s=>s===0?'Emb':`${s%2?'Attn':'MLP'} ${Math.floor((s-1)/2)}`;
+    const logScale=data.scale==='per-query-log', separateScale=data.scale.startsWith('per-query-');
+    if(separateScale) root.querySelector('.legend').textContent=`FP32 gates · separate ${logScale?'logarithmic':'linear'} scales · hatched: unavailable`;
+    else root.querySelector('.maximum').textContent=d3.format(',.2f')(data.color_domain[1]);
+    let pinned=null;
+    const describe=c=>`${c.kind} · receiving L${c.layer} · ${sourceName(c.source)} · gate ${fmt(c.value)} · BF16 applied ${fmt(c.applied)} · z ${fmt(c.z)}`;
+    function restore(state){const s=state?.modelContent;if(s?.figure==='scalar-qkv-all-sources' && s.run===data.run){pinned=lookup.get(`${s.kind}/${s.layer}/${s.source}`)||null;detail.textContent=pinned?describe(pinned):'';}}
+    restore(window.openai?.widgetState);
+    window.addEventListener('openai:set_globals',e=>restore(e.detail?.globals?.widgetState));
+    function persist(c){pinned=c;detail.textContent=c?describe(c):'';const snapshot={modelContent:c?{figure:'scalar-qkv-all-sources',run:data.run,kind:c.kind,layer:c.layer,source:c.source,source_label:sourceName(c.source),coefficient:c.value}:null,privateContent:null};window.openai?.setWidgetState?.(snapshot)?.catch(()=>{});}
+    function tooltip(event,message){tip.textContent=message;tip.style.display='block';const b=root.getBoundingClientRect();const x=event.clientX-b.left,y=event.clientY-b.top;tip.style.left=Math.max(0,Math.min(x+12,root.clientWidth-tip.offsetWidth-4))+'px';tip.style.top=Math.max(0,Math.min(y+12,root.clientHeight-tip.offsetHeight-4))+'px';}
+    const panels=kinds.map(kind=>{const section=document.createElement('section');section.innerHTML=`<h3>${kind}</h3><svg class="chart" role="img" aria-label="${kind} coefficients by receiving layer and Emb, attention, MLP source"></svg>`;root.querySelector('.panels').append(section);return {kind,section};});
+    function draw(){
+      const styles=getComputedStyle(root),colors=[styles.getPropertyValue('--low').trim(),styles.getPropertyValue('--viz-series-1').trim()];
+      for(const {kind,section} of panels){
+        const domain=separateScale?data.color_domains[kind]:data.color_domain;
+        const color=(logScale?d3.scaleLog():d3.scaleLinear()).domain(domain).range(colors);
+        const width=section.getBoundingClientRect().width,left=64,right=12,top=separateScale?58:8,bottom=62,ph=288,pw=width-left-right,height=top+ph+bottom,cw=pw/n,ch=ph/data.depth;
+        const svg=d3.select(section.querySelector('svg')).attr('viewBox',`0 0 ${width} ${height}`).attr('height',height);svg.selectAll('*').remove();
+        svg.attr('data-color-domain',JSON.stringify(domain)).attr('data-color-scale',logScale?'log':'linear');
+        svg.append('title').text(`${kind}: positive, unnormalized source coefficients; ${separateScale?`independent ${logScale?'logarithmic':'linear'} color scale`:'same linear scale for Q, K and V'}.`);
+        if(separateScale){
+          const gradient=svg.append('defs').append('linearGradient').attr('id',`scalar-ramp-${kind}`);
+          gradient.append('stop').attr('offset','0%').attr('stop-color',colors[0]);
+          gradient.append('stop').attr('offset','100%').attr('stop-color',colors[1]);
+          svg.append('rect').attr('x',left).attr('y',4).attr('width',pw).attr('height',10).attr('fill',`url(#scalar-ramp-${kind})`);
+          const x=(logScale?d3.scaleLog():d3.scaleLinear()).domain(domain).range([left,left+pw]);
+          const inner=logScale?d3.range(Math.ceil(Math.log10(domain[0])),Math.floor(Math.log10(domain[1]))+1).map(e=>10**e):x.ticks(width>=600?5:3);
+          const ticks=[domain[0],...inner.filter(v=>v>domain[0]&&v<domain[1]),domain[1]];
+          const labels=ticks.map((v,i)=>svg.append('text').attr('class','color-tick').attr('x',x(v)).attr('y',32).attr('text-anchor',i===0?'start':i===ticks.length-1?'end':'middle').text(i===0||i===ticks.length-1?d3.format(',.3~f')(v):d3.format(',')(v)));
+          let previous=labels[0].node().getBoundingClientRect();const end=labels.at(-1).node().getBoundingClientRect();
+          for(let i=1;i<labels.length-1;i++){const b=labels[i].node().getBoundingClientRect();if(b.left<previous.right+4||b.right+4>end.left)labels[i].attr('display','none');else previous=b;}
+        }
+        const pattern=svg.append('defs').append('pattern').attr('id',`scalar-hatch-${kind}`).attr('patternUnits','userSpaceOnUse').attr('width',6).attr('height',6);
+        pattern.append('path').attr('d','M-1,1L1,-1M0,6L6,0M5,7L7,5').attr('stroke','var(--border)').attr('fill','none');
+        svg.append('rect').attr('x',left).attr('y',top).attr('width',pw).attr('height',ph).attr('fill',`url(#scalar-hatch-${kind})`);
+        svg.selectAll('.cell').data(data.cells.filter(c=>c.kind===kind)).join('rect').attr('class','cell').attr('data-coefficient-cell','').attr('x',c=>left+c.source*cw).attr('y',c=>top+c.layer*ch).attr('width',cw+.01).attr('height',ch+.01).attr('fill',c=>color(c.value));
+        svg.append('rect').attr('class','frame').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',pw).attr('height',ph);
+        const label=(x,y,text,anchor='middle')=>svg.append('text').attr('x',x).attr('y',y).attr('text-anchor',anchor).text(text);
+        for(const l of [0,3,6,9,12,15,18,21,23]) label(left-10,top+(l+.5)*ch+4,l,'end');
+        const ticks=width>=600?[0,9,18,27,36,46]:[0,15,30,46];
+        const labels=ticks.map((s,i)=>label(left+(s+.5)*cw,top+ph+20,sourceName(s),i===0?'start':i===ticks.length-1?'end':'middle').attr('class','x-tick'));
+        label(left+pw/2,height-8,'Embedding / source layer').attr('class','axis-title').attr('data-axis','x');
+        svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(16,${top+ph/2}) rotate(-90)`).attr('text-anchor','middle').text('Receiving layer');
+        // Remove only optional interior ticks if measured labels collide.
+        for(let i=1;i<labels.length-1;i++){const a=labels[i-1].node().getBoundingClientRect(),b=labels[i].node().getBoundingClientRect(),c=labels[i+1].node().getBoundingClientRect();if(b.left<a.right+4||b.right+4>c.left)labels[i].attr('display','none');}
+        const hit=svg.append('rect').attr('data-chart-hit','').attr('class','cursor-interaction').attr('x',left).attr('y',top).attr('width',pw).attr('height',ph).attr('fill','transparent');
+        function at(event){const [x,y]=d3.pointer(event,svg.node());const s=Math.max(0,Math.min(n-1,Math.floor((x-left)/cw))),l=Math.max(0,Math.min(data.depth-1,Math.floor((y-top)/ch)));return {s,l,c:lookup.get(`${kind}/${l}/${s}`)};}
+        hit.on('pointermove',event=>{const {s,l,c}=at(event);tooltip(event,c?describe(c):`${kind} · receiving L${l} · ${sourceName(s)} · unavailable`);}).on('pointerleave',()=>tip.style.display='none').on('click',event=>{const {c}=at(event);if(c)persist(c);});
+      }
+    }
+    new ResizeObserver(draw).observe(root);draw();
+  })();
+  </script>
+</div>

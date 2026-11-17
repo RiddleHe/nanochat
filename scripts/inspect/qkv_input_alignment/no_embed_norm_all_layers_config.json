@@ -1,0 +1,54 @@
+{
+  "experiment": "d24_no_embed_norm_input_alignment",
+  "reference_run": "/local-ssd/mh3897/analysis_runs/d24_no_embed_norm_v_comparison/step7809_20261102T235407Z/no_embed_norm",
+  "squared_energy_thresholds": [
+    0.5
+  ],
+  "forward_dtype": "bfloat16",
+  "svd_dtype": "float64",
+  "basis_dtype": "float32",
+  "analysis_dtype": "float32",
+  "storage_dtype": "float32",
+  "summary_dtype": "float64",
+  "source_batch_size": 4,
+  "seed": 42,
+  "cpu_threads": 4,
+  "tie_rtol": 1e-08,
+  "validation": {
+    "svd_relative_error": 1e-10,
+    "stored_basis_orthogonality_error": 2e-06,
+    "alignment_bound_tolerance": 3e-06,
+    "source_norm_rtol": 2e-05,
+    "source_norm_atol": 1e-06
+  },
+  "model_type": "gpt_base_no_embed_norm",
+  "layers": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23
+  ],
+  "kinds": [
+    "V"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "parent_run": "/local-ssd/mh3897/analysis_runs/d24_vocab_vo_cosine/gpt_base_scalar_res_qkv_no_embed_norm_step7773_20261108T232243Z",
+  "cpu_threads": 4,
+  "spectrum_dtype": "float64",
+  "spectrum_method": "eigh of explicitly centered or uncentered FP64 Gram matrix",
+  "thresholds": [0.5, 0.9, 0.99],
+  "validation": {
+    "parent_norm_rtol": 0.000002,
+    "parent_cosine_atol": 0.000002,
+    "orthogonality_atol": 0.00000000002,
+    "spectral_relative_tolerance": 0.0000000001
+  }
+}

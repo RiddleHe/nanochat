@@ -1,0 +1,65 @@
+<div id="gpt-base-raw-source-norms">
+<style>
+#gpt-base-raw-source-norms{position:relative;color-scheme:only dark;--background:#181818;--foreground:#f4f4f4;--muted-foreground:#b8b8b8;--border:#353535;--popover:#242424;--popover-foreground:#f4f4f4;--viz-series-1:#5a9aef;background:var(--background);color:var(--foreground);padding:12px;box-sizing:border-box}
+#gpt-base-raw-source-norms[data-theme="light"]{color-scheme:light;--background:#fff;--foreground:#171717;--muted-foreground:#555;--border:#d5d8df;--popover:#fff;--popover-foreground:#171717;--viz-series-1:#1d5ca8}
+#gpt-base-raw-source-norms .raw-chart{display:block;width:100%}
+#gpt-base-raw-source-norms .raw-chart text{fill:var(--foreground);font-size:12px;font-weight:400}
+#gpt-base-raw-source-norms .raw-tooltip{position:absolute;pointer-events:none;z-index:10;background:var(--popover);color:var(--popover-foreground);padding:8px;max-width:260px}
+#gpt-base-raw-source-norms .raw-detail{min-height:36px;margin-top:8px}
+</style>
+<h2>GPTBase · raw source L2 norms</h2>
+<div class="text-small" id="raw-caption"></div>
+<div id="raw-chart-holder"></div>
+<div class="text-small">Emb: after embedding RMSNorm · A0–A23: attention module outputs after output projection</div>
+<div id="raw-detail" class="raw-detail text-small tabular-nums" aria-live="polite"></div>
+<div id="raw-tooltip" class="raw-tooltip tooltip text-small tabular-nums" role="tooltip" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script>
+(()=>{
+const data=__RAW_SOURCE_NORMS_DATA__,root=document.getElementById('gpt-base-raw-source-norms');
+const modelLabel=data.model_label||'GPTBase';root.dataset.theme=data.theme||'dark';root.querySelector('h2').textContent=`${modelLabel} · raw source L2 norms`;
+const get=id=>root.querySelector('#'+id),holder=get('raw-chart-holder'),tip=get('raw-tooltip'),fmt=d3.format(',.3f');
+get('raw-caption').textContent=`${data.tokens.toLocaleString()} token occurrences · ${data.dimensions.toLocaleString()} dimensions · token-mean norms · linear scale from zero`;
+let pinned=null;
+function restore(state){const s=state?.modelContent;if(s?.run_id===data.run_id&&s.view==='raw_source_norms'&&data.points.some(p=>p.index===s.source_index))pinned=s.source_index;}
+restore(window.openai?.widgetState);
+function describe(p){return `${p.label} · mean L2 ${fmt(p.mean)} · token std ${fmt(p.std)}`;}
+function draw(){
+ const width=holder.getBoundingClientRect().width;if(!width)return;
+ const height=360,left=72,right=18,top=14,bottom=54;
+ holder.replaceChildren();
+ const x=d3.scaleLinear().domain(d3.extent(data.points,p=>p.source_layer)).range([left+5,width-right-5]);
+ const y=d3.scaleLinear().domain([0,data.y_max]).range([height-bottom-5,top+5]);
+ const svg=d3.select(holder).append('svg').attr('class','raw-chart').attr('viewBox',`0 0 ${width} ${height}`).attr('role','img').attr('aria-label',`${modelLabel} mean raw L2 norm of normalized embedding and all attention outputs`);
+ svg.append('title').text(`${modelLabel} raw source L2 norms`);
+ svg.append('desc').text('Full source vector norm measured per token then averaged. No receiving-layer normalization, Q/K/V projection, fitted scaling, or cumulative residual summation. Emb is after embedding RMSNorm. Hover or tap to inspect source mean and population token standard deviation.');
+ svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','none').attr('stroke','var(--border)');
+ const ticks=y.ticks(5);
+ svg.append('g').selectAll('line').data(ticks).join('line').attr('x1',left).attr('x2',width-right).attr('y1',y).attr('y2',y).attr('stroke','var(--border)').attr('stroke-opacity',.5);
+ svg.append('g').attr('transform',`translate(${left},0)`).call(d3.axisLeft(y).tickValues(ticks).tickSize(0).tickPadding(8)).call(g=>g.select('.domain').remove());
+ const n=width<400?4:Math.min(9,Math.floor((width-left-right)/48));
+ const xticks=[...new Set(d3.range(n).map(i=>Math.round(-1+i*(data.points.length-1)/(n-1))))];
+ const xa=svg.append('g').attr('data-source-axis','').attr('transform',`translate(0,${height-bottom})`).call(d3.axisBottom(x).tickValues(xticks).tickFormat(v=>v===-1?'Emb':`A${v}`).tickSize(0).tickPadding(9)).call(g=>g.select('.domain').remove());
+ xa.selectAll('text').attr('text-anchor',v=>v===-1?'start':v===data.points.at(-1).source_layer?'end':'middle');
+ svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+width-right)/2).attr('y',height-6).attr('text-anchor','middle').text('Embedding / attention source layer');
+ svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(16,${(top+height-bottom)/2}) rotate(-90)`).attr('text-anchor','middle').text('Mean raw L2 norm');
+ svg.append('path').datum(data.points).attr('data-mean-line','').attr('d',d3.line().x(p=>x(p.source_layer)).y(p=>y(p.mean))).attr('fill','none').attr('stroke','var(--viz-series-1)').attr('stroke-width',2);
+ svg.append('g').selectAll('circle').data(data.points).join('circle').attr('data-source-index',p=>p.index).attr('cx',p=>x(p.source_layer)).attr('cy',p=>y(p.mean)).attr('r',3).attr('fill','var(--viz-series-1)');
+ const guide=svg.append('line').attr('y1',top).attr('y2',height-bottom).attr('stroke','var(--border)').attr('visibility','hidden');
+ const marker=svg.append('circle').attr('r',5).attr('fill','var(--viz-series-1)').attr('visibility','hidden');
+ function show(p,event){
+  guide.attr('x1',x(p.source_layer)).attr('x2',x(p.source_layer)).attr('visibility','visible');marker.attr('cx',x(p.source_layer)).attr('cy',y(p.mean)).attr('visibility','visible');
+  if(event){tip.textContent=describe(p);tip.hidden=false;const b=root.getBoundingClientRect();tip.style.left=Math.max(0,Math.min(event.clientX-b.left+10,b.width-tip.offsetWidth))+'px';tip.style.top=Math.max(0,event.clientY-b.top-tip.offsetHeight-10)+'px';}
+ }
+ if(pinned!==null){const p=data.points.find(p=>p.index===pinned);show(p);get('raw-detail').textContent=describe(p);}
+ const overlay=svg.append('rect').attr('data-chart-hit','').attr('class','cursor-interaction').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','transparent');
+ function nearest(e){const px=d3.pointer(e,svg.node())[0];return data.points[d3.bisector(p=>p.source_layer).center(data.points,x.invert(px))];}
+ overlay.on('pointermove',e=>show(nearest(e),e)).on('pointerleave',()=>{tip.hidden=true;guide.attr('visibility','hidden');marker.attr('visibility','hidden');if(pinned!==null)show(data.points.find(p=>p.index===pinned));}).on('click',e=>{const p=nearest(e);pinned=p.index;get('raw-detail').textContent=describe(p);show(p);window.openai?.setWidgetState({modelContent:{run_id:data.run_id,view:'raw_source_norms',source_index:p.index},privateContent:null})?.catch(()=>{});});
+ const labels=xa.selectAll('text').nodes(),kept=[];
+ for(const label of labels){const b=label.getBoundingClientRect();if(kept.some(k=>b.left<k.right+4&&b.right+4>k.left))label.parentNode.remove();else kept.push(b);}
+}
+window.addEventListener('openai:set_globals',e=>{restore(e.detail?.globals?.widgetState);draw();});
+new ResizeObserver(draw).observe(holder);draw();
+})();
+</script>
+</div>

@@ -1,0 +1,56 @@
+<div id="vocab-vo-pca-__MODE__" style="color-scheme:only dark;--background:Canvas;--foreground:CanvasText;--popover:Canvas;--popover-foreground:CanvasText;--border:color-mix(in srgb,CanvasText 18%,Canvas);background:var(--background);color:var(--foreground);position:relative">
+<style>
+#vocab-vo-pca-__MODE__ .chart{display:block;width:100%}
+#vocab-vo-pca-__MODE__ .chart text{fill:var(--foreground);font-size:12px}
+#vocab-vo-pca-__MODE__ .legend{display:flex;flex-wrap:wrap;gap:16px;margin:12px 0}
+#vocab-vo-pca-__MODE__ .legend button{display:inline-flex;gap:6px;align-items:center;background:transparent;border:0;padding:0;color:var(--foreground);font:inherit}
+#vocab-vo-pca-__MODE__ .legend button[aria-pressed="false"]{opacity:.45}
+#vocab-vo-pca-__MODE__ .swatch{width:22px;border-top:2px solid var(--viz-series-1)}
+#vocab-vo-pca-__MODE__ .swatch.scalar{border-color:var(--viz-series-2);border-top-style:dashed}
+#vocab-vo-pca-__MODE__ .tooltip{position:absolute;pointer-events:none;background:var(--popover);color:var(--popover-foreground);padding:10px;max-width:100%;box-sizing:border-box;z-index:2}
+#vocab-vo-pca-__MODE__ .row{margin-top:5px}
+</style>
+<h3>__TITLE__</h3>
+<div class="legend text-small"></div>
+<svg class="chart" role="img" aria-label="Cumulative explained fractions for raw embeddings and eleven V to O output matrices over all vocabulary tokens."></svg>
+<div class="tooltip text-small tabular-nums" role="tooltip" hidden></div>
+<script type="application/json">__DATA__</script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script>
+(()=>{
+const root=document.getElementById('vocab-vo-pca-__MODE__'),data=JSON.parse(root.querySelector('script[type="application/json"]').textContent),svg=d3.select(root.querySelector('.chart')),tip=root.querySelector('.tooltip');
+const series=data.series.map((s,i)=>({...s,color:i===0?'var(--foreground)':`var(--viz-series-${(i-1)%6+1})`,dash:i<=6?null:'6 3'}));
+const legend=root.querySelector('.legend');for(const s of series){const b=document.createElement('button');b.type='button';b.dataset.series=s.id;b.setAttribute('aria-pressed','true');const sw=document.createElement('span');sw.className='swatch';sw.style.borderColor=s.color;if(s.dash)sw.style.borderTopStyle='dashed';b.append(sw,document.createTextNode(s.label));legend.append(b);}
+let visible=new Set(series.map(s=>s.id)),pinned=null;
+function restore(state){const s=state?.modelContent;if(s?.view!=='vocab-vo-pca-__MODE__')return;if(Array.isArray(s.visible))visible=new Set(s.visible.filter(id=>series.some(d=>d.id===id)));pinned=Number.isFinite(s.progress)&&s.progress>=1&&s.progress<=data.dimensions?s.progress:null;}
+function save(){window.openai?.setWidgetState?.({modelContent:{view:'vocab-vo-pca-__MODE__',visible:[...visible],progress:pinned},privateContent:null})?.catch(()=>{});}
+restore(window.openai?.widgetState);
+function interpolate(points,at){if(at<points[0].x||at>points.at(-1).x)return null;const j=d3.bisector(p=>p.x).left(points,at);if(j===0)return {...points[0],interpolated:false};const a=points[j-1],b=points[j],t=(Math.log(at)-Math.log(a.x))/(Math.log(b.x)-Math.log(a.x));return {x:at,y:a.y+t*(b.y-a.y),interpolated:t>1e-8&&t<1-1e-8};}
+function draw(){
+ const w=root.clientWidth,h=w<440?360:440,f={left:64,right:w-14,top:12,bottom:h-60};
+ const extent=d3.extent(series.flatMap(s=>s.points),p=>p.y),pad=(extent[1]-extent[0])*.08;
+ const x=d3.scaleLog().domain([1,data.dimensions]).range([f.left+4,f.right-4]),y=d3.scaleLinear().domain([0,1]).range([f.bottom-4,f.top+4]);
+ svg.selectAll('*').remove();svg.attr('viewBox',`0 0 ${w} ${h}`).attr('height',h);
+ svg.append('title').text('__TITLE__');svg.append('desc').text('All valid vocabulary rows equally weighted, including special tokens. Raw Emb reference and eleven layer outputs. Each point is cumulative squared-singular-value fraction at an integer direction count. Centered spectra subtract the mean vector; uncentered spectra preserve it. No row normalization.');
+ svg.append('rect').attr('data-chart-frame','').attr('x',f.left).attr('y',f.top).attr('width',f.right-f.left).attr('height',f.bottom-f.top).attr('fill','none').attr('stroke','var(--border)');
+ for(const v of [0,.25,.5,.75,1])svg.append('line').attr('x1',f.left).attr('x2',f.right).attr('y1',y(v)).attr('y2',y(v)).attr('stroke','var(--border)');
+ for(const level of (data.mode==='centered'?[.5,.9]:[.9]))svg.append('line').attr('data-reference',level).attr('x1',f.left).attr('x2',f.right).attr('y1',y(level)).attr('y2',y(level)).attr('stroke','var(--foreground)').attr('stroke-opacity',.65).attr('stroke-dasharray','5 4');
+ svg.append('g').attr('class','axis').attr('transform',`translate(${f.left},0)`).call(d3.axisLeft(y).tickValues(data.mode==='centered'?[0,.25,.5,.75,.9,1]:[0,.25,.5,.75,1]).tickFormat(d3.format('.0%')).tickSize(0).tickPadding(8));
+ svg.append('g').attr('class','axis').attr('transform',`translate(0,${f.bottom})`).call(d3.axisBottom(x).tickValues(w<440?[1,32,1536]:[1,10,100,1000]).tickFormat(d3.format(',d')).tickSize(0).tickPadding(10));
+ svg.selectAll('.axis .domain').remove();svg.selectAll('.axis:last-of-type .tick text').attr('text-anchor',d=>d===1?'start':d===1536?'end':'middle');
+ svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(f.left+f.right)/2).attr('y',h-12).attr('text-anchor','middle').text(w<440?'Directions (log scale)':'Number of directions · log scale');
+ svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(18,${(f.top+f.bottom)/2}) rotate(-90)`).attr('text-anchor','middle').text('__Y_LABEL__');
+ for(const s of series){root.querySelector(`button[data-series="${s.id}"]`).setAttribute('aria-pressed',visible.has(s.id));svg.append('path').datum(s.points).attr('data-line',s.id).attr('display',visible.has(s.id)?null:'none').attr('d',d3.line().x(p=>x(p.x)).y(p=>y(p.y))).attr('fill','none').attr('stroke',s.color).attr('stroke-width',s.id==='Emb'?2.5:1.4).attr('stroke-dasharray',s.dash);}
+ const guide=svg.append('line').attr('data-chart-hover-guide','').attr('y1',f.top).attr('y2',f.bottom).attr('stroke','var(--foreground)').attr('stroke-opacity',.4).attr('visibility','hidden'),marks=svg.append('g');
+ function clear(){tip.hidden=true;guide.attr('visibility','hidden');marks.selectAll('*').remove();}
+ function show(at){tip.replaceChildren();marks.selectAll('*').remove();guide.attr('x1',x(at)).attr('x2',x(at)).attr('visibility','visible');const title=document.createElement('div');title.textContent=at.toFixed(1)+' directions · interpolated';tip.append(title);let rows=0;for(const s of series){if(!visible.has(s.id))continue;const p=interpolate(s.points,at);if(!p)continue;rows++;marks.append('circle').attr('data-chart-hover-marker',s.id).attr('cx',x(at)).attr('cy',y(p.y)).attr('r',3).attr('fill',s.color);const row=document.createElement('div');row.className='row';row.dataset.tooltipSeries=s.id;row.textContent=`${s.label}: ${(100*p.y).toFixed(2)}%`;tip.append(row);}tip.hidden=!rows;tip.style.left=Math.max(0,Math.min(w-tip.offsetWidth,x(at)-tip.offsetWidth/2))+'px';tip.style.top=(svg.node().getBoundingClientRect().top-root.getBoundingClientRect().top+f.top+8)+'px';}
+ const coordinate=e=>Math.max(1,Math.min(data.dimensions,x.invert(d3.pointer(e,svg.node())[0])));
+ svg.append('rect').attr('data-chart-hit','').attr('data-chart-hover-overlay','cross-series').attr('x',f.left).attr('y',f.top).attr('width',f.right-f.left).attr('height',f.bottom-f.top).attr('fill','transparent').on('pointermove',e=>{if(pinned===null)show(coordinate(e));}).on('pointerleave',()=>{if(pinned===null)clear();}).on('click',e=>{pinned=pinned===null?coordinate(e):null;if(pinned===null)clear();else show(pinned);save();});
+ if(pinned!==null)show(pinned);else clear();
+ const labels=[...svg.node().querySelectorAll('text')];let overlap=false;labels.forEach((a,i)=>labels.slice(i+1).forEach(b=>{const r=a.getBoundingClientRect(),s=b.getBoundingClientRect();if(r.left<s.right+4&&r.right+4>s.left&&r.top<s.bottom+4&&r.bottom+4>s.top)overlap=true;}));svg.attr('data-label-overlap',String(overlap));
+}
+root.querySelectorAll('button[data-series]').forEach(b=>b.addEventListener('click',()=>{visible.has(b.dataset.series)?visible.delete(b.dataset.series):visible.add(b.dataset.series);draw();save();}));
+window.addEventListener('openai:set_globals',e=>{restore(e.detail?.globals?.widgetState);draw();});new ResizeObserver(draw).observe(root);draw();
+})();
+</script>
+</div>

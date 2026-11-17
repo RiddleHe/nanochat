@@ -1,0 +1,159 @@
+<div id="attn-res-source-norms">
+  <style>
+    #attn-res-source-norms {position:relative}
+    #attn-res-source-norms[data-appearance="dark"] {color-scheme:only dark;--background:#181818;--foreground:#f4f4f4;--muted-foreground:#b8b8b8;--border:#353535;--popover:#242424;--popover-foreground:#f4f4f4;--viz-series-1:#3579d5;--viz-series-2:#f5d64d;--viz-series-3:#ef8bbd;background:var(--background);color:var(--foreground);padding:12px;box-sizing:border-box}
+    #attn-res-source-norms .norm-panels {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 24px}
+    #attn-res-source-norms figure {margin:0;min-width:0}
+    #attn-res-source-norms .norm-chart {display:block;width:100%}
+    #attn-res-source-norms .norm-chart text {fill:var(--foreground);font-size:12px;font-weight:400}
+    #attn-res-source-norms .norm-legend {display:flex;gap:16px;flex-wrap:wrap;margin:12px 0}
+    #attn-res-source-norms .norm-legend button {background:transparent!important;border:0;padding:0;color:var(--foreground)!important;font:inherit;display:inline-flex;align-items:center;gap:6px}
+    #attn-res-source-norms .norm-legend button[aria-pressed="false"] {opacity:.45}
+    #attn-res-source-norms .norm-tooltip {position:absolute;pointer-events:none;z-index:10;background:var(--popover);color:var(--popover-foreground);padding:8px;max-width:280px}
+    #attn-res-source-norms .norm-tooltip table {border-collapse:collapse}
+    #attn-res-source-norms .norm-tooltip td {padding:2px 6px}
+    #attn-res-source-norms .norm-tooltip td:not(:first-child) {text-align:right}
+    #attn-res-source-norms #norm-raw {margin-top:24px}
+    #attn-res-source-norms #norm-detail {min-height:24px;margin-top:8px}
+    @media(max-width:700px){#attn-res-source-norms .norm-panels {grid-template-columns:1fr}}
+  </style>
+  <h2>Source magnitude before and after Q/K/V projection</h2>
+  <div id="norm-caption" class="text-small"></div>
+  <div id="norm-legend" class="norm-legend text-small" aria-label="Visible series"></div>
+  <div id="norm-panels" class="norm-panels"></div>
+  <div id="norm-detail" class="text-small tabular-nums" aria-live="polite"></div>
+  <div id="norm-raw"></div>
+  <div id="norm-tooltip" class="norm-tooltip tooltip text-small tabular-nums" role="tooltip" hidden></div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+  (()=>{
+    const root=document.getElementById('attn-res-source-norms'),data=__SOURCE_NORMS_DATA__;
+    if(data.theme==='dark')root.dataset.appearance='dark';
+    const get=id=>root.querySelector('#'+id),names=['Q input','Q projected','K input','K projected','V input','V projected'];
+    const sourceStart=data.x_start??-1;
+    const labels=Object.fromEntries(names.map(n=>[n,n]));
+    const colors=Object.fromEntries(names.map(n=>[n,`var(--viz-series-${'QKV'.indexOf(n[0])+1})`]));
+    const dash=Object.fromEntries(names.map(n=>[n,n.endsWith('input')?'6 3':null]));
+    const fmt=d3.format('.3f');
+    let enabled=new Set(names),pinned=null;
+    function restore(state){
+      if(state?.modelContent?.run_id!==data.run_id||state.modelContent.family!==data.family)return;
+      enabled=new Set((state.privateContent?.enabled||names).filter(n=>names.includes(n)));
+      pinned=state.modelContent.selection||null;
+    }
+    restore(window.openai?.widgetState);
+    if(data.title)root.querySelector('h2').textContent=data.title;
+    if(data.columns===1)get('norm-panels').style.gridTemplateColumns='1fr';
+    get('norm-caption').textContent=`${data.tokens.toLocaleString()} tokens · 1,536 dimensions · projected ↑ / input ↓ · SAME magnitude scale above and below zero, shared across panels · all norms positive · before RoPE and Q/K normalization`;
+    if(data.source_caption)get('norm-caption').textContent+=' · '+data.source_caption;
+    const buttons=[];
+    names.forEach(name=>{
+      const button=document.createElement('button');button.type='button';button.className='cursor-interaction';
+      button.setAttribute('aria-pressed',String(enabled.has(name)));button.setAttribute('aria-label',labels[name]);
+      const swatch=d3.select(button).append('svg').attr('width',24).attr('height',12).attr('aria-hidden','true');
+      swatch.append('line').attr('x1',1).attr('x2',23).attr('y1',6).attr('y2',6).attr('stroke',colors[name]).attr('stroke-width',2).attr('stroke-dasharray',dash[name]);
+      button.appendChild(document.createTextNode(labels[name]));get('norm-legend').appendChild(button);
+      buttons.push({button,name});button.addEventListener('click',()=>{
+        enabled.has(name)?enabled.delete(name):enabled.add(name);redraw();save();
+      });
+    });
+    if(!data.raw)get('norm-raw').hidden=true;
+    const panels=[...data.panels,...(data.raw?[data.raw]:[])].map(panel=>{
+      const figure=document.createElement('figure'),title=document.createElement('h3'),holder=document.createElement('div');
+      title.textContent=panel.title+(panel.layer===null?' · separate Y scale':'');figure.append(title,holder);
+      get(panel.layer===null?'norm-raw':'norm-panels').appendChild(figure);
+      return {...panel,id:panel.layer===null?'raw':String(panel.layer),holder};
+    });
+    function save(){window.openai?.setWidgetState({modelContent:{run_id:data.run_id,family:data.family,selection:pinned},privateContent:{enabled:[...enabled]}}).catch(()=>{});}
+    function visible(panel){return panel.series.filter(s=>panel.layer===null||enabled.has(s.name));}
+    function sample(series,x){
+      const lo=Math.floor(x-sourceStart),hi=Math.min(series.values.length-1,lo+1),t=x-sourceStart-lo;
+      return {name:series.name,value:series.values[lo]*(1-t)+series.values[hi]*t,std:series.std[lo]*(1-t)+series.std[hi]*t};
+    }
+    function sourceLabel(x,panel){
+      if(panel.source_labels){
+        const lo=Math.floor(x-sourceStart),hi=Math.min(panel.source_labels.length-1,lo+1);
+        return Math.abs(x-Math.round(x))<.015?panel.source_labels[Math.round(x-sourceStart)]:`${panel.source_labels[lo]} → ${panel.source_labels[hi]} (interpolated)`;
+      }
+      return Math.abs(x-Math.round(x))<.015?(Math.round(x)===-1?'Emb':String(Math.round(x))):`${x.toFixed(2)} (interpolated)`;
+    }
+    function draw(panel){
+      const width=panel.holder.getBoundingClientRect().width;if(width<1)return;
+      panel.holder.replaceChildren();
+      const height=420,left=68,right=20,top=12,bottom=48;
+      const maxSource=panel.series[0].values.length-1+sourceStart;
+      const x=d3.scaleLinear().domain([sourceStart,maxSource]).range([left+4,width-right-4]);
+      const zero=(top+height-bottom)/2;
+      const yProjected=d3.scaleLinear().domain([0,data.comparison_max*1.05]).range([zero,top+4]);
+      const yInput=d3.scaleLinear().domain([0,data.comparison_max*1.05]).range([zero,height-bottom-4]);
+      const yFor=name=>name.endsWith('input')?yInput:yProjected;
+      const svg=d3.select(panel.holder).append('svg').attr('class','norm-chart').attr('viewBox',`0 0 ${width} ${height}`).attr('role','img').attr('aria-label',`${panel.title}, mean per-token L2 norm by source layer`);
+      svg.append('title').text(panel.title);
+      svg.append('desc').text(panel.layer===null?'Normalized embedding and each layer’s attention plus MLP write before receiving-layer normalization.':`Per-source weighted, normalized Q/K/V input components (dashed) and full projections (solid), averaged over identical tokens. Each query has its own routing weight and actual mixture denominator. All vectors have 1,536 dimensions; embedding ${data.embedding_displayed?'included as Emb':'excluded'}.`);
+      svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','none').attr('stroke','var(--border)');
+      for(const [type,scale] of [['projected',yProjected],['input',yInput]]){
+        const ticks=scale.ticks(3).filter(v=>v>0);
+        svg.append('g').selectAll('line').data(ticks).join('line').attr('x1',left).attr('x2',width-right).attr('y1',scale).attr('y2',scale).attr('stroke','var(--border)').attr('stroke-opacity',.5);
+        svg.append('g').attr('data-y-axis',type).attr('transform',`translate(${left},0)`).call(d3.axisLeft(scale).tickValues(ticks).tickSize(0).tickPadding(8)).call(g=>g.select('.domain').remove());
+      }
+      svg.append('line').attr('data-zero-line','').attr('x1',left).attr('x2',width-right).attr('y1',zero).attr('y2',zero).attr('stroke','var(--muted-foreground)');
+      svg.append('text').attr('x',left-8).attr('y',zero).attr('dy','.32em').attr('text-anchor','end').text('0');
+      const n=width<360?4:Math.min(7,Math.floor((width-left-right)/40));
+      let xticks=[...new Set(d3.range(n).map(i=>Math.round(sourceStart+i*(maxSource-sourceStart)/(n-1))))];
+      if(panel.source_labels){
+        const pairs=panel.source_labels.length/2;
+        const count=width<360?2:Math.min(pairs,Math.max(2,Math.floor((width-left-right)/70)));
+        xticks=[...new Set(d3.range(count).map(i=>Math.round(i*(pairs-1)/(count-1))))].flatMap(i=>[2*i,2*i+1]);
+      }
+      const xaxis=svg.append('g').attr('data-source-axis','').attr('transform',`translate(0,${height-bottom})`).call(d3.axisBottom(x).tickValues(xticks).tickFormat(v=>panel.source_labels?panel.source_labels[v-sourceStart]:(v===-1?'Emb':v)).tickSize(0).tickPadding(8)).call(g=>g.select('.domain').remove());
+      if(panel.source_labels)xaxis.selectAll('text').attr('y',v=>v%2===0?8:26);
+      else xaxis.selectAll('text').attr('text-anchor',v=>v===sourceStart?'start':v===maxSource?'end':'middle');
+      svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+width-right)/2).attr('y',height-5).attr('text-anchor','middle').text('Source layer index');
+      svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(16,${(top+zero)/2}) rotate(-90)`).attr('text-anchor','middle').text('Projected L2 ↑');
+      svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(16,${(zero+height-bottom)/2}) rotate(-90)`).attr('text-anchor','middle').text('Input L2 ↓');
+      for(const series of visible(panel)){
+        const y=yFor(series.name);
+        const points=series.values.map((value,i)=>({x:i+sourceStart,value}));
+        svg.append('path').datum(points).attr('data-series',series.name).attr('d',d3.line().x(d=>x(d.x)).y(d=>y(d.value)))
+          .attr('fill','none').attr('stroke',colors[series.name]).attr('stroke-width',2).attr('stroke-dasharray',dash[series.name]);
+        svg.append('g').attr('data-series-points',series.name).selectAll('circle').data(points).join('circle').attr('cx',d=>x(d.x)).attr('cy',d=>y(d.value)).attr('r',2.5).attr('fill',colors[series.name]);
+      }
+      const guide=svg.append('line').attr('data-chart-hover-guide','').attr('y1',top).attr('y2',height-bottom).attr('stroke','var(--border)').attr('visibility','hidden');
+      const markers=svg.append('g');
+      function show(value,event){
+        guide.attr('x1',x(value)).attr('x2',x(value)).attr('visibility','visible');
+        const rows=visible(panel).map(s=>sample(s,value));
+        markers.selectAll('circle').data(rows,d=>d.name).join('circle').attr('data-chart-hover-marker','').attr('cx',x(value)).attr('cy',d=>yFor(d.name)(d.value)).attr('r',4).attr('fill',d=>colors[d.name]);
+        if(event){
+          const tip=get('norm-tooltip');tip.replaceChildren();
+          const title=document.createElement('div');title.textContent=`${panel.title} · source ${sourceLabel(value,panel)}`;tip.appendChild(title);
+          const table=document.createElement('table');
+          const header=table.insertRow();['','Mean','Token std'].forEach(t=>{header.insertCell().textContent=t;});
+          rows.forEach(row=>{const tr=table.insertRow();[row.name,fmt(row.value),fmt(row.std)].forEach(t=>{tr.insertCell().textContent=t;});});
+          tip.appendChild(table);tip.hidden=false;
+          const bounds=root.getBoundingClientRect();tip.style.left=Math.max(0,Math.min(event.clientX-bounds.left+12,bounds.width-tip.offsetWidth))+'px';
+          tip.style.top=Math.max(0,event.clientY-bounds.top-tip.offsetHeight-10)+'px';
+        }
+        return rows;
+      }
+      if(pinned?.panel===panel.id&&pinned.x>=sourceStart&&pinned.x<=maxSource){
+        const rows=show(pinned.x);get('norm-detail').textContent=`${panel.title} · source ${sourceLabel(pinned.x,panel)} · ${rows.map(r=>r.name+' '+fmt(r.value)).join(' · ')}`;
+      }
+      const overlay=svg.append('rect').attr('data-chart-hit','').attr('data-chart-hover-overlay','cross-series').attr('class','cursor-interaction')
+        .attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','transparent');
+      const at=event=>Math.max(sourceStart,Math.min(maxSource,x.invert(d3.pointer(event,svg.node())[0])));
+      overlay.on('pointermove',event=>show(at(event),event)).on('pointerleave',()=>{
+        get('norm-tooltip').hidden=true;guide.attr('visibility','hidden');markers.selectAll('*').remove();
+        if(pinned?.panel===panel.id)show(pinned.x);
+      }).on('click',event=>{pinned={panel:panel.id,x:at(event)};redraw();save();});
+      // Check all label bounds after layout; drop interior X ticks if needed.
+      const xtexts=svg.selectAll('g.tick text').nodes().filter(n=>n.getBoundingClientRect().y>svg.node().getBoundingClientRect().y+height-bottom-2);
+      const kept=[];
+      for(const node of xtexts){const b=node.getBoundingClientRect();if(kept.some(p=>b.left<p.right+4&&b.right+4>p.left&&b.top<p.bottom+4&&b.bottom+4>p.top)){node.parentNode.remove();}else kept.push(b);}
+    }
+    function redraw(){get('norm-tooltip').hidden=true;get('norm-detail').textContent='';buttons.forEach(({button,name})=>button.setAttribute('aria-pressed',String(enabled.has(name))));panels.forEach(draw);}
+    window.addEventListener('openai:set_globals',event=>{restore(event.detail?.globals?.widgetState);redraw();});
+    const observer=new ResizeObserver(redraw);panels.forEach(p=>observer.observe(p.holder));redraw();
+  })();
+  </script>
+</div>

@@ -1,0 +1,17 @@
+{
+  "checkpoint_run": "bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z",
+  "checkpoint_step": 7809,
+  "sequence_length": 2048,
+  "batch_size": 16,
+  "seed": 42,
+  "forward_dtype": "bfloat16",
+  "norm_dtype": "float32",
+  "aggregation_dtype": "float64",
+  "variance_ddof": 0,
+  "token_policy": "Parquet row order; one BOS per document; concatenate all documents; non-overlapping 2048-token contexts; retain final partial context; no cropping, padding, repetition or target-only token exclusion.",
+  "embedding_boundary": "raw embedding lookup; no initial embedding RMSNorm",
+  "attention_boundary": "after attention output projection, before residual addition",
+  "mlp_boundary": "MLP module output before residual addition",
+  "model_type": "gpt_base_no_embed_norm",
+  "model_code_source": "/local-ssd/mh3897/analysis_runs/d24_no_embed_norm_v_comparison/step7809_20261102T235407Z/no_embed_norm/code/nanochat"
+}

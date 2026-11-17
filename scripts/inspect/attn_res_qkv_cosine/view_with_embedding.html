@@ -1,0 +1,70 @@
+<div id="depth-source-cosine-__FAMILY__">
+<style>
+#depth-source-cosine-__FAMILY__{position:relative;font-family:system-ui,sans-serif;color-scheme:only light;--background:#fff;--foreground:#202124;--muted-foreground:#5f6368;--border:#dadce0;--popover:#fff;--popover-foreground:#202124;--viz-series-1:#2864b4;--viz-series-2:#bb5a21;background:var(--background);color:var(--foreground);padding:12px;box-sizing:border-box}
+#depth-source-cosine-__FAMILY__ h2{font-weight:500}
+#depth-source-cosine-__FAMILY__ .panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+#depth-source-cosine-__FAMILY__ figure{margin:0;min-width:0}
+#depth-source-cosine-__FAMILY__ svg{display:block;width:100%}
+#depth-source-cosine-__FAMILY__ svg text{fill:var(--foreground);font-size:12px;font-weight:400}
+#depth-source-cosine-__FAMILY__ .legend{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:14px 0}
+#depth-source-cosine-__FAMILY__ .ramp{width:180px;height:12px;background:linear-gradient(to right,var(--viz-series-2),var(--background),var(--viz-series-1))}
+#depth-source-cosine-__FAMILY__ .tooltip{position:absolute;pointer-events:none;z-index:10;background:var(--popover);color:var(--popover-foreground);padding:8px;max-width:min(290px,calc(100% - 24px));white-space:normal;box-sizing:border-box;border-radius:0;box-shadow:none;font-weight:400;text-align:left;transform:none}
+#depth-source-cosine-__FAMILY__ .tooltip[hidden]{display:none}
+#depth-source-cosine-__FAMILY__ .tooltip:not([hidden]){display:block}
+#depth-source-cosine-__FAMILY__ .detail{min-height:40px;margin-top:8px}
+#depth-source-cosine-__FAMILY__ .mask-swatch{width:16px;height:16px;background:repeating-linear-gradient(135deg,var(--background) 0 3px,var(--border) 3px 4px,var(--background) 4px 6px)}
+#depth-source-cosine-__FAMILY__ .undefined-swatch{width:16px;height:16px;background:var(--border)}
+@media(max-width:600px){#depth-source-cosine-__FAMILY__ .panels{grid-template-columns:1fr;gap:20px}}
+</style>
+<h2>D24 · __SOURCE_TITLE__ cosine similarity</h2>
+<p class="text-small">Q, K and V depth-routing queries · mean across 262,144 token occurrences · zero-based layers</p>
+<div class="legend text-small tabular-nums"><span>−1</span><span class="ramp" aria-label="Orange negative, white zero, blue positive"></span><span>+1</span><span>Shared linear scale · white = 0</span></div>
+<div class="panels"></div>
+<div class="legend text-small"><span class="mask-swatch" aria-hidden="true"></span><span>Unavailable</span>__UNDEFINED_LEGEND__</div>
+<p class="text-small">__SOURCE_NOTE__</p>
+<div class="detail text-small tabular-nums" aria-live="polite"></div>
+<div class="tooltip text-small tabular-nums" role="tooltip" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script>
+(()=>{
+ const data=__COSINE_DATA__,root=document.getElementById('depth-source-cosine-__FAMILY__');
+ const tooltip=root.querySelector('.tooltip'),detail=root.querySelector('.detail'),fmt=d3.format('.5f');
+ const lookup=new Map(data.cells.map(c=>[`${c.kind}:${c.layer}:${c.source_layer}`,c]));
+ const style=getComputedStyle(root),color=d3.scaleLinear().domain([-1,0,1]).range([style.getPropertyValue('--viz-series-2').trim(),style.getPropertyValue('--background').trim(),style.getPropertyValue('--viz-series-1').trim()]).clamp(true);
+ const panels=[];let pinned=null;
+ function valid(s){return s?.run_id===data.run_id&&s?.family===data.family&&lookup.has(`${s.kind}:${s.layer}:${s.source_layer}`);}
+ const saved=window.openai?.widgetState?.modelContent;if(valid(saved))pinned=saved;
+ function describe(c){return `${c.kind} · receiving layer ${c.layer} · ${c.source_layer===-1?'Emb':data.source_label+' source '+c.source_layer} · ${c.mean===null?'undefined (zero query/source norm)':`mean ${fmt(c.mean)} · token std ${fmt(c.std)}`} · valid ${c.count.toLocaleString()} / ${data.tokens.toLocaleString()} · query L2 norm ${fmt(c.query_norm)}`;}
+ for(const kind of ['Q','K','V']){const figure=document.createElement('figure'),caption=document.createElement('figcaption'),holder=document.createElement('div');caption.textContent=kind;figure.append(caption,holder);root.querySelector('.panels').append(figure);panels.push({kind,holder});}
+ function draw(p){
+  tooltip.hidden=true;
+  const width=p.holder.getBoundingClientRect().width;if(width<1)return;
+  const left=64,right=8,top=8,bottom=54,plotHeight=384,height=top+plotHeight+bottom;
+  p.holder.replaceChildren();
+  const svg=d3.select(p.holder).append('svg').attr('class','cosine-chart').attr('viewBox',`0 0 ${width} ${height}`).attr('role','img').attr('aria-label',`${p.kind} depth-query and raw-source cosine; receiving layer versus ${data.source_label} source layer`);
+  svg.append('title').text(`${p.kind} · source cosine similarity`);
+  svg.append('desc').text('Token-mean cosine similarity on a shared signed scale from −1 to +1. Zero is white. Hatched cells are unavailable. Solid gray marks undefined cosine for zero query norm.');
+  const pattern=svg.append('defs').append('pattern').attr('id',`cosine-mask-${data.family}-${p.kind}`).attr('width',6).attr('height',6).attr('patternUnits','userSpaceOnUse');
+  pattern.append('path').attr('d','M0,6L6,0').attr('stroke','var(--border)').attr('stroke-width',.6);
+  const x=d3.scaleBand().domain(d3.range(data.first_source,data.depth-1)).range([left,width-right]),y=d3.scaleBand().domain(d3.range(data.depth)).range([top,top+plotHeight]);
+  const cells=d3.range(data.depth).flatMap(layer=>d3.range(data.first_source,data.depth-1).map(source_layer=>({layer,source_layer,cell:lookup.get(`${p.kind}:${layer}:${source_layer}`)})));
+  svg.selectAll('rect.cosine-cell').data(cells).join('rect').attr('class','cosine-cell').attr('data-available',d=>!!d.cell).attr('data-defined',d=>!!d.cell&&d.cell.mean!==null).attr('x',d=>x(d.source_layer)).attr('y',d=>y(d.layer)).attr('width',x.bandwidth()).attr('height',y.bandwidth()).attr('fill',d=>!d.cell?`url(#cosine-mask-${data.family}-${p.kind})`:d.cell.mean===null?'var(--border)':color(d.cell.mean));
+  svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',plotHeight).attr('fill','none').attr('stroke','var(--border)');
+  const xa=svg.append('g').attr('transform',`translate(0,${top+plotHeight})`).call(d3.axisBottom(x).tickValues([data.first_source,7,15,data.depth-2]).tickFormat(v=>v===-1?'Emb':v).tickSize(0).tickPadding(7)).call(g=>g.select('.domain').remove());
+  xa.selectAll('.tick text').attr('text-anchor',v=>v===data.first_source?'start':v===data.depth-2?'end':'middle');
+  svg.append('g').attr('transform',`translate(${left},0)`).call(d3.axisLeft(y).tickValues([0,3,6,9,12,15,18,21,23]).tickSize(0).tickPadding(6)).call(g=>g.select('.domain').remove());
+  svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+width-right)/2).attr('y',height-5).attr('text-anchor','middle').text(data.family==='mlp' ? 'Source MLP layer' : width < 270 ? 'Emb / attn layer' : 'Emb / source attention layer');
+  svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(15,${top+plotHeight/2}) rotate(-90)`).attr('text-anchor','middle').text('Receiving layer');
+  if(pinned?.kind===p.kind){const c=lookup.get(`${p.kind}:${pinned.layer}:${pinned.source_layer}`);svg.append('rect').attr('x',x(c.source_layer)).attr('y',y(c.layer)).attr('width',x.bandwidth()).attr('height',y.bandwidth()).attr('fill','none').attr('stroke','var(--foreground)').attr('stroke-width',1.5);detail.textContent=describe(c);}
+  const hit=svg.append('rect').attr('data-chart-hit','').attr('class','cursor-interaction').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',plotHeight).attr('fill','transparent');
+  function at(e){const [px,py]=d3.pointer(e,svg.node());return lookup.get(`${p.kind}:${Math.floor((py-top)/y.step())}:${Math.floor((px-left)/x.step())+data.first_source}`);}
+  hit.on('pointermove',e=>{const c=at(e);if(!c){tooltip.hidden=true;return;}tooltip.textContent=describe(c);tooltip.hidden=false;const b=root.getBoundingClientRect();tooltip.style.left=Math.max(0,Math.min(e.clientX-b.left+10,b.width-tooltip.offsetWidth))+'px';tooltip.style.top=Math.max(0,e.clientY-b.top-tooltip.offsetHeight-8)+'px';}).on('pointerleave',()=>tooltip.hidden=true).on('click',e=>{const c=at(e);if(!c)return;pinned={run_id:data.run_id,family:data.family,kind:c.kind,layer:c.layer,source_layer:c.source_layer};panels.forEach(draw);window.openai?.setWidgetState({modelContent:pinned,privateContent:null})?.catch(()=>{});});
+  // Check label spacing after layout; reduce optional x ticks if bounds collide.
+  const labels=xa.selectAll('.tick text').nodes();let end=-Infinity;
+  for(const label of labels){const b=label.getBoundingClientRect();if(b.left<end+4&&label.textContent!=='Emb'&&label.textContent!=='22'){label.parentNode.remove();}else{end=b.right;}}
+ }
+ window.addEventListener('openai:set_globals',e=>{const s=e.detail?.globals?.widgetState?.modelContent;if(valid(s)){pinned=s;panels.forEach(draw);}});
+ const observer=new ResizeObserver(()=>panels.forEach(draw));panels.forEach(p=>{draw(p);observer.observe(p.holder);});
+})();
+</script>
+</div>

@@ -1,0 +1,75 @@
+<div id="svd-layer-counts">
+  <style>
+    #svd-layer-counts {--background:#181818;--foreground:#eee;--border:#444;--rank-color:#aaa;--popover:#252525;--popover-foreground:#eee;--viz-series-1:#70a9fa;--viz-series-2:#f6ce5b;--viz-series-3:#ec93cc;--viz-series-4:#75c7a4;--viz-series-5:#bf9af9;--viz-series-6:#f69e71;background:var(--background);color:var(--foreground);color-scheme:dark;padding:16px;position:relative}
+    #svd-layer-counts .layer-legend {display:flex;gap:10px 18px;flex-wrap:wrap;margin:16px 0}
+    #svd-layer-counts .layer-legend button {background:transparent;border:0;padding:0;font:inherit;color:var(--foreground);display:inline-flex;gap:6px;align-items:center}
+    #svd-layer-counts .layer-legend button[aria-pressed=false] {opacity:.4}
+    #svd-layer-counts .layer-chart {width:100%;display:block}
+    #svd-layer-counts .layer-chart text {fill:var(--foreground);font-size:12px;font-weight:400}
+    #svd-layer-counts .layer-tooltip {position:absolute;pointer-events:none;background:var(--popover);color:var(--popover-foreground);padding:10px;z-index:5;max-width:270px}
+    #svd-layer-counts .layer-tooltip-grid {display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
+    #svd-layer-counts .layer-detail {margin-top:12px}
+  </style>
+  <h2 class="layer-title"></h2>
+  <div class="text-small layer-caption"></div>
+  <div class="layer-legend text-small"></div>
+  <div class="layer-panels"></div>
+  <div class="layer-detail text-small tabular-nums" aria-live="polite"></div>
+  <div class="layer-tooltip tooltip text-small tabular-nums" role="tooltip" hidden></div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+  (()=>{
+    const root=document.getElementById('svd-layer-counts'),data=__SVD_LAYER_DATA__,get=s=>root.querySelector(s);
+    get('.layer-title').textContent=`GPTBase · ${data.panels.map(p=>p.kind).join('/')} · ${Math.round(data.threshold*100)}% squared singular-value energy`;
+    get('.layer-caption').textContent=`${data.panels[0].series.length} heads · ${data.panels.length>1?'shared Y scale · ':''}zero-based layers and heads`;
+    const heads=data.panels[0].series.map(s=>s.head),color=h=>`var(--viz-series-${h%6+1})`,dash=h=>h<6?null:'6 4';
+    let enabled=new Set(heads),selection=null,rankEnabled=true,uniformEnabled=true;
+    function restore(state){const m=state?.modelContent;if(m?.run_id!==data.run_id||m?.view!==data.view)return;enabled=new Set((state.privateContent?.enabled??heads).filter(h=>heads.includes(h)));selection=m.selection??null;rankEnabled=state.privateContent?.rankEnabled??true;uniformEnabled=state.privateContent?.uniformEnabled??true;}
+    restore(window.openai?.widgetState);
+    function save(){window.openai?.setWidgetState({modelContent:{run_id:data.run_id,view:data.view,selection},privateContent:{enabled:[...enabled],rankEnabled,uniformEnabled}}).catch(()=>{});}
+    const buttons=heads.map(h=>{const b=document.createElement('button');b.type='button';b.className='cursor-interaction';const sw=d3.select(b).append('svg').attr('width',24).attr('height',12).attr('aria-hidden','true');sw.append('line').attr('x1',1).attr('x2',23).attr('y1',6).attr('y2',6).attr('stroke',color(h)).attr('stroke-width',2).attr('stroke-dasharray',dash(h));b.append(document.createTextNode(`H${h}`));b.onclick=()=>{enabled.has(h)?enabled.delete(h):enabled.add(h);draw();save();};get('.layer-legend').append(b);return {b,h};});
+    let rankButton=null;
+    if(data.show_rank){rankButton=document.createElement('button');rankButton.type='button';rankButton.className='cursor-interaction';rankButton.dataset.rankLegend='';const sw=d3.select(rankButton).append('svg').attr('width',24).attr('height',12).attr('aria-hidden','true');sw.append('line').attr('x1',1).attr('x2',23).attr('y1',6).attr('y2',6).attr('stroke','var(--rank-color)').attr('stroke-width',2).attr('stroke-dasharray','6 4');rankButton.append(document.createTextNode('Rank'));rankButton.onclick=()=>{rankEnabled=!rankEnabled;draw();save();};get('.layer-legend').append(rankButton);}
+    let uniformButton=null;
+    const uniformName=`Ideal ${Math.round(data.threshold*100)}%`;
+    if(data.show_uniform){uniformButton=document.createElement('button');uniformButton.type='button';uniformButton.className='cursor-interaction';uniformButton.dataset.uniformLegend='';const sw=d3.select(uniformButton).append('svg').attr('width',24).attr('height',12).attr('aria-hidden','true');sw.append('line').attr('x1',1).attr('x2',23).attr('y1',6).attr('y2',6).attr('stroke','var(--foreground)').attr('stroke-width',1.8).attr('stroke-dasharray','10 5');uniformButton.append(document.createTextNode(uniformName));uniformButton.onclick=()=>{uniformEnabled=!uniformEnabled;draw();save();};get('.layer-legend').append(uniformButton);}
+    const all=data.panels.flatMap(p=>p.series.flatMap(s=>s.values)),extent=d3.extent(all.flatMap(d=>[d.k,...(data.show_rank?[d.rank]:[]),...(data.show_uniform?[d.uniform_count]:[])])),maxY=d3.scaleLinear().domain([0,extent[1]+Math.max(2,(extent[1]-extent[0])*.06)]).nice().domain()[1],xd=d3.extent(all,d=>d.layer);
+    function draw(){
+      const container=get('.layer-panels');container.replaceChildren();get('.layer-tooltip').hidden=true;buttons.forEach(({b,h})=>b.setAttribute('aria-pressed',String(enabled.has(h))));if(rankButton)rankButton.setAttribute('aria-pressed',String(rankEnabled));if(uniformButton)uniformButton.setAttribute('aria-pressed',String(uniformEnabled));
+      for(const panel of data.panels){
+        const section=document.createElement('section');if(data.panels.length>1){const heading=document.createElement('h3');heading.textContent=panel.kind;section.append(heading);}container.append(section);
+        const width=section.getBoundingClientRect().width,height=data.panels.length===1?390:280,left=64,right=14,top=14,bottom=50;
+        const x=d3.scaleLinear().domain(xd).range([left+5,width-right-5]),y=d3.scaleLinear().domain([0,maxY]).range([height-bottom-5,top+5]);
+        const svg=d3.select(section).append('svg').attr('class','layer-chart').attr('data-kind',panel.kind).attr('data-y-max',maxY).attr('viewBox',`0 0 ${width} ${height}`).attr('role','img').attr('aria-label',`${panel.kind} direction count for ${data.threshold*100} percent squared singular-value energy, all heads across layers`);
+        svg.append('title').text(`${panel.kind} · number of singular value directions across layers`);
+        svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','none').attr('stroke','var(--border)');
+        svg.append('g').selectAll('line').data(y.ticks(4)).join('line').attr('x1',left).attr('x2',width-right).attr('y1',y).attr('y2',y).attr('stroke','var(--border)').attr('stroke-opacity',.5);
+        const tickCount=width<380?4:9,ticks=[...new Set(d3.range(tickCount).map(i=>Math.round(xd[0]+i*(xd[1]-xd[0])/(tickCount-1))))];
+        const xa=svg.append('g').attr('transform',`translate(0,${height-bottom})`).call(d3.axisBottom(x).tickValues(ticks).tickFormat(d3.format('d')).tickSize(0).tickPadding(8)).call(g=>g.select('.domain').remove());
+        xa.selectAll('text').attr('text-anchor',d=>d===xd[0]?'start':d===xd[1]?'end':'middle');
+        svg.append('g').attr('transform',`translate(${left},0)`).call(d3.axisLeft(y).ticks(4).tickFormat(d3.format('d')).tickSize(0).tickPadding(8)).call(g=>g.select('.domain').remove());
+        svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+width-right)/2).attr('y',height-6).attr('text-anchor','middle').text('Receiving layer');
+        svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(17,${(top+height-bottom)/2}) rotate(-90)`).attr('text-anchor','middle').text('Number of singular value directions');
+        for(const s of panel.series.filter(s=>enabled.has(s.head))){svg.append('path').datum(s.values).attr('data-head',s.head).attr('d',d3.line().x(d=>x(d.layer)).y(d=>y(d.k))).attr('fill','none').attr('stroke',color(s.head)).attr('stroke-width',1.6).attr('stroke-dasharray',dash(s.head));svg.append('g').selectAll('circle').data(s.values).join('circle').attr('cx',d=>x(d.layer)).attr('cy',d=>y(d.k)).attr('r',2).attr('fill',color(s.head));}
+        if(data.show_rank&&rankEnabled){for(const s of panel.series)svg.append('path').datum(s.values).attr('data-rank-head',s.head).attr('d',d3.line().x(d=>x(d.layer)).y(d=>y(d.rank))).attr('fill','none').attr('stroke','var(--rank-color)').attr('stroke-width',1.8).attr('stroke-dasharray','6 4');const ranks=[...new Set(panel.series.flatMap(s=>s.values.map(v=>v.rank)))];if(ranks.length===1)svg.append('text').attr('data-rank-label','').attr('x',width-right-8).attr('y',y(ranks[0])-8).attr('text-anchor','end').text(ranks[0]);}
+        if(data.show_uniform&&uniformEnabled){const seen=new Set();for(const s of panel.series){const key=JSON.stringify(s.values.map(v=>v.uniform_count));if(seen.has(key))continue;seen.add(key);svg.append('path').datum(s.values).attr('data-uniform-line','').attr('d',d3.line().x(d=>x(d.layer)).y(d=>y(d.uniform_count))).attr('fill','none').attr('stroke','var(--foreground)').attr('stroke-width',1.8).attr('stroke-dasharray','10 5');}const values=[...new Set(panel.series.flatMap(s=>s.values.map(v=>v.uniform_count)))];if(values.length===1)svg.append('text').attr('data-uniform-label','').attr('x',width-right-8).attr('y',y(values[0])-8).attr('text-anchor','end').text(values[0]);}
+        const guide=svg.append('line').attr('data-chart-hover-guide','').attr('stroke','var(--foreground)').attr('stroke-opacity',.5).attr('y1',top).attr('y2',height-bottom).attr('visibility','hidden'),markers=svg.append('g');
+        function show(value,event){
+          const lo=Math.floor(value),hi=Math.ceil(value),fraction=value-lo,rows=panel.series.filter(s=>enabled.has(s.head)).map(s=>({head:s.head,k:s.values[lo].k+(s.values[hi].k-s.values[lo].k)*fraction})),exact=Math.abs(value-Math.round(value))<1e-8;
+          const rankRows=data.show_rank&&rankEnabled?[...new Set(panel.series.map(s=>s.values[lo].rank+(s.values[hi].rank-s.values[lo].rank)*fraction))].map(k=>({rank:true,k})):[];
+          const uniformRows=data.show_uniform&&uniformEnabled?[...new Set(panel.series.map(s=>s.values[lo].uniform_count+(s.values[hi].uniform_count-s.values[lo].uniform_count)*fraction))].map(k=>({uniform:true,k})):[];
+          const title=exact?`${panel.kind} · layer ${Math.round(value)}`:`${panel.kind} · layer ${value.toFixed(2)} · interpolated`;
+          guide.attr('x1',x(value)).attr('x2',x(value)).attr('visibility','visible');markers.selectAll('circle').data([...rows,...rankRows,...uniformRows]).join('circle').attr('data-chart-hover-marker','').attr('cx',x(value)).attr('cy',r=>y(r.k)).attr('r',3.5).attr('fill',r=>r.rank?'var(--rank-color)':r.uniform?'var(--foreground)':color(r.head));
+          if(event){const tip=get('.layer-tooltip');tip.replaceChildren();const header=document.createElement('div');header.textContent=title;tip.append(header);const grid=document.createElement('div');grid.className='layer-tooltip-grid';for(const r of [...rows,...rankRows,...uniformRows]){const row=document.createElement('span');row.textContent=`${r.rank?'Rank':r.uniform?uniformName:'H'+r.head}: ${exact?r.k:r.k.toFixed(1)}`;grid.append(row);}tip.append(grid);tip.hidden=false;const b=root.getBoundingClientRect();tip.style.left=Math.max(0,Math.min(event.clientX-b.left+10,b.width-tip.offsetWidth))+'px';tip.style.top=Math.max(0,event.clientY-b.top-tip.offsetHeight-8)+'px';}
+          return title+' · '+[...rows,...rankRows,...uniformRows].map(r=>`${r.rank?'Rank':r.uniform?uniformName:'H'+r.head}: ${exact?r.k:r.k.toFixed(1)}`).join(' · ');
+        }
+        if(selection?.kind===panel.kind)get('.layer-detail').textContent=show(selection.layer);
+        const at=e=>Math.max(xd[0],Math.min(xd[1],x.invert(d3.pointer(e,svg.node())[0])));
+        svg.append('rect').attr('data-chart-hit','').attr('data-chart-hover-overlay','cross-series').attr('class','cursor-interaction').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','transparent').on('pointermove',e=>show(at(e),e)).on('click',e=>{selection={kind:panel.kind,layer:Math.round(at(e))};draw();save();}).on('pointerleave',()=>{get('.layer-tooltip').hidden=true;guide.attr('visibility','hidden');markers.selectAll('*').remove();if(selection?.kind===panel.kind)show(selection.layer);});
+        const boxes=[];for(const n of xa.selectAll('text').nodes()){const b=n.getBoundingClientRect();if(boxes.some(a=>b.left<a.right+4&&b.right+4>a.left))n.parentNode.remove();else boxes.push(b);}
+      }
+    }
+    window.addEventListener('openai:set_globals',e=>{restore(e.detail?.globals?.widgetState);draw();});new ResizeObserver(draw).observe(get('.layer-panels'));draw();
+  })();
+  </script>
+</div>

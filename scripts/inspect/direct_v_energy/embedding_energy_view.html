@@ -1,0 +1,113 @@
+<div id="embedding-v-energy-lines">
+  <style>
+    #embedding-v-energy-lines {position:relative;color-scheme:dark;color:var(--foreground)}
+    #embedding-v-energy-lines h2 {padding-right:92px}
+    #embedding-v-energy-lines .energy-legend {display:flex;gap:16px;flex-wrap:wrap;margin:12px 0}
+    #embedding-v-energy-lines .energy-legend button {display:inline-flex;align-items:center;gap:6px;border:0;padding:0;background:transparent;color:var(--foreground);font:inherit}
+    #embedding-v-energy-lines .energy-legend button[aria-pressed="false"] {opacity:.45}
+    #embedding-v-energy-lines .energy-legend span {display:inline-block;width:18px;border-top:2px solid var(--viz-series-1)}
+    #embedding-v-energy-lines .energy-legend button[data-series="no_embed_norm"] span {border-color:var(--viz-series-2);border-top-style:dashed}
+    #embedding-v-energy-lines .energy-legend button[data-series="uniform"] span {border-color:var(--viz-series-3);border-top-style:dotted}
+    #embedding-v-energy-lines .energy-legend button[data-series="no_embed_norm_attn0"] span {border-color:var(--viz-series-4);border-top-style:dashed}
+    #embedding-v-energy-lines .energy-chart {display:block;width:100%;margin:12px 0}
+    #embedding-v-energy-lines .energy-chart text {fill:var(--foreground);font-size:12px;font-weight:400}
+    #embedding-v-energy-lines .tooltip {position:absolute;pointer-events:none;z-index:2;background:var(--popover);color:var(--popover-foreground);padding:10px;max-width:calc(100% - 4px);box-sizing:border-box}
+    #embedding-v-energy-lines .tooltip-row {margin-top:6px}
+  </style>
+  <h2>Embedding · V projected energy</h2>
+  <div class="text-small energy-subtitle">262,144 tokens · mean squared L2 norm · averaged across 12 heads</div>
+  <div class="energy-legend text-small">
+    <button type="button" class="cursor-interaction" data-series="baseline" aria-pressed="true"><span></span>GPTBase baseline</button>
+    <button type="button" class="cursor-interaction" data-series="no_embed_norm" aria-pressed="true"><span></span>No norm(x0)</button>
+  </div>
+  <svg class="energy-chart" role="img" aria-label="Embedding V-projected squared norm averaged over tokens and twelve heads, comparing baseline and no initial embedding RMSNorm across receiving layers."></svg>
+  <div class="text-small energy-footer">Embedding source · receiving RMSNorm retained · zero-based layers</div>
+  <div class="tooltip text-small tabular-nums" role="tooltip" hidden></div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+  (()=>{
+    const root=document.getElementById('embedding-v-energy-lines'),data=__EMBEDDING_ENERGY__;
+    const svg=d3.select(root.querySelector('.energy-chart')),tip=root.querySelector('.tooltip');
+    const colors={baseline:1,no_embed_norm:2,uniform:3,no_embed_norm_attn0:4};
+    const series=data.series.map(s=>({...s,color:`var(--viz-series-${colors[s.id]})`}));
+    const layers=series[0].points.map(p=>p.x),first=layers[0],last=layers[layers.length-1];
+    const share=data.metric==='share',fmt=d3.format(share?'.4%':',.4f'),view=`embedding-v-${data.metric||'energy'}-head-mean${data.uniform_reference?'-uniform':''}${data.include_first_attention?'-a0':''}`;
+    const legend=root.querySelector('.energy-legend');legend.replaceChildren();
+    for(const s of series){
+      const button=document.createElement('button');button.type='button';button.className='cursor-interaction';button.dataset.series=s.id;button.setAttribute('aria-pressed','true');
+      button.append(document.createElement('span'),document.createTextNode(s.label));legend.append(button);
+    }
+    const title=share?(data.include_first_attention?'Emb + A0 · V projected energy share':'Embedding · V projected energy share'):'Embedding · V projected energy';
+    const description=share?'Selected source squared V-projection norm divided by summed component squared V-projection norms over Emb, attention and MLP, per token and head, then averaged over 262,144 tokens and twelve heads. A0 is the first attention output. Linear axes.':'Arithmetic mean across twelve per-head mean squared projection norms, using the same 262,144 validation tokens and actual receiving residual normalization. Linear axes.';
+    root.querySelector('h2').textContent=title;
+    svg.attr('aria-label',description);
+    if(share){
+      root.querySelector('.energy-subtitle').textContent='262,144 tokens · per-token energy share · averaged across 12 heads';
+      root.querySelector('.energy-footer').textContent='Denominator: summed Emb + attention + MLP component energies · zero-based layers';
+    }
+    let visible=new Set(series.map(s=>s.id)),pinned=null;
+    function restore(state){const s=state?.modelContent;if(s?.view!==view||s.run_id!==data.run_id)return;
+      if(Array.isArray(s.visible))visible=new Set(s.visible.filter(id=>series.some(t=>t.id===id)));
+      pinned=series[0].points.some(p=>p.x===s.layer)?s.layer:null;}
+    restore(window.openai?.widgetState);
+    function save(){window.openai?.setWidgetState({modelContent:{view,run_id:data.run_id,visible:[...visible],layer:pinned},privateContent:null}).catch(()=>{});}
+    function interpolate(points,x){const j=d3.bisector(p=>p.x).left(points,x);if(j===0)return points[0].y;if(j===points.length)return points[j-1].y;
+      const a=points[j-1],b=points[j];return a.y+(x-a.x)/(b.x-a.x)*(b.y-a.y);}
+    function draw(){
+      const w=root.getBoundingClientRect().width,h=380,l=76,r=18,t=18,b=62;
+      const points=series.flatMap(s=>s.points),extent=d3.extent(points,p=>p.y);
+      const x=d3.scaleLinear().domain(d3.extent(points,p=>p.x)).range([l+6,w-r-6]);
+      const y=d3.scaleLinear().domain([0,extent[1]*1.08]).nice().range([h-b-6,t+6]);
+      svg.selectAll('*').remove();svg.attr('viewBox',`0 0 ${w} ${h}`);
+      svg.append('title').text(title+': baseline versus no norm(x0)');
+      svg.append('desc').text(description);
+      svg.append('rect').attr('data-chart-frame','').attr('x',l).attr('y',t).attr('width',w-l-r).attr('height',h-b-t).attr('fill','none').attr('stroke','var(--border)');
+      for(const v of y.ticks(5)){
+        svg.append('line').attr('x1',l).attr('x2',w-r).attr('y1',y(v)).attr('y2',y(v)).attr('stroke','var(--border)');
+        svg.append('text').attr('x',l-10).attr('y',y(v)+4).attr('text-anchor','end').text(share?d3.format('.0%')(v):v);
+      }
+      const tickCount=Math.min(layers.length,w<440?4:8);
+      const ticks=Array.from({length:tickCount},(_,i)=>layers[Math.round(i*(layers.length-1)/(tickCount-1))]);
+      for(const v of ticks)svg.append('text').attr('x',x(v)).attr('y',h-b+23).attr('text-anchor',v===first?'start':v===last?'end':'middle').text(v);
+      svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(l+w-r)/2).attr('y',h-12).attr('text-anchor','middle').text('Receiving layer');
+      svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(18,${(t+h-b)/2}) rotate(-90)`).attr('text-anchor','middle').text(share?(data.include_first_attention?'Mean component energy share (%)':'Mean embedding energy share (%)'):'Mean projected energy (L2²)');
+      const markers={};
+      for(const s of series){
+        root.querySelector(`[data-series="${s.id}"]`).setAttribute('aria-pressed',visible.has(s.id));
+        const g=svg.append('g').attr('data-series-group',s.id).attr('display',visible.has(s.id)?null:'none');
+        g.append('path').datum(s.points).attr('data-mean-line',s.id).attr('d',d3.line().x(p=>x(p.x)).y(p=>y(p.y))).attr('fill','none').attr('stroke',s.color).attr('stroke-width',2.2).attr('stroke-dasharray',s.id==='baseline'?null:s.id==='uniform'?'2 4':s.id==='no_embed_norm_attn0'?'8 3 2 3':'6 4');
+        for(const p of s.points)g.append(s.id==='no_embed_norm'?'rect':'circle').attr('data-observation','').attr('cx',x(p.x)).attr('cy',y(p.y)).attr('r',s.id==='uniform'?2:3.5).attr('x',x(p.x)-3).attr('y',y(p.y)-3).attr('width',6).attr('height',6).attr('fill',s.color);
+        markers[s.id]=svg.append('circle').attr('data-chart-hover-marker',s.id).attr('r',4).attr('fill',s.color).attr('visibility','hidden');
+      }
+      const guide=svg.append('line').attr('data-chart-hover-guide','').attr('y1',t).attr('y2',h-b).attr('stroke','var(--foreground)').attr('stroke-opacity',.35).attr('visibility','hidden');
+      function show(at){
+        guide.attr('x1',x(at)).attr('x2',x(at)).attr('visibility','visible');tip.replaceChildren();
+        const title=document.createElement('div'),exact=series[0].points.some(p=>Math.abs(p.x-at)<1e-8);
+        title.textContent=`Layer ${d3.format('.2~f')(at)}${exact?'':' · interpolated'}`;tip.append(title);
+        let highest=h-b,rows=0;
+        for(const s of series){
+          const on=visible.has(s.id);markers[s.id].attr('visibility',on?'visible':'hidden');if(!on)continue;
+          const value=interpolate(s.points,at);highest=Math.min(highest,y(value));rows++;
+          markers[s.id].attr('cx',x(at)).attr('cy',y(value));
+          const row=document.createElement('div');row.className='tooltip-row';row.dataset.tooltipSeries=s.id;row.textContent=`${s.label}: ${fmt(value)}`;tip.append(row);
+        }
+        tip.hidden=!rows;
+        const offset=svg.node().getBoundingClientRect().top-root.getBoundingClientRect().top;
+        tip.style.left=`${Math.max(0,Math.min(w-tip.offsetWidth,x(at)-tip.offsetWidth/2))}px`;
+        tip.style.top=`${offset+Math.max(t,highest-tip.offsetHeight-12)}px`;
+      }
+      function clear(){tip.hidden=true;guide.attr('visibility','hidden');Object.values(markers).forEach(m=>m.attr('visibility','hidden'));}
+      const position=e=>Math.max(first,Math.min(last,x.invert(d3.pointer(e,svg.node())[0])));
+      svg.append('rect').attr('data-chart-hit','').attr('data-chart-hover-overlay','cross-series').attr('x',l).attr('y',t).attr('width',w-l-r).attr('height',h-b-t).attr('fill','transparent')
+        .on('pointermove',e=>{if(pinned===null)show(position(e));}).on('pointerleave',()=>{if(pinned===null)clear();})
+        .on('click',e=>{const near=series[0].points[d3.bisector(p=>p.x).center(series[0].points,position(e))].x;pinned=pinned===near?null:near;if(pinned===null)clear();else show(pinned);save();});
+      if(pinned!==null)show(pinned);else clear();
+      const bounds=svg.node().getBoundingClientRect(),labels=[...svg.node().querySelectorAll('text')];
+      root.dataset.labelsFit=String(labels.every(n=>{const a=n.getBoundingClientRect();return a.left>=bounds.left&&a.right<=bounds.right&&a.top>=bounds.top&&a.bottom<=bounds.bottom;}));
+    }
+    for(const button of root.querySelectorAll('.energy-legend button'))button.addEventListener('click',()=>{const id=button.dataset.series;if(visible.has(id))visible.delete(id);else visible.add(id);draw();save();});
+    window.addEventListener('openai:set_globals',event=>{restore(event.detail?.globals?.widgetState);draw();});
+    new ResizeObserver(draw).observe(root);draw();
+  })();
+  </script>
+</div>

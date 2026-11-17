@@ -1,0 +1,1756 @@
+{
+  "rows": [
+    {
+      "run": "bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z",
+      "status": "completed",
+      "final": 7738,
+      "final_complete": true,
+      "final_bpb": 0.7201665477805808,
+      "steps": [
+        1000,
+        2000,
+        3000,
+        4000,
+        5000,
+        6000,
+        7000
+      ],
+      "gib": 41.3683967590332,
+      "hardlinks": 0
+    },
+    {
+      "run": "bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z",
+      "status": "exited",
+      "final": 6589,
+      "final_complete": true,
+      "final_bpb": 0.7307677541804639,
+      "steps": [
+        1000,
+        2000,
+        3000,
+        4000,
+        5000,
+        6000
+      ],
+      "gib": 34.35381317138672,
+      "hardlinks": 0
+    },
+    {
+      "run": "bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z",
+      "status": "completed",
+      "final": 7809,
+      "final_complete": true,
+      "final_bpb": 0.7243763383174804,
+      "steps": [
+        1000,
+        2000,
+        3000,
+        4000,
+        5000,
+        6000,
+        7000
+      ],
+      "gib": 41.355899810791016,
+      "hardlinks": 0
+    },
+    {
+      "run": "bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z",
+      "status": "completed",
+      "final": 7809,
+      "final_complete": true,
+      "final_bpb": 0.724122628460751,
+      "steps": [
+        1000,
+        2000,
+        3000,
+        4000,
+        5000,
+        6000,
+        7000
+      ],
+      "gib": 41.355899810791016,
+      "hardlinks": 0
+    },
+    {
+      "run": "bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z",
+      "status": "exited",
+      "final": 8072,
+      "final_complete": true,
+      "final_bpb": 0.7263562998198584,
+      "steps": [
+        1000,
+        2000,
+        3000,
+        4000,
+        5000,
+        6000,
+        7000,
+        8000
+      ],
+      "gib": 45.78680419921875,
+      "hardlinks": 0
+    },
+    {
+      "run": "bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z",
+      "status": "exited",
+      "final": 7773,
+      "final_complete": true,
+      "final_bpb": 0.711655857040471,
+      "steps": [
+        1000,
+        2000,
+        3000,
+        4000,
+        5000,
+        6000,
+        7000
+      ],
+      "gib": 41.35606002807617,
+      "hardlinks": 0
+    },
+    {
+      "run": "bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z",
+      "status": "exited",
+      "final": 8779,
+      "final_complete": true,
+      "final_bpb": 0.7260538623013387,
+      "steps": [
+        1000,
+        2000,
+        3000,
+        4000,
+        5000,
+        6000,
+        7000,
+        8000
+      ],
+      "gib": 42.951019287109375,
+      "hardlinks": 0
+    },
+    {
+      "run": "bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z",
+      "status": "exited",
+      "final": 8072,
+      "final_complete": true,
+      "final_bpb": 0.7280773119319812,
+      "steps": [
+        1000,
+        2000,
+        3000,
+        4000,
+        5000,
+        6000,
+        7000,
+        8000
+      ],
+      "gib": 45.78680419921875,
+      "hardlinks": 0
+    },
+    {
+      "run": "bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z",
+      "status": "exited",
+      "final": 8329,
+      "final_complete": true,
+      "final_bpb": 0.7274507801563684,
+      "steps": [
+        1000,
+        2000,
+        3000,
+        4000,
+        5000,
+        6000,
+        7000,
+        8000
+      ],
+      "gib": 44.305999755859375,
+      "hardlinks": 0
+    }
+  ],
+  "candidates": [
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/meta_003000.json",
+      "step": 3000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/model_002000.pt",
+      "step": 2000,
+      "allocated": 3020603392,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/optim_006000_rank1.pt",
+      "step": 6000,
+      "allocated": 1662480384,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/optim_002000_rank0.pt",
+      "step": 2000,
+      "allocated": 1662480384,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/optim_002000_rank1.pt",
+      "step": 2000,
+      "allocated": 1662480384,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/optim_003000_rank0.pt",
+      "step": 3000,
+      "allocated": 1662480384,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/model_006000.pt",
+      "step": 6000,
+      "allocated": 3020603392,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/optim_003000_rank1.pt",
+      "step": 3000,
+      "allocated": 1662480384,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/optim_007000_rank1.pt",
+      "step": 7000,
+      "allocated": 1662480384,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/meta_002000.json",
+      "step": 2000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/model_003000.pt",
+      "step": 3000,
+      "allocated": 3020603392,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/model_004000.pt",
+      "step": 4000,
+      "allocated": 3020603392,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/model_001000.pt",
+      "step": 1000,
+      "allocated": 3020603392,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/optim_004000_rank0.pt",
+      "step": 4000,
+      "allocated": 1662480384,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/optim_005000_rank0.pt",
+      "step": 5000,
+      "allocated": 1662480384,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/meta_006000.json",
+      "step": 6000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/optim_006000_rank0.pt",
+      "step": 6000,
+      "allocated": 1662480384,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/meta_004000.json",
+      "step": 4000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/model_007000.pt",
+      "step": 7000,
+      "allocated": 3020603392,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/optim_005000_rank1.pt",
+      "step": 5000,
+      "allocated": 1662480384,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/meta_007000.json",
+      "step": 7000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/optim_001000_rank0.pt",
+      "step": 1000,
+      "allocated": 1662480384,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/optim_004000_rank1.pt",
+      "step": 4000,
+      "allocated": 1662480384,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/optim_007000_rank0.pt",
+      "step": 7000,
+      "allocated": 1662480384,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/model_005000.pt",
+      "step": 5000,
+      "allocated": 3020603392,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/meta_005000.json",
+      "step": 5000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/meta_001000.json",
+      "step": 1000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z/optim_001000_rank1.pt",
+      "step": 1000,
+      "allocated": 1662480384,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/meta_003000.json",
+      "step": 3000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/model_002000.pt",
+      "step": 2000,
+      "allocated": 2916966400,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/optim_006000_rank1.pt",
+      "step": 6000,
+      "allocated": 1615441920,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/optim_002000_rank0.pt",
+      "step": 2000,
+      "allocated": 1615441920,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/optim_002000_rank1.pt",
+      "step": 2000,
+      "allocated": 1615441920,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/optim_003000_rank0.pt",
+      "step": 3000,
+      "allocated": 1615441920,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/model_006000.pt",
+      "step": 6000,
+      "allocated": 2916966400,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/optim_003000_rank1.pt",
+      "step": 3000,
+      "allocated": 1615441920,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/meta_002000.json",
+      "step": 2000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/model_003000.pt",
+      "step": 3000,
+      "allocated": 2916966400,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/model_004000.pt",
+      "step": 4000,
+      "allocated": 2916966400,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/model_001000.pt",
+      "step": 1000,
+      "allocated": 2916966400,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/optim_004000_rank0.pt",
+      "step": 4000,
+      "allocated": 1615441920,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/optim_005000_rank0.pt",
+      "step": 5000,
+      "allocated": 1615441920,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/meta_006000.json",
+      "step": 6000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/optim_006000_rank0.pt",
+      "step": 6000,
+      "allocated": 1615441920,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/meta_004000.json",
+      "step": 4000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/optim_005000_rank1.pt",
+      "step": 5000,
+      "allocated": 1615441920,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/optim_001000_rank0.pt",
+      "step": 1000,
+      "allocated": 1615441920,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/optim_004000_rank1.pt",
+      "step": 4000,
+      "allocated": 1615441920,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/model_005000.pt",
+      "step": 5000,
+      "allocated": 2916966400,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/meta_005000.json",
+      "step": 5000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/meta_001000.json",
+      "step": 1000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_head_scaled_embed_no_embed_norm_nosmear_s42_20261111T031430Z/optim_001000_rank1.pt",
+      "step": 1000,
+      "allocated": 1615441920,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/meta_003000.json",
+      "step": 3000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/model_002000.pt",
+      "step": 2000,
+      "allocated": 3019964416,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/optim_006000_rank1.pt",
+      "step": 6000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/optim_002000_rank0.pt",
+      "step": 2000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/optim_002000_rank1.pt",
+      "step": 2000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/optim_003000_rank0.pt",
+      "step": 3000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/model_006000.pt",
+      "step": 6000,
+      "allocated": 3019964416,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/optim_003000_rank1.pt",
+      "step": 3000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/optim_007000_rank1.pt",
+      "step": 7000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/meta_002000.json",
+      "step": 2000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/model_003000.pt",
+      "step": 3000,
+      "allocated": 3019964416,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/model_004000.pt",
+      "step": 4000,
+      "allocated": 3019964416,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/model_001000.pt",
+      "step": 1000,
+      "allocated": 3019964416,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/optim_004000_rank0.pt",
+      "step": 4000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/optim_005000_rank0.pt",
+      "step": 5000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/meta_006000.json",
+      "step": 6000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/optim_006000_rank0.pt",
+      "step": 6000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/meta_004000.json",
+      "step": 4000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/model_007000.pt",
+      "step": 7000,
+      "allocated": 3019964416,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/optim_005000_rank1.pt",
+      "step": 5000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/meta_007000.json",
+      "step": 7000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/optim_001000_rank0.pt",
+      "step": 1000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/optim_004000_rank1.pt",
+      "step": 4000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/optim_007000_rank0.pt",
+      "step": 7000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/model_005000.pt",
+      "step": 5000,
+      "allocated": 3019964416,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/meta_005000.json",
+      "step": 5000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/meta_001000.json",
+      "step": 1000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_no_embed_norm_nosmear_s42_20261030T190903Z/optim_001000_rank1.pt",
+      "step": 1000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/meta_003000.json",
+      "step": 3000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/model_002000.pt",
+      "step": 2000,
+      "allocated": 3019964416,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/optim_006000_rank1.pt",
+      "step": 6000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/optim_002000_rank0.pt",
+      "step": 2000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/optim_002000_rank1.pt",
+      "step": 2000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/optim_003000_rank0.pt",
+      "step": 3000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/model_006000.pt",
+      "step": 6000,
+      "allocated": 3019964416,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/optim_003000_rank1.pt",
+      "step": 3000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/optim_007000_rank1.pt",
+      "step": 7000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/meta_002000.json",
+      "step": 2000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/model_003000.pt",
+      "step": 3000,
+      "allocated": 3019964416,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/model_004000.pt",
+      "step": 4000,
+      "allocated": 3019964416,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/model_001000.pt",
+      "step": 1000,
+      "allocated": 3019964416,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/optim_004000_rank0.pt",
+      "step": 4000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/optim_005000_rank0.pt",
+      "step": 5000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/meta_006000.json",
+      "step": 6000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/optim_006000_rank0.pt",
+      "step": 6000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/meta_004000.json",
+      "step": 4000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/model_007000.pt",
+      "step": 7000,
+      "allocated": 3019964416,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/optim_005000_rank1.pt",
+      "step": 5000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/meta_007000.json",
+      "step": 7000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/optim_001000_rank0.pt",
+      "step": 1000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/optim_004000_rank1.pt",
+      "step": 4000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/optim_007000_rank0.pt",
+      "step": 7000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/model_005000.pt",
+      "step": 5000,
+      "allocated": 3019964416,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/meta_005000.json",
+      "step": 5000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/meta_001000.json",
+      "step": 1000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_nosmear_s42_20261015T184256Z/optim_001000_rank1.pt",
+      "step": 1000,
+      "allocated": 1661841408,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/meta_003000.json",
+      "step": 3000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/model_002000.pt",
+      "step": 2000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_008000_rank1.pt",
+      "step": 8000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_006000_rank1.pt",
+      "step": 6000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_002000_rank0.pt",
+      "step": 2000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/meta_008000.json",
+      "step": 8000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_008000_rank0.pt",
+      "step": 8000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_002000_rank1.pt",
+      "step": 2000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_003000_rank0.pt",
+      "step": 3000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/model_006000.pt",
+      "step": 6000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_003000_rank1.pt",
+      "step": 3000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_007000_rank1.pt",
+      "step": 7000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/meta_002000.json",
+      "step": 2000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/model_003000.pt",
+      "step": 3000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/model_004000.pt",
+      "step": 4000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/model_001000.pt",
+      "step": 1000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_004000_rank0.pt",
+      "step": 4000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_005000_rank0.pt",
+      "step": 5000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/meta_006000.json",
+      "step": 6000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_006000_rank0.pt",
+      "step": 6000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/meta_004000.json",
+      "step": 4000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/model_007000.pt",
+      "step": 7000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_005000_rank1.pt",
+      "step": 5000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/model_008000.pt",
+      "step": 8000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/meta_007000.json",
+      "step": 7000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_001000_rank0.pt",
+      "step": 1000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_004000_rank1.pt",
+      "step": 4000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_007000_rank0.pt",
+      "step": 7000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/model_005000.pt",
+      "step": 5000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/meta_005000.json",
+      "step": 5000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/meta_001000.json",
+      "step": 1000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_pooled_qk_embed_no_embed_norm_nosmear_s42_20261110T023255Z/optim_001000_rank1.pt",
+      "step": 1000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/meta_003000.json",
+      "step": 3000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/model_002000.pt",
+      "step": 2000,
+      "allocated": 3019972608,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/optim_006000_rank1.pt",
+      "step": 6000,
+      "allocated": 1661849600,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/optim_002000_rank0.pt",
+      "step": 2000,
+      "allocated": 1661849600,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/optim_002000_rank1.pt",
+      "step": 2000,
+      "allocated": 1661849600,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/optim_003000_rank0.pt",
+      "step": 3000,
+      "allocated": 1661849600,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/model_006000.pt",
+      "step": 6000,
+      "allocated": 3019972608,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/optim_003000_rank1.pt",
+      "step": 3000,
+      "allocated": 1661849600,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/optim_007000_rank1.pt",
+      "step": 7000,
+      "allocated": 1661849600,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/meta_002000.json",
+      "step": 2000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/model_003000.pt",
+      "step": 3000,
+      "allocated": 3019972608,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/model_004000.pt",
+      "step": 4000,
+      "allocated": 3019972608,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/model_001000.pt",
+      "step": 1000,
+      "allocated": 3019972608,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/optim_004000_rank0.pt",
+      "step": 4000,
+      "allocated": 1661849600,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/optim_005000_rank0.pt",
+      "step": 5000,
+      "allocated": 1661849600,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/meta_006000.json",
+      "step": 6000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/optim_006000_rank0.pt",
+      "step": 6000,
+      "allocated": 1661849600,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/meta_004000.json",
+      "step": 4000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/model_007000.pt",
+      "step": 7000,
+      "allocated": 3019972608,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/optim_005000_rank1.pt",
+      "step": 5000,
+      "allocated": 1661849600,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/meta_007000.json",
+      "step": 7000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/optim_001000_rank0.pt",
+      "step": 1000,
+      "allocated": 1661849600,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/optim_004000_rank1.pt",
+      "step": 4000,
+      "allocated": 1661849600,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/optim_007000_rank0.pt",
+      "step": 7000,
+      "allocated": 1661849600,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/model_005000.pt",
+      "step": 5000,
+      "allocated": 3019972608,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/meta_005000.json",
+      "step": 5000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/meta_001000.json",
+      "step": 1000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z/optim_001000_rank1.pt",
+      "step": 1000,
+      "allocated": 1661849600,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/meta_003000.json",
+      "step": 3000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/model_002000.pt",
+      "step": 2000,
+      "allocated": 2725838848,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_008000_rank1.pt",
+      "step": 8000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_006000_rank1.pt",
+      "step": 6000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_002000_rank0.pt",
+      "step": 2000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/meta_008000.json",
+      "step": 8000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_008000_rank0.pt",
+      "step": 8000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_002000_rank1.pt",
+      "step": 2000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_003000_rank0.pt",
+      "step": 3000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/model_006000.pt",
+      "step": 6000,
+      "allocated": 2725838848,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_003000_rank1.pt",
+      "step": 3000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_007000_rank1.pt",
+      "step": 7000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/meta_002000.json",
+      "step": 2000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/model_003000.pt",
+      "step": 3000,
+      "allocated": 2725838848,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/model_004000.pt",
+      "step": 4000,
+      "allocated": 2725838848,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/model_001000.pt",
+      "step": 1000,
+      "allocated": 2725838848,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_004000_rank0.pt",
+      "step": 4000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_005000_rank0.pt",
+      "step": 5000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/meta_006000.json",
+      "step": 6000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_006000_rank0.pt",
+      "step": 6000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/meta_004000.json",
+      "step": 4000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/model_007000.pt",
+      "step": 7000,
+      "allocated": 2725838848,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_005000_rank1.pt",
+      "step": 5000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/model_008000.pt",
+      "step": 8000,
+      "allocated": 2725838848,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/meta_007000.json",
+      "step": 7000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_001000_rank0.pt",
+      "step": 1000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_004000_rank1.pt",
+      "step": 4000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_007000_rank0.pt",
+      "step": 7000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/model_005000.pt",
+      "step": 5000,
+      "allocated": 2725838848,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/meta_005000.json",
+      "step": 5000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/meta_001000.json",
+      "step": 1000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_single_qk_embed_no_embed_norm_nosmear_s42_20261113T234627Z/optim_001000_rank1.pt",
+      "step": 1000,
+      "allocated": 1519472640,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/meta_003000.json",
+      "step": 3000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/model_002000.pt",
+      "step": 2000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_008000_rank1.pt",
+      "step": 8000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_006000_rank1.pt",
+      "step": 6000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_002000_rank0.pt",
+      "step": 2000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/meta_008000.json",
+      "step": 8000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_008000_rank0.pt",
+      "step": 8000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_002000_rank1.pt",
+      "step": 2000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_003000_rank0.pt",
+      "step": 3000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/model_006000.pt",
+      "step": 6000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_003000_rank1.pt",
+      "step": 3000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_007000_rank1.pt",
+      "step": 7000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/meta_002000.json",
+      "step": 2000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/model_003000.pt",
+      "step": 3000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/model_004000.pt",
+      "step": 4000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/model_001000.pt",
+      "step": 1000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_004000_rank0.pt",
+      "step": 4000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_005000_rank0.pt",
+      "step": 5000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/meta_006000.json",
+      "step": 6000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_006000_rank0.pt",
+      "step": 6000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/meta_004000.json",
+      "step": 4000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/model_007000.pt",
+      "step": 7000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_005000_rank1.pt",
+      "step": 5000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/model_008000.pt",
+      "step": 8000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/meta_007000.json",
+      "step": 7000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_001000_rank0.pt",
+      "step": 1000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_004000_rank1.pt",
+      "step": 4000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_007000_rank0.pt",
+      "step": 7000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/model_005000.pt",
+      "step": 5000,
+      "allocated": 2916151296,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/meta_005000.json",
+      "step": 5000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/meta_001000.json",
+      "step": 1000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_head_out_no_embed_norm_nosmear_s42_20261115T020042Z/optim_001000_rank1.pt",
+      "step": 1000,
+      "allocated": 1614622720,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/meta_003000.json",
+      "step": 3000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/model_002000.pt",
+      "step": 2000,
+      "allocated": 2821062656,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_008000_rank1.pt",
+      "step": 8000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_006000_rank1.pt",
+      "step": 6000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_002000_rank0.pt",
+      "step": 2000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/meta_008000.json",
+      "step": 8000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_008000_rank0.pt",
+      "step": 8000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_002000_rank1.pt",
+      "step": 2000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_003000_rank0.pt",
+      "step": 3000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/model_006000.pt",
+      "step": 6000,
+      "allocated": 2821062656,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_003000_rank1.pt",
+      "step": 3000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_007000_rank1.pt",
+      "step": 7000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/meta_002000.json",
+      "step": 2000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/model_003000.pt",
+      "step": 3000,
+      "allocated": 2821062656,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/model_004000.pt",
+      "step": 4000,
+      "allocated": 2821062656,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/model_001000.pt",
+      "step": 1000,
+      "allocated": 2821062656,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_004000_rank0.pt",
+      "step": 4000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_005000_rank0.pt",
+      "step": 5000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/meta_006000.json",
+      "step": 6000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_006000_rank0.pt",
+      "step": 6000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/meta_004000.json",
+      "step": 4000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/model_007000.pt",
+      "step": 7000,
+      "allocated": 2821062656,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_005000_rank1.pt",
+      "step": 5000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/model_008000.pt",
+      "step": 8000,
+      "allocated": 2821062656,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/meta_007000.json",
+      "step": 7000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_001000_rank0.pt",
+      "step": 1000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_004000_rank1.pt",
+      "step": 4000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_007000_rank0.pt",
+      "step": 7000,
+      "allocated": 1562791936,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/model_005000.pt",
+      "step": 5000,
+      "allocated": 2821062656,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/meta_005000.json",
+      "step": 5000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/meta_001000.json",
+      "step": 1000,
+      "allocated": 4096,
+      "links": 1
+    },
+    {
+      "path": "/local-ssd/mh3897/base_checkpoints/bov_d24_f3p91e19_gpt_base_split_embed_shared_out_no_embed_norm_nosmear_s42_20261112T220627Z/optim_001000_rank1.pt",
+      "step": 1000,
+      "allocated": 1562791936,
+      "links": 1
+    }
+  ],
+  "action": "inventory only; nothing deleted"
+}

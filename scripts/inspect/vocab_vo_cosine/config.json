@@ -1,0 +1,14 @@
+{
+  "model_type": "gpt_base_scalar_res_qkv_no_embed_norm",
+  "training_run": "/local-ssd/mh3897/run_queues/bov_d24_f3p91e19_gpt_base_scalar_res_qkv_no_embed_norm_sqrt_recovery_nosmear_s42_2gpu_20261103T212401Z",
+  "coefficient_reference": "/local-ssd/mh3897/analysis_runs/d24_scalar_res_input_alignment/gpt_base_scalar_res_qkv_no_embed_norm_step7773_20261106T024853Z",
+  "checkpoint_step": 7773,
+  "candidate_layers": [8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
+  "batch_size": 1024,
+  "cpu_threads": 4,
+  "forward_cast": "bfloat16",
+  "analysis_dtype": "float32",
+  "validation_relative_output_tolerance": 0.00002,
+  "validation_absolute_cosine_tolerance": 0.000002,
+  "plot_max_absolute_cosine_error": 0.0001
+}

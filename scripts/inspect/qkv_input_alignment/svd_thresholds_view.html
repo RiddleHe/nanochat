@@ -1,0 +1,53 @@
+<div id="svd-thresholds">
+  <style>
+    #svd-thresholds {color-scheme:dark;--background:#181818;--foreground:#eeeeee;--border:#444444;--viz-series-1:#70a9fa;background:var(--background);color:var(--foreground);padding:16px;position:relative}
+    #svd-thresholds .threshold-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:20px}
+    #svd-thresholds .threshold-chart {width:100%;display:block}
+    #svd-thresholds .threshold-chart text {fill:var(--foreground);font-size:12px;font-weight:400}
+    #svd-thresholds .threshold-detail {margin-top:12px;min-height:2em}
+    @media(max-width:780px) {#svd-thresholds .threshold-grid {grid-template-columns:1fr}}
+  </style>
+  <h2 class="threshold-title"></h2>
+  <div class="text-small">Squared singular-value energy · no head averaging · zero-based indices</div>
+  <div class="threshold-grid"></div>
+  <div class="threshold-detail text-small tabular-nums" aria-live="polite"></div>
+  <script>
+  (()=>{
+    const root=document.getElementById('svd-thresholds'),data=__SVD_THRESHOLD_DATA__,grid=root.querySelector('.threshold-grid'),detail=root.querySelector('.threshold-detail');
+    root.querySelector('.threshold-title').textContent=`GPTBase · ${data.kind} · singular direction counts`;
+    const ns='http://www.w3.org/2000/svg';
+    function node(parent,tag,attrs={},text){const n=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,v);if(text!==undefined)n.textContent=text;parent.append(n);return n;}
+    let selected=null;
+    function show(e,p,save=false){detail.textContent=`L${e.layer} · head ${e.head} · target ${p.threshold*100}% · ${p.count} directions · ${(p.captured*100).toFixed(3)}% captured`;if(save){selected={layer:e.layer,head:e.head,threshold:p.threshold};window.openai?.setWidgetState({modelContent:{run_id:data.run_id,view:'svd_thresholds',layers:data.layers,kind:data.kind,selection:selected}}).catch(()=>{});}}
+    function restore(state){const s=state?.modelContent;if(s?.run_id!==data.run_id||s?.view!=='svd_thresholds'||JSON.stringify(s?.layers)!==JSON.stringify(data.layers)||s?.kind!==data.kind)return;selected=s.selection;const e=data.entries.find(e=>e.layer===selected?.layer&&e.head===selected?.head),p=e?.points.find(p=>p.threshold===selected.threshold);if(p)show(e,p);}
+    function draw(){
+      grid.replaceChildren();
+      for(const e of data.entries){
+        const section=document.createElement('section'),heading=document.createElement('h3');heading.textContent=`L${e.layer} · Head ${e.head}`;section.append(heading);grid.append(section);
+        const w=section.getBoundingClientRect().width,h=320,l=64,r=18,t=20,b=70;
+        const x0=Math.min(...data.thresholds),x1=Math.max(...data.thresholds),x=v=>l+7+(v-x0)/(x1-x0||1)*(w-l-r-14),y=v=>h-b-5-v/data.max_count*(h-b-t-10);
+        const svg=node(section,'svg',{class:'threshold-chart',viewBox:`0 0 ${w} ${h}`,role:'img','aria-label':`L${e.layer} ${data.kind} head ${e.head}: `+e.points.map(p=>`${p.threshold*100}% needs ${p.count} directions`).join('; ')});
+        node(svg,'title',{},`L${e.layer} ${data.kind} · head ${e.head}`);
+        node(svg,'rect',{'data-chart-frame':'',x:l,y:t,width:w-l-r,height:h-b-t,fill:'none',stroke:'var(--border)'});
+        for(const v of [0,32,64,96,data.max_count]){node(svg,'line',{x1:l,x2:w-r,y1:y(v),y2:y(v),stroke:'var(--border)','stroke-opacity':.5});node(svg,'text',{x:l-9,y:y(v)+4,'text-anchor':'end'},v);}
+        for(const p of e.points)node(svg,'text',{'data-x-tick':'',x:x(p.threshold),y:h-b+22,'text-anchor':p.threshold===x0?'start':p.threshold===x1?'end':'middle'},`${p.threshold*100}`);
+        const title=node(svg,'text',{class:'axis-title','data-axis':'x',x:(l+w-r)/2,y:h-22,'text-anchor':'middle'});
+        node(title,'tspan',{x:(l+w-r)/2,dy:0},'Squared singular-value');node(title,'tspan',{x:(l+w-r)/2,dy:16},'energy captured (percent)');
+        node(svg,'text',{class:'axis-title','data-axis':'y',transform:`translate(17,${(t+h-b)/2}) rotate(-90)`,'text-anchor':'middle'},'Direction count');
+        node(svg,'path',{'data-series':'count',d:e.points.map((p,i)=>`${i?'L':'M'}${x(p.threshold)},${y(p.count)}`).join(' '),fill:'none',stroke:'var(--viz-series-1)','stroke-width':2});
+        for(const p of e.points){
+          node(svg,'circle',{cx:x(p.threshold),cy:y(p.count),r:4,fill:'var(--viz-series-1)'});
+          node(svg,'text',{'data-value':'',x:x(p.threshold),y:y(p.count)-12,'text-anchor':p.threshold===x0?'start':p.threshold===x1?'end':'middle'},p.count);
+          const hit=node(svg,'circle',{'data-chart-hit':'',cx:x(p.threshold),cy:y(p.count),r:16,fill:'transparent','data-tooltip':`${p.threshold*100}% target · ${p.count} directions · ${(p.captured*100).toFixed(3)}% captured`,class:'cursor-interaction'});
+          hit.addEventListener('pointerenter',()=>show(e,p));hit.addEventListener('click',()=>show(e,p,true));
+        }
+        const labels=[...svg.querySelectorAll('text')];
+        for(const label of labels.filter(n=>n.hasAttribute('data-value'))){const a=label.getBoundingClientRect();if(labels.some(n=>{if(n===label)return false;const b=n.getBoundingClientRect();return a.left<b.right+4&&a.right+4>b.left&&a.top<b.bottom+4&&a.bottom+4>b.top;}))label.remove();}
+      }
+    }
+    restore(window.openai?.widgetState);
+    window.addEventListener('openai:set_globals',e=>restore(e.detail?.globals?.widgetState));
+    new ResizeObserver(draw).observe(root);draw();
+  })();
+  </script>
+</div>

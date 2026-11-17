@@ -1,0 +1,11 @@
+{
+  "parent_run": "/local-ssd/mh3897/analysis_runs/d24_scalar_res_input_alignment/gpt_base_scalar_res_qkv_no_embed_norm_step7773_20261106T024853Z",
+  "selection_run": "/local-ssd/mh3897/analysis_runs/d24_vocab_vo_cosine/gpt_base_scalar_res_qkv_no_embed_norm_step7773_20261108T232243Z",
+  "cpu_threads": 4,
+  "batch_size": 1,
+  "validation_sequences": [0, 64, 127],
+  "validation_positions": [0, 1, 2, 127, 511, 512, 513, 1023, 2047],
+  "probability_atol": 0.00002,
+  "lse_atol": 0.00002,
+  "exclude_position_zero": true
+}

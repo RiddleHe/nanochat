@@ -1,0 +1,94 @@
+<div id="qkv-input-alignment">
+  <style>
+    #qkv-input-alignment {position:relative;color:var(--foreground)}
+    #qkv-input-alignment .alignment-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 16px}
+    #qkv-input-alignment figure {margin:0;min-width:0}
+    #qkv-input-alignment .alignment-chart {width:100%;display:block}
+    #qkv-input-alignment .alignment-chart text {fill:var(--foreground);font-size:12px;font-weight:400}
+    #qkv-input-alignment .alignment-legend {display:flex;gap:16px;flex-wrap:wrap;margin:12px 0}
+    #qkv-input-alignment .alignment-legend button {background:transparent;border:0;color:var(--foreground);padding:0;font:inherit;display:inline-flex;align-items:center;gap:6px}
+    #qkv-input-alignment .alignment-legend button[aria-pressed="false"] {opacity:.45}
+    #qkv-input-alignment .alignment-tooltip {position:absolute;pointer-events:none;z-index:10;padding:8px;background:var(--popover);color:var(--popover-foreground);max-width:270px}
+    #qkv-input-alignment .alignment-detail {margin-top:8px}
+    @media(max-width:780px){#qkv-input-alignment .alignment-grid {grid-template-columns:1fr}}
+  </style>
+  <h2>GPTBase · input alignment with dominant singular directions</h2>
+  <div class="alignment-caption text-small"></div>
+  <div class="alignment-legend text-small"></div>
+  <div class="alignment-grid"></div>
+  <div class="alignment-detail text-small tabular-nums" aria-live="polite"></div>
+  <div class="alignment-tooltip tooltip text-small tabular-nums" role="tooltip" hidden></div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+  (()=>{
+    const root=document.getElementById('qkv-input-alignment'), data=__ALIGNMENT_DATA__;
+    const get=s=>root.querySelector(s),pct=d3.format('.1%'),names=['Alignment','Reference'];
+    const colors={Alignment:'var(--viz-series-1)',Reference:'var(--foreground)'};
+    let enabled=new Set(names),selection=null;
+    function restore(state){if(state?.modelContent?.run_id!==data.run_id||state.modelContent.view!==data.view)return;enabled=new Set((state.privateContent?.enabled||names).filter(x=>names.includes(x)));selection=state.modelContent.selection||null;}
+    restore(window.openai?.widgetState);
+    function save(){window.openai?.setWidgetState({modelContent:{run_id:data.run_id,view:data.view,selection},privateContent:{enabled:[...enabled]}}).catch(()=>{});}
+    const family={attention:'Emb + attention',mlp:'MLP',all:'Emb + attention + MLP'}[data.family];
+    get('.alignment-caption').textContent=`${family} sources · ${data.tokens.toLocaleString()} tokens · ${pct(data.threshold)} squared-singular-value threshold · zero-based layers/heads · shared 0–100% scale`;
+    const buttons=names.map(name=>{
+      const b=document.createElement('button');b.type='button';b.className='cursor-interaction';
+      const sw=d3.select(b).append('svg').attr('width',24).attr('height',12).attr('aria-hidden','true');
+      sw.append('line').attr('x1',1).attr('x2',23).attr('y1',6).attr('y2',6).attr('stroke',colors[name]).attr('stroke-width',2).attr('stroke-dasharray',name==='Reference'?'6 3':null);
+      b.append(document.createTextNode(name==='Alignment'?'Input energy fraction':'Isotropic reference · k / input dimension'));
+      b.onclick=()=>{enabled.has(name)?enabled.delete(name):enabled.add(name);redraw();save();};
+      get('.alignment-legend').append(b);return {b,name};
+    });
+    const panels=data.panels.map(p=>{
+      const fig=document.createElement('figure'),title=document.createElement('h3'),sub=document.createElement('div'),holder=document.createElement('div');
+      title.textContent=p.title;sub.className='text-small';sub.textContent=p.reference===null?'Zero matrix · alignment undefined':`k = ${p.k} · captured ${pct(p.captured)} · reference ${pct(p.reference)}`;
+      fig.append(title,sub,holder);get('.alignment-grid').append(fig);
+      return {...p,id:`${p.layer}-${p.head}-${p.kind}`,holder};
+    });
+    function draw(p){
+      const width=p.holder.getBoundingClientRect().width;if(width<1)return;p.holder.replaceChildren();
+      const height=260,left=64,right=12,top=12,bottom=50;
+      const svg=d3.select(p.holder).append('svg').attr('class','alignment-chart').attr('viewBox',`0 0 ${width} ${height}`).attr('role','img').attr('aria-label',`${p.title}; mean input energy fraction by source`);
+      svg.append('title').text(p.title);svg.append('desc').text('Fraction of full source-vector energy in the selected input singular subspace. Token means, no head averaging. Missing values are undefined.');
+      const y=d3.scaleLinear().domain([0,1]).range([height-bottom-4,top+4]);
+      const x=d3.scaleLinear().domain(p.labels.length>1?[0,p.labels.length-1]:[-.5,.5]).range([left+4,width-right-4]);
+      svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','none').attr('stroke','var(--border)');
+      const yt=[0,.25,.5,.75,1];
+      svg.append('g').selectAll('line').data(yt).join('line').attr('x1',left).attr('x2',width-right).attr('y1',y).attr('y2',y).attr('stroke','var(--border)').attr('stroke-opacity',.5);
+      svg.append('g').attr('transform',`translate(${left},0)`).call(d3.axisLeft(y).tickValues(yt).tickFormat(d3.format('.0%')).tickSize(0).tickPadding(8)).call(g=>g.select('.domain').remove());
+      const n=Math.min(p.labels.length,width<360?4:6);
+      const ticks=n<2?(n?[0]:[]):[...new Set(d3.range(n).map(i=>Math.round(i*(p.labels.length-1)/(n-1))))];
+      const xa=svg.append('g').attr('data-source-axis','').attr('transform',`translate(0,${height-bottom})`).call(d3.axisBottom(x).tickValues(ticks).tickFormat(i=>p.labels[i]).tickSize(0).tickPadding(8)).call(g=>g.select('.domain').remove());
+      xa.selectAll('text').attr('text-anchor',i=>i===0?'start':i===p.labels.length-1?'end':'middle');
+      svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+width-right)/2).attr('y',height-5).attr('text-anchor','middle').text('Source layer');
+      svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(14,${(top+height-bottom)/2}) rotate(-90)`).attr('text-anchor','middle').text('Input energy fraction');
+      if(!p.labels.length){svg.append('text').attr('x',(left+width-right)/2).attr('y',height/2).attr('text-anchor','middle').text('No available sources');return;}
+      if(enabled.has('Reference')&&p.reference!==null)svg.append('line').attr('data-series','Reference').attr('x1',left+4).attr('x2',width-right-4).attr('y1',y(p.reference)).attr('y2',y(p.reference)).attr('stroke',colors.Reference).attr('stroke-dasharray','6 3');
+      if(enabled.has('Alignment')){
+        svg.append('path').datum(p.mean).attr('data-series','Alignment').attr('d',d3.line().defined(v=>v!==null).x((v,i)=>x(i)).y(v=>y(v))).attr('fill','none').attr('stroke',colors.Alignment).attr('stroke-width',2);
+        svg.append('g').selectAll('circle').data(p.mean.map((v,i)=>({v,i})).filter(d=>d.v!==null)).join('circle').attr('cx',d=>x(d.i)).attr('cy',d=>y(d.v)).attr('r',2.5).attr('fill',colors.Alignment);
+      }
+      const guide=svg.append('line').attr('data-chart-hover-guide','').attr('y1',top).attr('y2',height-bottom).attr('stroke','var(--border)').attr('visibility','hidden'),markers=svg.append('g');
+      function show(value,event){
+        const lo=Math.floor(value),hi=Math.ceil(value),t=value-lo;
+        const mean=p.mean[lo]!==null&&p.mean[hi]!==null?p.mean[lo]*(1-t)+p.mean[hi]*t:null;
+        const std=p.std[lo]!==null&&p.std[hi]!==null?p.std[lo]*(1-t)+p.std[hi]*t:null;
+        const near=Math.round(value),exact=Math.abs(value-near)<.015,label=exact?p.labels[near]:`${p.labels[lo]} → ${p.labels[hi]} (interpolated)`;
+        const rows=[];if(enabled.has('Alignment')&&mean!==null)rows.push({name:'Alignment',v:mean});if(enabled.has('Reference')&&p.reference!==null)rows.push({name:'Reference',v:p.reference});
+        guide.attr('x1',x(value)).attr('x2',x(value)).attr('visibility','visible');
+        markers.selectAll('circle').data(rows,d=>d.name).join('circle').attr('data-chart-hover-marker','').attr('cx',x(value)).attr('cy',d=>y(d.v)).attr('r',4).attr('fill',d=>colors[d.name]);
+        const detail=`${p.title} · ${label} · ${rows.map(r=>r.name+' '+pct(r.v)).join(' · ')}${enabled.has('Alignment')?(mean===null?' · undefined':` · token std ${pct(std)}`):''}${exact?' · valid tokens '+p.counts[near].toLocaleString():''}`;
+        if(event){const tip=get('.alignment-tooltip');tip.textContent=detail;tip.hidden=false;const b=root.getBoundingClientRect();tip.style.left=Math.max(0,Math.min(event.clientX-b.left+10,b.width-tip.offsetWidth))+'px';tip.style.top=Math.max(0,event.clientY-b.top-tip.offsetHeight-8)+'px';}
+        return detail;
+      }
+      if(selection?.panel===p.id&&selection.x>=0&&selection.x<=p.labels.length-1)get('.alignment-detail').textContent=show(selection.x);
+      const at=e=>Math.max(0,Math.min(p.labels.length-1,x.invert(d3.pointer(e,svg.node())[0])));
+      svg.append('rect').attr('data-chart-hit','').attr('data-chart-hover-overlay','cross-series').attr('class','cursor-interaction').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','transparent')
+        .on('pointermove',e=>show(at(e),e)).on('click',e=>{selection={panel:p.id,x:at(e)};redraw();save();}).on('pointerleave',()=>{get('.alignment-tooltip').hidden=true;guide.attr('visibility','hidden');markers.selectAll('*').remove();if(selection?.panel===p.id)show(selection.x);});
+      const boxes=[];for(const node of xa.selectAll('text').nodes()){const b=node.getBoundingClientRect();if(boxes.some(a=>b.left<a.right+4&&b.right+4>a.left)){node.parentNode.remove();}else boxes.push(b);}
+    }
+    function redraw(){get('.alignment-tooltip').hidden=true;get('.alignment-detail').textContent='';buttons.forEach(({b,name})=>b.setAttribute('aria-pressed',String(enabled.has(name))));panels.forEach(draw);}
+    window.addEventListener('openai:set_globals',e=>{restore(e.detail?.globals?.widgetState);redraw();});
+    const observer=new ResizeObserver(redraw);panels.forEach(p=>observer.observe(p.holder));redraw();
+  })();
+  </script>
+</div>

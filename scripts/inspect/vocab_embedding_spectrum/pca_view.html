@@ -1,0 +1,105 @@
+<div id="vocab-pca-variance">
+  <style>
+    #vocab-pca-variance {position:relative;color-scheme:dark;color:var(--foreground)}
+    #vocab-pca-variance h2 {padding-right:92px}
+    #vocab-pca-variance .pca-chart {display:block;width:100%;margin-top:16px;overflow:visible}
+    #vocab-pca-variance .pca-chart text {fill:var(--foreground);font-size:12px;font-weight:400}
+    #vocab-pca-variance .tooltip {position:absolute;pointer-events:none;background:var(--popover);color:var(--popover-foreground);padding:8px 12px;z-index:2;white-space:nowrap}
+  </style>
+  <h2>__PCA_TITLE__</h2>
+  <div class="text-small">GPTBase D24 · step 7,809 · centered · all 32,768 tokens equally weighted</div>
+  <svg class="pca-chart" role="img" aria-label="__PCA_DESCRIPTION__"></svg>
+  <div class="tooltip text-small tabular-nums" role="tooltip" hidden></div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+  (() => {
+    const root = document.getElementById('vocab-pca-variance');
+    const data = __PCA_DATA__;
+    const values = data.values.map((v,i) => ({x:i+1,y:v}));
+    const svg = d3.select(root.querySelector('svg'));
+    const tooltip = root.querySelector('.tooltip');
+    let pinned = null, showSelection = null;
+    const format = new Intl.NumberFormat('en-US');
+    function restore(state) {
+      const saved = state?.modelContent;
+      if (saved?.view === 'vocabulary-centered-pca' && saved?.metric === data.metric && saved?.x_scale === data.x_scale && saved?.run_id === data.run_id && Number.isInteger(saved.directions)) {
+        pinned = Math.max(1,Math.min(values.length,saved.directions));
+        showSelection?.(pinned);
+      }
+    }
+    restore(window.openai?.widgetState);
+    function draw() {
+      const w = root.getBoundingClientRect().width, h = w < 440 ? 370 : 420;
+      const left=68, right=20, top=18, bottom=64;
+      const x = (data.x_scale==='linear'?d3.scaleLinear():d3.scaleLog()).domain(d3.extent(values,d=>d.x)).range([left+5,w-right-5]);
+      const y = d3.scaleLinear().domain(d3.extent([0,...values.map(d=>d.y)])).range([h-bottom-5,top+5]);
+      svg.selectAll('*').remove();
+      svg.attr('viewBox',`0 0 ${w} ${h}`);
+      svg.append('title').text(data.title);
+      svg.append('desc').text(data.description);
+      svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',w-left-right).attr('height',h-top-bottom).attr('fill','none').attr('stroke','var(--border)');
+      for (const tick of y.ticks(5)) {
+        svg.append('line').attr('x1',left).attr('x2',w-right).attr('y1',y(tick)).attr('y2',y(tick)).attr('stroke','var(--border)');
+        svg.append('text').attr('x',left-10).attr('y',y(tick)+4).attr('text-anchor','end').text(tick);
+      }
+      const ticks = data.x_scale==='linear' ? (w <= 400 ? [1,512,1024,values.length] : [1,256,512,768,1024,1280,values.length]) : (w <= 400 ? [1,10,100,values.length] : [1,10,100,1000,values.length]);
+      for (const tick of ticks) {
+        svg.append('line').attr('x1',x(tick)).attr('x2',x(tick)).attr('y1',top).attr('y2',h-bottom).attr('stroke','var(--border)');
+        svg.append('text').attr('data-x-tick',tick).attr('x',x(tick)).attr('y',h-bottom+22).attr('text-anchor',tick===1?'start':tick===values.length?'end':'middle').text(format.format(tick));
+      }
+      svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+w-right)/2).attr('y',h-12).attr('text-anchor','middle').text(`PCA direction${data.metric==='cumulative'?'s':''} (${data.x_scale} scale)`);
+      svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(17,${(top+h-bottom)/2}) rotate(-90)`).attr('text-anchor','middle').text(data.y_axis);
+      svg.append('path').datum(values).attr('data-pca-line','').attr('d',d3.line().x(d=>x(d.x)).y(d=>y(d.y))).attr('fill','none').attr('stroke','var(--viz-series-1)').attr('stroke-width',2.5);
+      for (const item of data.thresholds) {
+        const point=values[item.k-1];
+        svg.append('circle').attr('cx',x(point.x)).attr('cy',y(point.y)).attr('r',3.5).attr('fill','var(--viz-series-1)');
+        if (item.q===0.5 || (item.q===0.9 && w>440)) {
+          svg.append('text').attr('data-annotation','').attr('x',x(point.x)-8).attr('y',y(point.y)-12).attr('text-anchor','end').text(`${format.format(item.k)} → ${item.q*100}%`);
+        }
+      }
+      if (data.metric!=='cumulative') {
+        for (const point of [values[0],values[values.length-1]]) {
+          const first=point.x===1;
+          svg.append('circle').attr('cx',x(point.x)).attr('cy',y(point.y)).attr('r',3.5).attr('fill','var(--viz-series-1)');
+          const label=data.metric==='variance-share'?`${point.y.toFixed(first?3:4)}%`:point.y.toFixed(2);
+          svg.append('text').attr('data-annotation','').attr('x',x(point.x)+(first?10:-8)).attr('y',y(point.y)+(first?16:-12)).attr('text-anchor',first?'start':'end').text(`PC ${format.format(point.x)} · ${label}`);
+        }
+      }
+      const guide=svg.append('line').attr('data-chart-hover-guide','').attr('y1',top).attr('y2',h-bottom).attr('stroke','var(--foreground)').attr('stroke-opacity',0.35).attr('visibility','hidden');
+      const marker=svg.append('circle').attr('data-chart-hover-marker','').attr('r',4).attr('fill','var(--viz-series-1)').attr('visibility','hidden');
+      showSelection = (k) => {
+        const point=values[k-1];
+        guide.attr('x1',x(k)).attr('x2',x(k)).attr('visibility','visible');
+        marker.attr('cx',x(k)).attr('cy',y(point.y)).attr('visibility','visible');
+        tooltip.textContent=data.metric==='std'?`PC ${format.format(k)} · SD ${point.y.toFixed(3)}`:data.metric==='variance-share'?`PC ${format.format(k)} · ${point.y.toFixed(4)}% variance`:`${format.format(k)} directions · ${point.y.toFixed(2)}% variance`;
+        tooltip.hidden=false;
+        const offset=svg.node().getBoundingClientRect().top-root.getBoundingClientRect().top;
+        tooltip.style.left=`${Math.max(0,Math.min(w-tooltip.offsetWidth,x(k)-tooltip.offsetWidth-12))}px`;
+        tooltip.style.top=`${offset+Math.max(top,y(point.y)-tooltip.offsetHeight-14)}px`;
+      };
+      function nearest(event) {
+        const [px]=d3.pointer(event,svg.node());
+        return values[d3.bisector(d=>d.x).center(values,x.invert(px))].x;
+      }
+      svg.append('rect').attr('data-chart-hit','').attr('x',left).attr('y',top).attr('width',w-left-right).attr('height',h-top-bottom).attr('fill','transparent')
+        .on('pointermove',event=>{if(pinned===null)showSelection(nearest(event));})
+        .on('pointerleave',()=>{if(pinned===null){tooltip.hidden=true;guide.attr('visibility','hidden');marker.attr('visibility','hidden');}})
+        .on('click',event=>{
+          const k=nearest(event); pinned=pinned===k?null:k;
+          showSelection(k);
+          window.openai?.setWidgetState({modelContent:{view:'vocabulary-centered-pca',metric:data.metric,x_scale:data.x_scale,run_id:data.run_id,directions:pinned},privateContent:null}).catch(()=>{});
+        });
+      // Measure all label types together; remove optional annotations before ticks.
+      const overlap=(a,b)=>a.left<b.right+4&&a.right+4>b.left&&a.top<b.bottom+4&&a.bottom+4>b.top;
+      for (const candidate of [...svg.node().querySelectorAll('[data-annotation]'),...svg.node().querySelectorAll('[data-x-tick="1000"]')]) {
+        const box=candidate.getBoundingClientRect();
+        if ([...svg.node().querySelectorAll('text')].some(other=>other!==candidate&&overlap(box,other.getBoundingClientRect())))candidate.remove();
+      }
+      if(pinned!==null)showSelection(pinned);
+    }
+    window.addEventListener('openai:set_globals',event=>restore(event.detail?.globals?.widgetState));
+    new ResizeObserver(draw).observe(root);
+    draw();
+  })();
+  </script>
+</div>

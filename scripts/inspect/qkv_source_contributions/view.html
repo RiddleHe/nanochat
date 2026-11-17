@@ -1,0 +1,156 @@
+<div id="qkv-source-study">
+  <style>
+    #qkv-source-study {position:relative}
+    #qkv-source-study .panels {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    #qkv-source-study figure {margin:0;min-width:0}
+    #qkv-source-study svg {display:block;width:100%;overflow:visible}
+    #qkv-source-study svg text {fill:var(--foreground);font-size:12px;font-weight:400}
+    #qkv-source-study .scale {display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
+    #qkv-source-study .ramp {width:160px;height:10px;background:linear-gradient(to right,color-mix(in srgb,var(--viz-series-1) 5%,transparent),color-mix(in srgb,var(--viz-series-1) 52.5%,transparent) 25%,color-mix(in srgb,var(--viz-series-1) 72.2%,transparent) 50%,color-mix(in srgb,var(--viz-series-1) 87.3%,transparent) 75%,var(--viz-series-1))}
+    #qkv-source-study .selection {margin-top:20px}
+    #qkv-source-study .detail {margin-top:8px;min-height:24px}
+    #qkv-source-study .chart-hit {fill:transparent}
+    #qkv-source-study #qkv-tooltip {position:absolute;pointer-events:none;z-index:10;background:var(--popover);color:var(--popover-foreground);padding:8px;max-width:220px}
+    @media(max-width:720px){#qkv-source-study .panels {grid-template-columns:1fr}}
+  </style>
+  <h2>Where each head reads from previous layers</h2>
+  <p class="text-small" id="qkv-sample-label"></p>
+  <h3>Mean absolute projected norm</h3>
+  <div class="scale"><span class="tabular-nums">0</span><span class="ramp" aria-hidden="true"></span><span id="qkv-mean-max" class="tabular-nums"></span><span class="text-small">L2 norm · square-root color scale</span></div>
+  <div class="panels" id="qkv-means"></div>
+  <h3>Variation across heads</h3>
+  <div class="scale"><span class="tabular-nums">0</span><span class="ramp" aria-hidden="true"></span><span id="qkv-std-max" class="tabular-nums"></span><span class="text-small">Population SD · square-root color scale</span></div>
+  <div class="panels" id="qkv-stds"></div>
+  <div class="selection">
+    <h3>Individual heads</h3>
+    <div class="viz-controls">
+      <label class="form-label">Projection<select id="qkv-kind" class="form-select"><option>Q</option><option>K</option><option>V</option></select></label>
+      <label class="form-label">Receiving layer<select id="qkv-layer" class="form-select"></select></label>
+      <label class="form-label">Source<select id="qkv-source" class="form-select"></select></label>
+    </div>
+    <div class="detail tabular-nums text-small" id="qkv-selected-label" aria-live="polite"></div>
+    <div id="qkv-head-chart"></div>
+  </div>
+  <div class="detail tabular-nums text-small" id="qkv-hover-label" aria-live="off"></div>
+  <div id="qkv-tooltip" class="tooltip text-small tabular-nums" role="tooltip" hidden></div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+    (() => {
+      const root = document.getElementById('qkv-source-study');
+      const data = __EXPERIMENT_DATA__;
+      const nLayers = Math.max(...data.cells.map(c => c.layer)) + 1;
+      const lookup = new Map(data.cells.map(c => [`${c.kind}:${c.layer}:${c.source}`, c]));
+      const maxima = {mean:d3.max(data.cells,c=>c.mean),std:d3.max(data.cells,c=>c.std)};
+      const fmt = d3.format('.4f');
+      const el = id => root.querySelector('#'+id);
+      const sourceName = source => source < 0 ? 'Embedding' : `Layer ${source}`;
+      const initial = window.openai?.widgetState?.modelContent || {};
+      let selected = {kind:['Q','K','V'].includes(initial.kind)?initial.kind:'Q',
+                      layer:Number.isInteger(initial.layer)&&initial.layer>=0&&initial.layer<nLayers?initial.layer:nLayers-1,
+                      source:Number.isInteger(initial.source)?initial.source:-1};
+      if(selected.source < -1 || selected.source >= selected.layer) selected.source = -1;
+      el('qkv-sample-label').textContent = `${data.sequences} sequences · ${data.tokens.toLocaleString()} token occurrences · checkpoint 7,809 · before Q/K normalization · layers indexed from 0`;
+      el('qkv-mean-max').textContent=fmt(maxima.mean);
+      el('qkv-std-max').textContent=fmt(maxima.std);
+      for(let layer=0;layer<nLayers;layer++){
+        const option=document.createElement('option');option.value=layer;option.textContent=layer;el('qkv-layer').appendChild(option);
+      }
+      const panels=[];
+      for(const metric of ['mean','std']) for(const kind of ['Q','K','V']){
+        const figure=document.createElement('figure');
+        const caption=document.createElement('figcaption');caption.textContent=kind;figure.appendChild(caption);
+        const holder=document.createElement('div');figure.appendChild(holder);
+        el(metric==='mean'?'qkv-means':'qkv-stds').appendChild(figure);
+        panels.push({holder,kind,metric});
+      }
+      function save(){
+        window.openai?.setWidgetState({modelContent:{run_id:data.run_id,...selected},privateContent:null}).catch(()=>{});
+      }
+      function syncControls(){
+        el('qkv-kind').value=selected.kind;el('qkv-layer').value=selected.layer;
+        el('qkv-source').replaceChildren();
+        for(let source=-1;source<selected.layer;source++){
+          const option=document.createElement('option');option.value=source;option.textContent=sourceName(source);el('qkv-source').appendChild(option);
+        }
+        el('qkv-source').value=selected.source;
+      }
+      function selectCell(cell){
+        selected={kind:cell.kind,layer:cell.layer,source:cell.source};syncControls();drawHeads();drawAll();save();
+      }
+      function newSvg(holder,width,height,title){
+        holder.replaceChildren();
+        const svg=d3.select(holder).append('svg').attr('viewBox',`0 0 ${width} ${height}`).attr('role','img').attr('aria-label',title);
+        svg.append('title').text(title);return svg;
+      }
+      function drawPanel(panel){
+        const width=panel.holder.getBoundingClientRect().width;if(width<1)return;
+        const left=68,right=8,top=8,bottom=48;
+        const size=width-left-right,height=size+top+bottom;
+        const svg=newSvg(panel.holder,width,height,`${panel.kind} ${panel.metric==='mean'?'mean absolute norm':'head standard deviation'} by receiving and source layer`);
+        const x=d3.scaleBand().domain(d3.range(nLayers)).range([left,width-right]);
+        const y=d3.scaleBand().domain(d3.range(-1,nLayers-1)).range([top,top+size]);
+        const observations=data.cells.filter(c=>c.kind===panel.kind);
+        svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',size).attr('height',size).attr('fill','none').attr('stroke','var(--border)');
+        svg.selectAll('rect.value').data(observations).join('rect').attr('class','value')
+          .attr('x',c=>x(c.layer)).attr('y',c=>y(c.source)).attr('width',x.bandwidth()).attr('height',y.bandwidth())
+          .attr('fill','var(--viz-series-1)').attr('fill-opacity',c=>0.05+0.95*Math.sqrt(c[panel.metric]/maxima[panel.metric]));
+        const xTicks=width<360?[0,8,16,23]:[0,6,12,18,23];
+        const yTicks=[-1,3,7,11,15,19,22];
+        svg.append('g').attr('transform',`translate(0,${top+size})`).call(d3.axisBottom(x).tickValues(xTicks).tickSize(0).tickPadding(7)).call(g=>g.select('.domain').remove());
+        svg.append('g').attr('transform',`translate(${left},0)`).call(d3.axisLeft(y).tickValues(yTicks).tickFormat(v=>v<0?'Emb':String(v)).tickSize(0).tickPadding(7)).call(g=>g.select('.domain').remove());
+        svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',left+size/2).attr('y',height-4).attr('text-anchor','middle').text('Receiving layer');
+        svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(14,${top+size/2}) rotate(-90)`).attr('text-anchor','middle').text('Source layer');
+        if(selected.kind===panel.kind){
+          svg.append('rect').attr('x',x(selected.layer)).attr('y',y(selected.source)).attr('width',x.bandwidth()).attr('height',y.bandwidth()).attr('fill','none').attr('stroke','var(--foreground)').attr('stroke-width',1.5);
+        }
+        const hit=svg.append('rect').attr('class','chart-hit cursor-interaction').attr('data-chart-hit','').attr('x',left).attr('y',top).attr('width',size).attr('height',size);
+        function cellAt(event){
+          const [px,py]=d3.pointer(event,svg.node());
+          const layer=Math.floor((px-left)/x.step()),source=Math.floor((py-top)/y.step())-1;
+          return lookup.get(`${panel.kind}:${layer}:${source}`);
+        }
+        hit.on('pointermove',event=>{
+          const cell=cellAt(event),tooltip=el('qkv-tooltip');
+          if(!cell){tooltip.hidden=true;return;}
+          const label=`${cell.kind} · receiving ${cell.layer} · ${sourceName(cell.source)} · mean ${fmt(cell.mean)} · head SD ${fmt(cell.std)}`;
+          el('qkv-hover-label').textContent=label;tooltip.textContent=label;tooltip.hidden=false;
+          const bounds=root.getBoundingClientRect();
+          tooltip.style.left=Math.max(0,Math.min(event.clientX-bounds.left+12,bounds.width-tooltip.offsetWidth))+'px';
+          tooltip.style.top=Math.max(0,event.clientY-bounds.top-tooltip.offsetHeight-12)+'px';
+        })
+          .on('pointerleave',()=>{el('qkv-hover-label').textContent='';el('qkv-tooltip').hidden=true;})
+          .on('click',event=>{const cell=cellAt(event);if(cell)selectCell(cell);});
+      }
+      function drawHeads(){
+        const cell=lookup.get(`${selected.kind}:${selected.layer}:${selected.source}`);
+        el('qkv-selected-label').textContent=`${cell.kind} · receiving layer ${cell.layer} · ${sourceName(cell.source)} · mean ${fmt(cell.mean)} · head SD ${fmt(cell.std)} · range ${fmt(cell.min)}–${fmt(cell.max)}`;
+        const holder=el('qkv-head-chart'),width=holder.getBoundingClientRect().width;if(width<1)return;
+        const height=235,left=68,right=12,top=12,bottom=44;
+        const svg=newSvg(holder,width,height,`Mean absolute norms for ${cell.heads.length} individual heads`);
+        const x=d3.scaleBand().domain(d3.range(cell.heads.length)).range([left,width-right]).padding(0.22);
+        const y=d3.scaleLinear().domain([0,d3.max(cell.heads)*1.12]).nice().range([height-bottom,top]);
+        svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','none').attr('stroke','var(--border)');
+        svg.selectAll('rect.head').data(cell.heads).join('rect').attr('class','head').attr('x',(d,i)=>x(i)).attr('y',d=>y(d)).attr('width',x.bandwidth()).attr('height',d=>y(0)-y(d)).attr('fill','var(--viz-series-1)')
+          .attr('data-tooltip',(d,i)=>`Head ${i}: mean ${fmt(d)}, token SD ${fmt(cell.token_std[i])}`);
+        const ticks=width<400?[0,4,8,cell.heads.length-1]:d3.range(cell.heads.length);
+        svg.append('g').attr('transform',`translate(0,${height-bottom})`).call(d3.axisBottom(x).tickValues([...new Set(ticks)]).tickSize(0).tickPadding(6)).call(g=>g.select('.domain').remove());
+        svg.append('g').attr('transform',`translate(${left},0)`).call(d3.axisLeft(y).ticks(4).tickSize(0).tickPadding(6)).call(g=>g.select('.domain').remove());
+        svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+width-right)/2).attr('y',height-4).attr('text-anchor','middle').text('Head index');
+        svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(14,${(top+height-bottom)/2}) rotate(-90)`).attr('text-anchor','middle').text('Mean L2 norm');
+      }
+      function drawAll(){panels.forEach(drawPanel);}
+      el('qkv-kind').addEventListener('change',()=>{selected.kind=el('qkv-kind').value;drawHeads();drawAll();save();});
+      el('qkv-layer').addEventListener('change',()=>{selected.layer=Number(el('qkv-layer').value);if(selected.source>=selected.layer)selected.source=-1;syncControls();drawHeads();drawAll();save();});
+      el('qkv-source').addEventListener('change',()=>{selected.source=Number(el('qkv-source').value);drawHeads();drawAll();save();});
+      window.addEventListener('openai:set_globals',event=>{
+        const saved=event.detail?.globals?.widgetState?.modelContent;
+        if(saved&&lookup.has(`${saved.kind}:${saved.layer}:${saved.source}`)){
+          selected={kind:saved.kind,layer:saved.layer,source:saved.source};syncControls();drawHeads();drawAll();
+        }
+      });
+      syncControls();drawAll();drawHeads();
+      const observer=new ResizeObserver(()=>{drawAll();drawHeads();});
+      panels.forEach(panel=>observer.observe(panel.holder));observer.observe(el('qkv-head-chart'));
+    })();
+  </script>
+</div>

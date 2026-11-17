@@ -1,0 +1,105 @@
+<div id="qkv-head-maps">
+  <style>
+    #qkv-head-maps {position:relative}
+    #qkv-head-maps .head-panels {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    #qkv-head-maps figure {margin:0;min-width:0}
+    #qkv-head-maps svg {display:block;width:100%}
+    #qkv-head-maps svg text {fill:var(--foreground);font-size:12px;font-weight:400}
+    #qkv-head-maps .head-legend {display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 16px}
+    #qkv-head-maps .head-gradient {width:160px;height:10px;background:linear-gradient(to right,color-mix(in srgb,var(--viz-series-1) 3%,transparent),var(--viz-series-1))}
+    #qkv-head-maps #head-tooltip {position:absolute;pointer-events:none;z-index:10;background:var(--popover);color:var(--popover-foreground);padding:8px;max-width:230px}
+    #qkv-head-maps .head-row {margin-bottom:20px}
+    #qkv-head-maps .cell-detail {min-height:24px}
+    @media(max-width:720px){#qkv-head-maps .head-panels {grid-template-columns:1fr}}
+  </style>
+  <h2>Source contributions by head</h2>
+  <div class="text-small" id="head-caption"></div>
+  <div id="head-rows"></div>
+  <div id="head-tooltip" class="tooltip text-small tabular-nums" role="tooltip" hidden></div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+  (() => {
+    const root=document.getElementById('qkv-head-maps');
+    const data=__HEAD_DATA__;
+    const metrics=data.metrics||['magnitude','share'];
+    const get=id=>root.querySelector('#'+id);
+    const maxima=Object.fromEntries(metrics.map(metric=>[metric,d3.max(data.panels.filter(p=>p.metric===metric).flatMap(p=>p.values.flat()))]));
+    const metricNames={magnitude:'Mean magnitude per token',share:'Mean relative share per token'};
+    const fmt=d3.format('.4f');
+    const formatValue=(metric,value)=>metric==='share'?d3.format('.2%')(value):fmt(value);
+    get('head-caption').textContent=`${data.tokens.toLocaleString()} token occurrences · before Q/K normalization · zero-based layer and head indices`;
+    const panels=[];
+    let pinned=null;
+    const saved=window.openai?.widgetState?.modelContent;
+    if(saved?.run_id===data.run_id&&data.layers.includes(saved.layer)&&saved.metric in metricNames)pinned=saved;
+    for(const layer of data.layers){
+      const section=document.createElement('section');section.className='head-row';
+      const title=document.createElement('h3');title.textContent=`Receiving layer ${layer}`;section.appendChild(title);
+      get('head-rows').appendChild(section);
+      for(const metric of metrics){
+        const legend=document.createElement('div');legend.className='head-legend text-small tabular-nums';
+        const label=document.createElement('span');label.textContent=metricNames[metric];legend.appendChild(label);
+        const zero=document.createElement('span');zero.textContent=metric==='share'?'0%':'0';legend.appendChild(zero);
+        const ramp=document.createElement('span');ramp.className='head-gradient';ramp.setAttribute('aria-hidden','true');legend.appendChild(ramp);
+        const maxLabel=document.createElement('span');maxLabel.textContent=formatValue(metric,maxima[metric]);legend.appendChild(maxLabel);
+        const scaleLabel=document.createElement('span');scaleLabel.textContent=metric==='share'?'Shared linear scale':'L2 norm · shared linear scale';legend.appendChild(scaleLabel);
+        section.appendChild(legend);
+        const grid=document.createElement('div');grid.className='head-panels';section.appendChild(grid);
+        const detail=document.createElement('div');detail.className='cell-detail text-small tabular-nums';detail.setAttribute('aria-live','polite');section.appendChild(detail);
+        for(const sourcePanel of data.panels.filter(p=>p.layer===layer&&p.metric===metric)){
+          const figure=document.createElement('figure'),caption=document.createElement('figcaption'),holder=document.createElement('div');
+          caption.textContent=sourcePanel.kind;figure.appendChild(caption);figure.appendChild(holder);grid.appendChild(figure);
+          panels.push({...sourcePanel,holder,detail});
+        }
+      }
+    }
+    function description(panel,head,source){return `${panel.kind} · layer ${panel.layer} · head ${head} · source ${source<0?'Embedding':source} · ${panel.metric==='share'?'mean relative share':'mean magnitude'} ${formatValue(panel.metric,panel.values[head][source+1])}`;}
+    function draw(panel){
+      const width=panel.holder.getBoundingClientRect().width;if(width<1)return;
+      const left=64,right=8,top=8,bottom=44,heads=panel.values.length,rows=panel.values[0].length;
+      const cellHeight=18,plotHeight=heads*cellHeight,height=top+plotHeight+bottom;
+      panel.holder.replaceChildren();
+      const svg=d3.select(panel.holder).append('svg').attr('viewBox',`0 0 ${width} ${height}`).attr('role','img')
+        .attr('aria-label',`${panel.kind}, receiving layer ${panel.layer}: ${metricNames[panel.metric]} with sources on X and heads on Y`);
+      svg.append('title').text(`${panel.kind}, layer ${panel.layer}`);
+      svg.append('desc').text(`${heads} individual heads; embedding and previous layer writes; ${metricNames[panel.metric]} across ${data.tokens} tokens, without head averaging.`);
+      const x=d3.scaleBand().domain(d3.range(-1,rows-1)).range([left,width-right]);
+      const y=d3.scaleBand().domain(d3.range(heads)).range([top,top+plotHeight]);
+      const cells=panel.values.flatMap((values,head)=>values.map((value,row)=>({head,source:row-1,value})));
+      svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',plotHeight).attr('fill','none').attr('stroke','var(--border)');
+      svg.selectAll('rect.cell').data(cells).join('rect').attr('class','cell').attr('x',c=>x(c.source)).attr('y',c=>y(c.head))
+        .attr('width',x.bandwidth()).attr('height',y.bandwidth()).attr('fill','var(--viz-series-1)').attr('fill-opacity',c=>0.03+0.97*c.value/maxima[panel.metric]);
+      const tickCount=width<360?4:Math.min(rows,Math.floor((width-left-right)/34));
+      const ticks=[...new Set(d3.range(tickCount).map(i=>Math.round(i*(rows-1)/(tickCount-1))-1))];
+      svg.append('g').attr('transform',`translate(0,${top+plotHeight})`).call(d3.axisBottom(x).tickValues(ticks).tickFormat(v=>v===-1?'Emb':v).tickSize(0).tickPadding(7)).call(g=>g.select('.domain').remove());
+      svg.append('g').attr('transform',`translate(${left},0)`).call(d3.axisLeft(y).tickSize(0).tickPadding(6)).call(g=>g.select('.domain').remove());
+      svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+width-right)/2).attr('y',height-3).attr('text-anchor','middle').text('Previous layer index');
+      svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(14,${top+plotHeight/2}) rotate(-90)`).attr('text-anchor','middle').text('Head index');
+      if(pinned&&pinned.metric===panel.metric&&pinned.layer===panel.layer&&pinned.kind===panel.kind&&pinned.head>=0&&pinned.head<heads&&pinned.source<rows-1&&pinned.source>=-1){
+        svg.append('rect').attr('x',x(pinned.source)).attr('y',y(pinned.head)).attr('width',x.bandwidth()).attr('height',y.bandwidth()).attr('fill','none').attr('stroke','var(--foreground)').attr('stroke-width',1.5);
+        panel.detail.textContent=description(panel,pinned.head,pinned.source);
+      }
+      const overlay=svg.append('rect').attr('data-chart-hit','').attr('class','cursor-interaction').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',plotHeight).attr('fill','transparent');
+      function at(event){const [px,py]=d3.pointer(event,svg.node());const source=Math.floor((px-left)/x.step())-1,head=Math.floor((py-top)/y.step());return head>=0&&head<heads&&source>=-1&&source<rows-1?{head,source}:null;}
+      overlay.on('pointermove',event=>{
+        const cell=at(event),tooltip=get('head-tooltip');if(!cell){tooltip.hidden=true;return;}
+        tooltip.textContent=description(panel,cell.head,cell.source);tooltip.hidden=false;
+        const bounds=root.getBoundingClientRect();
+        tooltip.style.left=Math.max(0,Math.min(event.clientX-bounds.left+12,bounds.width-tooltip.offsetWidth))+'px';
+        tooltip.style.top=Math.max(0,event.clientY-bounds.top-tooltip.offsetHeight-10)+'px';
+      }).on('pointerleave',()=>{get('head-tooltip').hidden=true;}).on('click',event=>{
+        const cell=at(event);if(!cell)return;
+        pinned={run_id:data.run_id,layer:panel.layer,kind:panel.kind,metric:panel.metric,...cell};
+        for(const p of panels)p.detail.textContent='';panels.forEach(draw);
+        window.openai?.setWidgetState({modelContent:pinned,privateContent:null}).catch(()=>{});
+      });
+    }
+    window.addEventListener('openai:set_globals',event=>{
+      const state=event.detail?.globals?.widgetState?.modelContent;
+      if(state?.run_id===data.run_id&&data.layers.includes(state.layer)&&state.metric in metricNames){pinned=state;panels.forEach(draw);}
+    });
+    const observer=new ResizeObserver(()=>panels.forEach(draw));
+    panels.forEach(p=>{draw(p);observer.observe(p.holder);});
+  })();
+  </script>
+</div>

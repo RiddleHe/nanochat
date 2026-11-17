@@ -54,6 +54,8 @@ parser.add_argument("--head-dim", type=int, default=128, help="target head dimen
 parser.add_argument("--max-seq-len", type=int, default=2048, help="max context length")
 parser.add_argument("--window-pattern", type=str, default="SSSL", help="sliding window pattern tiled across layers: L=full, S=half context (e.g. 'SSL')")
 parser.add_argument("--model-type", type=str, default="gpt", help="model architecture variant (e.g. 'gpt', 'linear_attn', 'sparse_attn')")
+parser.add_argument("--norm-value-input", action="store_true", help="RMS-normalize direct embedding values; retain raw initial residual")
+parser.add_argument("--sum-head-attention", action="store_true", help="Sum head probabilities in pooled embedding attention")
 # Training horizon (only one used, in order of precedence)
 parser.add_argument("--num-iterations", type=int, default=-1, help="explicit number of optimization steps (-1 = disable)")
 parser.add_argument("--target-flops", type=float, default=-1.0, help="calculate num_iterations to reach target_flops (-1 = disable)")
@@ -137,10 +139,13 @@ def build_model_meta(depth):
     base_dim = depth * args.aspect_ratio
     model_dim = ((base_dim + args.head_dim - 1) // args.head_dim) * args.head_dim
     num_heads = model_dim // args.head_dim
+    value_options = {name: True for name in ("norm_value_input", "sum_head_attention")
+                     if getattr(args, name)}
     config = ConfigClass(
         sequence_len=args.max_seq_len, vocab_size=vocab_size,
         n_layer=depth, n_head=num_heads, n_kv_head=num_heads, n_embd=model_dim,
         window_pattern=args.window_pattern,
+        **value_options,
     )
     with torch.device("meta"):
         model_meta = ModelClass(config)

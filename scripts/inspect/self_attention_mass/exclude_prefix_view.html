@@ -1,0 +1,60 @@
+<div id="self-attention-exclude-prefix" style="color-scheme:only dark;--background:Canvas;--foreground:CanvasText;--popover:Canvas;--popover-foreground:CanvasText;--border:color-mix(in srgb,CanvasText 18%,Canvas);background:var(--background);color:var(--foreground);position:relative">
+<style>
+#self-attention-exclude-prefix h3{padding-right:90px}
+#self-attention-exclude-prefix .chart{display:block;width:100%}
+#self-attention-exclude-prefix .chart text{fill:var(--foreground);font-size:12px}
+#self-attention-exclude-prefix .legend{display:flex;flex-wrap:wrap;gap:20px;margin:12px 0}
+#self-attention-exclude-prefix .legend button{display:inline-flex;gap:7px;align-items:center;background:transparent;border:0;padding:0;color:var(--foreground);font:inherit}
+#self-attention-exclude-prefix .legend button[aria-pressed="false"]{opacity:.4}
+#self-attention-exclude-prefix .dot-swatch{height:7px;width:7px;border-radius:50%;background:var(--viz-series-1)}
+#self-attention-exclude-prefix .line-swatch{width:7px;height:7px;background:var(--viz-series-2)}
+#self-attention-exclude-prefix .tooltip{position:absolute;pointer-events:none;background:var(--popover);color:var(--popover-foreground);padding:10px;max-width:100%;box-sizing:border-box;z-index:2}
+#self-attention-exclude-prefix .tooltip div+div{margin-top:4px}
+@media(pointer:coarse){#self-attention-exclude-prefix .legend button{min-height:44px}}
+</style>
+<h3>Self-attention after removing keys 0–3</h3>
+<div class="text-small">128 × 2,048 tokens · queries at positions 4–2,047</div>
+<div class="legend text-small">
+<button type="button" class="cursor-interaction" data-series="target" aria-pressed="true"><span style="color:var(--viz-series-3)">▲</span>Target heads</button>
+<button type="button" class="cursor-interaction" data-series="other" aria-pressed="true"><span class="dot-swatch"></span>Other heads</button>
+<button type="button" class="cursor-interaction" data-series="uniform" aria-pressed="true"><span class="line-swatch"></span>Uniform baseline</button>
+</div>
+<svg class="chart" role="img" aria-label="Self-attention after removing keys zero through three and average attention per remaining eligible token, for all 24 layers and 12 heads, with curves connecting head means."></svg>
+<div class="tooltip text-small tabular-nums" role="tooltip" hidden></div>
+<script type="application/json">__DATA__</script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script>
+(()=>{
+const root=document.getElementById('self-attention-exclude-prefix'),data=JSON.parse(root.querySelector('script[type="application/json"]').textContent),svg=d3.select(root.querySelector('.chart')),tip=root.querySelector('.tooltip');
+const groups=[{id:'target',label:'Target heads',color:'var(--viz-series-3)'},{id:'other',label:'Other heads',color:'var(--viz-series-1)'},{id:'uniform',label:'Uniform baseline',color:'var(--viz-series-2)'}];
+const points=groups.flatMap(g=>data.rows.filter(r=>g.id==='uniform'||(g.id==='target')===r.target).flatMap(r=>r.heads.map(h=>({...h,mean:h[g.id==='uniform'?'uniform':'adjusted'].mean,std:h[g.id==='uniform'?'uniform':'adjusted'].std,group:g.id,color:g.color,layer:r.layer,target:r.target,window:r.window_size,x:r.layer+(g.id==='uniform'?.13:-.13)+(h.head-5.5)*.018}))));
+let visible=new Set(groups.map(g=>g.id)),pinned=null;
+function restore(state){const s=state?.modelContent;if(s?.view!=='self-attention-exclude-prefix'||s.run_id!==data.run_id)return;if(Array.isArray(s.visible))visible=new Set(s.visible.filter(x=>groups.some(g=>g.id===x)));pinned=s.selected&&points.some(p=>p.layer===s.selected.layer&&p.head===s.selected.head&&p.group===s.selected.group)?s.selected:null;}
+function save(){window.openai?.setWidgetState?.({modelContent:{view:'self-attention-exclude-prefix',run_id:data.run_id,visible:[...visible],selected:pinned},privateContent:null})?.catch(()=>{});}
+restore(window.openai?.widgetState);
+function draw(){
+const w=root.clientWidth,h=w<440?360:440,f={left:64,right:w-14,top:12,bottom:h-58},extent=d3.extent(points,p=>p.layer),x=d3.scaleLinear().domain([extent[0]-.55,extent[1]+.55]).range([f.left+5,f.right-5]),y=d3.scaleLinear().domain([0,Math.min(1,Math.ceil(d3.max(points,p=>p.mean)*1.1*10)/10)]).range([f.bottom-5,f.top+5]);
+svg.selectAll('*').remove();svg.attr('viewBox',`0 0 ${w} ${h}`).attr('height',h);svg.append('title').text('Self-attention after removing keys 0–3 · all layers');svg.append('desc').text('GPTBaseScalarResQKVNoEmbedNorm checkpoint 7773. Each dot is one head averaged over 261,632 token occurrences in 128 validation sequences, excluding query positions 0–3. Each colored curve equally averages twelve head means. The second group is the mean probability across eligible keys, 1 divided by their count. Self-attention is renormalized over eligible keys at positions four onward, separately for each query. The actual model forward is unchanged. Horizontal offsets separate heads; all head dots belong to their integer layer. Token population SD and count are available on hover.');
+svg.append('rect').attr('data-chart-frame','').attr('x',f.left).attr('y',f.top).attr('width',f.right-f.left).attr('height',f.bottom-f.top).attr('fill','none').attr('stroke','var(--border)');
+for(const v of y.ticks(4))svg.append('line').attr('x1',f.left).attr('x2',f.right).attr('y1',y(v)).attr('y2',y(v)).attr('stroke','var(--border)');
+svg.append('g').attr('class','axis').attr('transform',`translate(${f.left},0)`).call(d3.axisLeft(y).ticks(4).tickFormat(d3.format('.0%')).tickSize(0).tickPadding(8));
+const ticks=w<440?[0,8,16,23]:[0,3,6,9,12,15,18,21,23];svg.append('g').attr('class','axis').attr('transform',`translate(0,${f.bottom})`).call(d3.axisBottom(x).tickValues(ticks).tickFormat(d3.format('d')).tickSize(0).tickPadding(10));svg.selectAll('.axis .domain').remove();
+svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(f.left+f.right)/2).attr('y',h-10).attr('text-anchor','middle').text('Attention layer index');
+svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(18,${(f.top+f.bottom)/2}) rotate(-90)`).attr('text-anchor','middle').text('Renormalized self-attention');
+for(const g of groups){root.querySelector(`button[data-series="${g.id}"]`).setAttribute('aria-pressed',visible.has(g.id));const marks=svg.append('g').attr('data-series-group',g.id).attr('display',visible.has(g.id)?null:'none'),ps=points.filter(p=>p.group===g.id);
+if(g.id==='target')marks.selectAll('path').data(ps).join('path').attr('data-head-dot',p=>`${p.group}:${p.layer}:${p.head}`).attr('d',d3.symbol().type(d3.symbolTriangle).size(30)).attr('transform',p=>`translate(${x(p.x)},${y(p.mean)})`).attr('fill',g.color).attr('fill-opacity',.8);
+else if(g.id==='other')marks.selectAll('circle').data(ps).join('circle').attr('data-head-dot',p=>`${p.group}:${p.layer}:${p.head}`).attr('cx',p=>x(p.x)).attr('cy',p=>y(p.mean)).attr('r',3).attr('fill',g.color).attr('fill-opacity',.8);
+else marks.selectAll('rect').data(ps).join('rect').attr('data-head-dot',p=>`${p.group}:${p.layer}:${p.head}`).attr('x',p=>x(p.x)-2).attr('y',p=>y(p.mean)-2).attr('width',4).attr('height',4).attr('fill',g.color).attr('fill-opacity',.7);}
+for(const metric of ['adjusted','uniform']){const ms=data.rows.map(r=>({x:r.layer,target:r.target,mean:r[metric+'_mean']}));svg.append('path').datum(ms).attr('data-mean-curve',metric).attr('d',d3.line().defined(p=>metric==='uniform'?visible.has('uniform'):visible.has(p.target?'target':'other')).x(p=>x(p.x)).y(p=>y(p.mean))).attr('fill','none').attr('stroke',metric==='uniform'?'var(--viz-series-2)':'var(--viz-series-1)').attr('stroke-width',2).attr('stroke-dasharray',metric==='uniform'?'5 3':null);}
+const focus=svg.append('circle').attr('data-hover-highlight','').attr('r',6).attr('fill','none').attr('stroke','var(--foreground)').attr('visibility','hidden');
+function clear(){tip.hidden=true;focus.attr('visibility','hidden');}
+function show(p){if(!p){clear();return;}focus.attr('cx',x(p.x)).attr('cy',y(p.mean)).attr('visibility','visible');tip.replaceChildren();const rows=[`L${p.layer} · H${p.head}`];if(visible.has(p.target?'target':'other'))rows.push(`Adjusted self-attention: ${(p.adjusted.mean*100).toFixed(2)}%`,`Token SD: ${(p.adjusted.std*100).toFixed(2)} percentage points`);if(visible.has('uniform'))rows.push(`Uniform baseline: ${(p.uniform.mean*100).toFixed(3)}%`);rows.push(`${p.count.toLocaleString()} query positions`,p.target?'Target layer':'Other layer');for(const text of rows){const el=document.createElement('div');el.textContent=text;tip.append(el);}tip.hidden=false;tip.style.left=Math.max(0,Math.min(w-tip.offsetWidth,x(p.x)+12))+'px';tip.style.top=(svg.node().getBoundingClientRect().top-root.getBoundingClientRect().top+f.top+8)+'px';}
+function nearest(e){const [px,py]=d3.pointer(e,svg.node());return d3.least(points.filter(p=>visible.has(p.group)),p=>(x(p.x)-px)**2+(y(p.mean)-py)**2);}
+svg.append('rect').attr('data-chart-hit','').attr('data-chart-hover-overlay','nearest-point').attr('x',f.left).attr('y',f.top).attr('width',f.right-f.left).attr('height',f.bottom-f.top).attr('fill','transparent').on('pointermove',e=>{if(!pinned)show(nearest(e));}).on('pointerleave',()=>{if(!pinned)clear();}).on('click',e=>{const p=nearest(e);pinned=pinned?null:p?{layer:p.layer,head:p.head,group:p.group}:null;show(pinned?p:null);save();});
+if(pinned&&visible.has(pinned.group))show(points.find(p=>p.layer===pinned.layer&&p.head===pinned.head&&p.group===pinned.group));else clear();
+const labels=[...svg.node().querySelectorAll('text')];let overlap=false;labels.forEach((a,i)=>labels.slice(i+1).forEach(b=>{const r=a.getBoundingClientRect(),s=b.getBoundingClientRect();if(r.left<s.right+4&&r.right+4>s.left&&r.top<s.bottom+4&&r.bottom+4>s.top)overlap=true;}));svg.attr('data-label-overlap',String(overlap));
+}
+root.querySelectorAll('button[data-series]').forEach(b=>b.addEventListener('click',()=>{visible.has(b.dataset.series)?visible.delete(b.dataset.series):visible.add(b.dataset.series);pinned=null;draw();save();}));window.addEventListener('openai:set_globals',e=>{restore(e.detail?.globals?.widgetState);draw();});new ResizeObserver(draw).observe(root);draw();
+})();
+</script>
+</div>

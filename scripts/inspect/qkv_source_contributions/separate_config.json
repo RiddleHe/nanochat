@@ -1,0 +1,14 @@
+{
+  "experiment": "d24_qkv_separate_sources",
+  "source_definition": "normalized_embedding_then_separate_attention_and_mlp_writes_interleaved_by_layer",
+  "receiving_modules": ["Q", "K", "V"],
+  "source_batch_size": 4,
+  "relative_share_definition": "per_token_per_head_norm_divided_by_sum_over_all_available_embedding_attention_mlp_sources",
+  "full_projected_norm_definition": "sqrt_sum_squared_head_norms_per_token_before_token_aggregation",
+  "plot_layers": [6, 12, 18, 23],
+  "visualization_status": "held_by_user",
+  "validation": {
+    "recombined_parent_relative_rms_max": 0.00002,
+    "full_norm_relative_rms_max": 0.000002
+  }
+}

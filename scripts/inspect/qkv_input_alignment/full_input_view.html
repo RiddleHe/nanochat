@@ -1,0 +1,60 @@
+<div id="full-input-alignment">
+  <style>
+    #full-input-alignment {--background:#181818;--foreground:#eee;--border:#444;--popover:#252525;--popover-foreground:#eee;--viz-series-1:#70a9fa;background:var(--background);color:var(--foreground);color-scheme:dark;padding:16px;position:relative}
+    #full-input-alignment[data-theme="light"] {--background:#fff;--foreground:#171717;--border:#d5d8df;--popover:#fff;--popover-foreground:#171717;--viz-series-1:#1d5ca8;color-scheme:light}
+    #full-input-alignment .filtered-chart {width:100%;display:block}
+    #full-input-alignment svg text {fill:var(--foreground);font-size:12px;font-weight:400}
+    #full-input-alignment .filtered-legend {display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0}
+    #full-input-alignment .color-ramp {width:160px;height:12px;background:linear-gradient(to right,var(--background),var(--viz-series-1))}
+    #full-input-alignment .filtered-tooltip {position:absolute;pointer-events:none;background:var(--popover);color:var(--popover-foreground);padding:10px;z-index:5;max-width:280px}
+    #full-input-alignment .filtered-detail {margin-top:12px}
+  </style>
+  <h2 class="filtered-title"></h2>
+  <div class="filtered-caption text-small"></div>
+  <div class="filtered-legend text-small"><span>0%</span><span class="color-ramp" aria-hidden="true"></span><span class="color-max"></span><span>Mean input alignment · shared linear scale</span></div>
+  <div class="filtered-holder"></div>
+  <div class="filtered-detail text-small tabular-nums" aria-live="polite"></div>
+  <div class="filtered-tooltip tooltip text-small tabular-nums" role="tooltip" hidden></div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+  (()=>{
+    const root=document.getElementById('full-input-alignment'),data=__FULL_INPUT_DATA__,get=s=>root.querySelector(s),pct=d3.format('.2%');
+    root.dataset.theme=data.theme;
+    get('.filtered-title').textContent=`GPTBase · ${data.kinds} undivided input alignment`;
+    get('.filtered-caption').textContent=`${data.tokens.toLocaleString()} tokens · actual projection input after RMSNorm · ${Math.round(data.threshold*100)}% squared-singular-value threshold · zero-based layers and heads`;
+    get('.color-max').textContent=d3.format('.0%')(data.color_domain[1]);
+    if(data.embedding_comparison){const key=document.createElement('span');key.textContent=`□ Solid box${data.box_kinds!==data.kinds?' ('+data.box_kinds+' only)':''}: full input > Emb only`;get('.filtered-legend').append(key);}
+    let selection=null;
+    function restore(state){if(state?.modelContent?.run_id===data.run_id&&state.modelContent.view===data.view)selection=state.modelContent.selection||null;}
+    restore(window.openai?.widgetState);
+    function save(){const p=selection?data.rows[selection.row]:null;window.openai?.setWidgetState({modelContent:{run_id:data.run_id,view:data.view,selection,entry:p?{layer:selection.column,kind:p.kind,head:p.head,k:p.values[selection.column].k}:null}}).catch(()=>{});}
+    function description(r,c){const p=data.rows[r],v=p.values[c];return `L${c} · ${p.kind} · head ${p.head} · full input alignment ${v.mean===null?'undefined':pct(v.mean)}${data.embedding_comparison?` · Emb only ${v.emb_mean===null?'undefined':pct(v.emb_mean)} · difference ${v.delta===null?'undefined':d3.format('+.2f')(100*v.delta)+' pp'}`:''} · token std ${v.std===null?'undefined':pct(v.std)} · k ${v.k} · reference k/${data.input_dimension} ${v.reference===null?'undefined':pct(v.reference)} · captured ${v.captured===null?'undefined':pct(v.captured)} · ${v.count.toLocaleString()} valid tokens`;}
+    function draw(){
+      const holder=get('.filtered-holder'),width=holder.getBoundingClientRect().width;if(!width)return;holder.replaceChildren();get('.filtered-tooltip').hidden=true;get('.filtered-detail').textContent='';
+      const left=72,right=12,top=10,bottom=50,height=top+data.rows.length*19+bottom;
+      const svg=d3.select(holder).append('svg').attr('class','filtered-chart').attr('viewBox',`0 0 ${width} ${height}`).attr('role','img').attr('aria-label','Undivided input alignment, receiving layer on X, Q K V heads on Y');
+      svg.append('title').text('Actual full projection input alignment');svg.append('desc').text('Each cell is the token-mean fraction of the actual complete input squared norm in the selected head input singular subspace. Rows are grouped Q, K, V, then head; columns are receiving layers. No source splitting or head averaging.');
+      const x=d3.scaleBand().domain(d3.range(data.sources.length)).range([left,width-right]),y=d3.scaleBand().domain(d3.range(data.rows.length)).range([top,height-bottom]);
+      const css=getComputedStyle(root),color=d3.scaleLinear().domain(data.color_domain).range([css.getPropertyValue('--background').trim(),css.getPropertyValue('--viz-series-1').trim()]);
+      const cells=data.rows.flatMap((p,r)=>data.sources.map((_,c)=>({r,c,available:true,value:p.values[c].mean})));
+      svg.append('g').selectAll('rect').data(cells).join('rect').attr('data-filtered-cell','').attr('data-available',d=>String(d.available)).attr('x',d=>x(d.c)).attr('y',d=>y(d.r)).attr('width',x.bandwidth()).attr('height',y.bandwidth()).attr('fill',d=>d.value===null?'var(--border)':color(d.value)).attr('aria-label',d=>description(d.r,d.c));
+      if(data.embedding_comparison)svg.append('g').selectAll('rect').data(cells.filter(d=>data.rows[d.r].values[d.c].boxed)).join('rect').attr('data-emb-exceedance','').attr('data-layer',d=>d.c).attr('data-head',d=>data.rows[d.r].head).attr('data-kind',d=>data.rows[d.r].kind).attr('x',d=>x(d.c)+1.2).attr('y',d=>y(d.r)+1.2).attr('width',Math.max(0,x.bandwidth()-2.4)).attr('height',y.bandwidth()-2.4).attr('fill','none').attr('stroke','var(--foreground)').attr('stroke-width',1.8).attr('pointer-events','none');
+      svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','none').attr('stroke','var(--border)');
+      const n=Math.min(data.sources.length,width<380?4:Math.max(2,Math.floor((width-left-right)/30))),ticks=n<=1?[0]:[...new Set(d3.range(n).map(i=>Math.round(i*(data.sources.length-1)/(n-1))))];
+      const xa=svg.append('g').attr('transform',`translate(0,${height-bottom})`).call(d3.axisBottom(x).tickValues(ticks).tickFormat(i=>data.sources[i]).tickSize(0).tickPadding(8)).call(g=>g.select('.domain').remove());
+      svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+width-right)/2).attr('y',height-6).attr('text-anchor','middle').text('Receiving layer · zero-based');
+      svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(20,${(top+height-bottom)/2}) rotate(-90)`).attr('text-anchor','middle').text(data.kinds.length===1?'Head':'Query · head');
+      svg.append('g').attr('class','head-axis').attr('transform',`translate(${left},0)`).call(d3.axisLeft(y).tickSize(0).tickPadding(7).tickFormat(i=>data.kinds.length===1?data.rows[i].head:data.rows[i].kind+data.rows[i].head)).call(g=>g.select('.domain').remove());
+      for(let r=1;r<data.rows.length;r++){if(data.rows[r].kind!==data.rows[r-1].kind)svg.append('line').attr('x1',left).attr('x2',width-right).attr('y1',y(r)).attr('y2',y(r)).attr('stroke','var(--foreground)').attr('stroke-width',1);}
+      const marker=svg.append('rect').attr('fill','none').attr('stroke','var(--foreground)').attr('stroke-width',2).attr('stroke-dasharray',data.embedding_comparison?'3 3':null).attr('visibility','hidden').attr('pointer-events','none');
+      function show(r,c,event){marker.attr('x',x(c)+1).attr('y',y(r)+1).attr('width',Math.max(0,x.bandwidth()-2)).attr('height',y.bandwidth()-2).attr('visibility','visible');const detail=description(r,c);if(event){const tip=get('.filtered-tooltip');tip.textContent=detail;tip.hidden=false;const b=root.getBoundingClientRect();tip.style.left=Math.max(0,Math.min(event.clientX-b.left+10,b.width-tip.offsetWidth))+'px';tip.style.top=Math.max(0,event.clientY-b.top-tip.offsetHeight-8)+'px';}return detail;}
+      const valid=()=>selection&&data.rows[selection.row]&&selection.column>=0&&selection.column<data.sources.length;
+      if(valid())get('.filtered-detail').textContent=show(selection.row,selection.column);
+      const at=e=>{const [mx,my]=d3.pointer(e,svg.node());return {row:Math.max(0,Math.min(data.rows.length-1,Math.floor((my-top)/y.bandwidth()))),column:Math.max(0,Math.min(data.sources.length-1,Math.floor((mx-left)/x.bandwidth())))};};
+      svg.append('rect').attr('data-chart-hit','').attr('class','cursor-interaction').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','transparent').on('pointermove',e=>{const s=at(e);show(s.row,s.column,e);}).on('click',e=>{selection=at(e);draw();save();}).on('pointerleave',()=>{get('.filtered-tooltip').hidden=true;marker.attr('visibility','hidden');if(valid())show(selection.row,selection.column);});
+      const boxes=[];for(const node of xa.selectAll('text').nodes()){const b=node.getBoundingClientRect();if(boxes.some(a=>b.left<a.right+4&&b.right+4>a.left))node.parentNode.remove();else boxes.push(b);}
+    }
+    window.addEventListener('openai:set_globals',e=>{restore(e.detail?.globals?.widgetState);draw();});new ResizeObserver(draw).observe(get('.filtered-holder'));draw();
+  })();
+  </script>
+</div>

@@ -1,0 +1,25 @@
+{
+  "experiment": "d24_attn_res_qkv_routing",
+  "checkpoint_run": "bov_d24_f3p91e19_gpt_base_attn_res_qkv_nosmear_s42_20261015T184949Z",
+  "checkpoint_step": 7738,
+  "token_run": "d24_qkv_source_contributions/gpt_base_step7809_20261019T174146Z",
+  "num_sequences": 128,
+  "sequence_length": 2048,
+  "batch_size": 1,
+  "seed": 42,
+  "forward_dtype": "bfloat16",
+  "storage_dtype": "float32",
+  "summary_dtype": "float64",
+  "query_types": ["Q", "K", "V"],
+  "source_families": ["embedding", "attention", "mlp"],
+  "measurement": "actual_post_bfloat16_cast_depth_routing_weight_without_renormalization",
+  "std_ddof": 0,
+  "validation": {
+    "precast_weight_sum_max_error": 0.000002,
+    "applied_weight_sum_max_error": 0.00390625,
+    "fp32_mixture_relative_rms_max": 0.01,
+    "require_exact_bf16_mixture_replay": true,
+    "require_exact_forward_replay_every_sequence": true
+  },
+  "visualization_status": "held_by_user"
+}

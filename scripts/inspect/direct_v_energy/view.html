@@ -1,0 +1,98 @@
+<div id="qkv-projected-energy">
+  <style>
+    #qkv-projected-energy {--background:#fff;--foreground:#171717;--border:#d5d8df;--popover:#fff;--popover-foreground:#171717;--viz-series-1:#1d5ca8;color:var(--foreground);background:var(--background);color-scheme:light;position:relative;padding:12px}
+    #qkv-projected-energy .heatmap-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    #qkv-projected-energy figure {margin:0;min-width:0}
+    #qkv-projected-energy .heatmap-chart {display:block;width:100%}
+    #qkv-projected-energy svg text {fill:var(--foreground);font-size:12px;font-weight:400}
+    #qkv-projected-energy .heatmap-caption {margin-bottom:10px;padding-right:70px}
+    #qkv-projected-energy .heatmap-title {padding-right:92px}
+    #qkv-projected-energy .color-key {display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}
+    #qkv-projected-energy .color-ramp {height:12px;width:180px;background:linear-gradient(to right,var(--background),var(--viz-series-1))}
+    #qkv-projected-energy .family-heading {grid-column:1/-1;margin:8px 0 0}
+    #qkv-projected-energy .heatmap-tooltip {position:absolute;pointer-events:none;z-index:10;background:var(--popover);color:var(--popover-foreground);padding:8px;max-width:270px}
+    #qkv-projected-energy .heatmap-detail {margin-top:12px;min-height:2em}
+    @media(max-width:780px){#qkv-projected-energy .heatmap-grid{grid-template-columns:1fr}}
+  </style>
+  <h2 class="heatmap-title"></h2>
+  <div class="heatmap-caption text-small"></div>
+  <div class="color-key text-small"><span>0</span><span class="color-ramp" aria-hidden="true"></span><span class="color-max"></span><span class="scale-label"></span></div>
+  <div class="heatmap-grid"></div>
+  <div class="heatmap-detail text-small tabular-nums" aria-live="polite"></div>
+  <div class="heatmap-tooltip tooltip text-small tabular-nums" role="tooltip" hidden></div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+  (()=>{
+    const root=document.getElementById('qkv-projected-energy'),data=__ENERGY_DATA__;
+    const get=s=>root.querySelector(s),number=d3.format(',.3f');
+    get('.color-max').textContent=d3.format(',.2f')(data.color_domain[1]);
+    get('.scale-label').textContent=`Mean squared L2 norm · ${data.scale_label||'same linear scale for both models'}`;
+    get('.heatmap-title').textContent=`${data.model_label||'GPTBase'} · ${data.kind} ${data.raw_sources?'raw-source ':''}projected squared norm`;
+    get('.heatmap-caption').textContent=`${data.tokens.toLocaleString()} tokens · ${data.head_dimension}D per head · ${data.raw_sources?'unweighted sources, no receiving RMSNorm · ':''}square each token's norm, then average · zero-based layers and heads`;
+    let selection=null;
+    function restore(state){if(state?.modelContent?.run_id===data.run_id&&state.modelContent.view===data.view)selection=state.modelContent.selection||null;}
+    restore(window.openai?.widgetState);
+    function save(){window.openai?.setWidgetState({modelContent:{run_id:data.run_id,view:data.view,selection}}).catch(()=>{});}
+    const panels=[],families=data.family==='all'?['attention','mlp']:[data.family];
+    function addPanel(parent,layer,kind,family,titleText){
+      const heads=data.panels.filter(p=>p.kind===kind&&p.layer===layer),indices=heads[0].labels.map((label,i)=>({label,i})).filter(s=>family==='mlp'?s.label.startsWith('M'):!s.label.startsWith('M'));
+      const fig=document.createElement('figure'),title=document.createElement(data.layout==='layer_grid'?'div':'h3'),holder=document.createElement('div');title.textContent=titleText;
+      if(data.layout==='layer_grid'){title.className='text-small';title.style.margin='10px 0 4px';}
+      fig.append(title,holder);parent.append(fig);
+      panels.push({family,kind,layer,heads,indices,holder,id:`${layer}-${family}-${kind}`});
+    }
+    if(data.layout==='layer_grid'){
+      for(const layer of data.layers){
+        const group=document.createElement('section'),title=document.createElement('h3');title.textContent=`L${layer}`;group.setAttribute('data-layer-group',layer);group.append(title);get('.heatmap-grid').append(group);
+        for(const family of families)addPanel(group,layer,data.kind,family,family==='attention'?'Emb + attention outputs':'MLP outputs');
+      }
+    }else{
+      for(const family of families){
+        const heading=document.createElement('h3');heading.className='family-heading';heading.textContent=family==='attention'?'Embedding + attention outputs':'MLP outputs';get('.heatmap-grid').append(heading);
+        for(const kind of [...new Set(data.panels.map(p=>p.kind))])addPanel(get('.heatmap-grid'),data.layer,kind,family,kind);
+      }
+    }
+    function describe(p,h,r){
+      const a=p.heads[h],s=p.indices[r];
+      return `L${p.layer} · ${p.kind} · head ${a.head} · ${s.label==='Emb'?'Emb':(p.family==='mlp'?'MLP ':'Attention ')+s.label.slice(1)} · mean squared norm ${number(a.mean[s.i])} · token std of squared norm ${number(a.std[s.i])} · mean full-bank energy share ${d3.format('.3%')(a.shares[s.i])} · ${a.counts[s.i].toLocaleString()} tokens`;
+    }
+    function draw(p){
+      const width=p.holder.getBoundingClientRect().width;if(!width)return;p.holder.replaceChildren();
+      const left=66,right=8,top=8,bottom=48,height=top+Math.max(1,data.transpose?p.heads.length:p.indices.length)*(data.layout==='layer_grid'?19:23)+bottom;
+      const svg=d3.select(p.holder).append('svg').attr('class','heatmap-chart').attr('viewBox',`0 0 ${width} ${height}`).attr('role','img').attr('aria-label',`L${p.layer} ${p.kind}, ${p.family==='mlp'?'MLP':'embedding and attention'} mean squared projected norm by head and source`);
+      svg.append('title').text(`L${p.layer} · ${p.kind} · ${p.family}`);svg.append('desc').text((data.transpose?'Columns are sources; rows are zero-based heads. ':'Columns are zero-based heads; rows are sources. ')+'Mean squared L2 norm of the individual head projection, squared per token before averaging. All singular directions; no head concatenation or head averaging. Shared linear color scale across all displayed panels; endpoints shown in the legend.');
+      const xKey=d=>data.transpose?d.label:d.head,yKey=d=>data.transpose?d.head:d.label;
+      const x=d3.scaleBand().domain(data.transpose?p.indices.map(s=>s.label):p.heads.map(a=>a.head)).range([left,width-right]);
+      const y=d3.scaleBand().domain(data.transpose?p.heads.map(a=>a.head):p.indices.map(s=>s.label)).range([top,height-bottom]);
+      const sourceLabel=label=>label==='Emb'?'Emb':label.slice(1);
+      const css=getComputedStyle(root),color=d3.scaleLinear().domain(data.color_domain).range([css.getPropertyValue('--background').trim(),css.getPropertyValue('--viz-series-1').trim()]);
+      const cells=p.heads.flatMap((a,h)=>p.indices.map((s,r)=>({h,r,head:a.head,label:s.label,value:a.mean[s.i]})));
+      svg.append('g').selectAll('rect').data(cells).join('rect').attr('data-alignment-cell','').attr('x',d=>x(xKey(d))).attr('y',d=>y(yKey(d))).attr('width',x.bandwidth()).attr('height',y.bandwidth()).attr('fill',d=>d.value===null?'var(--border)':color(d.value)).attr('aria-label',d=>describe(p,d.h,d.r));
+      svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','none').attr('stroke','var(--border)');
+      const domain=x.domain(),tickCount=Math.min(domain.length,root.clientWidth<=380?4:Math.max(2,Math.floor((width-left-right)/32)));
+      const tickHeads=tickCount<=1?domain:[...new Set(d3.range(tickCount).map(i=>domain[Math.round(i*(domain.length-1)/(tickCount-1))]))];
+      const xa=svg.append('g').attr('transform',`translate(0,${height-bottom})`).call(d3.axisBottom(x).tickValues(tickHeads).tickFormat(data.transpose?sourceLabel:String).tickSize(0).tickPadding(8)).call(g=>g.select('.domain').remove());
+      svg.append('g').attr('transform',`translate(${left},0)`).call(d3.axisLeft(y).tickSize(0).tickPadding(7).tickFormat(data.transpose?String:sourceLabel)).call(g=>g.select('.domain').remove());
+      svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+width-right)/2).attr('y',height-5).attr('text-anchor','middle').text(data.transpose?'Source layer':'Head index');
+      svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(14,${(top+height-bottom)/2}) rotate(-90)`).attr('text-anchor','middle').text(data.transpose?'Head index':'Source layer');
+      if(!p.indices.length)return;
+      const marker=svg.append('rect').attr('fill','none').attr('stroke','var(--foreground)').attr('stroke-width',2).attr('visibility','hidden').attr('pointer-events','none');
+      function show(h,r,event){
+        marker.attr('x',x(data.transpose?p.indices[r].label:p.heads[h].head)+1).attr('y',y(data.transpose?p.heads[h].head:p.indices[r].label)+1).attr('width',Math.max(0,x.bandwidth()-2)).attr('height',y.bandwidth()-2).attr('visibility','visible');
+        const detail=describe(p,h,r);
+        if(event){const tip=get('.heatmap-tooltip');tip.textContent=detail;tip.hidden=false;const b=root.getBoundingClientRect();tip.style.left=Math.max(0,Math.min(event.clientX-b.left+10,b.width-tip.offsetWidth))+'px';tip.style.top=Math.max(0,event.clientY-b.top-tip.offsetHeight-8)+'px';}
+        return detail;
+      }
+      function selected(){if(selection?.panel===p.id&&p.heads[selection.head]&&p.indices[selection.row])get('.heatmap-detail').textContent=show(selection.head,selection.row);}
+      const locate=e=>{const [mx,my]=d3.pointer(e,svg.node()),xi=Math.max(0,Math.min(x.domain().length-1,Math.floor((mx-left)/x.bandwidth()))),yi=Math.max(0,Math.min(y.domain().length-1,Math.floor((my-top)/y.bandwidth())));return data.transpose?[yi,xi]:[xi,yi];};
+      svg.append('rect').attr('data-chart-hit','').attr('class','cursor-interaction').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-bottom-top).attr('fill','transparent')
+        .on('pointermove',e=>show(...locate(e),e)).on('click',e=>{const [h,r]=locate(e);selection={panel:p.id,head:h,row:r};redraw();save();}).on('pointerleave',()=>{get('.heatmap-tooltip').hidden=true;marker.attr('visibility','hidden');selected();});
+      selected();
+      const bounds=[];for(const node of xa.selectAll('text').nodes()){const b=node.getBoundingClientRect();if(bounds.some(a=>b.left<a.right+4&&b.right+4>a.left))node.parentNode.remove();else bounds.push(b);}
+    }
+    function redraw(){get('.heatmap-tooltip').hidden=true;get('.heatmap-detail').textContent='';panels.forEach(draw);}
+    window.addEventListener('openai:set_globals',e=>{restore(e.detail?.globals?.widgetState);redraw();});
+    const observer=new ResizeObserver(redraw);panels.forEach(p=>observer.observe(p.holder));redraw();
+  })();
+  </script>
+</div>
