@@ -837,7 +837,7 @@ class GPTBase(nn.Module):
                       'alpha_attn_in', 'beta_attn_in', 'alpha_mlp_in', 'beta_mlp_in',
                       'alpha_q', 'beta_q', 'alpha_k', 'beta_k', 'alpha_v', 'beta_v',
                       'alpha_qkv', 'beta_qkv', 'gamma_v', 'alpha_o', 'beta_o',
-                      'lambda_v')
+                      'lambda_v', 'head_scale', 'a_scale')
             if hasattr(m, n)
         )
         # Dead c_v under v_from_v1 / v_from_value_emb: at late layers, c_v's forward
@@ -949,7 +949,11 @@ class GPTBase(nn.Module):
             # betas so it gets the high-LR / no-decay treatment, matching the user
             # intent that this scalar should be free to grow above 1.0 if helpful.
             if hasattr(block.attn, 'gamma_v'): beta_params.append(block.attn.gamma_v)
+            # Elementwise head/embedding scales are coefficients, not Muon matrices.
+            if hasattr(block.attn, 'head_scale'): beta_params.append(block.attn.head_scale)
+            if hasattr(block.attn, 'a_scale'): beta_params.append(block.attn.a_scale)
         coeff_params = alpha_params + beta_params
+        coeff_ids = {id(p) for p in coeff_params}
 
         # Dead params under v_from_v1 / v_from_value_emb: late-layer c_v.weight
         # is unused (forward skipped, no grad path to loss). Exclude from the
@@ -972,7 +976,8 @@ class GPTBase(nn.Module):
 
         # Separate out all parameters into groups
         all_block_params = [p for p in self.transformer.h.parameters()
-                            if id(p) not in dead_param_ids and id(p) not in lambda_v_ids]
+                            if id(p) not in dead_param_ids and id(p) not in lambda_v_ids
+                            and id(p) not in coeff_ids]
         matrix_params = [p for p in all_block_params if p.dim() >= 2]  # exclude scalar coeffs
         embedding_params = list(self.transformer.wte.parameters())
         lm_head_params = list(self.lm_head.parameters())

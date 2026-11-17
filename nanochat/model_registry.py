@@ -26,6 +26,7 @@ class GPTNoLambdaConfig(GPTConfig):
 # gpt_base.py family: pre-norm Transformer with optional BoV routing, no smear
 # -----------------------------------------------------------------------------
 from nanochat.model.gpt_base import GPTBaseConfig, GPTBase
+from nanochat.model.gpt_base_no_embed_norm import GPTBaseNoEmbedNorm
 
 @dataclass
 class GPTBaseAddInitResConfig(GPTBaseConfig):
@@ -236,6 +237,13 @@ class GPTBaseAddInitPreNormMlpOnlyLearnConfig(GPTBaseConfig):
 from nanochat.model.gpt_attn_res import GPTAttnResConfig, GPTAttnRes
 from nanochat.model.gpt_attn_res_sink import GPTAttnResSinkConfig, GPTAttnResSink
 from nanochat.model.gpt_base_attn_res_qkv import GPTBaseAttnResQKVConfig, GPTBaseAttnResQKV
+from nanochat.model.gpt_base_scalar_res_qkv_no_embed_norm import GPTBaseScalarResQKVNoEmbedNormConfig, GPTBaseScalarResQKVNoEmbedNorm
+from nanochat.model.gpt_base_pooled_qk_embed_no_embed_norm import GPTBasePooledQKEmbedNoEmbedNormConfig, GPTBasePooledQKEmbedNoEmbedNorm
+from nanochat.model.gpt_base_head_scaled_embed_no_embed_norm import GPTBaseHeadScaledEmbedNoEmbedNormConfig, GPTBaseHeadScaledEmbedNoEmbedNorm
+from nanochat.model.gpt_base_single_qk_embed_no_embed_norm import GPTBaseSingleQKEmbedNoEmbedNormConfig, GPTBaseSingleQKEmbedNoEmbedNorm
+from nanochat.model.gpt_base_single_qk_value_proj_no_embed_norm import GPTBaseSingleQKValueProjNoEmbedNormConfig, GPTBaseSingleQKValueProjNoEmbedNorm
+from nanochat.model.gpt_base_split_embed_shared_out_no_embed_norm import GPTBaseSplitEmbedSharedOutNoEmbedNormConfig, GPTBaseSplitEmbedSharedOutNoEmbedNorm
+from nanochat.model.gpt_base_split_embed_head_out_no_embed_norm import GPTBaseSplitEmbedHeadOutNoEmbedNormConfig, GPTBaseSplitEmbedHeadOutNoEmbedNorm
 
 # -----------------------------------------------------------------------------
 # Registry: model_type string -> (ConfigClass, ModelClass)
@@ -246,6 +254,13 @@ MODELS = {
     "gpt_nolambda":     (GPTNoLambdaConfig,     GPT),
     # gpt_base.py family
     "gpt_base":                (GPTBaseConfig,             GPTBase),
+    "gpt_base_no_embed_norm":  (GPTBaseConfig,             GPTBaseNoEmbedNorm),
+    "gpt_base_pooled_qk_embed_no_embed_norm": (GPTBasePooledQKEmbedNoEmbedNormConfig, GPTBasePooledQKEmbedNoEmbedNorm),
+    "gpt_base_head_scaled_embed_no_embed_norm": (GPTBaseHeadScaledEmbedNoEmbedNormConfig, GPTBaseHeadScaledEmbedNoEmbedNorm),
+    "gpt_base_single_qk_embed_no_embed_norm": (GPTBaseSingleQKEmbedNoEmbedNormConfig, GPTBaseSingleQKEmbedNoEmbedNorm),
+    "gpt_base_single_qk_value_proj_no_embed_norm": (GPTBaseSingleQKValueProjNoEmbedNormConfig, GPTBaseSingleQKValueProjNoEmbedNorm),
+    "gpt_base_split_embed_shared_out_no_embed_norm": (GPTBaseSplitEmbedSharedOutNoEmbedNormConfig, GPTBaseSplitEmbedSharedOutNoEmbedNorm),
+    "gpt_base_split_embed_head_out_no_embed_norm": (GPTBaseSplitEmbedHeadOutNoEmbedNormConfig, GPTBaseSplitEmbedHeadOutNoEmbedNorm),
     "gpt_base_add_init_res":         (GPTBaseAddInitResConfig,         GPTBase),
     "gpt_base_add_init_res_detach":  (GPTBaseAddInitResDetachConfig,   GPTBase),
     "gpt_base_add_init_v":            (GPTBaseAddInitVConfig,           GPTBase),
@@ -289,6 +304,7 @@ MODELS = {
     "gpt_base_add_init_pre_norm_mlp_only_learn":  (GPTBaseAddInitPreNormMlpOnlyLearnConfig,  GPTBase),
     # standalone variants
     "gpt_base_attn_res_qkv": (GPTBaseAttnResQKVConfig, GPTBaseAttnResQKV),
+    "gpt_base_scalar_res_qkv_no_embed_norm": (GPTBaseScalarResQKVNoEmbedNormConfig, GPTBaseScalarResQKVNoEmbedNorm),
     "attn_res":      (GPTAttnResConfig,     GPTAttnRes),
     "attn_res_sink": (GPTAttnResSinkConfig, GPTAttnResSink),
 }

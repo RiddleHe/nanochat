@@ -5,6 +5,7 @@ import torch
 
 import nanochat.flash_attention as attention
 import nanochat.model.gpt_base as base_module
+import nanochat.model.gpt_base_no_embed_norm as no_embed_norm_module
 import nanochat.model.gpt_base_attn_res_qkv as qkv_module
 from nanochat.engine import KVCache
 from nanochat.model_registry import get_model
@@ -12,6 +13,7 @@ from nanochat.model_registry import get_model
 
 @pytest.mark.parametrize("model_type", [
     "gpt_base",
+    "gpt_base_no_embed_norm",
     "gpt_base_v_from_x0_learn",
     "gpt_base_v_from_v1",
     "gpt_base_v_from_value_emb_learn_shared",
@@ -22,6 +24,7 @@ from nanochat.model_registry import get_model
 def test_smear_free_training_and_cache(monkeypatch, model_type):
     monkeypatch.setattr(attention, "USE_FA3", False)
     monkeypatch.setattr(base_module, "COMPUTE_DTYPE", torch.float32)
+    monkeypatch.setattr(no_embed_norm_module, "COMPUTE_DTYPE", torch.float32)
     monkeypatch.setattr(qkv_module, "COMPUTE_DTYPE", torch.float32)
     torch.manual_seed(42)
     Config, Model = get_model(model_type)
