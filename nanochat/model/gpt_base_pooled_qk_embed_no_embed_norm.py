@@ -142,7 +142,8 @@ class GPTBasePooledQKEmbedNoEmbedNorm(GPTBaseNoEmbedNorm):
             for name in ("c_q", "c_k", "c_v"):
                 if hasattr(block.attn, name):
                     nn.init.uniform_(getattr(block.attn, name).weight, -bound, bound)
-            nn.init.zeros_(block.attn.c_proj.weight)
+            if not isinstance(block.attn.c_proj, nn.Identity):
+                nn.init.zeros_(block.attn.c_proj.weight)
             nn.init.uniform_(block.mlp.c_fc.weight, -0.4 * bound, 0.4 * bound)
             nn.init.zeros_(block.mlp.c_proj.weight)
         self.cos, self.sin = self._precompute_rotary_embeddings(

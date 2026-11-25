@@ -60,3 +60,19 @@ def test_small_shape_preserves_architecture():
         assert small[key] == original[key]
     assert original["n_embd"] == 1536
 
+
+def test_no_out_proj_checks_open_zero_scalar():
+    name = "gpt_base_single_qk_no_out_proj_no_embed_norm"
+    Config, _ = MODELS[name]
+    config = asdict(Config(sequence_len=16, vocab_size=128, n_layer=4,
+                           n_head=4, n_kv_head=4, n_embd=32))
+    with checks.precision(torch.float32):
+        initial = checks.make_model(name, config, "cpu", perturb=False)
+        checked = checks.make_model(name, config, "cpu")
+        for i in initial.config.pooled_qk_target_layers:
+            assert initial.transformer.h[i].attn.a_scale.item() == 0
+            assert checked.transformer.h[i].attn.a_scale.item() > 0
+        optimizer = checked.setup_optimizer()
+        checks.backward(checked, checks.tokens(config, 2, "cpu"), optimizer)
+        for i in checked.config.pooled_qk_target_layers:
+            assert checked.transformer.h[i].attn.c_q.weight.grad.abs().sum() > 0

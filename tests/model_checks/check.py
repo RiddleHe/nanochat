@@ -79,6 +79,13 @@ def make_model(name, config, device, *, perturb=True):
             for p in model.parameters():
                 if p.ndim >= 2 and not torch.count_nonzero(p):
                     p.normal_(std=0.01)
+            # No-W_o variants gate the whole branch with a zero scalar instead.
+            # Open it for numerical/cache checks so Q/K and value gradients are
+            # exercised; perturb=False still checks the exact initialization.
+            for module in model.modules():
+                scale = getattr(module, "a_scale", None)
+                if scale is not None and not torch.count_nonzero(scale):
+                    scale.fill_(0.1)
     return model
 
 
