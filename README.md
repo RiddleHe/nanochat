@@ -6,11 +6,23 @@ This repo hosts two distinct training frameworks that are both extremely hackabl
 
 ## How to add a new architecture
 
-Most architectural changes live in `nanochat/model/gpt_base.py`. The typical pattern is to add a boolean flag to the config dataclass and a small branch in the model that activates when the flag is on. If the variant introduces its own learnable parameters, declare them alongside the existing ones in the same file so the optimizer picks them up automatically. The base file is intentionally one place — keep new variants there unless the change is large enough to warrant a sibling file (`nanochat/model/gpt_<name>.py`), in which case you mirror the same interface.
+Define the model and configuration in `nanochat/model/`, reusing a base class
+where its behavior matches the variant. Register the config/model pair in
+`nanochat/model_registry.py`; training selects it with `--model-type`, and
+checkpoint metadata records that choice for evaluation. Small compatible options
+can remain config flags; distinct architectures can have their own modules.
 
-Once the change is in `gpt_base.py`, register it in `nanochat/model_registry.py`. A registration is just a tiny config subclass that flips your new flag on, plus an entry in the `MODELS` dictionary mapping a name (used as `--model-type`) to that config and the model class. Training and evaluation read this registry to instantiate the right model, and the checkpoint metadata records the chosen model type so evaluation can auto-detect it without flags.
+Explicitly handle initialization after meta allocation, optimizer membership,
+FLOP estimates, cached inference, and checkpoint compatibility. Merely declaring
+a parameter does not guarantee the correct optimizer group or initialization.
+Add checks for the variant's equations and these interfaces.
 
 ## How to train and evaluate the model
+
+For BoV comparisons, follow the [training preparation guide](runs/README.md):
+select the canonical recipe, prepare a frozen run, then check/test/launch through
+its generated launcher. The guide also states which functionality is on master
+and which remains on `research/bank_of_values`.
 
 Pretraining is launched from `scripts/base_train.py` via `torchrun`, which handles distributed setup, the learning-rate schedule, gradient accumulation, and periodic validation. For ablation studies, `runs/ablations.sh` wraps a batch of variants at the depth-appropriate compute budget (FLOPs defaults baked in for d12 and d24), automatically picks a sensible total batch size, and writes results into a depth-specific results folder. Variants whose checkpoint already exists in that folder are skipped, so a new variant slots in alongside the principled set without re-training the others. Validation bits-per-byte is logged throughout training and the per-variant curves get aggregated into a single CSV for direct comparison.
 
