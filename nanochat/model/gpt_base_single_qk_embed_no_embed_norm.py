@@ -16,6 +16,17 @@ from nanochat.model.gpt_base_pooled_qk_embed_no_embed_norm import (
 @dataclass
 class GPTBaseSingleQKEmbedNoEmbedNormConfig(GPTBasePooledQKEmbedNoEmbedNormConfig):
     """Global n_head still describes ordinary layers and determines Q/K width."""
+    attention_sink: bool = False
+
+    def __post_init__(self):
+        super().__post_init__()
+        if type(self.attention_sink) is not bool:
+            raise ValueError("attention_sink must be a boolean")
+        if self.attention_sink:
+            if type(self) is not GPTBaseSingleQKEmbedNoEmbedNormConfig:
+                raise ValueError("attention_sink is supported only by direct single-head embedding attention")
+            if not self.norm_value_input:
+                raise ValueError("attention_sink requires norm_value_input=True")
 
 
 class SingleQKEmbeddingAttention(nn.Module):
@@ -30,6 +41,9 @@ class SingleQKEmbeddingAttention(nn.Module):
         self.c_k = base.Linear(config.n_embd, self.head_dim, bias=False)
         self.c_proj = base.Linear(config.n_embd, config.n_embd, bias=False)
         self.a_scale = nn.Parameter(torch.empty(1, dtype=torch.float32))
+        if config.attention_sink:
+            # A learned zero-value option, independent of all token positions.
+            self.sink_logit = nn.Parameter(torch.empty(1, dtype=torch.float32))
 
     def _chunk(self, q, k, embeddings, query_positions, key_positions):
         scores = (q @ k.transpose(-2, -1)).float() * self.head_dim**-0.5
@@ -37,7 +51,14 @@ class SingleQKEmbeddingAttention(nn.Module):
         allowed = distance >= 0
         if self.window_size[0] >= 0:
             allowed = allowed & (distance <= self.window_size[0])
-        probabilities = scores.masked_fill(~allowed, float("-inf")).softmax(-1)
+        scores = scores.masked_fill(~allowed, float("-inf"))
+        if hasattr(self, "sink_logit"):
+            # The sink is always eligible, including in local windows and cache
+            # decoding. Discard its probability without renormalizing real keys.
+            sink = self.sink_logit.expand(*scores.shape[:-1], 1)
+            probabilities = torch.cat((scores, sink), dim=-1).softmax(-1)[..., :-1]
+        else:
+            probabilities = scores.softmax(-1)
         return probabilities.squeeze(1).to(embeddings.dtype) @ embeddings
 
     def forward(self, x, x0, ve, cos_sin, kv_cache):
@@ -95,10 +116,12 @@ class GPTBaseSingleQKEmbedNoEmbedNorm(GPTBasePooledQKEmbedNoEmbedNorm):
         super().init_weights()
         for i in self.config.pooled_qk_target_layers:
             self.transformer.h[i].attn.a_scale.fill_(1.0)
+            if self.config.attention_sink:
+                self.transformer.h[i].attn.sink_logit.zero_()
 
     def num_scaling_params(self):
         counts = super().num_scaling_params()
-        scalars = len(self.config.pooled_qk_target_layers)
+        scalars = len(self.config.pooled_qk_target_layers) * (1 + self.config.attention_sink)
         counts["transformer_matrices"] -= scalars
         counts["scalars"] += scalars
         return counts
@@ -118,6 +141,9 @@ class GPTBaseSingleQKEmbedNoEmbedNorm(GPTBasePooledQKEmbedNoEmbedNorm):
 
         Same architecture convention as pooled QK: excludes checkpoint replay,
         masked chunk padding, softmax/norms, optimizer and evaluation work.
+        Sink logits are excluded from matrix FLOPs; the extra softmax entry and
+        its gradient are softmax work, so attention_sink does not change this
+        budget estimate. This does not claim identical runtime or kernel work.
         """
         # D forward multiplies, D input-gradient multiplies, and ~2D for
         # the scalar-gradient multiply/reduction (leading-order convention).

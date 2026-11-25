@@ -164,7 +164,7 @@ def prepare(args):
             command += ["--model-type", args.model_type]
         if args.device_batch_size is not None:
             command += ["--device-batch-size", str(args.device_batch_size)]
-        for flag in ("norm_value_input", "sum_head_attention"):
+        for flag in ("norm_value_input", "sum_head_attention", "attention_sink"):
             if getattr(args, flag):
                 command += ["--" + flag.replace("_", "-")]
         if args.target_layers is not None:
@@ -479,6 +479,7 @@ def parser():
     p.add_argument("--model-type", help="Registry name; required for JSON recipes, optional shell recipe override")
     p.add_argument("--norm-value-input", action="store_true")
     p.add_argument("--sum-head-attention", action="store_true")
+    p.add_argument("--attention-sink", action="store_true", help="Learned zero-value sink for normalized single-head embedding attention")
     p.add_argument("--target-layers", type=int, nargs="+",
                    help="Explicit zero-based embedding-value target indices")
     p.add_argument("--dependency", type=Path, action="append", default=[], help="Additional file/directory to hash and verify")

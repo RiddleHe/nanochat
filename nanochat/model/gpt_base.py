@@ -837,7 +837,7 @@ class GPTBase(nn.Module):
                       'alpha_attn_in', 'beta_attn_in', 'alpha_mlp_in', 'beta_mlp_in',
                       'alpha_q', 'beta_q', 'alpha_k', 'beta_k', 'alpha_v', 'beta_v',
                       'alpha_qkv', 'beta_qkv', 'gamma_v', 'alpha_o', 'beta_o',
-                      'lambda_v', 'head_scale', 'a_scale')
+                      'lambda_v', 'head_scale', 'a_scale', 'sink_logit')
             if hasattr(m, n)
         )
         # Dead c_v under v_from_v1 / v_from_value_emb: at late layers, c_v's forward
@@ -935,7 +935,7 @@ class GPTBase(nn.Module):
         # Collect learnable blend coeffs (alpha = main path, beta = skip path) into
         # named lists so they can go into the right AdamW groups (mirrors gpt.py's
         # resid_lambdas/x0_lambdas treatment).
-        alpha_params, beta_params = [], []
+        alpha_params, beta_params, sink_params = [], [], []
         for block in self.transformer.h:
             for n in ('alpha_res', 'alpha_attn_in', 'alpha_mlp_in'):
                 if hasattr(block, n): alpha_params.append(getattr(block, n))
@@ -952,7 +952,8 @@ class GPTBase(nn.Module):
             # Elementwise head/embedding scales are coefficients, not Muon matrices.
             if hasattr(block.attn, 'head_scale'): beta_params.append(block.attn.head_scale)
             if hasattr(block.attn, 'a_scale'): beta_params.append(block.attn.a_scale)
-        coeff_params = alpha_params + beta_params
+            if hasattr(block.attn, 'sink_logit'): sink_params.append(block.attn.sink_logit)
+        coeff_params = alpha_params + beta_params + sink_params
         coeff_ids = {id(p) for p in coeff_params}
 
         # Dead params under v_from_v1 / v_from_value_emb: late-layer c_v.weight
@@ -1003,6 +1004,10 @@ class GPTBase(nn.Module):
             param_groups.append(dict(kind='adamw', params=alpha_params, lr=scalar_lr * 0.01, betas=(0.8, 0.95), eps=1e-10, weight_decay=0.05))
         if beta_params:
             param_groups.append(dict(kind='adamw', params=beta_params, lr=scalar_lr, betas=(0.96, 0.95), eps=1e-10, weight_decay=0.0))
+        # Independent softmax sink logits: match AttnRes sink's optimizer, not
+        # the high-LR output amplitude scalars. No width-based LR scaling.
+        if sink_params:
+            param_groups.append(dict(kind='adamw', params=sink_params, lr=0.001, betas=(0.9, 0.999), eps=1e-10, weight_decay=0.0))
         # lambda_v: per-head scale init at 1.0; small LR keeps it close to identity
         # but lets each head pick its own gain on the cached layer-0 v.
         if lambda_v_params:

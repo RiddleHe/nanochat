@@ -56,6 +56,7 @@ parser.add_argument("--window-pattern", type=str, default="SSSL", help="sliding 
 parser.add_argument("--model-type", type=str, default="gpt", help="model architecture variant (e.g. 'gpt', 'linear_attn', 'sparse_attn')")
 parser.add_argument("--norm-value-input", action="store_true", help="RMS-normalize direct embedding values; retain raw initial residual")
 parser.add_argument("--sum-head-attention", action="store_true", help="Sum head probabilities in pooled embedding attention")
+parser.add_argument("--attention-sink", action="store_true", help="Learned zero-value sink for normalized single-head embedding attention")
 parser.add_argument("--target-layers", type=int, nargs="+", help="Explicit zero-based embedding-value target indices; default: ScalarRes depth mapping")
 # Training horizon (only one used, in order of precedence)
 parser.add_argument("--num-iterations", type=int, default=-1, help="explicit number of optimization steps (-1 = disable)")
@@ -140,7 +141,7 @@ def build_model_meta(depth, *, use_target_layers=True):
     base_dim = depth * args.aspect_ratio
     model_dim = ((base_dim + args.head_dim - 1) // args.head_dim) * args.head_dim
     num_heads = model_dim // args.head_dim
-    value_options = {name: True for name in ("norm_value_input", "sum_head_attention")
+    value_options = {name: True for name in ("norm_value_input", "sum_head_attention", "attention_sink")
                      if getattr(args, name)}
     if use_target_layers and args.target_layers is not None:
         value_options["pooled_qk_target_layers"] = args.target_layers

@@ -67,7 +67,7 @@ def resolve(args):
         inventory.append(dict(path=str(item), size=stat.st_size, mtime_ns=stat.st_mtime_ns))
 
     Config, Model = get_model(args.model_type)
-    value_options = {name: True for name in ("norm_value_input", "sum_head_attention")
+    value_options = {name: True for name in ("norm_value_input", "sum_head_attention", "attention_sink")
                      if getattr(args, name, False)}
     target_layers = getattr(args, "target_layers", None)
     if target_layers is not None:
@@ -144,6 +144,7 @@ def main():
     parser.add_argument("--expect-all-flags-false", action="store_true")
     parser.add_argument("--norm-value-input", action="store_true")
     parser.add_argument("--sum-head-attention", action="store_true")
+    parser.add_argument("--attention-sink", action="store_true", help="Learned zero-value sink for normalized single-head embedding attention")
     parser.add_argument("--target-layers", type=int, nargs="+",
                         help="Explicit zero-based embedding-value target indices; default: ScalarRes depth mapping")
     parser.add_argument("--base-dir", default=os.environ.get("NANOCHAT_BASE_DIR"), required=not os.environ.get("NANOCHAT_BASE_DIR"))
