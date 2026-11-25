@@ -19,6 +19,15 @@ spec.loader.exec_module(checks)
 INCOMPLETE_INITIALIZERS = {"gpt", "gpt_nolambda", "attn_res", "attn_res_sink"}
 
 
+@pytest.fixture(autouse=True)
+def isolate_compiler_cache():
+    # Each frozen-run check runs in its own process. Match that isolation when
+    # pytest checks several architectures with different Muon matrix shapes.
+    torch.compiler.reset()
+    yield
+    torch.compiler.reset()
+
+
 @pytest.mark.parametrize("name", sorted(set(MODELS) - INCOMPLETE_INITIALIZERS))
 def test_registered_model_contract(name):
     Config, _ = MODELS[name]
@@ -50,3 +59,4 @@ def test_small_shape_preserves_architecture():
     for key in ("n_layer", "n_head", "n_kv_head", "pooled_qk_target_layers", "norm_value_input", "sum_head_attention"):
         assert small[key] == original[key]
     assert original["n_embd"] == 1536
+

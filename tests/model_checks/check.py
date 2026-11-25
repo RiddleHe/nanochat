@@ -246,6 +246,10 @@ def distributed_comparison(name, config, device, dtype, rank, world):
 
 
 def full_shape_check(name, config, device, batch, dtype, distributed):
+    # Reduced-shape reference/sharded checks specialize the same fused optimizer
+    # functions. Start this independent shape with the fresh compiler cache that
+    # the training process has, rather than exhausting its specialization limit.
+    torch.compiler.reset()
     gc.collect()
     torch.cuda.empty_cache()
     torch.cuda.reset_peak_memory_stats()
