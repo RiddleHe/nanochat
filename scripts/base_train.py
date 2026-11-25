@@ -56,6 +56,7 @@ parser.add_argument("--window-pattern", type=str, default="SSSL", help="sliding 
 parser.add_argument("--model-type", type=str, default="gpt", help="model architecture variant (e.g. 'gpt', 'linear_attn', 'sparse_attn')")
 parser.add_argument("--norm-value-input", action="store_true", help="RMS-normalize direct embedding values; retain raw initial residual")
 parser.add_argument("--sum-head-attention", action="store_true", help="Sum head probabilities in pooled embedding attention")
+parser.add_argument("--target-layers", type=int, nargs="+", help="Explicit zero-based embedding-value target indices; default: ScalarRes depth mapping")
 # Training horizon (only one used, in order of precedence)
 parser.add_argument("--num-iterations", type=int, default=-1, help="explicit number of optimization steps (-1 = disable)")
 parser.add_argument("--target-flops", type=float, default=-1.0, help="calculate num_iterations to reach target_flops (-1 = disable)")
@@ -132,7 +133,7 @@ print0(f"Vocab size: {vocab_size:,}")
 
 ConfigClass, ModelClass = get_model(args.model_type)
 
-def build_model_meta(depth):
+def build_model_meta(depth, *, use_target_layers=True):
     """Build a model on meta device for a given depth (shapes/dtypes only, no data)."""
     # Model dim is nudged up to nearest multiple of head_dim for clean division
     # (FA3 requires head_dim divisible by 8, and this guarantees head_dim == args.head_dim exactly)
@@ -141,6 +142,8 @@ def build_model_meta(depth):
     num_heads = model_dim // args.head_dim
     value_options = {name: True for name in ("norm_value_input", "sum_head_attention")
                      if getattr(args, name)}
+    if use_target_layers and args.target_layers is not None:
+        value_options["pooled_qk_target_layers"] = args.target_layers
     config = ConfigClass(
         sequence_len=args.max_seq_len, vocab_size=vocab_size,
         n_layer=depth, n_head=num_heads, n_kv_head=num_heads, n_embd=model_dim,
@@ -277,7 +280,9 @@ num_scaling_params = get_scaling_params(model)
 target_tokens = int(args.target_param_data_ratio * num_scaling_params) # optimal tokens for the model we are about to train
 
 # Our reference model is d12, this is where a lot of hyperparameters are tuned and then transfered to higher depths (muP style)
-d12_ref = build_model_meta(12) # creates the model on meta device
+# This is the canonical hyperparameter reference, not a resized placement control.
+# Explicit target indices belong only to the actual training depth.
+d12_ref = build_model_meta(12, use_target_layers=False)
 D_REF = args.target_param_data_ratio * get_scaling_params(d12_ref) # compute-optimal d12 training horizon in tokens (measured empirically)
 B_REF = 2**19 # optimal batch size at d12 ~= 524,288 tokens (measured empirically)
 

@@ -190,7 +190,7 @@ def test_cache_rejects_grad_and_overflow():
 
 
 @pytest.mark.parametrize("kwargs", [dict(n_kv_head=1), dict(add_init_v=True),
-                                    dict(pooled_qk_target_layers=(0,))])
+                                    dict(pooled_qk_target_layers=(3,))])
 def test_invalid_architectures(kwargs):
     config = dict(n_layer=3, n_embd=16, n_head=2, n_kv_head=2)
     config.update(kwargs)

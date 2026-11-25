@@ -50,8 +50,7 @@ def test_mapping_configuration_and_absent_values():
     assert target_layers_for_depth(12) == (4, 5, 6, 7, 9, 10, 11)
     config = Config()
     assert asdict(Config(**asdict(config))) == asdict(config)
-    with pytest.raises(ValueError, match="fixed depth"):
-        Config(pooled_qk_target_layers=[0])
+    assert Config(pooled_qk_target_layers=[0]).pooled_qk_target_layers == (0,)
     with pytest.raises(ValueError, match="BoV flags"):
         Config(add_init_res=True)
     with pytest.raises(ValueError, match="equal Q/K"):

@@ -37,10 +37,20 @@ class GPTBasePooledQKEmbedNoEmbedNormConfig(base.GPTBaseConfig):
             raise ValueError("norm_value_input and sum_head_attention must be booleans")
         if self.sum_head_attention and type(self) is not GPTBasePooledQKEmbedNoEmbedNormConfig:
             raise ValueError("sum_head_attention is supported only by pooled embedding attention")
-        expected = target_layers_for_depth(self.n_layer)
-        if self.pooled_qk_target_layers is not None and tuple(self.pooled_qk_target_layers) != expected:
-            raise ValueError(f"Target layers must match the fixed depth mapping: {expected}")
-        self.pooled_qk_target_layers = expected  # Serialized with checkpoint config.
+        if self.n_layer < 1:
+            raise ValueError("Depth must be positive")
+        if self.pooled_qk_target_layers is None:
+            self.pooled_qk_target_layers = target_layers_for_depth(self.n_layer)
+        else:
+            targets = self.pooled_qk_target_layers
+            if (not isinstance(targets, (list, tuple)) or not targets
+                    or any(type(i) is not int or not 0 <= i < self.n_layer for i in targets)):
+                raise ValueError("Target layers must be a nonempty list of integer indices in [0, n_layer)")
+            if len(set(targets)) != len(targets):
+                raise ValueError("Target layers must not contain duplicate indices")
+            # Explicit indices are literal at this depth, never remapped. Retain
+            # the existing serialized field for legacy checkpoint compatibility.
+            self.pooled_qk_target_layers = tuple(sorted(targets))
         if self.attention_chunk_size < 1:
             raise ValueError("attention_chunk_size must be positive")
         if self.n_kv_head != self.n_head:

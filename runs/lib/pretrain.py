@@ -69,6 +69,9 @@ def resolve(args):
     Config, Model = get_model(args.model_type)
     value_options = {name: True for name in ("norm_value_input", "sum_head_attention")
                      if getattr(args, name, False)}
+    target_layers = getattr(args, "target_layers", None)
+    if target_layers is not None:
+        value_options["pooled_qk_target_layers"] = target_layers
     width = train["depth"] * train["aspect-ratio"]
     head_dim = train["head-dim"]
     width = ((width + head_dim - 1) // head_dim) * head_dim
@@ -96,7 +99,10 @@ def resolve(args):
     command = [python, "-m", "torch.distributed.run", "--standalone", "--nnodes=1",
                f"--nproc-per-node={args.gpu_count}", "--module", "--", "scripts.base_train"]
     command.extend(f"--{key}={value}" for key, value in train.items())
-    command.extend("--" + name.replace("_", "-") for name in value_options)
+    command.extend("--" + name.replace("_", "-") for name, value in value_options.items()
+                   if value is True)
+    if target_layers is not None:
+        command.extend(["--target-layers", *map(str, config.pooled_qk_target_layers)])
     commit = args.source_commit or subprocess.check_output(
         ["git", "-C", str(REPO), "rev-parse", "HEAD"], text=True).strip()
     sources = {}
@@ -138,6 +144,8 @@ def main():
     parser.add_argument("--expect-all-flags-false", action="store_true")
     parser.add_argument("--norm-value-input", action="store_true")
     parser.add_argument("--sum-head-attention", action="store_true")
+    parser.add_argument("--target-layers", type=int, nargs="+",
+                        help="Explicit zero-based embedding-value target indices; default: ScalarRes depth mapping")
     parser.add_argument("--base-dir", default=os.environ.get("NANOCHAT_BASE_DIR"), required=not os.environ.get("NANOCHAT_BASE_DIR"))
     parser.add_argument("--gpu-count", type=int, default=2)
     parser.add_argument("--device-batch-size", type=int)

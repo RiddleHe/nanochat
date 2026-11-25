@@ -167,6 +167,8 @@ def prepare(args):
         for flag in ("norm_value_input", "sum_head_attention"):
             if getattr(args, flag):
                 command += ["--" + flag.replace("_", "-")]
+        if args.target_layers is not None:
+            command += ["--target-layers", *map(str, args.target_layers)]
         with (run / "prepare.log").open("x") as log:
             subprocess.run(command, cwd=code, env=env, stdout=log, stderr=subprocess.STDOUT, check=True)
         manifest = read(run / "manifest.json")
@@ -477,6 +479,8 @@ def parser():
     p.add_argument("--model-type", help="Registry name; required for JSON recipes, optional shell recipe override")
     p.add_argument("--norm-value-input", action="store_true")
     p.add_argument("--sum-head-attention", action="store_true")
+    p.add_argument("--target-layers", type=int, nargs="+",
+                   help="Explicit zero-based embedding-value target indices")
     p.add_argument("--dependency", type=Path, action="append", default=[], help="Additional file/directory to hash and verify")
     for action in ("check", "test", "launch", "wait"):
         command = commands.add_parser(action)
