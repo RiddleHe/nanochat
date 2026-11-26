@@ -7,7 +7,10 @@ Uses the actual WeightedLoop at B4/T32/D64, four layers/four loops/k2. The
 single-worker global-batch reference averages two independent B4 loss units;
 it never pools balance across eight sequences. Optimizer acceptance is bitwise
 against MuonAdamW with identical Muon batch shapes and Adam row slices. This
-isolates communication from BF16 kernel-shape effects. No training is launched.
+isolates communication from BF16 kernel-shape effects. Training, full-sequence
+logits and causal/prefix checks use compiled blocks; KV-cache parity uses eager
+blocks, matching the uncompiled checkpoint loader / generation Engine. Compiled
+FA3 KV-cache execution is not covered by this gate. No training is launched.
 """
 import argparse
 import copy
@@ -195,22 +198,12 @@ def check_owned_state(optimizer, reference, mappings, names, rank, world_size):
                 exact_state(optimizer.state[parameter], reference.state[selected], name)
 
 
-def check_arm(alpha, rank, world_size, device):
-    model = make_model(alpha, device, compiled=True)
-    eager = make_model(alpha, device, compiled=False)
-    initial = {name: parameter.detach().clone() for name, parameter in model.named_parameters()}
-    exact_state(initial, dict(eager.named_parameters()), "eager_initialization")
-    initial_hashes = gather(digest(initial))
-    if len(set(initial_hashes)) != 1:
-        raise AssertionError("Rank initializations differ")
-    x, y = batch(rank, device)
-    local, losses = gradients(model, x, y)
-    eager_grad, eager_losses = gradients(eager, x, y)
-    checks = {"compiled_eager_gradients": compare_tensors(
-        local, eager_grad, TOLERANCES["gradients_relative_l2"], TOLERANCES["gradients_max_scaled"])}
+def check_inference_paths(model, eager, x):
+    """Compiled noncached checks plus the supported eager generation path."""
     model.eval()
     eager.eval()
     with torch.no_grad():
+        checks = {}
         logits = model(x)
         expected = eager(x)
         checks["compiled_eager_logits"] = compare_tensors(
@@ -224,15 +217,39 @@ def check_arm(alpha, rank, world_size, device):
         exact_state(logits[:, :16], future[:, :16], "future_token_independence")
         prefix = model(x[:, :16])
         cache = KVCache(batch_size=4, num_heads=1, seq_len=32, head_dim=64,
-                        num_layers=model.cache_layers, device=device, dtype=torch.bfloat16)
-        cached = torch.cat([model(x[:, :16], kv_cache=cache),
-                            model(x[:, 16:17], kv_cache=cache),
-                            model(x[:, 17:], kv_cache=cache)], dim=1)
+                        num_layers=eager.cache_layers, device=x.device, dtype=eager.cos.dtype)
+        # The trainer never uses a KV cache. The standard checkpoint loader and
+        # Engine use eager models; FA3's default num_splits=0 cache kernel cannot
+        # be traced by the pinned runtime. Keep compiled training checks intact
+        # and verify the supported generation path separately, without fallback.
+        cached = torch.cat([eager(x[:, :16], kv_cache=cache),
+                            eager(x[:, 16:17], kv_cache=cache),
+                            eager(x[:, 17:], kv_cache=cache)], dim=1)
         if cache.get_pos() != 32:
             raise AssertionError("Incorrect KV cache position")
-        checks["prefix_and_cached_logits"] = compare_tensors(
-            {"prefix": prefix, "cache": cached}, {"prefix": logits[:, :16], "cache": logits},
+        checks["compiled_prefix_logits"] = compare_tensors(
+            {"prefix": prefix}, {"prefix": logits[:, :16]},
             TOLERANCES["logits_relative_l2"], TOLERANCES["logits_max_scaled"])
+        checks["eager_cached_logits"] = compare_tensors(
+            {"cache": cached}, {"cache": expected},
+            TOLERANCES["logits_relative_l2"], TOLERANCES["logits_max_scaled"])
+    return checks
+
+
+def check_arm(alpha, rank, world_size, device):
+    model = make_model(alpha, device, compiled=True)
+    eager = make_model(alpha, device, compiled=False)
+    initial = {name: parameter.detach().clone() for name, parameter in model.named_parameters()}
+    exact_state(initial, dict(eager.named_parameters()), "eager_initialization")
+    initial_hashes = gather(digest(initial))
+    if len(set(initial_hashes)) != 1:
+        raise AssertionError("Rank initializations differ")
+    x, y = batch(rank, device)
+    local, losses = gradients(model, x, y)
+    eager_grad, eager_losses = gradients(eager, x, y)
+    checks = {"compiled_eager_gradients": compare_tensors(
+        local, eager_grad, TOLERANCES["gradients_relative_l2"], TOLERANCES["gradients_max_scaled"])}
+    checks.update(check_inference_paths(model, eager, x))
     del eager
     local_hashes = gather(digest(local))
     if len(set(local_hashes)) != world_size:
@@ -312,7 +329,9 @@ def main():
             raise RuntimeError("Real Flash Attention 3 is required; fallback is not accepted")
         report.update(world_size=world_size, compute_dtype=str(COMPUTE_DTYPE),
                       device_name=torch.cuda.get_device_name(device), fa3=True,
-                      compiled_blocks=True, harness_recompile_limit=64)
+                      compiled_blocks=True, cache_block_compile=False,
+                      compiled_cache_tested=False, cache_reference="eager_full_sequence",
+                      harness_recompile_limit=64)
         with torch._dynamo.config.patch(recompile_limit=64, suppress_errors=False):
             for alpha in (0., .01):
                 report["reports"].append(check_arm(alpha, rank, world_size, device))
