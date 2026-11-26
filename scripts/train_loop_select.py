@@ -56,6 +56,8 @@ def main(model_class=GPTLoopSelect, config_class=GPTLoopSelectConfig):
     args = ap.parse_args()
     torch.set_float32_matmul_precision("high")
     cfg = json.loads(Path(args.config).read_text())
+    if hasattr(model_class, "validate_training_config"):
+        model_class.validate_training_config(cfg)
     config_hash = hashlib.sha256(json.dumps(cfg, sort_keys=True).encode()).hexdigest()
     _, rank, local_rank, world, device = compute_init(cfg.get("device_type", "cuda"))
     assert world == cfg["world_size"], (world, cfg["world_size"])
@@ -195,10 +197,16 @@ def main(model_class=GPTLoopSelect, config_class=GPTLoopSelectConfig):
     while step < horizon:
         sync();t0=time.monotonic();loss_sum=torch.zeros((),device=device)
         aux_sum=torch.zeros((),device=device)
+        selection_counts = gate_mass = None
+        log_selection = step == 0 or (cfg["eval_every"] > 0 and (step + 1) % cfg["eval_every"] == 0) or step + 1 == horizon
         for micro in range(accum):
             x,y=next(train)
             if hasattr(model, "training_loss"):
-                ce, aux = model.training_loss(x, y)
+                ce, aux, stats = model.training_loss(x, y, return_stats=True)
+                if log_selection:
+                    counts, mass = stats["selected_counts"], stats["gate_mass"]
+                    selection_counts = counts if selection_counts is None else selection_counts + counts
+                    gate_mass = mass if gate_mass is None else gate_mass + mass
             else:
                 ce, aux = model(x, y), torch.zeros((), device=device)
             loss = ce + aux
@@ -239,6 +247,12 @@ def main(model_class=GPTLoopSelect, config_class=GPTLoopSelectConfig):
             dist.all_reduce(loss_sum,op=dist.ReduceOp.AVG)
             dist.all_reduce(aux_sum,op=dist.ReduceOp.AVG)
         sync();dt=time.monotonic()-t0;training_seconds+=dt;step+=1
+        if selection_counts is not None:
+            if world > 1:
+                dist.all_reduce(selection_counts)
+                dist.all_reduce(gate_mass)
+            event("selection", step=step, token_positions=batch,
+                  selected_counts=selection_counts.tolist(), gate_mass=gate_mass.tolist())
         event("train",step=step,horizon=horizon,loss=loss_sum.item(),weighted_aux_loss=aux_sum.item(),total_loss=(loss_sum+aux_sum).item(),seconds=dt,optimizer_seconds=odt,
             lr_multiplier=lrm,muon_momentum=momentum,tokens=step*batch,model_flops=step*batch*fpt,
             selector_local_grad_norm_mean=scorer_grad,
