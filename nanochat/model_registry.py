@@ -27,6 +27,7 @@ class GPTNoLambdaConfig(GPTConfig):
 # -----------------------------------------------------------------------------
 from nanochat.model.gpt_base import GPTBaseConfig, GPTBase
 from nanochat.model.gpt_base_no_embed_norm import GPTBaseNoEmbedNorm
+from nanochat.model.gpt_loop_select import GPTLoopSelectConfig, GPTLoopSelect
 
 # -----------------------------------------------------------------------------
 # Registry: model_type string -> (ConfigClass, ModelClass)
@@ -38,6 +39,7 @@ MODELS = {
     # gpt_base.py family
     "gpt_base":         (GPTBaseConfig,         GPTBase),
     "gpt_base_no_embed_norm": (GPTBaseConfig,    GPTBaseNoEmbedNorm),
+    "gpt_loop_select": (GPTLoopSelectConfig, GPTLoopSelect),
 }
 
 
