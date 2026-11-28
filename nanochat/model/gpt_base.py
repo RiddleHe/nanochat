@@ -79,7 +79,7 @@ class CausalSelfAttention(nn.Module):
         self.c_v = Linear(self.n_embd, self.n_kv_head * self.head_dim, bias=False)
         self.c_proj = Linear(self.n_embd, self.n_embd, bias=False)
 
-    def forward(self, x, cos_sin, kv_cache):
+    def forward(self, x, cos_sin, kv_cache, cache_layer_idx=None):
         B, T, C = x.size()
 
         # Project the input to get queries, keys, and values
@@ -102,7 +102,8 @@ class CausalSelfAttention(nn.Module):
             y = flash_attn.flash_attn_func(q, k, v, causal=True, window_size=self.window_size)
         else:
             # Inference: use flash_attn_with_kvcache which handles cache management
-            k_cache, v_cache = kv_cache.get_layer_cache(self.layer_idx)
+            layer_idx = self.layer_idx if cache_layer_idx is None else cache_layer_idx
+            k_cache, v_cache = kv_cache.get_layer_cache(layer_idx)
             y = flash_attn.flash_attn_with_kvcache(
                 q, k_cache, v_cache,
                 k=k, v=v,
@@ -111,7 +112,7 @@ class CausalSelfAttention(nn.Module):
                 window_size=self.window_size,
             )
             # Advance position after last layer processes
-            if self.layer_idx == kv_cache.n_layers - 1:
+            if layer_idx == kv_cache.n_layers - 1:
                 kv_cache.advance(T)
 
         # Re-assemble the heads and project back to residual stream.
@@ -141,8 +142,8 @@ class Block(nn.Module):
         self.attn = CausalSelfAttention(config, layer_idx, window_size)
         self.mlp = MLP(config)
 
-    def forward(self, x, cos_sin, kv_cache):
-        x = x + self.attn(norm(x), cos_sin, kv_cache)
+    def forward(self, x, cos_sin, kv_cache, cache_layer_idx=None):
+        x = x + self.attn(norm(x), cos_sin, kv_cache, cache_layer_idx)
         x = x + self.mlp(norm(x))
         return x
 
@@ -363,6 +364,11 @@ class GPTBase(nn.Module):
     def _prepare_embeddings(self, embeddings):
         return norm(embeddings)
 
+    def _forward_blocks(self, x, cos_sin, kv_cache):
+        for block in self.transformer.h:
+            x = block(x, cos_sin, kv_cache)
+        return x
+
     def forward(self, idx, targets=None, kv_cache=None, loss_reduction='mean'):
         B, T = idx.size()
 
@@ -372,6 +378,9 @@ class GPTBase(nn.Module):
         assert self.cos.dtype == COMPUTE_DTYPE, f"Rotary embeddings must be in {COMPUTE_DTYPE}, got {self.cos.dtype}"
         # if kv cache exists, we need to offset the rotary embeddings to the current position in the cache
         T0 = 0 if kv_cache is None else kv_cache.get_pos()
+        assert T0 + T <= self.cos.size(1), "Sequence exceeds rotary cache"
+        if kv_cache is not None:
+            assert T0 + T <= kv_cache.max_seq_len, "Sequence exceeds KV cache"
         cos_sin = self.cos[:, T0:T0+T], self.sin[:, T0:T0+T] # truncate cache to current sequence length
 
         # Embed the tokens
@@ -380,8 +389,7 @@ class GPTBase(nn.Module):
         x = self._prepare_embeddings(x)
 
         # Forward the trunk of the Transformer.
-        for block in self.transformer.h:
-            x = block(x, cos_sin, kv_cache)
+        x = self._forward_blocks(x, cos_sin, kv_cache)
         x = norm(x)
 
         # Forward the lm_head (compute logits)

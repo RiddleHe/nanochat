@@ -23,3 +23,6 @@ eval_logs/
 
 # Private agent state; the reusable workflow itself lives in .agents/skills.
 .research/
+
+# Local experiment outputs
+runs-local/

@@ -198,7 +198,7 @@ class Engine:
 
         # 1) Run a batch 1 prefill of the prompt tokens
         m = self.model.config
-        kv_model_kwargs = {"num_heads": m.n_kv_head, "head_dim": m.n_embd // m.n_head, "num_layers": m.n_layer}
+        kv_model_kwargs = {"num_heads": m.n_kv_head, "head_dim": m.n_embd // m.n_head, "num_layers": getattr(m, "effective_depth", m.n_layer)}
         kv_cache_prefill = KVCache(
             batch_size=1,
             seq_len=len(tokens),
